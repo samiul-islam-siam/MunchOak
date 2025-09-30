@@ -3,48 +3,49 @@ package com.example.munchoak;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 
 public class MenuPage {
 
-    private TableView<FoodItems> tableView;
     private ObservableList<FoodItems> foodList;
+    private FlowPane foodContainer;
 
     private TextField nameField, detailsField, priceField, ratingsField;
+    private Label imageFilenameLabel;
+    private File selectedImageFile = null;
+    private Button addOrUpdateButton;
+
+    private FoodItems currentEditingFood = null;
 
     public Node getView() {
-        tableView = new TableView<>();
         foodList = FXCollections.observableArrayList();
-        tableView.setItems(foodList);
 
-        // Table columns
-        TableColumn<FoodItems, Integer> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        foodContainer = new FlowPane();
+        foodContainer.setHgap(15);
+        foodContainer.setVgap(15);
+        foodContainer.setPadding(new Insets(10));
 
-        TableColumn<FoodItems, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        ScrollPane scrollPane = new ScrollPane(foodContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        TableColumn<FoodItems, String> detailsCol = new TableColumn<>("Details");
-        detailsCol.setCellValueFactory(new PropertyValueFactory<>("details"));
-
-        TableColumn<FoodItems, Double> priceCol = new TableColumn<>("Price");
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        TableColumn<FoodItems, Double> ratingsCol = new TableColumn<>("Ratings");
-        ratingsCol.setCellValueFactory(new PropertyValueFactory<>("ratings"));
-
-        tableView.getColumns().addAll(idCol, nameCol, detailsCol, priceCol, ratingsCol);
-
-        // Input fields
         nameField = new TextField();
         detailsField = new TextField();
         priceField = new TextField();
         ratingsField = new TextField();
+        imageFilenameLabel = new Label("No image selected");
 
         GridPane inputGrid = new GridPane();
         inputGrid.setPadding(new Insets(10));
@@ -60,50 +61,51 @@ public class MenuPage {
         inputGrid.add(new Label("Ratings:"), 0, 3);
         inputGrid.add(ratingsField, 1, 3);
 
-        Button addButton = new Button("Add");
-        Button updateButton = new Button("Update Selected");
-        Button deleteButton = new Button("Delete Selected");
+        // Browse button with filename label
+        Button browseBtn = new Button("Browse...");
+        browseBtn.setOnAction(e -> chooseImage());
 
-        HBox buttonBox = new HBox(10, addButton, updateButton, deleteButton);
-        VBox vbox = new VBox(10, tableView, inputGrid, buttonBox);
-        vbox.setPadding(new Insets(10));
+        HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
+        imageBox.setAlignment(Pos.CENTER_LEFT);
+        inputGrid.add(new Label("Image:"), 0, 4);
+        inputGrid.add(imageBox, 1, 4);
 
-        // Load data from DB
-        loadFoodItems();
-
-        // Button actions
-        addButton.setOnAction(e -> addFoodItem());
-        updateButton.setOnAction(e -> updateFoodItem());
-        deleteButton.setOnAction(e -> deleteFoodItem());
-
-        // Selecting row fills input fields
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                nameField.setText(newSelection.getName());
-                detailsField.setText(newSelection.getDetails());
-                priceField.setText(String.valueOf(newSelection.getPrice()));
-                ratingsField.setText(String.valueOf(newSelection.getRatings()));
+        addOrUpdateButton = new Button("Add");
+        addOrUpdateButton.setOnAction(e -> {
+            if (currentEditingFood == null) {
+                addFoodItem();
+            } else {
+                updateFoodItem();
             }
         });
 
+        VBox vbox = new VBox(15, scrollPane, inputGrid, addOrUpdateButton);
+        vbox.setPadding(new Insets(5));
+
+        loadFoodItems();
         return vbox;
     }
 
     private void loadFoodItems() {
         foodList.clear();
+        foodContainer.getChildren().clear();
+
         String sql = "SELECT * FROM Details";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                foodList.add(new FoodItems(
+                FoodItems food = new FoodItems(
                         rs.getInt("Food_ID"),
                         rs.getString("Food_Name"),
                         rs.getString("Details"),
                         rs.getDouble("Price"),
-                        rs.getDouble("Ratings")
-                ));
+                        rs.getDouble("Ratings"),
+                        rs.getString("ImagePath")
+                );
+                foodList.add(food);
+                foodContainer.getChildren().add(createFoodCard(food));
             }
 
         } catch (SQLException e) {
@@ -111,8 +113,66 @@ public class MenuPage {
         }
     }
 
+    private VBox createFoodCard(FoodItems food) {
+        VBox card = new VBox(8);
+        card.setPadding(new Insets(10));
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setStyle("-fx-background-color: #f4f4f4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #000;-fx-border-width: 2;");
+        card.setPrefWidth(220);
+
+        ImageView imgView = new ImageView();
+        imgView.setFitWidth(180);
+        imgView.setFitHeight(120);
+        imgView.setPreserveRatio(true);
+
+        String imagePath = "/images/" + food.getImagePath();
+        Image image = null;
+
+        try (InputStream is = getClass().getResourceAsStream(imagePath)) {
+            if (is != null) {
+                image = new Image(is);
+            } else {
+                String filePath = "file:src/main/resources/images/" + food.getImagePath();
+                image = new Image(filePath);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (image == null || image.isError()) {
+            try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
+                if (placeholder != null) {
+                    image = new Image(placeholder);
+                }
+            } catch (Exception ignored) {}
+        }
+
+        imgView.setImage(image);
+
+        Label name = new Label(food.getName());
+        name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label desc = new Label(food.getDetails());
+        desc.setWrapText(true);
+        Label price = new Label("Price: $" + food.getPrice());
+        Label rating = new Label("⭐ " + food.getRatings());
+
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setOnAction(e -> deleteFoodItem(food));
+
+        Button editBtn = new Button("Edit");
+        editBtn.setOnAction(e -> populateFieldsForEdit(food));
+
+        HBox buttons = new HBox(10, editBtn, deleteBtn);
+        buttons.setAlignment(Pos.CENTER);
+
+        card.getChildren().addAll(imgView, name, desc, price, rating, buttons);
+        return card;
+    }
+
     private void addFoodItem() {
-        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings) VALUES (?, ?, ?, ?)";
+        String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
+
+        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -120,21 +180,26 @@ public class MenuPage {
             stmt.setString(2, detailsField.getText());
             stmt.setDouble(3, Double.parseDouble(priceField.getText()));
             stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
+            stmt.setString(5, imageFilename);
 
             stmt.executeUpdate();
             loadFoodItems();
             clearFields();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void updateFoodItem() {
-        FoodItems selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (currentEditingFood == null) return;
 
-        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=? WHERE Food_ID=?";
+        String imageFilename = currentEditingFood.getImagePath();
+        if (selectedImageFile != null) {
+            imageFilename = selectedImageFile.getName();
+        }
+
+        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=? WHERE Food_ID=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -142,33 +207,41 @@ public class MenuPage {
             stmt.setString(2, detailsField.getText());
             stmt.setDouble(3, Double.parseDouble(priceField.getText()));
             stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
-            stmt.setInt(5, selected.getId());
+            stmt.setString(5, imageFilename);
+            stmt.setInt(6, currentEditingFood.getId());
 
             stmt.executeUpdate();
             loadFoodItems();
             clearFields();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteFoodItem(FoodItems food) {
+        String sql = "DELETE FROM Details WHERE Food_ID=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, food.getId());
+            stmt.executeUpdate();
+            loadFoodItems();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void deleteFoodItem() {
-        FoodItems selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        String sql = "DELETE FROM Details WHERE Food_ID=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, selected.getId());
-            stmt.executeUpdate();
-            loadFoodItems();
-            clearFields();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void populateFieldsForEdit(FoodItems food) {
+        currentEditingFood = food;
+        nameField.setText(food.getName());
+        detailsField.setText(food.getDetails());
+        priceField.setText(String.valueOf(food.getPrice()));
+        ratingsField.setText(String.valueOf(food.getRatings()));
+        imageFilenameLabel.setText(food.getImagePath());
+        selectedImageFile = null; // Reset so user can optionally choose a new one
+        addOrUpdateButton.setText("Update");
     }
 
     private void clearFields() {
@@ -176,6 +249,34 @@ public class MenuPage {
         detailsField.clear();
         priceField.clear();
         ratingsField.clear();
+        imageFilenameLabel.setText("No image selected");
+        selectedImageFile = null;
+        currentEditingFood = null;
+        addOrUpdateButton.setText("Add");
+    }
+
+    private void chooseImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Food Image");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                File destDir = new File("src/main/resources/images/");
+                if (!destDir.exists()) destDir.mkdirs();
+
+                File destFile = new File(destDir, file.getName());
+                Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                selectedImageFile = file;
+                imageFilenameLabel.setText(file.getName());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
-
