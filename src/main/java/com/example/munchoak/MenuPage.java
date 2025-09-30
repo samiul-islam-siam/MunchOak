@@ -4,11 +4,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.example.munchoak.Cart;
+import com.example.munchoak.Payment;
+import com.example.munchoak.Bill;
 
 public class MenuPage {
 
@@ -16,6 +24,9 @@ public class MenuPage {
     private ObservableList<FoodItems> foodList;
 
     private TextField nameField, detailsField, priceField, ratingsField;
+
+    // Cart for the current user
+    private Cart cart = new Cart("customer123");  // Token for demo
 
     public Node getView() {
         tableView = new TableView<>();
@@ -63,8 +74,12 @@ public class MenuPage {
         Button addButton = new Button("Add");
         Button updateButton = new Button("Update Selected");
         Button deleteButton = new Button("Delete Selected");
+        Button addToCartButton = new Button("Add to Cart");
+        Button checkoutButton = new Button("Checkout");
 
-        HBox buttonBox = new HBox(10, addButton, updateButton, deleteButton);
+        Button viewCartButton = new Button("View Cart");
+        HBox buttonBox = new HBox(10, addButton, updateButton, deleteButton, addToCartButton, viewCartButton, checkoutButton);
+
         VBox vbox = new VBox(10, tableView, inputGrid, buttonBox);
         vbox.setPadding(new Insets(10));
 
@@ -75,6 +90,47 @@ public class MenuPage {
         addButton.setOnAction(e -> addFoodItem());
         updateButton.setOnAction(e -> updateFoodItem());
         deleteButton.setOnAction(e -> deleteFoodItem());
+
+        viewCartButton.setOnAction(e -> showCart());
+
+        // Add to Cart action
+        addToCartButton.setOnAction(e -> {
+            FoodItems selected = tableView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                cart.addToCart(selected.getId(), 1);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        selected.getName() + " added to cart!");
+                alert.showAndWait();
+            }
+        });
+
+        // Checkout action
+        checkoutButton.setOnAction(e -> {
+            if (cart.getBuyHistory().isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Cart is empty!").showAndWait();
+                return;
+            }
+            Map<Integer, FoodItems> foodMap = new HashMap<>();
+            for (FoodItems item : foodList) {
+                foodMap.put(item.getId(), item);
+            }
+
+            Payment payment = new Payment(cart.getTotalPrice(foodMap));
+            payment.processPayment();
+            Bill bill = new Bill(cart, payment);
+
+// Show bill in new window
+            TextArea receiptArea = new TextArea(bill.generateReceipt(foodMap));
+            receiptArea.setEditable(false);
+
+            Stage billStage = new Stage();
+            billStage.setTitle("Your Bill");
+            billStage.setScene(new Scene(new VBox(receiptArea), 400, 400));
+            billStage.show();
+
+            // Clear the cart after checkout
+            cart = new Cart("customer123");
+        });
 
         // Selecting row fills input fields
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -170,6 +226,71 @@ public class MenuPage {
             e.printStackTrace();
         }
     }
+
+    public static class CartItemView {
+        private String name;
+        private int quantity;
+        private double price;
+        private double total;
+
+        public CartItemView(String name, int quantity, double price) {
+            this.name = name;
+            this.quantity = quantity;
+            this.price = price;
+            this.total = price * quantity;
+        }
+
+        public String getName() { return name; }
+        public int getQuantity() { return quantity; }
+        public double getPrice() { return price; }
+        public double getTotal() { return total; }
+    }
+
+
+    private void showCart() {
+        // Map Food_ID -> FoodItems
+        Map<Integer, FoodItems> foodMap = new HashMap<>();
+        for (FoodItems item : foodList) {
+            foodMap.put(item.getId(), item);
+        }
+
+        // Table for cart items
+        TableView<CartItemView> cartTable = new TableView<>();
+        ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
+
+        // Build rows from cart history
+        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+            FoodItems food = foodMap.get(entry.getKey());
+            if (food != null) {
+                cartItems.add(new CartItemView(food.getName(), entry.getValue(), food.getPrice()));
+            }
+        }
+        cartTable.setItems(cartItems);
+
+        // Columns
+        TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
+        qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+
+        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol);
+
+        // Show in new window
+        Stage cartStage = new Stage();
+        cartStage.setTitle("Your Cart");
+        VBox vbox = new VBox(10, cartTable);
+        vbox.setPadding(new Insets(10));
+        cartStage.setScene(new Scene(vbox, 500, 400));
+        cartStage.show();
+    }
+
 
     private void clearFields() {
         nameField.clear();
