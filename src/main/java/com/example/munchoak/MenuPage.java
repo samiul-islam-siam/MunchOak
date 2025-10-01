@@ -20,12 +20,12 @@ import java.util.*;
 
 public class MenuPage {
 
-    private ObservableList<FoodItems> foodList;
-    private VBox foodContainer;
+    private ObservableList<FoodItems> foodList; //list of foods
+    private VBox foodContainer; //food card for each food
 
-    private TextField nameField, detailsField, priceField, ratingsField;
-    private ComboBox<String> categoryBox;
-    private Label imageFilenameLabel;
+    private TextField nameField, detailsField, priceField, ratingsField; //food properties (input)
+    private ComboBox<String> categoryBox; //category (input)
+    private Label imageFilenameLabel; //image (input)
     private File selectedImageFile = null;
     private Button addOrUpdateButton;
 
@@ -37,7 +37,7 @@ public class MenuPage {
         foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
 
-        ScrollPane scrollPane = new ScrollPane(foodContainer);
+        ScrollPane scrollPane = new ScrollPane(foodContainer); //to make Scrollable
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
