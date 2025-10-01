@@ -41,11 +41,12 @@ public class MenuPage {
         foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
 
+        // ===== SCROLL PANE FOR FOOD ITEMS =====
         ScrollPane scrollPane = new ScrollPane(foodContainer);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // ==== Input fields ====
+        // ==== Input fields & form ====
         nameField = new TextField();
         detailsField = new TextField();
         priceField = new TextField();
@@ -77,7 +78,6 @@ public class MenuPage {
         Button renameCatBtn = new Button("Rename Category");
         Button deleteCatBtn = new Button("Delete Category");
         HBox categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
-
         inputGrid.add(categoryButtons, 1, 5);
 
         addCatBtn.setOnAction(e -> addCategory());
@@ -89,11 +89,10 @@ public class MenuPage {
         browseBtn.setOnAction(e -> chooseImage());
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
-
         inputGrid.add(new Label("Image:"), 0, 6);
         inputGrid.add(imageBox, 1, 6);
 
-        // Add / Update button
+        // Add / Update button inside form
         addOrUpdateButton = new Button("Add");
         addOrUpdateButton.setOnAction(e -> {
             if (currentEditingFood == null) {
@@ -102,6 +101,10 @@ public class MenuPage {
                 updateFoodItem();
             }
         });
+
+        VBox formBox = new VBox(10, inputGrid, addOrUpdateButton);
+        formBox.setVisible(false);
+        formBox.setManaged(false);
 
         // Cart buttons
         Button viewCartButton = new Button("View Cart");
@@ -112,12 +115,30 @@ public class MenuPage {
 
         HBox cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
-        VBox vbox = new VBox(15, scrollPane, inputGrid, addOrUpdateButton, cartButtons);
+        // ===== TOP "Add Food" BUTTON =====
+        Button showAddFormBtn = new Button("Add Food");
+        showAddFormBtn.setOnAction(e -> {
+            if (formBox.isVisible()) {
+                // Hide the form
+                formBox.setVisible(false);
+                formBox.setManaged(false);
+            } else {
+                // Show the form for adding new food
+                clearFields(); // reset form
+                formBox.setVisible(true);
+                formBox.setManaged(true);
+            }
+        });
+
+
+        // ===== MAIN LAYOUT =====
+        VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
         vbox.setPadding(new Insets(5));
 
         loadFoodItems();
         return vbox;
     }
+
 
     // ================== CATEGORY MANAGEMENT ===================
 
@@ -289,9 +310,9 @@ public class MenuPage {
         imgView.setFitHeight(120);
         imgView.setPreserveRatio(true);
 
+        // Load image
         String imagePath = "/images/" + food.getImagePath();
         Image image = null;
-
         try (InputStream is = getClass().getResourceAsStream(imagePath)) {
             if (is != null) {
                 image = new Image(is);
@@ -299,16 +320,14 @@ public class MenuPage {
                 String filePath = "file:src/main/resources/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
                 if (placeholder != null) {
                     image = new Image(placeholder);
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         imgView.setImage(image);
@@ -326,18 +345,16 @@ public class MenuPage {
             new Alert(Alert.AlertType.INFORMATION, food.getName() + " added to cart!").showAndWait();
         });
 
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setOnAction(e -> deleteFoodItem(food));
-
         Button editBtn = new Button("Edit");
-        editBtn.setOnAction(e -> populateFieldsForEdit(food));
+        editBtn.setOnAction(e -> showEditDialog(food));
 
-        HBox buttons = new HBox(10, addToCartBtn, editBtn, deleteBtn);
+        HBox buttons = new HBox(10, addToCartBtn, editBtn);
         buttons.setAlignment(Pos.CENTER);
 
         card.getChildren().addAll(imgView, name, desc, price, rating, buttons);
         return card;
     }
+
 
     private void addFoodItem() {
         if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
@@ -450,7 +467,12 @@ public class MenuPage {
         categoryBox.setValue(food.getCategory());
         selectedImageFile = null;
         addOrUpdateButton.setText("Update");
+
+        // show form
+        ((VBox) addOrUpdateButton.getParent()).setVisible(true);
+        ((VBox) addOrUpdateButton.getParent()).setManaged(true);
     }
+
 
     private void clearFields() {
         nameField.clear();
@@ -462,7 +484,12 @@ public class MenuPage {
         selectedImageFile = null;
         currentEditingFood = null;
         addOrUpdateButton.setText("Add");
+
+        // hide form again
+        ((VBox) addOrUpdateButton.getParent()).setVisible(false);
+        ((VBox) addOrUpdateButton.getParent()).setManaged(false);
     }
+
 
     private void chooseImage() {
         FileChooser fileChooser = new FileChooser();
@@ -584,4 +611,33 @@ public class MenuPage {
         stage.setScene(new Scene(vbox, 250, 150));
         stage.show();
     }
+
+    private void showEditDialog(FoodItems food) {
+        Stage dialog = new Stage();
+        dialog.setTitle("Edit " + food.getName());
+
+        Button updateBtn = new Button("Update");
+        updateBtn.setOnAction(e -> {
+            populateFieldsForEdit(food);  // fill input fields
+            dialog.close();
+        });
+
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setOnAction(e -> {
+            deleteFoodItem(food);
+            dialog.close();
+        });
+
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.setOnAction(e -> dialog.close());
+
+        VBox vbox = new VBox(15, new Label("Choose an action for " + food.getName()),
+                updateBtn, deleteBtn, cancelBtn);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(20));
+
+        dialog.setScene(new Scene(vbox, 300, 200));
+        dialog.show();
+    }
+
 }
