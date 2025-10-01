@@ -6,6 +6,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -19,7 +21,7 @@ public class RestaurantDashboard extends Application {
     private BorderPane root;
     private VBox sidebar;
     private StackPane contentPane;
-    private boolean compact = false; // false = full, true = icons only
+    private boolean compact = false;               // false = full (text + icon), true = compact (icons only)
     private final List<Button> menuButtons = new ArrayList<>();
     private Button hamburgerBtn;
 
@@ -27,12 +29,12 @@ public class RestaurantDashboard extends Application {
     public void start(Stage primaryStage) {
         root = new BorderPane();
 
-        // Sidebar setup
+        // Sidebar (left)
         sidebar = new VBox(8);
         sidebar.setPadding(new Insets(10));
         sidebar.setStyle("-fx-background-color: #2c3e50;");
 
-        // Hamburger button
+        // Hamburger (3-bar) button at top
         hamburgerBtn = new Button("☰");
         hamburgerBtn.setFont(Font.font(18));
         hamburgerBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
@@ -42,36 +44,42 @@ public class RestaurantDashboard extends Application {
         topBox.setAlignment(Pos.CENTER_LEFT);
         topBox.setPadding(new Insets(6, 0, 10, 6));
 
-        // Sidebar menu buttons
+        // Create menu buttons (icon, label)
         Button homeBtn = createMenuButton("🏠", "Home");
         Button ordersBtn = createMenuButton("🧾", "Orders");
-        Button menuBtn = createMenuButton("🍔", "Menu");
+        Button menuBtn   = createMenuButton("🍔", "Menu");
         Button reservationsBtn = createMenuButton("📅", "Reservations");
         Button reportsBtn = createMenuButton("📊", "Reports");
         Button aboutBtn = createMenuButton("ℹ️", "About Us");
 
         menuButtons.addAll(Arrays.asList(homeBtn, ordersBtn, menuBtn, reservationsBtn, reportsBtn, aboutBtn));
+
+        // Put hamburger + menu buttons in sidebar
         sidebar.getChildren().add(topBox);
         sidebar.getChildren().addAll(menuButtons);
 
-        // Content pane setup
+        // Content area in center
         contentPane = new StackPane();
         contentPane.setPadding(new Insets(20));
-        showHomePage(); // default page
+        showHomePage(); // default
 
-        // Button actions
+        // Wire up actions
         homeBtn.setOnAction(e -> showHomePage());
-        ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "Manage current orders here."));
-        menuBtn.setOnAction(e -> contentPane.getChildren().setAll(new MenuPage().getView()));
+        ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders."));
+        menuBtn.setOnAction(e -> {
+            contentPane.getChildren().clear();
+            contentPane.getChildren().add(new MenuPage().getView());
+        });
         reservationsBtn.setOnAction(e -> updateContentSimple("📅 Reservations", "View and manage reservations."));
-        reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "View sales and analytics."));
-        aboutBtn.setOnAction(e -> updateContentSimple("ℹ️ About Us", "MunchOak – we cook with passion. Open daily 10:00 - 23:00."));
+        reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
+        aboutBtn.setOnAction(e -> updateContentSimple("About Us",
+                "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
 
         // Layout
         root.setLeft(sidebar);
         root.setCenter(contentPane);
 
-        // Start in full mode
+        // Start in full view
         setCompact(false);
 
         Scene scene = new Scene(root, 1000, 650);
@@ -89,31 +97,39 @@ public class RestaurantDashboard extends Application {
         btn.setPrefWidth(200);
         btn.setMaxWidth(Double.MAX_VALUE);
 
-        // Hover effect
+        // Styling
         btn.setStyle("-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px;");
         btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px;"));
         btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px;"));
 
-        btn.setUserData(labelText); // store full label
+        btn.setUserData(labelText); // save the full label for toggling
         return btn;
     }
 
+    /** Toggle between compact and full sidebar */
     private void toggleCompact() {
         compact = !compact;
         setCompact(compact);
     }
 
+    /** Apply compact/full mode to sidebar and menu buttons */
     private void setCompact(boolean compactMode) {
         if (compactMode) {
+            // icons only
             sidebar.setPrefWidth(64);
             for (Button btn : menuButtons) {
+                // show only graphic (icon)
                 btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 btn.setPrefWidth(48);
-                Tooltip.install(btn, new Tooltip((String) btn.getUserData()));
-                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
+                // add a tooltip so label is still visible on hover
+                Tooltip t = new Tooltip((String) btn.getUserData());
+                Tooltip.install(btn, t);
+                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;"); // make compact look cleaner
             }
+            // make hamburger remain visible and left-aligned
             hamburgerBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px;");
         } else {
+            // full (icon + text)
             sidebar.setPrefWidth(220);
             for (Button btn : menuButtons) {
                 btn.setContentDisplay(ContentDisplay.LEFT);
@@ -125,7 +141,9 @@ public class RestaurantDashboard extends Application {
         }
     }
 
+    /** Show a simple text content (title + paragraph) */
     private void updateContentSimple(String title, String paragraph) {
+        contentPane.getChildren().clear();
         VBox v = new VBox(12);
         v.setPadding(new Insets(8));
         Label t = new Label(title);
@@ -134,11 +152,13 @@ public class RestaurantDashboard extends Application {
         p.setWrapText(true);
         p.setStyle("-fx-font-size: 14px;");
         v.getChildren().addAll(t, p);
-        contentPane.getChildren().setAll(v);
+        contentPane.getChildren().add(v);
     }
 
+    /** Load the HomePage view from the separate file/class */
     private void showHomePage() {
-        contentPane.getChildren().setAll(new HomePage().getView());
+        contentPane.getChildren().clear();
+        contentPane.getChildren().add(new HomePage().getView());
     }
 
     public static void main(String[] args) {

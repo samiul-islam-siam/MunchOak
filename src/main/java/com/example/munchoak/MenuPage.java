@@ -5,11 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -20,27 +22,31 @@ import java.util.*;
 
 public class MenuPage {
 
-    private ObservableList<FoodItems> foodList; //list of foods
-    private VBox foodContainer; //food card for each food
+    private ObservableList<FoodItems> foodList;
+    private VBox foodContainer;
 
-    private TextField nameField, detailsField, priceField, ratingsField; //food properties (input)
-    private ComboBox<String> categoryBox; //category (input)
-    private Label imageFilenameLabel; //image (input)
+    private TextField nameField, detailsField, priceField, ratingsField;
+    private ComboBox<String> categoryBox;
+    private Label imageFilenameLabel;
     private File selectedImageFile = null;
     private Button addOrUpdateButton;
 
     private FoodItems currentEditingFood = null;
 
+    // Cart for the current user
+    private Cart cart = new Cart("customer123");  // demo token
+
     public Node getView() {
         foodList = FXCollections.observableArrayList();
-
         foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
 
-        ScrollPane scrollPane = new ScrollPane(foodContainer); //to make Scrollable
+        // ===== SCROLL PANE FOR FOOD ITEMS =====
+        ScrollPane scrollPane = new ScrollPane(foodContainer);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+        // ==== Input fields & form ====
         nameField = new TextField();
         detailsField = new TextField();
         priceField = new TextField();
@@ -71,22 +77,22 @@ public class MenuPage {
         Button addCatBtn = new Button("Add Category");
         Button renameCatBtn = new Button("Rename Category");
         Button deleteCatBtn = new Button("Delete Category");
+        HBox categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
+        inputGrid.add(categoryButtons, 1, 5);
 
         addCatBtn.setOnAction(e -> addCategory());
         renameCatBtn.setOnAction(e -> renameCategory());
         deleteCatBtn.setOnAction(e -> deleteCategory());
 
-        HBox categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
-        inputGrid.add(categoryButtons, 1, 5);
-
+        // Image selection
         Button browseBtn = new Button("Browse...");
         browseBtn.setOnAction(e -> chooseImage());
-
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
         inputGrid.add(new Label("Image:"), 0, 6);
         inputGrid.add(imageBox, 1, 6);
 
+        // Add / Update button inside form
         addOrUpdateButton = new Button("Add");
         addOrUpdateButton.setOnAction(e -> {
             if (currentEditingFood == null) {
@@ -96,12 +102,43 @@ public class MenuPage {
             }
         });
 
-        VBox vbox = new VBox(15, scrollPane, inputGrid, addOrUpdateButton);
+        VBox formBox = new VBox(10, inputGrid, addOrUpdateButton);
+        formBox.setVisible(false);
+        formBox.setManaged(false);
+
+        // Cart buttons
+        Button viewCartButton = new Button("View Cart");
+        viewCartButton.setOnAction(e -> showCart());
+
+        Button checkoutButton = new Button("Checkout");
+        checkoutButton.setOnAction(e -> checkout());
+
+        HBox cartButtons = new HBox(15, viewCartButton, checkoutButton);
+
+        // ===== TOP "Add Food" BUTTON =====
+        Button showAddFormBtn = new Button("Add Food");
+        showAddFormBtn.setOnAction(e -> {
+            if (formBox.isVisible()) {
+                // Hide the form
+                formBox.setVisible(false);
+                formBox.setManaged(false);
+            } else {
+                // Show the form for adding new food
+                clearFields(); // reset form
+                formBox.setVisible(true);
+                formBox.setManaged(true);
+            }
+        });
+
+
+        // ===== MAIN LAYOUT =====
+        VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
         vbox.setPadding(new Insets(5));
 
         loadFoodItems();
         return vbox;
     }
+
 
     // ================== CATEGORY MANAGEMENT ===================
 
@@ -132,7 +169,7 @@ public class MenuPage {
                 stmt.setString(1, name);
                 stmt.executeUpdate();
                 loadCategories();
-                categoryBox.setValue(name); // auto-select new category
+                categoryBox.setValue(name);
             } catch (SQLException ex) {
                 showAlert("Error", "Category already exists or invalid.");
             }
@@ -152,20 +189,18 @@ public class MenuPage {
         dialog.setContentText("New Name:");
         dialog.showAndWait().ifPresent(newName -> {
             try (Connection conn = DatabaseConnection.getConnection()) {
-                // Update category table
                 PreparedStatement stmt = conn.prepareStatement("UPDATE Categories SET Category_Name=? WHERE Category_Name=?");
                 stmt.setString(1, newName);
                 stmt.setString(2, selected);
                 stmt.executeUpdate();
 
-                // Update food items too
                 PreparedStatement stmt2 = conn.prepareStatement("UPDATE Details SET Category=? WHERE Category=?");
                 stmt2.setString(1, newName);
                 stmt2.setString(2, selected);
                 stmt2.executeUpdate();
 
                 loadCategories();
-                categoryBox.setValue(newName); // keep showing the renamed one
+                categoryBox.setValue(newName);
                 loadFoodItems();
             } catch (SQLException ex) {
                 showAlert("Error", "Rename failed.");
@@ -241,7 +276,6 @@ public class MenuPage {
                 if (!categoryFlows.containsKey(category)) {
                     Label categoryLabel = new Label(category);
                     categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
-
                     Separator separator = new Separator();
                     separator.setPrefWidth(500);
 
@@ -276,9 +310,9 @@ public class MenuPage {
         imgView.setFitHeight(120);
         imgView.setPreserveRatio(true);
 
+        // Load image
         String imagePath = "/images/" + food.getImagePath();
         Image image = null;
-
         try (InputStream is = getClass().getResourceAsStream(imagePath)) {
             if (is != null) {
                 image = new Image(is);
@@ -286,9 +320,7 @@ public class MenuPage {
                 String filePath = "file:src/main/resources/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
 
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
@@ -307,33 +339,33 @@ public class MenuPage {
         Label price = new Label("Price: $" + food.getPrice());
         Label rating = new Label("⭐ " + food.getRatings());
 
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setOnAction(e -> deleteFoodItem(food));
+        Button addToCartBtn = new Button("Add to Cart");
+        addToCartBtn.setOnAction(e -> {
+            cart.addToCart(food.getId(), 1);
+            new Alert(Alert.AlertType.INFORMATION, food.getName() + " added to cart!").showAndWait();
+        });
 
         Button editBtn = new Button("Edit");
-        editBtn.setOnAction(e -> populateFieldsForEdit(food));
+        editBtn.setOnAction(e -> showEditDialog(food));
 
-        HBox buttons = new HBox(10, editBtn, deleteBtn);
+        HBox buttons = new HBox(10, addToCartBtn, editBtn);
         buttons.setAlignment(Pos.CENTER);
 
         card.getChildren().addAll(imgView, name, desc, price, rating, buttons);
         return card;
     }
 
+
     private void addFoodItem() {
-        // ✅ Category validation
         if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
             showAlert("Error", "No category selected.");
             return;
         }
-
-        // ✅ Food name validation
         if (nameField.getText().trim().isEmpty()) {
             showAlert("Error", "Food name cannot be empty.");
             return;
         }
 
-        // ✅ Price validation
         double price;
         try {
             price = Double.parseDouble(priceField.getText().trim());
@@ -346,7 +378,6 @@ public class MenuPage {
             return;
         }
 
-        // ✅ Ratings validation
         double rating;
         try {
             rating = Double.parseDouble(ratingsField.getText().trim());
@@ -385,40 +416,6 @@ public class MenuPage {
     private void updateFoodItem() {
         if (currentEditingFood == null) return;
 
-        if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
-            showAlert("Error", "No category selected.");
-            return;
-        }
-
-        if (nameField.getText().trim().isEmpty()) {
-            showAlert("Error", "Food name cannot be empty.");
-            return;
-        }
-
-        double price;
-        try {
-            price = Double.parseDouble(priceField.getText().trim());
-            if (price < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-
-        double rating;
-        try {
-            rating = Double.parseDouble(ratingsField.getText().trim());
-            if (rating < 0 || rating > 5) {
-                showAlert("Error", "Ratings must be between 0 and 5.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid ratings.");
-            return;
-        }
-
         String imageFilename = currentEditingFood.getImagePath();
         if (selectedImageFile != null) {
             imageFilename = selectedImageFile.getName();
@@ -430,8 +427,8 @@ public class MenuPage {
 
             stmt.setString(1, nameField.getText().trim());
             stmt.setString(2, detailsField.getText().trim());
-            stmt.setDouble(3, price);
-            stmt.setDouble(4, rating);
+            stmt.setDouble(3, Double.parseDouble(priceField.getText().trim()));
+            stmt.setDouble(4, Double.parseDouble(ratingsField.getText().trim()));
             stmt.setString(5, imageFilename);
             stmt.setString(6, categoryBox.getValue());
             stmt.setInt(7, currentEditingFood.getId());
@@ -445,68 +442,6 @@ public class MenuPage {
             showAlert("Error", "Failed to update food item.");
         }
     }
-
-//
-//    private void addFoodItem() {
-//        if (categoryBox.getValue() == null) {
-//            showAlert("Error", "No category selected");
-//            return;
-//        }
-//
-//        String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
-//
-//        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES (?, ?, ?, ?, ?, ?)";
-//        try (Connection conn = DatabaseConnection.getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//
-//            stmt.setString(1, nameField.getText());
-//            stmt.setString(2, detailsField.getText());
-//            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
-//            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
-//            stmt.setString(5, imageFilename);
-//            stmt.setString(6, categoryBox.getValue());
-//
-//            stmt.executeUpdate();
-//            loadFoodItems();
-//            clearFields();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void updateFoodItem() {
-//        if (currentEditingFood == null) return;
-//        if (categoryBox.getValue() == null) {
-//            showAlert("Error", "No category selected");
-//            return;
-//        }
-//
-//        String imageFilename = currentEditingFood.getImagePath();
-//        if (selectedImageFile != null) {
-//            imageFilename = selectedImageFile.getName();
-//        }
-//
-//        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=?, Category=? WHERE Food_ID=?";
-//        try (Connection conn = DatabaseConnection.getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//
-//            stmt.setString(1, nameField.getText());
-//            stmt.setString(2, detailsField.getText());
-//            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
-//            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
-//            stmt.setString(5, imageFilename);
-//            stmt.setString(6, categoryBox.getValue());
-//            stmt.setInt(7, currentEditingFood.getId());
-//
-//            stmt.executeUpdate();
-//            loadFoodItems();
-//            clearFields();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void deleteFoodItem(FoodItems food) {
         String sql = "DELETE FROM Details WHERE Food_ID=?";
@@ -532,7 +467,12 @@ public class MenuPage {
         categoryBox.setValue(food.getCategory());
         selectedImageFile = null;
         addOrUpdateButton.setText("Update");
+
+        // show form
+        ((VBox) addOrUpdateButton.getParent()).setVisible(true);
+        ((VBox) addOrUpdateButton.getParent()).setManaged(true);
     }
+
 
     private void clearFields() {
         nameField.clear();
@@ -544,7 +484,12 @@ public class MenuPage {
         selectedImageFile = null;
         currentEditingFood = null;
         addOrUpdateButton.setText("Add");
+
+        // hide form again
+        ((VBox) addOrUpdateButton.getParent()).setVisible(false);
+        ((VBox) addOrUpdateButton.getParent()).setManaged(false);
     }
+
 
     private void chooseImage() {
         FileChooser fileChooser = new FileChooser();
@@ -570,4 +515,129 @@ public class MenuPage {
             }
         }
     }
+
+    // ================== CART + CHECKOUT ===================
+
+    public static class CartItemView {
+        private String name;
+        private int quantity;
+        private double price;
+        private double total;
+
+        public CartItemView(String name, int quantity, double price) {
+            this.name = name;
+            this.quantity = quantity;
+            this.price = price;
+            this.total = price * quantity;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public double getTotal() {
+            return total;
+        }
+    }
+
+    private void showCart() {
+        Map<Integer, FoodItems> foodMap = new HashMap<>();
+        for (FoodItems item : foodList) {
+            foodMap.put(item.getId(), item);
+        }
+
+        TableView<CartItemView> cartTable = new TableView<>();
+        ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
+
+        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+            FoodItems food = foodMap.get(entry.getKey());
+            if (food != null) {
+                cartItems.add(new CartItemView(food.getName(), entry.getValue(), food.getPrice()));
+            }
+        }
+        cartTable.setItems(cartItems);
+
+        TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("name"));
+
+        TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
+        qtyCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("quantity"));
+
+        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
+        priceCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("price"));
+
+        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("total"));
+
+        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol);
+
+        Stage stage = new Stage();
+        stage.setTitle("Your Cart");
+
+        VBox vbox = new VBox(10, cartTable);
+        vbox.setPadding(new Insets(10));
+        stage.setScene(new Scene(vbox, 400, 300));
+        stage.show();
+    }
+
+    private void checkout() {
+        double total = 0;
+        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+            for (FoodItems food : foodList) {
+                if (food.getId() == entry.getKey()) {
+                    total += food.getPrice() * entry.getValue();
+                }
+            }
+        }
+
+        Stage stage = new Stage();
+        stage.setTitle("Bill");
+
+        Label billLabel = new Label("Total: $" + total);
+        billLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        VBox vbox = new VBox(15, billLabel);
+        vbox.setPadding(new Insets(20));
+        vbox.setAlignment(Pos.CENTER);
+
+        stage.setScene(new Scene(vbox, 250, 150));
+        stage.show();
+    }
+
+    private void showEditDialog(FoodItems food) {
+        Stage dialog = new Stage();
+        dialog.setTitle("Edit " + food.getName());
+
+        Button updateBtn = new Button("Update");
+        updateBtn.setOnAction(e -> {
+            populateFieldsForEdit(food);  // fill input fields
+            dialog.close();
+        });
+
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setOnAction(e -> {
+            deleteFoodItem(food);
+            dialog.close();
+        });
+
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.setOnAction(e -> dialog.close());
+
+        VBox vbox = new VBox(15, new Label("Choose an action for " + food.getName()),
+                updateBtn, deleteBtn, cancelBtn);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(20));
+
+        dialog.setScene(new Scene(vbox, 300, 200));
+        dialog.show();
+    }
+
 }
