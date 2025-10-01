@@ -48,7 +48,7 @@ public class MenuPage {
         imageFilenameLabel = new Label("No image selected");
 
         categoryBox = new ComboBox<>();
-        categoryBox.getItems().addAll("Drinks", "Sweets", "Spicy Foods", "Main Course", "Appetizers");
+        loadCategories(); // dynamic categories from DB
         categoryBox.setPromptText("Select Category");
 
         GridPane inputGrid = new GridPane();
@@ -67,13 +67,25 @@ public class MenuPage {
         inputGrid.add(new Label("Category:"), 0, 4);
         inputGrid.add(categoryBox, 1, 4);
 
+        // Category management buttons
+        Button addCatBtn = new Button("Add Category");
+        Button renameCatBtn = new Button("Rename Category");
+        Button deleteCatBtn = new Button("Delete Category");
+
+        addCatBtn.setOnAction(e -> addCategory());
+        renameCatBtn.setOnAction(e -> renameCategory());
+        deleteCatBtn.setOnAction(e -> deleteCategory());
+
+        HBox categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
+        inputGrid.add(categoryButtons, 1, 5);
+
         Button browseBtn = new Button("Browse...");
         browseBtn.setOnAction(e -> chooseImage());
 
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
-        inputGrid.add(new Label("Image:"), 0, 5);
-        inputGrid.add(imageBox, 1, 5);
+        inputGrid.add(new Label("Image:"), 0, 6);
+        inputGrid.add(imageBox, 1, 6);
 
         addOrUpdateButton = new Button("Add");
         addOrUpdateButton.setOnAction(e -> {
@@ -90,6 +102,113 @@ public class MenuPage {
         loadFoodItems();
         return vbox;
     }
+
+    // ================== CATEGORY MANAGEMENT ===================
+
+    private void loadCategories() {
+        categoryBox.getItems().clear();
+        String sql = "SELECT Category_Name FROM Categories ORDER BY Category_Name";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                categoryBox.getItems().add(rs.getString("Category_Name"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addCategory() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add Category");
+        dialog.setHeaderText("Enter new category name:");
+        dialog.setContentText("Category:");
+        dialog.showAndWait().ifPresent(name -> {
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement("INSERT INTO Categories (Category_Name) VALUES (?)")) {
+                stmt.setString(1, name);
+                stmt.executeUpdate();
+                loadCategories();
+            } catch (SQLException ex) {
+                showAlert("Error", "Category already exists or invalid.");
+            }
+        });
+    }
+
+    private void renameCategory() {
+        String selected = categoryBox.getValue();
+        if (selected == null) {
+            showAlert("Error", "Select a category first.");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog(selected);
+        dialog.setTitle("Rename Category");
+        dialog.setHeaderText("Enter new name for category:");
+        dialog.setContentText("New Name:");
+        dialog.showAndWait().ifPresent(newName -> {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                // Update category table
+                PreparedStatement stmt = conn.prepareStatement("UPDATE Categories SET Category_Name=? WHERE Category_Name=?");
+                stmt.setString(1, newName);
+                stmt.setString(2, selected);
+                stmt.executeUpdate();
+
+                // Update food items too
+                PreparedStatement stmt2 = conn.prepareStatement("UPDATE Details SET Category=? WHERE Category=?");
+                stmt2.setString(1, newName);
+                stmt2.setString(2, selected);
+                stmt2.executeUpdate();
+
+                loadCategories();
+                loadFoodItems();
+            } catch (SQLException ex) {
+                showAlert("Error", "Rename failed.");
+            }
+        });
+    }
+
+    private void deleteCategory() {
+        String selected = categoryBox.getValue();
+        if (selected == null) {
+            showAlert("Error", "Select a category to delete.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete category '" + selected + "'?\nAll foods in this category will also be deleted.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.YES) {
+                try (Connection conn = DatabaseConnection.getConnection()) {
+                    PreparedStatement stmt1 = conn.prepareStatement("DELETE FROM Details WHERE Category=?");
+                    stmt1.setString(1, selected);
+                    stmt1.executeUpdate();
+
+                    PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM Categories WHERE Category_Name=?");
+                    stmt2.setString(1, selected);
+                    stmt2.executeUpdate();
+
+                    loadCategories();
+                    loadFoodItems();
+                } catch (SQLException ex) {
+                    showAlert("Error", "Delete failed.");
+                }
+            }
+        });
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    // ================== FOOD ITEMS ===================
 
     private void loadFoodItems() {
         foodList.clear();
@@ -116,7 +235,6 @@ public class MenuPage {
                 foodList.add(food);
                 String category = food.getCategory();
 
-                // If category section doesn't exist, create it
                 if (!categoryFlows.containsKey(category)) {
                     Label categoryLabel = new Label(category);
                     categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
@@ -135,7 +253,6 @@ public class MenuPage {
                     categoryFlows.put(category, flow);
                 }
 
-                // Add food card to its category section
                 categoryFlows.get(category).getChildren().add(createFoodCard(food));
             }
 
