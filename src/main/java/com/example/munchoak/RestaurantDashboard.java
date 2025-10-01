@@ -65,14 +65,14 @@ public class RestaurantDashboard extends Application {
 
         // Wire up actions
         homeBtn.setOnAction(e -> showHomePage());
-        ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders (placeholder)."));
+        ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders."));
         menuBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
             contentPane.getChildren().add(new MenuPage().getView());
         });
-        reservationsBtn.setOnAction(e -> updateContentSimple("📅 Reservations", "View and manage reservations (placeholder)."));
-        reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics (placeholder)."));
-        aboutBtn.setOnAction(e -> updateContentSimple("ℹ️ About Us",
+        reservationsBtn.setOnAction(e -> updateContentSimple("📅 Reservations", "View and manage reservations."));
+        reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
+        aboutBtn.setOnAction(e -> updateContentSimple("About Us",
                 "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
 
         // Layout

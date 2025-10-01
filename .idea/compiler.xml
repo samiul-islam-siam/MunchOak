@@ -6,10 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="MunchOak" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="MunchOak" target="21" />
-    </bytecodeTargetLevel>
   </component>
 </project>
