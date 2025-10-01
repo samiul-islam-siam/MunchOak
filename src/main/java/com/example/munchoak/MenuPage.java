@@ -48,7 +48,7 @@ public class MenuPage {
         imageFilenameLabel = new Label("No image selected");
 
         categoryBox = new ComboBox<>();
-        loadCategories(); // dynamic categories from DB
+        loadCategories();
         categoryBox.setPromptText("Select Category");
 
         GridPane inputGrid = new GridPane();
@@ -132,6 +132,7 @@ public class MenuPage {
                 stmt.setString(1, name);
                 stmt.executeUpdate();
                 loadCategories();
+                categoryBox.setValue(name); // auto-select new category
             } catch (SQLException ex) {
                 showAlert("Error", "Category already exists or invalid.");
             }
@@ -164,6 +165,7 @@ public class MenuPage {
                 stmt2.executeUpdate();
 
                 loadCategories();
+                categoryBox.setValue(newName); // keep showing the renamed one
                 loadFoodItems();
             } catch (SQLException ex) {
                 showAlert("Error", "Rename failed.");
@@ -193,6 +195,7 @@ public class MenuPage {
                     stmt2.executeUpdate();
 
                     loadCategories();
+                    categoryBox.setValue(null);
                     loadFoodItems();
                 } catch (SQLException ex) {
                     showAlert("Error", "Delete failed.");
@@ -318,16 +321,54 @@ public class MenuPage {
     }
 
     private void addFoodItem() {
+        // ✅ Category validation
+        if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
+            showAlert("Error", "No category selected.");
+            return;
+        }
+
+        // ✅ Food name validation
+        if (nameField.getText().trim().isEmpty()) {
+            showAlert("Error", "Food name cannot be empty.");
+            return;
+        }
+
+        // ✅ Price validation
+        double price;
+        try {
+            price = Double.parseDouble(priceField.getText().trim());
+            if (price < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
+
+        // ✅ Ratings validation
+        double rating;
+        try {
+            rating = Double.parseDouble(ratingsField.getText().trim());
+            if (rating < 0 || rating > 5) {
+                showAlert("Error", "Ratings must be between 0 and 5.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid ratings.");
+            return;
+        }
+
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
         String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, nameField.getText());
-            stmt.setString(2, detailsField.getText());
-            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
-            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
+            stmt.setString(1, nameField.getText().trim());
+            stmt.setString(2, detailsField.getText().trim());
+            stmt.setDouble(3, price);
+            stmt.setDouble(4, rating);
             stmt.setString(5, imageFilename);
             stmt.setString(6, categoryBox.getValue());
 
@@ -337,11 +378,46 @@ public class MenuPage {
 
         } catch (Exception e) {
             e.printStackTrace();
+            showAlert("Error", "Failed to add food item.");
         }
     }
 
     private void updateFoodItem() {
         if (currentEditingFood == null) return;
+
+        if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
+            showAlert("Error", "No category selected.");
+            return;
+        }
+
+        if (nameField.getText().trim().isEmpty()) {
+            showAlert("Error", "Food name cannot be empty.");
+            return;
+        }
+
+        double price;
+        try {
+            price = Double.parseDouble(priceField.getText().trim());
+            if (price < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
+
+        double rating;
+        try {
+            rating = Double.parseDouble(ratingsField.getText().trim());
+            if (rating < 0 || rating > 5) {
+                showAlert("Error", "Ratings must be between 0 and 5.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid ratings.");
+            return;
+        }
 
         String imageFilename = currentEditingFood.getImagePath();
         if (selectedImageFile != null) {
@@ -352,10 +428,10 @@ public class MenuPage {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, nameField.getText());
-            stmt.setString(2, detailsField.getText());
-            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
-            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
+            stmt.setString(1, nameField.getText().trim());
+            stmt.setString(2, detailsField.getText().trim());
+            stmt.setDouble(3, price);
+            stmt.setDouble(4, rating);
             stmt.setString(5, imageFilename);
             stmt.setString(6, categoryBox.getValue());
             stmt.setInt(7, currentEditingFood.getId());
@@ -366,8 +442,71 @@ public class MenuPage {
 
         } catch (Exception e) {
             e.printStackTrace();
+            showAlert("Error", "Failed to update food item.");
         }
     }
+
+//
+//    private void addFoodItem() {
+//        if (categoryBox.getValue() == null) {
+//            showAlert("Error", "No category selected");
+//            return;
+//        }
+//
+//        String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
+//
+//        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES (?, ?, ?, ?, ?, ?)";
+//        try (Connection conn = DatabaseConnection.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//
+//            stmt.setString(1, nameField.getText());
+//            stmt.setString(2, detailsField.getText());
+//            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
+//            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
+//            stmt.setString(5, imageFilename);
+//            stmt.setString(6, categoryBox.getValue());
+//
+//            stmt.executeUpdate();
+//            loadFoodItems();
+//            clearFields();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private void updateFoodItem() {
+//        if (currentEditingFood == null) return;
+//        if (categoryBox.getValue() == null) {
+//            showAlert("Error", "No category selected");
+//            return;
+//        }
+//
+//        String imageFilename = currentEditingFood.getImagePath();
+//        if (selectedImageFile != null) {
+//            imageFilename = selectedImageFile.getName();
+//        }
+//
+//        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=?, Category=? WHERE Food_ID=?";
+//        try (Connection conn = DatabaseConnection.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//
+//            stmt.setString(1, nameField.getText());
+//            stmt.setString(2, detailsField.getText());
+//            stmt.setDouble(3, Double.parseDouble(priceField.getText()));
+//            stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
+//            stmt.setString(5, imageFilename);
+//            stmt.setString(6, categoryBox.getValue());
+//            stmt.setInt(7, currentEditingFood.getId());
+//
+//            stmt.executeUpdate();
+//            loadFoodItems();
+//            clearFields();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void deleteFoodItem(FoodItems food) {
         String sql = "DELETE FROM Details WHERE Food_ID=?";
