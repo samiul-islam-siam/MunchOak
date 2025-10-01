@@ -16,13 +16,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
+import java.util.*;
 
 public class MenuPage {
 
     private ObservableList<FoodItems> foodList;
-    private FlowPane foodContainer;
+    private VBox foodContainer;
 
     private TextField nameField, detailsField, priceField, ratingsField;
+    private ComboBox<String> categoryBox;
     private Label imageFilenameLabel;
     private File selectedImageFile = null;
     private Button addOrUpdateButton;
@@ -32,9 +34,7 @@ public class MenuPage {
     public Node getView() {
         foodList = FXCollections.observableArrayList();
 
-        foodContainer = new FlowPane();
-        foodContainer.setHgap(15);
-        foodContainer.setVgap(15);
+        foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
 
         ScrollPane scrollPane = new ScrollPane(foodContainer);
@@ -46,6 +46,10 @@ public class MenuPage {
         priceField = new TextField();
         ratingsField = new TextField();
         imageFilenameLabel = new Label("No image selected");
+
+        categoryBox = new ComboBox<>();
+        categoryBox.getItems().addAll("Drinks", "Sweets", "Spicy Foods", "Main Course", "Appetizers");
+        categoryBox.setPromptText("Select Category");
 
         GridPane inputGrid = new GridPane();
         inputGrid.setPadding(new Insets(10));
@@ -60,15 +64,16 @@ public class MenuPage {
         inputGrid.add(priceField, 1, 2);
         inputGrid.add(new Label("Ratings:"), 0, 3);
         inputGrid.add(ratingsField, 1, 3);
+        inputGrid.add(new Label("Category:"), 0, 4);
+        inputGrid.add(categoryBox, 1, 4);
 
-        // Browse button with filename label
         Button browseBtn = new Button("Browse...");
         browseBtn.setOnAction(e -> chooseImage());
 
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
-        inputGrid.add(new Label("Image:"), 0, 4);
-        inputGrid.add(imageBox, 1, 4);
+        inputGrid.add(new Label("Image:"), 0, 5);
+        inputGrid.add(imageBox, 1, 5);
 
         addOrUpdateButton = new Button("Add");
         addOrUpdateButton.setOnAction(e -> {
@@ -90,7 +95,9 @@ public class MenuPage {
         foodList.clear();
         foodContainer.getChildren().clear();
 
-        String sql = "SELECT * FROM Details";
+        String sql = "SELECT * FROM Details ORDER BY Category";
+        Map<String, FlowPane> categoryFlows = new LinkedHashMap<>();
+
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -102,10 +109,34 @@ public class MenuPage {
                         rs.getString("Details"),
                         rs.getDouble("Price"),
                         rs.getDouble("Ratings"),
-                        rs.getString("ImagePath")
+                        rs.getString("ImagePath"),
+                        rs.getString("Category")
                 );
+
                 foodList.add(food);
-                foodContainer.getChildren().add(createFoodCard(food));
+                String category = food.getCategory();
+
+                // If category section doesn't exist, create it
+                if (!categoryFlows.containsKey(category)) {
+                    Label categoryLabel = new Label(category);
+                    categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
+                    Separator separator = new Separator();
+                    separator.setPrefWidth(500);
+
+                    FlowPane flow = new FlowPane(15, 15);
+                    flow.setPadding(new Insets(5));
+
+                    VBox section = new VBox(10);
+                    section.getChildren().addAll(categoryLabel, separator, flow);
+                    section.setPadding(new Insets(10, 5, 20, 5));
+
+                    foodContainer.getChildren().add(section);
+                    categoryFlows.put(category, flow);
+                }
+
+                // Add food card to its category section
+                categoryFlows.get(category).getChildren().add(createFoodCard(food));
             }
 
         } catch (SQLException e) {
@@ -172,7 +203,7 @@ public class MenuPage {
     private void addFoodItem() {
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
-        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -181,6 +212,7 @@ public class MenuPage {
             stmt.setDouble(3, Double.parseDouble(priceField.getText()));
             stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
             stmt.setString(5, imageFilename);
+            stmt.setString(6, categoryBox.getValue());
 
             stmt.executeUpdate();
             loadFoodItems();
@@ -199,7 +231,7 @@ public class MenuPage {
             imageFilename = selectedImageFile.getName();
         }
 
-        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=? WHERE Food_ID=?";
+        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=?, Category=? WHERE Food_ID=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -208,7 +240,8 @@ public class MenuPage {
             stmt.setDouble(3, Double.parseDouble(priceField.getText()));
             stmt.setDouble(4, Double.parseDouble(ratingsField.getText()));
             stmt.setString(5, imageFilename);
-            stmt.setInt(6, currentEditingFood.getId());
+            stmt.setString(6, categoryBox.getValue());
+            stmt.setInt(7, currentEditingFood.getId());
 
             stmt.executeUpdate();
             loadFoodItems();
@@ -240,7 +273,8 @@ public class MenuPage {
         priceField.setText(String.valueOf(food.getPrice()));
         ratingsField.setText(String.valueOf(food.getRatings()));
         imageFilenameLabel.setText(food.getImagePath());
-        selectedImageFile = null; // Reset so user can optionally choose a new one
+        categoryBox.setValue(food.getCategory());
+        selectedImageFile = null;
         addOrUpdateButton.setText("Update");
     }
 
@@ -250,6 +284,7 @@ public class MenuPage {
         priceField.clear();
         ratingsField.clear();
         imageFilenameLabel.setText("No image selected");
+        categoryBox.setValue(null);
         selectedImageFile = null;
         currentEditingFood = null;
         addOrUpdateButton.setText("Add");

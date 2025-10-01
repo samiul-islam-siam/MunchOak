@@ -8,15 +8,17 @@ public class FoodItems {
     private final StringProperty details;
     private final DoubleProperty price;
     private final DoubleProperty ratings;
-    private final StringProperty imagePath; // NEW
+    private final StringProperty imagePath;
+    private final StringProperty category;  // <-- NEW
 
-    public FoodItems(int id, String name, String details, double price, double ratings, String imagePath) {
+    public FoodItems(int id, String name, String details, double price, double ratings, String imagePath, String category) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
         this.price = new SimpleDoubleProperty(price);
         this.ratings = new SimpleDoubleProperty(ratings);
         this.imagePath = new SimpleStringProperty(imagePath);
+        this.category = new SimpleStringProperty(category); // <-- NEW
     }
 
     public int getId() { return id.get(); }
@@ -41,4 +43,8 @@ public class FoodItems {
     public String getImagePath() { return imagePath.get(); }
     public StringProperty imagePathProperty() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath.set(imagePath); }
+
+    public String getCategory() { return category.get(); }           // <-- NEW
+    public StringProperty categoryProperty() { return category; }   // <-- NEW
+    public void setCategory(String category) { this.category.set(category); } // <-- NEW
 }
