@@ -1,0 +1,144 @@
+-- Create database
+CREATE DATABASE IF NOT EXISTS FOOD_ITEMS;
+USE FOOD_ITEMS;
+
+-- Drop old tables
+DROP TABLE IF EXISTS Details;
+DROP TABLE IF EXISTS Categories;
+
+-- Categories table
+CREATE TABLE Categories (
+    Category_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Category_Name VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Details (food items) table
+CREATE TABLE Details (
+    Food_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Food_Name VARCHAR(255) NOT NULL,
+    Details VARCHAR(255),
+    Price DOUBLE NOT NULL,
+    Ratings DOUBLE,
+    ImagePath VARCHAR(255),
+    Category VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_category FOREIGN KEY (Category) REFERENCES Categories(Category_Name)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Insert sample categories
+INSERT INTO Categories (Category_Name) VALUES
+('Drinks'), ('Sweets'), ('Spicy Foods'), ('Main Course'), ('Appetizers');
+
+-- Insert sample foods
+-- Insert 100 food items
+INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES
+('Coca Cola', 'Chilled soft drink', 1.50, 4.2, 'coca-cola.jpeg', 'Drinks'),
+('Orange Juice', 'Freshly squeezed orange juice', 2.00, 4.5, 'orange-juice.jpeg', 'Drinks'),
+('Mango Juice', 'Tropical mango juice', 2.50, 4.3, 'mango-juice.jpg', 'Drinks'),
+('Lemonade', 'Refreshing lemon drink', 1.80, 4.1, 'lemonade.jpeg', 'Drinks'),
+('Iced Tea', 'Chilled black tea with lemon', 2.20, 4.4, 'iced-tea.jpeg', 'Drinks'),
+('Cold Coffee', 'Iced coffee with milk', 3.00, 4.6, 'Coffee.jpg', 'Drinks'),
+('Strawberry Milkshake', 'Fresh strawberry milkshake', 3.50, 4.8, 'strawberry-milkshake.jpg', 'Drinks'),
+('Vanilla Milkshake', 'Classic vanilla milkshake', 3.20, 4.5, 'vanila-milkshake.jpg', 'Drinks'),
+('Banana Smoothie', 'Banana and yogurt smoothie', 3.10, 4.3, 'banasmoothie.jpeg', 'Drinks'),
+('Green Tea', 'Hot green tea', 2.00, 4.2, 'green-tea.jpeg', 'Drinks'),
+
+('Chocolate Cake', 'Dark chocolate layered cake', 3.50, 4.8, 'Chocolate-Strawberry-Cake.jpg', 'Sweets'),
+('Donut', 'Glazed donut with sprinkles', 2.00, 4.3, 'donut.jpeg', 'Sweets'),
+('Pudding', 'Creamy caramel pudding', 2.50, 4.5, 'pudding.jpeg', 'Sweets'),
+('Brownie', 'Fudgy chocolate brownie', 2.20, 4.6, 'brownise.jpg', 'Sweets'),
+('Ice Cream', 'Vanilla scoop ice cream', 1.80, 4.4, 'ice cream.jpeg', 'Sweets'),
+('Cupcake', 'Chocolate frosted cupcake', 2.00, 4.5, 'cup cake.jpg', 'Sweets'),
+('Cheesecake', 'New York style cheesecake', 3.50, 4.7, 'chesscake.jpeg', 'Sweets'),
+('Apple Pie', 'Classic apple pie', 3.00, 4.6, 'apple pie.jpg', 'Sweets'),
+('Strawberry Tart', 'Fresh strawberry tart', 2.80, 4.5, 'stawberry tart.jpg', 'Sweets'),
+('Muffin', 'Blueberry muffin', 2.20, 4.3, 'muffin.jpg', 'Sweets'),
+
+('Spicy Chicken Wings', 'Buffalo style hot wings', 6.99, 4.6, 'chicken-wings.jpg', 'Spicy Foods'),
+('Fried Chicken', 'Crispy fried chicken', 5.50, 4.4, 'Fried-Chicken.jpg', 'Spicy Foods'),
+('Grilled Chicken', 'Spicy grilled chicken breast', 6.00, 4.5, 'grilled chicken.jpeg', 'Spicy Foods'),
+('Chili Paneer', 'Spicy paneer with chili sauce', 5.20, 4.6, 'chili paneer.jpeg', 'Spicy Foods'),
+('Hot Dog', 'Spicy sausage hot dog', 3.50, 4.3, 'hot dog.jpg', 'Spicy Foods'),
+('Tacos', 'Mexican beef tacos', 4.00, 4.5, 'tacos.jpg', 'Spicy Foods'),
+('Nachos', 'Cheesy nachos with jalapenos', 3.50, 4.4, 'nachos.jpg', 'Spicy Foods'),
+('Curry', 'Spicy chicken curry', 5.80, 4.6, 'curry.jpg', 'Spicy Foods'),
+('Shawarma', 'Spicy chicken shawarma', 4.50, 4.5, 'shawrma.jpg', 'Spicy Foods'),
+('Samosa', 'Fried samosa with spicy filling', 2.00, 4.4, 'samosa.jpeg', 'Spicy Foods'),
+
+('Burger', 'Beef patty with lettuce and tomato', 5.99, 4.5, 'burger.jpeg', 'Main Course'),
+('Pizza', 'Cheese pizza with tomato sauce', 8.99, 4.7, 'pizza.jpeg', 'Main Course'),
+('Fried Rice', 'Egg fried rice', 4.50, 4.3, 'fried-rice.jpg', 'Main Course'),
+('Noodles', 'Vegetable noodles', 3.80, 4.2, 'noodles.jpeg', 'Main Course'),
+('Biryani', 'Chicken biryani', 6.00, 4.7, 'biriyani.jpg', 'Main Course'),
+('Mutton Biryani', 'Fragrant rice with spiced mutton pieces', 8.50, 4.8, 'mutton biriyani.jpg', 'Main Course'),
+('Pasta', 'Creamy Alfredo pasta', 7.50, 4.6, 'pasta.png', 'Main Course'),
+('Lasagna', 'Cheesy meat lasagna', 8.00, 4.5, 'lasagna.jpg', 'Main Course'),
+('Sandwich', 'Club sandwich with fries', 5.20, 4.3, 'sandwich.jpeg', 'Main Course'),
+('Hot Soup', 'Tomato soup with bread', 3.50, 4.4, 'hot soup.jpg', 'Main Course'),
+
+('Fries', 'Crispy golden fries', 2.50, 4.0, 'fries.jpeg', 'Appetizers'),
+('Spring Rolls', 'Crispy spring rolls', 2.80, 4.2, 'spring-role.jpg', 'Appetizers'),
+('Garlic Bread', 'Toasted garlic bread', 2.20, 4.3, 'garlic-bread.jpg', 'Appetizers'),
+('Onion Rings', 'Fried onion rings', 2.50, 4.1, 'onion-rings.jpg', 'Appetizers'),
+('Chicken Nuggets', 'Crispy chicken nuggets', 3.20, 4.4, 'chicken-nuggets.jpg', 'Appetizers'),
+('Mozzarella Sticks', 'Fried mozzarella sticks', 3.50, 4.5, 'Homemade-Mozzarella-Sticks.jpeg', 'Appetizers'),
+('Tandoori Wings', 'Spicy tandoori wings', 3.80, 4.5, 'tandoori wings.jpeg', 'Appetizers'),
+('Stuffed Mushrooms', 'Mushrooms stuffed with cheese', 4.20, 4.6, 'stuffed mushroom.jpeg', 'Appetizers'),
+('Bruschetta', 'Toasted bread with tomatoes', 3.50, 4.4, 'bruschetta.jpg', 'Appetizers'),
+('Potato Wedges', 'Seasoned potato wedges', 2.90, 4.2, 'potatowages.jpg', 'Appetizers'),
+
+('Ramen', 'Japanese noodle soup', 6.50, 4.7, 'ramen.jpeg', 'Main Course'),
+('Sushi', 'Assorted sushi rolls', 7.50, 4.8, 'sushi.jpg', 'Main Course'),
+('Tempura', 'Deep fried vegetables', 5.50, 4.6, 'tempura.jpeg', 'Appetizers'),
+('Miso Soup', 'Japanese miso soup', 3.00, 4.5, 'miso-soup.jpg', 'Appetizers'),
+('Falafel', 'Crispy falafel balls', 3.20, 4.4, 'falafel.jpeg', 'Appetizers'),
+('Hummus', 'Creamy chickpea dip', 3.00, 4.3, 'hummus.jpeg', 'Appetizers'),
+('Shashlik', 'Grilled meat skewers', 6.00, 4.5, 'shashlik.jpeg', 'Spicy Foods'),
+('Paneer Tikka', 'Grilled paneer skewers', 5.50, 4.6, 'paneer tikka.jpeg', 'Spicy Foods'),
+('Tortilla Chips', 'Crispy tortilla chips', 2.80, 4.2, 'tortilla-chips.jpeg', 'Appetizers'),
+('Guacamole', 'Avocado dip', 3.50, 4.5, 'guacamole.jpeg', 'Appetizers'),
+
+('Butter Chicken', 'Creamy Indian butter chicken', 7.50, 4.8, 'butter chicken.jpeg', 'Main Course'),
+('Paneer Butter Masala', 'Rich paneer curry', 6.50, 4.7, 'paneer butter masala.jpeg', 'Main Course'),
+('Dal Tadka', 'Yellow lentils with spices', 4.00, 4.3, 'dal tadka.jpeg', 'Main Course'),
+('Chicken Chowmein', 'Noodles stir-fried with chicken', 8.00, 4.6, 'chicken-chowmein.jpeg', 'Main Course'),
+('Egg Fried Rice', 'Classic fried rice with egg', 6.50, 4.4, 'egg-fried-rice.jpeg', 'Main Course'),
+('Spaghetti Bolognese', 'Pasta with minced beef sauce', 12.50, 4.7, 'spaghetti-bolognese.jpeg', 'Main Course'),
+('Vegetable Fried Rice', 'Fried rice with fresh vegetables', 6.00, 4.3, 'vegetable-fried-rice.jpeg', 'Main Course'),
+('Fish Curry', 'Spicy fish curry', 6.50, 4.6, 'fish curry.jpg', 'Spicy Foods'),
+('Chicken Tikka', 'Spicy grilled chicken pieces', 7.00, 4.7, 'chicken-tikka.jpg', 'Spicy Foods'),
+('Kebab', 'Grilled seekh kebabs', 5.50, 4.5, 'kebab.jpeg', 'Spicy Foods'),
+
+('Caesar Salad', 'Crisp lettuce with Caesar dressing', 4.50, 4.4, 'ceasar-salad.jpeg', 'Appetizers'),
+('Greek Salad', 'Salad with feta cheese', 4.80, 4.5, 'greek-salad.jpeg', 'Appetizers'),
+('Caprese Salad', 'Tomato and mozzarella salad', 4.20, 4.3, 'caprese-salad.jpeg', 'Appetizers'),
+('Tuna Sandwich', 'Tuna salad sandwich', 5.20, 4.4, 'tuna sandwich.jpg', 'Main Course'),
+('Chicken Wrap', 'Grilled chicken wrap', 5.50, 4.5, 'chicken-wrap.jpg', 'Main Course'),
+('Mutton Chops', 'Grilled mutton chops with herbs', 10.00, 4.7, 'mutton chops.jpeg', 'Main Course'),
+('Veg Wrap', 'Fresh veggie wrap', 4.50, 4.3, 'veg wrap.jpeg', 'Main Course'),
+('Quesadilla', 'Cheesy chicken quesadilla', 6.20, 4.6, 'quesadillas.jpeg', 'Main Course'),
+('Enchiladas', 'Spicy enchiladas with sauce', 6.50, 4.6, 'enchiladas.jpg', 'Main Course'),
+('Burrito', 'Mexican burrito with rice', 6.00, 4.5, 'burrito.jpeg', 'Main Course'),
+
+('Pancakes', 'Fluffy pancakes with syrup', 4.20, 4.5, 'pancakes.jpeg', 'Sweets'),
+('Waffles', 'Crispy waffles with honey', 4.50, 4.6, 'waffles.jpeg', 'Sweets'),
+('Crepes', 'Thin French crepes', 4.00, 4.4, 'crepes.jpeg', 'Sweets'),
+('Churros', 'Spanish fried churros', 3.80, 4.5, 'churros.jpeg', 'Sweets'),
+('Macarons', 'French almond cookies', 5.00, 4.7, 'macron.jpg', 'Sweets'),
+('Eclairs', 'Chocolate eclairs', 4.20, 4.6, 'eclairs.jpg', 'Sweets'),
+('Tiramisu', 'Italian coffee dessert', 5.50, 4.8, 'tiramisu.jpg', 'Sweets'),
+('Gulab Jamun', 'Indian sweet dumplings', 3.50, 4.7, 'gulab jamun.jpeg', 'Sweets'),
+('Rasgulla', 'Indian soft sweet balls', 3.20, 4.6, 'rasgulla.jpeg', 'Sweets'),
+('Kheer', 'Indian rice pudding', 3.50, 4.5, 'kheer.jpeg', 'Sweets'),
+
+('Clam Chowder', 'Creamy seafood soup', 6.50, 4.7, 'clam chowder.jpg', 'Main Course'),
+('Lobster Roll', 'Sandwich with lobster filling', 9.00, 4.8, 'lobster roll.jpeg', 'Main Course'),
+('Crab Cakes', 'Fried crab patties', 8.50, 4.6, 'crab cakes.jpeg', 'Main Course'),
+('Salmon Grill', 'Grilled salmon fillet', 10.50, 4.8, 'salmon grill.jpeg', 'Main Course'),
+('Tuna Steak', 'Seared tuna steak', 11.00, 4.7, 'tuna steak.jpg', 'Main Course'),
+('Fish and Chips', 'Fried fish with fries', 7.00, 4.5, 'fish and chips.jpg', 'Main Course'),
+('Shrimp Cocktail', 'Chilled shrimp with sauce', 6.50, 4.6, 'shirm-cocktail.jpeg', 'Appetizers'),
+('Garlic Mushrooms', 'Mushrooms tossed in garlic butter', 4.20, 4.5, 'garlic-mushrooms.jpg', 'Appetizers'),
+('Calamari', 'Fried calamari rings', 7.50, 4.5, 'calamari.jpg', 'Appetizers'),
+('Paella', 'Spanish seafood rice', 11.50, 4.8, 'pealla.jpeg', 'Main Course');
+
