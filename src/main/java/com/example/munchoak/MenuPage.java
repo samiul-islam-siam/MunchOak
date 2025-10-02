@@ -279,8 +279,9 @@ public class MenuPage {
                     Separator separator = new Separator();
                     separator.setPrefWidth(500);
 
-                    FlowPane flow = new FlowPane(15, 15);
+                    FlowPane flow = new FlowPane(10, 10);
                     flow.setPadding(new Insets(5));
+                    //flow.setPrefWrapLength(Region.USE_COMPUTED_SIZE); // optional
 
                     VBox section = new VBox(10);
                     section.getChildren().addAll(categoryLabel, separator, flow);
