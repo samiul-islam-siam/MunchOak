@@ -345,7 +345,7 @@ public class MenuPage {
         Button addToCartBtn = new Button("Add to Cart");
         addToCartBtn.setOnAction(e -> {
             cart.addToCart(food.getId(), 1);
-            // new Alert(Alert.AlertType.INFORMATION, food.getName() + " added to cart!").showAndWait();
+
             Stage popup = new Stage();
             popup.initStyle(StageStyle.UNDECORATED);
             popup.setAlwaysOnTop(true);
@@ -607,30 +607,6 @@ public class MenuPage {
         stage.setScene(new Scene(vbox, 400, 300));
         stage.show();
     }
-
-//    private void checkout() {
-//        double total = 0;
-//        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-//            for (FoodItems food : foodList) {
-//                if (food.getId() == entry.getKey()) {
-//                    total += food.getPrice() * entry.getValue();
-//                }
-//            }
-//        }
-//
-//        Stage stage = new Stage();
-//        stage.setTitle("Bill");
-//
-//        Label billLabel = new Label("Total: $" + total);
-//        billLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-//
-//        VBox vbox = new VBox(15, billLabel);
-//        vbox.setPadding(new Insets(20));
-//        vbox.setAlignment(Pos.CENTER);
-//
-//        stage.setScene(new Scene(vbox, 250, 150));
-//        stage.show();
-//    }
 
     private void checkout() {
         // Step 1: Calculate total

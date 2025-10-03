@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Database update">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Payment System updated">
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759463795464</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Payment System updated">
+      <option name="closed" value="true" />
+      <created>1759510871826</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1759510871826</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -128,6 +134,7 @@
     <MESSAGE value="Cart added" />
     <MESSAGE value="updated" />
     <MESSAGE value="Database update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Database update" />
+    <MESSAGE value="Payment System updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="Payment System updated" />
   </component>
 </project>
