@@ -56,6 +56,10 @@ public class Cart implements Serializable {
             }
         }
     }
+    public void completePayment() {
+        buyHistory.clear();
+        timestamp = Instant.now().toString(); // optional: update timestamp
+    }
 
     public void removeFromCartEntirely(Integer foodId) {
         buyHistory.remove(foodId);

@@ -6,8 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -21,9 +19,12 @@ public class RestaurantDashboard extends Application {
     private BorderPane root;
     private VBox sidebar;
     private StackPane contentPane;
-    private boolean compact = false;               // false = full (text + icon), true = compact (icons only)
+    private boolean compact = false; // false = full (text + icon), true = compact (icons only)
     private final List<Button> menuButtons = new ArrayList<>();
     private Button hamburgerBtn;
+
+    // Current logged-in user (demo single user)
+    private final User currentUser = new User(1, "user"); // can fetch from Users table later
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,7 +45,7 @@ public class RestaurantDashboard extends Application {
         topBox.setAlignment(Pos.CENTER_LEFT);
         topBox.setPadding(new Insets(6, 0, 10, 6));
 
-        // Create menu buttons (icon, label)
+        // Create menu buttons (icon + label)
         Button homeBtn = createMenuButton("🏠", "Home");
         Button ordersBtn = createMenuButton("🧾", "Orders");
         Button menuBtn   = createMenuButton("🍔", "Menu");
@@ -61,14 +62,14 @@ public class RestaurantDashboard extends Application {
         // Content area in center
         contentPane = new StackPane();
         contentPane.setPadding(new Insets(20));
-        showHomePage(); // default
+        showHomePage(); // default view
 
         // Wire up actions
         homeBtn.setOnAction(e -> showHomePage());
         ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders."));
         menuBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
-            contentPane.getChildren().add(new MenuPage().getView());
+            contentPane.getChildren().add(new MenuPage(currentUser).getView());
         });
         reservationsBtn.setOnAction(e -> updateContentSimple("📅 Reservations", "View and manage reservations."));
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
@@ -79,7 +80,7 @@ public class RestaurantDashboard extends Application {
         root.setLeft(sidebar);
         root.setCenter(contentPane);
 
-        // Start in full view
+        // Start in full sidebar mode
         setCompact(false);
 
         Scene scene = new Scene(root, 1000, 650);
@@ -88,6 +89,7 @@ public class RestaurantDashboard extends Application {
         primaryStage.show();
     }
 
+    // ---------------------- Sidebar / Buttons -----------------------
     private Button createMenuButton(String icon, String labelText) {
         Button btn = new Button(labelText);
         Label iconLabel = new Label(icon);
@@ -106,30 +108,23 @@ public class RestaurantDashboard extends Application {
         return btn;
     }
 
-    /** Toggle between compact and full sidebar */
     private void toggleCompact() {
         compact = !compact;
         setCompact(compact);
     }
 
-    /** Apply compact/full mode to sidebar and menu buttons */
     private void setCompact(boolean compactMode) {
         if (compactMode) {
-            // icons only
             sidebar.setPrefWidth(64);
             for (Button btn : menuButtons) {
-                // show only graphic (icon)
                 btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 btn.setPrefWidth(48);
-                // add a tooltip so label is still visible on hover
                 Tooltip t = new Tooltip((String) btn.getUserData());
                 Tooltip.install(btn, t);
-                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;"); // make compact look cleaner
+                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
             }
-            // make hamburger remain visible and left-aligned
             hamburgerBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px;");
         } else {
-            // full (icon + text)
             sidebar.setPrefWidth(220);
             for (Button btn : menuButtons) {
                 btn.setContentDisplay(ContentDisplay.LEFT);
@@ -141,7 +136,7 @@ public class RestaurantDashboard extends Application {
         }
     }
 
-    /** Show a simple text content (title + paragraph) */
+    // ---------------------- Content -----------------------
     private void updateContentSimple(String title, String paragraph) {
         contentPane.getChildren().clear();
         VBox v = new VBox(12);
@@ -155,7 +150,6 @@ public class RestaurantDashboard extends Application {
         contentPane.getChildren().add(v);
     }
 
-    /** Load the HomePage view from the separate file/class */
     private void showHomePage() {
         contentPane.getChildren().clear();
         contentPane.getChildren().add(new HomePage().getView());
