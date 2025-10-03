@@ -2,18 +2,21 @@
 CREATE DATABASE IF NOT EXISTS FOOD_ITEMS;
 USE FOOD_ITEMS;
 
--- Drop old tables
-DROP TABLE IF EXISTS Details;
-DROP TABLE IF EXISTS Categories;
+-- Users table
+CREATE TABLE IF NOT EXISTS Users (
+    User_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(50) UNIQUE NOT NULL,
+    Password VARCHAR(255) NOT NULL
+);
 
 -- Categories table
-CREATE TABLE Categories (
+CREATE TABLE IF NOT EXISTS Categories (
     Category_ID INT AUTO_INCREMENT PRIMARY KEY,
     Category_Name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- Details (food items) table
-CREATE TABLE Details (
+-- Food details table
+CREATE TABLE IF NOT EXISTS Details (
     Food_ID INT AUTO_INCREMENT PRIMARY KEY,
     Food_Name VARCHAR(255) NOT NULL,
     Details VARCHAR(255),
@@ -24,6 +27,22 @@ CREATE TABLE Details (
     CONSTRAINT fk_category FOREIGN KEY (Category) REFERENCES Categories(Category_Name)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+
+-- Payment history table
+DROP TABLE IF EXISTS PaymentHistory;
+
+CREATE TABLE PaymentHistory (
+    Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
+    User_ID INT NOT NULL,
+    Cart_ID VARCHAR(255) NOT NULL, -- store cart token or ID
+    Amount DOUBLE NOT NULL,
+    Timestamp VARCHAR(50) NOT NULL,
+    Status VARCHAR(10) NOT NULL DEFAULT 'PAID',
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 
 -- Insert sample categories
 INSERT INTO Categories (Category_Name) VALUES
@@ -141,4 +160,7 @@ INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VA
 ('Garlic Mushrooms', 'Mushrooms tossed in garlic butter', 4.20, 4.5, 'garlic-mushrooms.jpg', 'Appetizers'),
 ('Calamari', 'Fried calamari rings', 7.50, 4.5, 'calamari.jpg', 'Appetizers'),
 ('Paella', 'Spanish seafood rice', 11.50, 4.8, 'pealla.jpeg', 'Main Course');
+
+
+
 
