@@ -613,7 +613,7 @@ public class MenuPage {
         double total = 0;
         Map<Integer, FoodItems> foodMap = new HashMap<>();
         for (FoodItems food : foodList) {
-            foodMap.put(food.getId(), food);  // useful for Bill
+            foodMap.put(food.getId(), food);
         }
 
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
@@ -623,31 +623,11 @@ public class MenuPage {
             }
         }
 
-        // Step 2: Process payment
+        // Step 2: Process payment (pass cart + foodMap so bill can be generated later)
         Payment payment = new Payment(total);
-        payment.processPayment();
-
-        // Step 3: Generate bill
-        Bill bill = new Bill(cart, payment);
-        String receipt = bill.generateReceipt(foodMap);
-
-        // Step 4: Show in a new Stage
-        Stage stage = new Stage();
-        stage.setTitle("Bill Receipt");
-
-        TextArea receiptArea = new TextArea(receipt);
-        receiptArea.setEditable(false);
-        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-        receiptArea.setPrefWidth(500);
-        receiptArea.setPrefHeight(400);
-
-        VBox vbox = new VBox(15, receiptArea);
-        vbox.setPadding(new Insets(20));
-        vbox.setAlignment(Pos.CENTER);
-
-        stage.setScene(new Scene(vbox, 500, 400));
-        stage.show();
+        payment.processPayment(cart, foodMap);
     }
+
 
 
     private void showEditDialog(FoodItems food) {
