@@ -134,7 +134,7 @@ public class MenuPage {
         });
 
 
-        // ===== MAIN LAYOUT =====
+        // ===== MAIN LAYOUT ===== //
         VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
         vbox.setPadding(new Insets(5));
 
@@ -249,7 +249,7 @@ public class MenuPage {
         alert.show();
     }
 
-    // ================== FOOD ITEMS ===================
+    // ================== FOOD ITEMS MANAGEMENT ===================
 
     private void loadFoodItems() {
         foodList.clear();
@@ -536,7 +536,7 @@ public class MenuPage {
         }
     }
 
-    // ================== CART + CHECKOUT ===================
+    // =================== CART ====================
 
     public static class CartItemView {
         private String name;
@@ -608,6 +608,8 @@ public class MenuPage {
         stage.show();
     }
 
+    // ================== CHECKOUT ===================
+
     private void checkout() {
         // Step 1: Calculate total
         double total = 0;
@@ -628,7 +630,7 @@ public class MenuPage {
         payment.processPayment(cart, foodMap);
     }
 
-
+    // ================== EDIT ===================
 
     private void showEditDialog(FoodItems food) {
         Stage dialog = new Stage();
