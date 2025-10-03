@@ -1,5 +1,6 @@
 package com.example.munchoak;
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -12,6 +13,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -342,7 +345,24 @@ public class MenuPage {
         Button addToCartBtn = new Button("Add to Cart");
         addToCartBtn.setOnAction(e -> {
             cart.addToCart(food.getId(), 1);
-            new Alert(Alert.AlertType.INFORMATION, food.getName() + " added to cart!").showAndWait();
+            // new Alert(Alert.AlertType.INFORMATION, food.getName() + " added to cart!").showAndWait();
+            Stage popup = new Stage();
+            popup.initStyle(StageStyle.UNDECORATED);
+            popup.setAlwaysOnTop(true);
+
+            Label label = new Label(food.getName() + " added to cart!");
+            label.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px; -fx-font-size: 14px;");
+
+            VBox box = new VBox(label);
+            box.setAlignment(Pos.CENTER);
+
+            popup.setScene(new Scene(box));
+            popup.show();
+
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e2 -> popup.close());
+            delay.play();
+
         });
 
         Button editBtn = new Button("Edit");
@@ -588,29 +608,71 @@ public class MenuPage {
         stage.show();
     }
 
+//    private void checkout() {
+//        double total = 0;
+//        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+//            for (FoodItems food : foodList) {
+//                if (food.getId() == entry.getKey()) {
+//                    total += food.getPrice() * entry.getValue();
+//                }
+//            }
+//        }
+//
+//        Stage stage = new Stage();
+//        stage.setTitle("Bill");
+//
+//        Label billLabel = new Label("Total: $" + total);
+//        billLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+//
+//        VBox vbox = new VBox(15, billLabel);
+//        vbox.setPadding(new Insets(20));
+//        vbox.setAlignment(Pos.CENTER);
+//
+//        stage.setScene(new Scene(vbox, 250, 150));
+//        stage.show();
+//    }
+
     private void checkout() {
+        // Step 1: Calculate total
         double total = 0;
+        Map<Integer, FoodItems> foodMap = new HashMap<>();
+        for (FoodItems food : foodList) {
+            foodMap.put(food.getId(), food);  // useful for Bill
+        }
+
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-            for (FoodItems food : foodList) {
-                if (food.getId() == entry.getKey()) {
-                    total += food.getPrice() * entry.getValue();
-                }
+            FoodItems food = foodMap.get(entry.getKey());
+            if (food != null) {
+                total += food.getPrice() * entry.getValue();
             }
         }
 
+        // Step 2: Process payment
+        Payment payment = new Payment(total);
+        payment.processPayment();
+
+        // Step 3: Generate bill
+        Bill bill = new Bill(cart, payment);
+        String receipt = bill.generateReceipt(foodMap);
+
+        // Step 4: Show in a new Stage
         Stage stage = new Stage();
-        stage.setTitle("Bill");
+        stage.setTitle("Bill Receipt");
 
-        Label billLabel = new Label("Total: $" + total);
-        billLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        TextArea receiptArea = new TextArea(receipt);
+        receiptArea.setEditable(false);
+        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+        receiptArea.setPrefWidth(500);
+        receiptArea.setPrefHeight(400);
 
-        VBox vbox = new VBox(15, billLabel);
+        VBox vbox = new VBox(15, receiptArea);
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
 
-        stage.setScene(new Scene(vbox, 250, 150));
+        stage.setScene(new Scene(vbox, 500, 400));
         stage.show();
     }
+
 
     private void showEditDialog(FoodItems food) {
         Stage dialog = new Stage();
