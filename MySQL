@@ -1,16 +1,14 @@
 -- Create database
 CREATE DATABASE IF NOT EXISTS FOOD_ITEMS;
 USE FOOD_ITEMS;
+-- DROP DATABASE IF EXISTS FOOD_ITEMS;
 
--- Drop in correct order
-
+-- Drop old tables in correct order
 DROP TABLE IF EXISTS Details;
 DROP TABLE IF EXISTS Categories;
 DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS cartITEMS;
-DROP TABLE IF EXISTS carts;
+DROP TABLE IF EXISTS Paymenthistory;
+
 -- Users table
 CREATE TABLE Users (
     User_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,11 +26,9 @@ CREATE TABLE Paymenthistory (
     FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
 );
 
-
--- Categories table
+-- Categories table (optional, can keep for reference)
 CREATE TABLE Categories (
-    Category_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Category_Name VARCHAR(100) UNIQUE NOT NULL
+    Category_Name VARCHAR(100) PRIMARY KEY
 );
 
 -- Food details table
@@ -43,9 +39,7 @@ CREATE TABLE Details (
     Price DOUBLE NOT NULL,
     Ratings DOUBLE,
     ImagePath VARCHAR(255),
-    Category_ID INT NOT NULL,
-    FOREIGN KEY (Category_ID) REFERENCES Categories(Category_ID)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    Category VARCHAR(100) NOT NULL   -- just store category name directly
 );
 
 -- Default user
@@ -166,6 +160,7 @@ INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VA
 ('Garlic Mushrooms', 'Mushrooms tossed in garlic butter', 4.20, 4.5, 'garlic-mushrooms.jpg', 'Appetizers'),
 ('Calamari', 'Fried calamari rings', 7.50, 4.5, 'calamari.jpg', 'Appetizers'),
 ('Paella', 'Spanish seafood rice', 11.50, 4.8, 'pealla.jpeg', 'Main Course');
+
 
 
 
