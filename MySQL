@@ -2,52 +2,58 @@
 CREATE DATABASE IF NOT EXISTS FOOD_ITEMS;
 USE FOOD_ITEMS;
 
+-- Drop in correct order
+
+DROP TABLE IF EXISTS Details;
+DROP TABLE IF EXISTS Categories;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cartITEMS;
+DROP TABLE IF EXISTS carts;
 -- Users table
-CREATE TABLE IF NOT EXISTS Users (
+CREATE TABLE Users (
     User_ID INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(50) UNIQUE NOT NULL,
-    Password VARCHAR(255) NOT NULL
+    Password VARCHAR(100) NOT NULL
 );
 
+-- Payment history table
+CREATE TABLE Paymenthistory (
+    Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
+    User_ID INT NOT NULL,
+    TotalAmount DECIMAL(10,2) NOT NULL,
+    PaymentMethod VARCHAR(50),
+    PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+);
+
+
 -- Categories table
-CREATE TABLE IF NOT EXISTS Categories (
+CREATE TABLE Categories (
     Category_ID INT AUTO_INCREMENT PRIMARY KEY,
     Category_Name VARCHAR(100) UNIQUE NOT NULL
 );
 
 -- Food details table
-CREATE TABLE IF NOT EXISTS Details (
+CREATE TABLE Details (
     Food_ID INT AUTO_INCREMENT PRIMARY KEY,
     Food_Name VARCHAR(255) NOT NULL,
     Details VARCHAR(255),
     Price DOUBLE NOT NULL,
     Ratings DOUBLE,
     ImagePath VARCHAR(255),
-    Category VARCHAR(100) NOT NULL,
-    CONSTRAINT fk_category FOREIGN KEY (Category) REFERENCES Categories(Category_Name)
+    Category_ID INT NOT NULL,
+    FOREIGN KEY (Category_ID) REFERENCES Categories(Category_ID)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-
--- Payment history table
-DROP TABLE IF EXISTS PaymentHistory;
-
-CREATE TABLE PaymentHistory (
-    Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
-    User_ID INT NOT NULL,
-    Cart_ID VARCHAR(255) NOT NULL, -- store cart token or ID
-    Amount DOUBLE NOT NULL,
-    Timestamp VARCHAR(50) NOT NULL,
-    Status VARCHAR(10) NOT NULL DEFAULT 'PAID',
-    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
-        ON UPDATE CASCADE ON DELETE CASCADE
-);
-
+-- Default user
+INSERT INTO Users (Username, Password) VALUES ('defaultuser', 'password123');
 
 -- Insert sample categories
 INSERT INTO Categories (Category_Name) VALUES
 ('Drinks'), ('Sweets'), ('Spicy Foods'), ('Main Course'), ('Appetizers');
-
 -- Insert sample foods
 -- Insert 100 food items
 INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES
