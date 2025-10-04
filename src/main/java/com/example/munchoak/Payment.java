@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import java.sql.*;
 import java.time.Instant;
 import java.util.Map;
 
@@ -60,6 +60,17 @@ public class Payment {
                 alert.show();
             } else {
                 this.success = true;  // Always success
+                try (Connection conn = DatabaseConnection.getConnection()) {
+                    String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, Session.getCurrentUserId());
+                    stmt.setDouble(2, amount);   // use this.amount
+                    stmt.setString(3, "Card");   // or dynamically from dropdown
+                    stmt.executeUpdate();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
                 paymentStage.close();
 
                 // ✅ Generate Bill when payment is successful
