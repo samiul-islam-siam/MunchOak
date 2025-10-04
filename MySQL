@@ -15,6 +15,7 @@ CREATE TABLE Users (
     Username VARCHAR(50) UNIQUE NOT NULL,
     Password VARCHAR(100) NOT NULL
 );
+ALTER TABLE Users AUTO_INCREMENT = 202500;
 
 -- Payment history table
 CREATE TABLE Paymenthistory (
