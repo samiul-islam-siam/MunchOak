@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="History updated">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Cart updated">
       <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -164,7 +161,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759554063772</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Cart updated">
+      <option name="closed" value="true" />
+      <created>1759555352689</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1759555352689</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -174,6 +179,7 @@
     <MESSAGE value="Database update" />
     <MESSAGE value="Payment System updated" />
     <MESSAGE value="History updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="History updated" />
+    <MESSAGE value="Cart updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cart updated" />
   </component>
 </project>
