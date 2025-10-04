@@ -26,98 +26,183 @@ public class Payment {
         this.success = false;
     }
 
-    public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
-        Stage paymentStage = new Stage();
-        paymentStage.setTitle("Payment");
+//    public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
+//        Stage paymentStage = new Stage();
+//        paymentStage.setTitle("Payment");
+//
+//        // Card Number Field
+//        Label cardLabel = new Label("Card Number:");
+//        TextField cardField = new TextField();
+//        cardField.setPromptText("Enter card number");
+//
+//        // PIN Field
+//        Label pinLabel = new Label("PIN:");
+//        PasswordField pinField = new PasswordField();
+//        pinField.setPromptText("Enter PIN");
+//
+//        // Pay Button
+//        Button payButton = new Button("Pay");
+//        payButton.setDefaultButton(true);
+//
+//        VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
+//        vbox.setPadding(new Insets(20));
+//        vbox.setAlignment(Pos.CENTER);
+//
+//        Scene scene = new Scene(vbox, 300, 200);
+//        paymentStage.setScene(scene);
+//        paymentStage.show();
+//
+//        payButton.setOnAction(e -> {
+//            String cardNumber = cardField.getText().trim();
+//            String pin = pinField.getText().trim();
+//
+//            if (cardNumber.isEmpty() || pin.isEmpty()) {
+//                Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill all fields!");
+//                alert.show();
+//                return;
+//            }
+//
+//            this.success = true;
+//
+//            try (Connection conn = DatabaseConnection.getConnection()) {
+//                int userId = Session.getCurrentUserId();
+//
+//                // Ensure user exists
+//                if (!userExists(conn, userId)) {
+//                    userId = getNextUserId(conn);
+//                    createUser(conn, userId, "user" + userId, "defaultPassword");
+//                    Session.setCurrentUserId(userId); // update session
+//                }
+//
+//                // Get next Payment_ID for this user
+//                int nextPaymentId = getNextPaymentId(conn, userId);
+//
+//                // Insert payment
+//                String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
+//                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+//                stmt.setInt(1, userId);
+//                stmt.setDouble(2, amount);
+//                stmt.setString(3, "Card");
+//                stmt.executeUpdate();
+//
+//                ResultSet rs = stmt.getGeneratedKeys();
+//                if (rs.next()) {
+//                    this.id = rs.getInt(1);  // get Payment_ID automatically
+//                }
+//
+//
+//            } catch (SQLException ex) {
+//                ex.printStackTrace();
+//            }
+//
+//            paymentStage.close();
+//
+//            // Generate Bill
+//            Bill bill = new Bill(cart, this);
+//            String receipt = bill.generateReceipt(foodMap);
+//
+//            Stage billStage = new Stage();
+//            billStage.setTitle("Bill Receipt");
+//
+//            TextArea receiptArea = new TextArea(receipt);
+//            receiptArea.setEditable(false);
+//            receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+//            receiptArea.setPrefWidth(500);
+//            receiptArea.setPrefHeight(400);
+//
+//            VBox billBox = new VBox(15, receiptArea);
+//            billBox.setPadding(new Insets(20));
+//            billBox.setAlignment(Pos.CENTER);
+//
+//            billStage.setScene(new Scene(billBox, 500, 400));
+//            billStage.show();
+//        });
+//    }
+public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
+    Stage paymentStage = new Stage();
+    paymentStage.setTitle("Payment");
 
-        // Card Number Field
-        Label cardLabel = new Label("Card Number:");
-        TextField cardField = new TextField();
-        cardField.setPromptText("Enter card number");
+    // Card Number Field
+    Label cardLabel = new Label("Card Number:");
+    TextField cardField = new TextField();
 
-        // PIN Field
-        Label pinLabel = new Label("PIN:");
-        PasswordField pinField = new PasswordField();
-        pinField.setPromptText("Enter PIN");
+    // PIN Field
+    Label pinLabel = new Label("PIN:");
+    PasswordField pinField = new PasswordField();
 
-        // Pay Button
-        Button payButton = new Button("Pay");
-        payButton.setDefaultButton(true);
+    // Pay Button
+    Button payButton = new Button("Pay");
+    payButton.setDefaultButton(true);
 
-        VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
-        vbox.setPadding(new Insets(20));
-        vbox.setAlignment(Pos.CENTER);
+    VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
+    vbox.setPadding(new Insets(20));
+    vbox.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(vbox, 300, 200);
-        paymentStage.setScene(scene);
-        paymentStage.show();
+    paymentStage.setScene(new Scene(vbox, 300, 200));
+    paymentStage.show();
 
-        payButton.setOnAction(e -> {
-            String cardNumber = cardField.getText().trim();
-            String pin = pinField.getText().trim();
+    payButton.setOnAction(e -> {
+        String cardNumber = cardField.getText().trim();
+        String pin = pinField.getText().trim();
+        if (cardNumber.isEmpty() || pin.isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "Please fill all fields!").show();
+            return;
+        }
+        this.success = true;
 
-            if (cardNumber.isEmpty() || pin.isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill all fields!");
-                alert.show();
-                return;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            int userId = Session.getCurrentUserId();
+
+            // Ensure user exists
+            if (!userExists(conn, userId)) {
+                userId = getNextUserId(conn);
+                createUser(conn, userId, "user" + userId, "defaultPassword");
+                Session.setCurrentUserId(userId);
             }
 
-            this.success = true;
+            // Insert payment
+            String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            stmt.setInt(1, userId);
+            stmt.setDouble(2, amount);
+            stmt.setString(3, "Card");
+            stmt.executeUpdate();
 
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                int userId = Session.getCurrentUserId();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) this.id = rs.getInt(1);
 
-                // Ensure user exists
-                if (!userExists(conn, userId)) {
-                    userId = getNextUserId(conn);
-                    createUser(conn, userId, "user" + userId, "defaultPassword");
-                    Session.setCurrentUserId(userId); // update session
-                }
-
-                // Get next Payment_ID for this user
-                int nextPaymentId = getNextPaymentId(conn, userId);
-
-                // Insert payment
-                String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                stmt.setInt(1, userId);
-                stmt.setDouble(2, amount);
-                stmt.setString(3, "Card");
-                stmt.executeUpdate();
-
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) {
-                    this.id = rs.getInt(1);  // get Payment_ID automatically
-                }
-
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            // Save individual items
+            String itemSQL = "INSERT INTO PaymentItems (Payment_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
+            PreparedStatement itemStmt = conn.prepareStatement(itemSQL);
+            for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+                itemStmt.setInt(1, this.id);
+                itemStmt.setInt(2, entry.getKey());
+                itemStmt.setInt(3, entry.getValue());
+                itemStmt.addBatch();
             }
+            itemStmt.executeBatch();
 
-            paymentStage.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
-            // Generate Bill
-            Bill bill = new Bill(cart, this);
-            String receipt = bill.generateReceipt(foodMap);
+        paymentStage.close();
 
-            Stage billStage = new Stage();
-            billStage.setTitle("Bill Receipt");
+        // Show receipt
+        Bill bill = new Bill(cart, this);
+        String receipt = bill.generateReceipt(foodMap);
+        Stage billStage = new Stage();
+        billStage.setTitle("Bill Receipt");
+        TextArea receiptArea = new TextArea(receipt);
+        receiptArea.setEditable(false);
+        receiptArea.setStyle("-fx-font-family: monospace; -fx-font-size: 14px;");
+        VBox box = new VBox(receiptArea);
+        box.setPadding(new Insets(20));
+        billStage.setScene(new Scene(box, 500, 400));
+        billStage.show();
+    });
+}
 
-            TextArea receiptArea = new TextArea(receipt);
-            receiptArea.setEditable(false);
-            receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-            receiptArea.setPrefWidth(500);
-            receiptArea.setPrefHeight(400);
-
-            VBox billBox = new VBox(15, receiptArea);
-            billBox.setPadding(new Insets(20));
-            billBox.setAlignment(Pos.CENTER);
-
-            billStage.setScene(new Scene(billBox, 500, 400));
-            billStage.show();
-        });
-    }
 
     // Check if user exists
     private boolean userExists(Connection conn, int userId) throws SQLException {

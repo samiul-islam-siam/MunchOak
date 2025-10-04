@@ -44,6 +44,17 @@ CREATE TABLE Details (
     Category VARCHAR(100) NOT NULL   -- just store category name directly
 );
 
+CREATE TABLE PaymentItems (
+    Item_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Payment_ID INT NOT NULL,
+    Food_ID INT NOT NULL,
+    Quantity INT NOT NULL,
+    FOREIGN KEY (Payment_ID) REFERENCES PaymentHistory(Payment_ID),
+    FOREIGN KEY (Food_ID) REFERENCES Details(Food_ID)
+);
+
+
+
 -- Default user
 INSERT INTO Users (Username, Password) VALUES ('defaultuser', 'password123');
 

@@ -166,60 +166,194 @@ public class RestaurantDashboard extends Application {
         contentPane.getChildren().clear();
         contentPane.getChildren().add(new HomePage().getView());
     }
-    public class HistoryPage {
-        public void show() {
-            Stage stage = new Stage();
-            stage.setTitle("Payment History");
+//    public class HistoryPage {
+//        public void show() {
+//            Stage stage = new Stage();
+//            stage.setTitle("Payment History");
+//
+//            TableView<PaymentRecord> table = new TableView<>();
+//
+//            TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
+//            idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
+//
+//            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
+//            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+//
+//            TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
+//            amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+//
+//            TableColumn<PaymentRecord, String> methodCol = new TableColumn<>("Method");
+//            methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
+//
+//            TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
+//            dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
+//
+//            table.getColumns().addAll(userCol,idCol, amountCol, methodCol, dateCol);
+//
+//            ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
+//
+//            try (Connection conn = DatabaseConnection.getConnection()) {
+//                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
+//                PreparedStatement stmt = conn.prepareStatement(sql);
+//                ResultSet rs = stmt.executeQuery();
+//
+//                while (rs.next()) {
+//                    data.add(new PaymentRecord(
+//                            rs.getInt("Payment_ID"),
+//                            rs.getInt("User_ID"),
+//                            rs.getDouble("TotalAmount"),
+//                            rs.getString("PaymentMethod"),
+//                            rs.getString("PaymentDate")
+//                    ));
+//                }
+//            } catch (SQLException ex) {
+//                ex.printStackTrace();
+//            }
+//
+//            table.setItems(data);
+//
+//            VBox root = new VBox(table);
+//            Scene scene = new Scene(root, 700, 400);
+//            stage.setScene(scene);
+//            stage.show();
+//        }
+//    }
+public class HistoryPage {
+    public void show() {
+        Stage stage = new Stage();
+        stage.setTitle("Payment History");
 
-            TableView<PaymentRecord> table = new TableView<>();
+        TableView<PaymentRecord> table = new TableView<>();
 
-            TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
-            idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
+        TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
 
-            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
-            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+        TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
+        userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
 
-            TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
-            amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-            TableColumn<PaymentRecord, String> methodCol = new TableColumn<>("Method");
-            methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
+        TableColumn<PaymentRecord, String> methodCol = new TableColumn<>("Method");
+        methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
 
-            TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
-            dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
+        TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-            table.getColumns().addAll(userCol,idCol, amountCol, methodCol, dateCol);
-
-            ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
-
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    data.add(new PaymentRecord(
-                            rs.getInt("Payment_ID"),
-                            rs.getInt("User_ID"),
-                            rs.getDouble("TotalAmount"),
-                            rs.getString("PaymentMethod"),
-                            rs.getString("PaymentDate")
-                    ));
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        // Bill Button Column
+        TableColumn<PaymentRecord, Void> billCol = new TableColumn<>("Bill");
+        billCol.setCellFactory(col -> new TableCell<>() {
+            private final Button billButton = new Button("Bill");
+            {
+                billButton.setOnAction(e -> {
+                    PaymentRecord record = getTableView().getItems().get(getIndex());
+                    showBill(record);
+                });
             }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : billButton);
+            }
+        });
 
-            table.setItems(data);
+        table.getColumns().addAll(idCol, userCol, amountCol, methodCol, dateCol, billCol);
 
-            VBox root = new VBox(table);
-            Scene scene = new Scene(root, 700, 400);
-            stage.setScene(scene);
-            stage.show();
+        ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                data.add(new PaymentRecord(
+                        rs.getInt("Payment_ID"),
+                        rs.getInt("User_ID"),
+                        rs.getDouble("TotalAmount"),
+                        rs.getString("PaymentMethod"),
+                        rs.getString("PaymentDate")
+                ));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
+        table.setItems(data);
+        VBox root = new VBox(table);
+        Scene scene = new Scene(root, 800, 400);
+        stage.setScene(scene);
+        stage.show();
     }
 
+    private void showBill(PaymentRecord record) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Fetch items for this payment
+            String sql = "SELECT d.Food_Name, pi.Quantity, d.Price " +
+                    "FROM PaymentItems pi " +
+                    "JOIN Details d ON pi.Food_ID = d.Food_ID " +
+                    "WHERE pi.Payment_ID = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, record.getPaymentId());
+            ResultSet rs = stmt.executeQuery();
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Payment ID: ").append(record.getPaymentId()).append("\n");
+            sb.append("User ID: ").append(record.getUserId()).append("\n");
+            sb.append("Payment Method: ").append(record.getMethod()).append("\n");
+            sb.append("Date: ").append(record.getDate()).append("\n\n");
+            sb.append("Items:\n");
+
+            double total = 0;
+            while (rs.next()) {
+                String name = rs.getString("Food_Name");
+                int qty = rs.getInt("Quantity");
+                double price = rs.getDouble("Price");
+                double line = qty * price;
+                total += line;
+                sb.append(String.format("%s x %d = %.2f\n", name, qty, line));
+            }
+
+            sb.append("\nTotal: ").append(String.format("%.2f", total));
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Bill");
+            alert.setHeaderText("Payment ID: " + record.getPaymentId());
+            alert.setContentText(sb.toString());
+            alert.getDialogPane().setPrefWidth(400);
+            alert.showAndWait();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
     // Update PaymentRecord class to include userId
+//    public class PaymentRecord {
+//        private int paymentId;
+//        private int userId;
+//        private double amount;
+//        private String method;
+//        private String date;
+//
+//        public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
+//            this.paymentId = paymentId;
+//            this.userId = userId;
+//            this.amount = amount;
+//            this.method = method;
+//            this.date = date;
+//        }
+//
+//        public int getPaymentId() { return paymentId; }
+//        public int getUserId() { return userId; }
+//        public double getAmount() { return amount; }
+//        public String getMethod() { return method; }
+//        public String getDate() { return date; }
+//    }
+
+
+
     public class PaymentRecord {
         private int paymentId;
         private int userId;
@@ -241,7 +375,6 @@ public class RestaurantDashboard extends Application {
         public String getMethod() { return method; }
         public String getDate() { return date; }
     }
-
 
     public static void main(String[] args) {
         launch(args);
