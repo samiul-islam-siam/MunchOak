@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Cart updated">
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

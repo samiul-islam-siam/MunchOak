@@ -6,19 +6,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.sql.*;
 import java.time.Instant;
 import java.util.Map;
 
 public class Payment {
-    private static int nextId = 1;
-    private int id;
+    private int id;           // Payment ID
     private double amount;
     private boolean success;
     private String timestamp;
 
+    private static final int START_PAYMENT_ID = 3001;       // Start Payment_ID
+    private static final int START_USER_ID = 20250001;      // Start User_ID
+
     public Payment(double amount) {
-        this.id = nextId++;
         this.amount = amount;
         this.timestamp = Instant.now().toString();
         this.success = false;
@@ -50,7 +52,6 @@ public class Payment {
         paymentStage.setScene(scene);
         paymentStage.show();
 
-        // Handle Pay Button
         payButton.setOnAction(e -> {
             String cardNumber = cardField.getText().trim();
             String pin = pinField.getText().trim();
@@ -58,48 +59,125 @@ public class Payment {
             if (cardNumber.isEmpty() || pin.isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill all fields!");
                 alert.show();
-            } else {
-                this.success = true;  // Always success
-                try (Connection conn = DatabaseConnection.getConnection()) {
-                    String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
-                    PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setInt(1, Session.getCurrentUserId());
-                    stmt.setDouble(2, amount);   // use this.amount
-                    stmt.setString(3, "Card");   // or dynamically from dropdown
-                    stmt.executeUpdate();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                return;
+            }
+
+            this.success = true;
+
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                int userId = Session.getCurrentUserId();
+
+                // Ensure user exists
+                if (!userExists(conn, userId)) {
+                    userId = getNextUserId(conn);
+                    createUser(conn, userId, "user" + userId, "defaultPassword");
+                    Session.setCurrentUserId(userId); // update session
                 }
 
-                paymentStage.close();
+                // Get next Payment_ID for this user
+                int nextPaymentId = getNextPaymentId(conn, userId);
 
-                // ✅ Generate Bill when payment is successful
-                Bill bill = new Bill(cart, this);
-                String receipt = bill.generateReceipt(foodMap);
+                // Insert payment
+                String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                stmt.setInt(1, userId);
+                stmt.setDouble(2, amount);
+                stmt.setString(3, "Card");
+                stmt.executeUpdate();
 
-                Stage billStage = new Stage();
-                billStage.setTitle("Bill Receipt");
+                ResultSet rs = stmt.getGeneratedKeys();
+                if (rs.next()) {
+                    this.id = rs.getInt(1);  // get Payment_ID automatically
+                }
 
-                TextArea receiptArea = new TextArea(receipt);
-                receiptArea.setEditable(false);
-                receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-                receiptArea.setPrefWidth(500);
-                receiptArea.setPrefHeight(400);
 
-                VBox billBox = new VBox(15, receiptArea);
-                billBox.setPadding(new Insets(20));
-                billBox.setAlignment(Pos.CENTER);
-
-                billStage.setScene(new Scene(billBox, 500, 400));
-                billStage.show();
-                cart.getBuyHistory().clear();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
+
+            paymentStage.close();
+
+            // Generate Bill
+            Bill bill = new Bill(cart, this);
+            String receipt = bill.generateReceipt(foodMap);
+
+            Stage billStage = new Stage();
+            billStage.setTitle("Bill Receipt");
+
+            TextArea receiptArea = new TextArea(receipt);
+            receiptArea.setEditable(false);
+            receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+            receiptArea.setPrefWidth(500);
+            receiptArea.setPrefHeight(400);
+
+            VBox billBox = new VBox(15, receiptArea);
+            billBox.setPadding(new Insets(20));
+            billBox.setAlignment(Pos.CENTER);
+
+            billStage.setScene(new Scene(billBox, 500, 400));
+            billStage.show();
+            cart.getBuyHistory().clear();
         });
     }
 
+    // Check if user exists
+    private boolean userExists(Connection conn, int userId) throws SQLException {
+        String sql = "SELECT 1 FROM Users WHERE User_ID = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next();
+    }
 
-    public int getId() { return id; }
-    public double getAmount() { return amount; }
-    public boolean isSuccess() { return success; }
-    public String getTimestamp() { return timestamp; }
+    // Get next User_ID
+    private int getNextUserId(Connection conn) throws SQLException {
+        String sql = "SELECT MAX(User_ID) AS maxId FROM Users";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int maxId = rs.getInt("maxId");
+            return (maxId >= START_USER_ID) ? maxId + 1 : START_USER_ID;
+        }
+        return START_USER_ID;
+    }
+
+    // Create user
+    private void createUser(Connection conn, int userId, String username, String password) throws SQLException {
+        String sql = "INSERT INTO Users (User_ID, Username, Password) VALUES (?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+        stmt.setString(2, username);
+        stmt.setString(3, password);
+        stmt.executeUpdate();
+    }
+
+    // Get next Payment_ID for a particular user
+    private int getNextPaymentId(Connection conn, int userId) throws SQLException {
+        String sql = "SELECT MAX(Payment_ID) AS maxId FROM PaymentHistory WHERE User_ID = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int maxId = rs.getInt("maxId");
+            if (maxId >= START_PAYMENT_ID) return maxId + 1;
+        }
+        return START_PAYMENT_ID;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
 }

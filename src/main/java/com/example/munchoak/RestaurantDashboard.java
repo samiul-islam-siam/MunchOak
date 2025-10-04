@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
@@ -53,13 +54,13 @@ public class RestaurantDashboard extends Application {
         Button homeBtn = createMenuButton("🏠", "Home");
         Button ordersBtn = createMenuButton("🧾", "Orders");
         Button menuBtn   = createMenuButton("🍔", "Menu");
-        Button reservationsBtn = createMenuButton("📅", "Reservations");
+        Button reservationBtn = createMenuButton("📅", "Reservation");
         Button reportsBtn = createMenuButton("📊", "Reports");
         Button aboutBtn = createMenuButton("ℹ️", "About Us");
         Button historyBtn = createMenuButton("📜", "History");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationsBtn, reportsBtn, aboutBtn, historyBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
@@ -78,7 +79,13 @@ public class RestaurantDashboard extends Application {
             contentPane.getChildren().clear();
             contentPane.getChildren().add(new MenuPage().getView());
         });
-        reservationsBtn.setOnAction(e -> updateContentSimple("📅 Reservations", "View and manage reservations."));
+
+        reservationBtn.setOnAction(e -> {
+            Reservation reservation = new Reservation();
+            reservation.showReservationWindow((Stage) ((Node) e.getSource()).getScene().getWindow());
+        });
+
+
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
         aboutBtn.setOnAction(e -> updateContentSimple("About Us",
                 "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
@@ -178,6 +185,9 @@ public class RestaurantDashboard extends Application {
             TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
             idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
 
+            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
+            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+
             TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
             amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
@@ -187,20 +197,19 @@ public class RestaurantDashboard extends Application {
             TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
             dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-            table.getColumns().addAll(idCol, amountCol, methodCol, dateCol);
+            table.getColumns().addAll(userCol,idCol, amountCol, methodCol, dateCol);
 
             ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
 
             try (Connection conn = DatabaseConnection.getConnection()) {
-                // TEMP: assume default user id = 1
-                String sql = "SELECT Payment_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory WHERE User_ID=?";
+                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, 1); // <-- replace with Session.getCurrentUserId() when login is ready
                 ResultSet rs = stmt.executeQuery();
 
                 while (rs.next()) {
                     data.add(new PaymentRecord(
                             rs.getInt("Payment_ID"),
+                            rs.getInt("User_ID"),
                             rs.getDouble("TotalAmount"),
                             rs.getString("PaymentMethod"),
                             rs.getString("PaymentDate")
@@ -213,26 +222,30 @@ public class RestaurantDashboard extends Application {
             table.setItems(data);
 
             VBox root = new VBox(table);
-            Scene scene = new Scene(root, 600, 400);
+            Scene scene = new Scene(root, 700, 400);
             stage.setScene(scene);
             stage.show();
         }
     }
 
+    // Update PaymentRecord class to include userId
     public class PaymentRecord {
         private int paymentId;
+        private int userId;
         private double amount;
         private String method;
         private String date;
 
-        public PaymentRecord(int paymentId, double amount, String method, String date) {
+        public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
             this.paymentId = paymentId;
+            this.userId = userId;
             this.amount = amount;
             this.method = method;
             this.date = date;
         }
 
         public int getPaymentId() { return paymentId; }
+        public int getUserId() { return userId; }
         public double getAmount() { return amount; }
         public String getMethod() { return method; }
         public String getDate() { return date; }
