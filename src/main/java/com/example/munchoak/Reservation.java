@@ -4,13 +4,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Optional;
 
 public class Reservation {
@@ -18,20 +18,9 @@ public class Reservation {
     public void showReservationWindow(Stage stage) {
         stage.setTitle("Table Reservation - MunchOak");
 
-        // --- Code for Background Image ---
-//        BackgroundImage bgImage = new BackgroundImage(
-//                new Image(getClass().getResource("/images/reservation_bg.jpg").toExternalForm(), 800, 600, false, true),
-//                BackgroundRepeat.NO_REPEAT,
-//                BackgroundRepeat.NO_REPEAT,
-//                BackgroundPosition.CENTER,
-//                BackgroundSize.DEFAULT
-//        );
-
         VBox root = new VBox(15);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(30));
-
-//        root.setBackground(new Background(bgImage));
 
         Label titleLabel = new Label("Reserve Your Table 🍽️");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: blue;");
@@ -66,7 +55,6 @@ public class Reservation {
         Button backButton = new Button("← Back to Dashboard");
         backButton.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-underline: true;");
 
-        // --- Layout ---
         VBox formBox = new VBox(12,
                 nameField,
                 phoneField,
@@ -109,10 +97,13 @@ public class Reservation {
 
             Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
-                        "Your table has been successfully reserved!\nWe look forward to serving you.");
-                // Optionally save data to file or database here
-                clearFields(nameField, phoneField, specialRequest, guestsSpinner, datePicker, timeBox);
+                if (saveReservationToDB(name, phone, guests, date.toString(), time, specialRequest.getText())) {
+                    showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
+                            "Your table has been successfully reserved!\nWe look forward to serving you.");
+                    clearFields(nameField, phoneField, specialRequest, guestsSpinner, datePicker, timeBox);
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
+                }
             }
         });
 
@@ -120,6 +111,28 @@ public class Reservation {
             RestaurantDashboard mainMenu = new RestaurantDashboard();
             mainMenu.start(stage);
         });
+    }
+
+    // --- Save Reservation to Database ---
+    private boolean saveReservationToDB(String name, String phone, int guests, String date, String time, String request) {
+        String sql = "INSERT INTO Reservations (Name, Phone, Guests, ReservationDate, ReservationTime, SpecialRequests) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, phone);
+            stmt.setInt(3, guests);
+            stmt.setString(4, date);
+            stmt.setString(5, time + ":00"); // MySQL TIME format
+            stmt.setString(6, request);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
