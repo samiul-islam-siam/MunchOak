@@ -12,13 +12,13 @@ import java.time.Instant;
 import java.util.Map;
 
 public class Payment {
-    private int id;
+    private int id;           // Payment ID
     private double amount;
     private boolean success;
     private String timestamp;
 
-    // Use a fixed user ID for now
-    private static final int USER_ID = 202500;
+    private static final int START_PAYMENT_ID = 3001;       // Start Payment_ID
+    private static final int START_USER_ID = 20250001;      // Start User_ID
 
     public Payment(double amount) {
         this.amount = amount;
@@ -62,28 +62,34 @@ public class Payment {
                 return;
             }
 
-            this.success = true; // mark payment as success
+            this.success = true;
 
             try (Connection conn = DatabaseConnection.getConnection()) {
+                int userId = Session.getCurrentUserId();
 
-                // Ensure user 202500 exists
-                if (!userExists(conn, USER_ID)) {
-                    createUser(conn, USER_ID, "defaultUser", "password123");
+                // Ensure user exists
+                if (!userExists(conn, userId)) {
+                    userId = getNextUserId(conn);
+                    createUser(conn, userId, "user" + userId, "defaultPassword");
+                    Session.setCurrentUserId(userId); // update session
                 }
+
+                // Get next Payment_ID for this user
+                int nextPaymentId = getNextPaymentId(conn, userId);
 
                 // Insert payment
                 String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                stmt.setInt(1, USER_ID);
+                stmt.setInt(1, userId);
                 stmt.setDouble(2, amount);
                 stmt.setString(3, "Card");
                 stmt.executeUpdate();
 
-                // Get generated Payment_ID
                 ResultSet rs = stmt.getGeneratedKeys();
                 if (rs.next()) {
-                    this.id = rs.getInt(1);
+                    this.id = rs.getInt(1);  // get Payment_ID automatically
                 }
+
 
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -113,7 +119,7 @@ public class Payment {
         });
     }
 
-    // Check if the user exists
+    // Check if user exists
     private boolean userExists(Connection conn, int userId) throws SQLException {
         String sql = "SELECT 1 FROM Users WHERE User_ID = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -122,7 +128,19 @@ public class Payment {
         return rs.next();
     }
 
-    // Create default user
+    // Get next User_ID
+    private int getNextUserId(Connection conn) throws SQLException {
+        String sql = "SELECT MAX(User_ID) AS maxId FROM Users";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int maxId = rs.getInt("maxId");
+            return (maxId >= START_USER_ID) ? maxId + 1 : START_USER_ID;
+        }
+        return START_USER_ID;
+    }
+
+    // Create user
     private void createUser(Connection conn, int userId, String username, String password) throws SQLException {
         String sql = "INSERT INTO Users (User_ID, Username, Password) VALUES (?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -130,6 +148,19 @@ public class Payment {
         stmt.setString(2, username);
         stmt.setString(3, password);
         stmt.executeUpdate();
+    }
+
+    // Get next Payment_ID for a particular user
+    private int getNextPaymentId(Connection conn, int userId) throws SQLException {
+        String sql = "SELECT MAX(Payment_ID) AS maxId FROM PaymentHistory WHERE User_ID = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int maxId = rs.getInt("maxId");
+            if (maxId >= START_PAYMENT_ID) return maxId + 1;
+        }
+        return START_PAYMENT_ID;
     }
 
     // Getters

@@ -26,6 +26,7 @@ CREATE TABLE Paymenthistory (
     PaymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
 );
+ALTER TABLE PaymentHistory AUTO_INCREMENT = 3001;
 
 -- Categories table (optional, can keep for reference)
 CREATE TABLE Categories (
