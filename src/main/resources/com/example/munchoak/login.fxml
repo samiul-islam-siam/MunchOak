@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.munchoak.LoginController"
+           stylesheets="@styles/Login.css" prefWidth="800" prefHeight="400">
+
+    <VBox spacing="30" alignment="CENTER">
+
+        <!-- Logo -->
+        <ImageView fitWidth="200" fitHeight="100">
+            <image>
+                <Image url="@images/logo.png"/>
+            </image>
+        </ImageView>
+
+        <!-- Username Field -->
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="Username"/>
+            <TextField fx:id="usernameField" prefWidth="300"/>
+        </HBox>
+
+        <!-- Password Field -->
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="Password"/>
+            <PasswordField fx:id="passwordField" prefWidth="300"/>
+        </HBox>
+
+        <!-- Buttons -->
+        <HBox spacing="12" alignment="CENTER">
+            <Button text="Login" prefWidth="100" onAction="#handleLogin"/>
+            <Button text="Sign Up" prefWidth="100" onAction="#handleSignup"/>
+        </HBox>
+
+    </VBox>
+</StackPane>

@@ -1,0 +1,7 @@
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.munchoak.AdminController">
+    <children>
+        <Button fx:id="viewOrdersButton" text="View Orders" layoutX="200" layoutY="100" onAction="#handleViewOrders"/>
+        <Button fx:id="manageMenuButton" text="Manage Menu" layoutX="200" layoutY="150" onAction="#handleManageMenu"/>
+        <Button fx:id="viewUsersButton" text="View Users" layoutX="200" layoutY="200" onAction="#handleViewUsers"/>
+    </children>
+</AnchorPane>

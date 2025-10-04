@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p][%-d{HH:mm:ss.SSS}] [%t] %n%l%n%m%n" />
+        </layout>
+    </appender>
+
+    <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="encoding" value="UTF-8" />
+        <param name="Threshold" value="INFO" />
+        <param name="DataPattern" value="'.'yyyy-MM-dd'.log'" />
+        <!-- 日志文件路径 -->
+        <param name="File" value="@log.path@/@project.groupId@/@project.artifactId@.log" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p][%-d{HH:mm:ss.SSS}] [%t] %n%l%n%m%n" />
+        </layout>
+    </appender>
+
+    <!-- 自定义的日志分类，根据实际情况调整 -->
+    <category name="org.example.munchoak" additivity="false">
+        <level value="@log.level@" />
+        <appender-ref ref="CONSOLE" />
+        <!-- <appender-ref ref="FILE" /> -->
+    </category>
+
+    <root>
+        <!-- 根据实际情况修改日志级别，一般是INFO以上 -->
+        <level value="INFO" />
+        <!-- 该appender需要在发布时删除，以免输出重复的日志到catalina.out文件 -->
+        <appender-ref ref="CONSOLE" />
+        <!-- <appender-ref ref="FILE" /> -->
+    </root>
+
+    <logger name="org.apache" additivity="false">
+        <level value="WARN" />
+    </logger>
+    <logger name="org.springframework" additivity="false">
+        <level value="WARN" />
+    </logger>
+
+</log4j:configuration>
