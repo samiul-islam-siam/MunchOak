@@ -574,46 +574,6 @@ public class MenuPage {
         public void setQuantity(int quantity) { this.quantity = quantity; }
     }
 
-//    private void showCart() {
-//        Map<Integer, FoodItems> foodMap = new HashMap<>();
-//        for (FoodItems item : foodList) {
-//            foodMap.put(item.getId(), item);
-//        }
-//
-//        TableView<CartItemView> cartTable = new TableView<>();
-//        ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
-//
-//        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-//            FoodItems food = foodMap.get(entry.getKey());
-//            if (food != null) {
-//                cartItems.add(new CartItemView(food.getName(), entry.getValue(), food.getPrice()));
-//            }
-//        }
-//        cartTable.setItems(cartItems);
-//
-//        TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
-//        nameCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("name"));
-//
-//        TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
-//        qtyCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("quantity"));
-//
-//        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
-//        priceCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("price"));
-//
-//        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
-//        totalCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("total"));
-//
-//        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol);
-//
-//        Stage stage = new Stage();
-//        stage.setTitle("Your Cart");
-//
-//        VBox vbox = new VBox(10, cartTable);
-//        vbox.setPadding(new Insets(10));
-//        stage.setScene(new Scene(vbox, 400, 300));
-//        stage.show();
-//    }
-
     private void showCart() {
         // Map all FoodItems by ID
         Map<Integer, FoodItems> foodMap = new HashMap<>();

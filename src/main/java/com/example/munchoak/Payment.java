@@ -92,6 +92,7 @@ public class Payment {
 
                 billStage.setScene(new Scene(billBox, 500, 400));
                 billStage.show();
+                cart.getBuyHistory().clear();
             }
         });
     }
