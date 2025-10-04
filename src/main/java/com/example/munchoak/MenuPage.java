@@ -3,6 +3,7 @@ package com.example.munchoak;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -539,17 +540,20 @@ public class MenuPage {
     // =================== CART ====================
 
     public static class CartItemView {
+        private int id;
         private String name;
         private int quantity;
         private double price;
         private double total;
 
-        public CartItemView(String name, int quantity, double price) {
+        public CartItemView(int id, String name, int quantity, double price) {
+            this.id = id;
             this.name = name;
             this.quantity = quantity;
             this.price = price;
             this.total = price * quantity;
         }
+        public int getId() {return id;}
 
         public String getName() {
             return name;
@@ -566,47 +570,114 @@ public class MenuPage {
         public double getTotal() {
             return total;
         }
+
+        public void setQuantity(int quantity) { this.quantity = quantity; }
     }
 
     private void showCart() {
+        // Map all FoodItems by ID
         Map<Integer, FoodItems> foodMap = new HashMap<>();
         for (FoodItems item : foodList) {
             foodMap.put(item.getId(), item);
         }
 
-        TableView<CartItemView> cartTable = new TableView<>();
+        // Prepare cart data for TableView
         ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
-
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             FoodItems food = foodMap.get(entry.getKey());
             if (food != null) {
-                cartItems.add(new CartItemView(food.getName(), entry.getValue(), food.getPrice()));
+                cartItems.add(new CartItemView(food.getId(), food.getName(), entry.getValue(), food.getPrice()));
             }
         }
-        cartTable.setItems(cartItems);
 
+        TableView<CartItemView> cartTable = new TableView<>(cartItems);
+
+        // Columns
         TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
-        qtyCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("quantity"));
+        qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
         TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
-        priceCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("price"));
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
 
         TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
-        totalCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("total"));
+        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
 
-        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol);
+        // 🧾 Define totalLabel first so it’s visible in the cell factory
+        Label totalLabel = new Label("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
+        totalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+        // 🧮 Action column (Edit & Remove)
+        TableColumn<CartItemView, Void> actionCol = new TableColumn<>("Action");
+        actionCol.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Edit");
+            private final Button removeBtn = new Button("Remove");
+            private final HBox box = new HBox(5, editBtn, removeBtn);
+
+            {
+                editBtn.setOnAction(e -> {
+                    CartItemView item = getTableView().getItems().get(getIndex());
+                    TextInputDialog dialog = new TextInputDialog(String.valueOf(item.getQuantity()));
+                    dialog.setTitle("Edit Quantity");
+                    dialog.setHeaderText("Update quantity for " + item.getName());
+                    dialog.setContentText("New quantity:");
+
+                    dialog.showAndWait().ifPresent(value -> {
+                        try {
+                            int newQty = Integer.parseInt(value);
+                            if (newQty <= 0) {
+                                cart.removeFromCartEntirely(item.getId());
+                                cartItems.remove(item);
+                            } else {
+                                cart.getBuyHistory().put(item.getId(), newQty);
+                                item.setQuantity(newQty);
+                                cartTable.refresh();
+                            }
+                            totalLabel.setText("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
+                        } catch (NumberFormatException ex) {
+                            new Alert(Alert.AlertType.ERROR, "Please enter a valid number").show();
+                        }
+                    });
+                });
+
+                removeBtn.setOnAction(e -> {
+                    CartItemView item = getTableView().getItems().get(getIndex());
+                    cart.removeFromCartEntirely(item.getId());
+                    cartItems.remove(item);
+                    totalLabel.setText("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
+                });
+            }
+
+            @Override
+            protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                if (empty) setGraphic(null);
+                else setGraphic(box);
+            }
+        });
+
+        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol, actionCol);
+
+        // Close button
+        Button closeBtn = new Button("Close");
+        closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
+
+        HBox bottomBar = new HBox(10, totalLabel, closeBtn);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        bottomBar.setPadding(new Insets(10));
+
+        VBox vbox = new VBox(10, cartTable, bottomBar);
+        vbox.setPadding(new Insets(10));
 
         Stage stage = new Stage();
         stage.setTitle("Your Cart");
-
-        VBox vbox = new VBox(10, cartTable);
-        vbox.setPadding(new Insets(10));
-        stage.setScene(new Scene(vbox, 400, 300));
+        stage.setScene(new Scene(vbox, 600, 400));
         stage.show();
     }
+
+
 
     // ================== CHECKOUT ===================
 
