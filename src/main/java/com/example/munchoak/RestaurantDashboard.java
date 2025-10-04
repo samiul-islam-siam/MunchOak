@@ -166,8 +166,6 @@ public class RestaurantDashboard extends Application {
         contentPane.getChildren().clear();
         contentPane.getChildren().add(new HomePage().getView());
     }
-
-    // ------------------- History Page -------------------
     public class HistoryPage {
         public void show() {
             Stage stage = new Stage();
@@ -178,6 +176,9 @@ public class RestaurantDashboard extends Application {
             TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
             idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
 
+            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
+            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+
             TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
             amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
@@ -187,20 +188,19 @@ public class RestaurantDashboard extends Application {
             TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
             dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-            table.getColumns().addAll(idCol, amountCol, methodCol, dateCol);
+            table.getColumns().addAll(userCol,idCol, amountCol, methodCol, dateCol);
 
             ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
 
             try (Connection conn = DatabaseConnection.getConnection()) {
-                // TEMP: assume default user id = 1
-                String sql = "SELECT Payment_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory WHERE User_ID=?";
+                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, 1); // <-- replace with Session.getCurrentUserId() when login is ready
                 ResultSet rs = stmt.executeQuery();
 
                 while (rs.next()) {
                     data.add(new PaymentRecord(
                             rs.getInt("Payment_ID"),
+                            rs.getInt("User_ID"),
                             rs.getDouble("TotalAmount"),
                             rs.getString("PaymentMethod"),
                             rs.getString("PaymentDate")
@@ -213,30 +213,35 @@ public class RestaurantDashboard extends Application {
             table.setItems(data);
 
             VBox root = new VBox(table);
-            Scene scene = new Scene(root, 600, 400);
+            Scene scene = new Scene(root, 700, 400);
             stage.setScene(scene);
             stage.show();
         }
     }
 
+    // Update PaymentRecord class to include userId
     public class PaymentRecord {
         private int paymentId;
+        private int userId;
         private double amount;
         private String method;
         private String date;
 
-        public PaymentRecord(int paymentId, double amount, String method, String date) {
+        public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
             this.paymentId = paymentId;
+            this.userId = userId;
             this.amount = amount;
             this.method = method;
             this.date = date;
         }
 
         public int getPaymentId() { return paymentId; }
+        public int getUserId() { return userId; }
         public double getAmount() { return amount; }
         public String getMethod() { return method; }
         public String getDate() { return date; }
     }
+
 
     public static void main(String[] args) {
         launch(args);
