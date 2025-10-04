@@ -1,12 +1,10 @@
 package com.example.munchoak;
 
-import com.example.munchoak.FoodItems;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Bill {
-    private Cart cart;
-    private Payment payment;
+    private final Cart cart;
+    private final Payment payment;
 
     public Bill(Cart cart, Payment payment) {
         this.cart = cart;
@@ -15,30 +13,35 @@ public class Bill {
 
     public String generateReceipt(Map<Integer, FoodItems> foodMap) {
         StringBuilder sb = new StringBuilder();
-        sb.append("----- Bill Receipt -----\n");
-        sb.append("Cart ID: ").append(cart.getId()).append("\n");
-        sb.append("Timestamp: ").append(cart.getTimestamp()).append("\n\n");
+        sb.append("============================================\n");
+        sb.append("              MunchOak Restaurant            \n");
+        sb.append("============================================\n");
+        sb.append("Payment ID : ").append(payment.getId()).append("\n");
+        sb.append("Date/Time  : ").append(payment.getTimestamp()
+                .substring(0, 19).replace("T", " ")).append("\n");
+        sb.append("Status     : ").append(payment.isSuccess() ? "Paid" : "Failed").append("\n");
+        sb.append("--------------------------------------------\n");
+        sb.append(String.format("%-20s %5s %10s\n", "Item", "Qty", "Price"));
+        sb.append("--------------------------------------------\n");
 
         double total = 0;
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             int foodId = entry.getKey();
             int qty = entry.getValue();
-
             FoodItems item = foodMap.get(foodId);
             if (item != null) {
-                double line = item.getPrice() * qty;
-                total += line;
-                sb.append(item.getName())
-                        .append(" x ").append(qty)
-                        .append(" = ").append(line).append("\n");
+                double price = item.getPrice() * qty;
+                total += price;
+                sb.append(String.format("%-20s %5d %10.2f\n",
+                        item.getName(), qty, price));
             }
         }
 
-        sb.append("\nTotal: ").append(total).append("\n");
-        sb.append("Payment ID: ").append(payment.getId()).append("\n");
-        sb.append("Status: ").append(payment.isSuccess() ? "PAID" : "FAILED").append("\n");
-        sb.append("------------------------\n");
-
+        sb.append("--------------------------------------------\n");
+        sb.append(String.format("%-20s %15.2f\n", "TOTAL:", total));
+        sb.append("============================================\n");
+        sb.append("         Thank you for dining with us!       \n");
+        sb.append("============================================\n");
         return sb.toString();
     }
 }
