@@ -8,7 +8,7 @@
             fx:controller="com.example.login.controllers.HomePageController">
 
     <top>
-        <Label text="🍽 Welcome to Munchoak" style="-fx-font-size: 28; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+        <Label text="🍽 Welcome to MunchOak" style="-fx-font-size: 28; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
     </top>
 
     <center>

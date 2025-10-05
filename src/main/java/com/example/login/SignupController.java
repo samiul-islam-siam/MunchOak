@@ -1,6 +1,5 @@
 package com.example.login;
 
-import com.example.login.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

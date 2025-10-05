@@ -1,17 +1,46 @@
 package com.example.login;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class WelcomeController {
 
     @FXML
-    private Label welcomeLabel;
+    private void adminLoginAction() {
+        // TODO: Add admin login window later
+        System.out.println("Admin login clicked");
+    }
 
     @FXML
-    public void initialize() {
-        // You can add more logic here if needed
-        welcomeLabel.setText("Welcome to FSKTM Restaurant!");
+    private void userLoginAction() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(fxmlLoader.load()));
+            stage.setTitle("User Login");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void registerAction() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("register.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(fxmlLoader.load()));
+            stage.setTitle("Register");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void guestBrowseAction() {
+        System.out.println("Guest browsing...");
     }
 }
-

@@ -2,11 +2,12 @@ package com.example.login;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 public class LoginController {
 
@@ -21,15 +22,6 @@ public class LoginController {
 
     @FXML
     private Button registerButton;
-
-    @FXML
-    private StackPane rootPane;
-
-    @FXML
-    public void initialize() {
-        userNameField.setText("");
-        passwordField.setText("");
-    }
 
     @FXML
     private void loginButtonActionPerformed() {
@@ -54,9 +46,11 @@ public class LoginController {
     @FXML
     private void registerButtonActionPerformed() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/register.fxml"));
-            rootPane.getChildren().clear();
-            rootPane.getChildren().add(loader.load());
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("register.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(fxmlLoader.load()));
+            stage.setTitle("Register");
+            stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
