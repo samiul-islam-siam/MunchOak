@@ -1,0 +1,34 @@
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.munchoak.WelcomeController"
+           prefWidth="800" prefHeight="600">
+
+    <!-- Background Image -->
+    <ImageView fitWidth="1500" fitHeight="800" preserveRatio="false">
+        <image>
+            <Image url="@images/welcome_bg.png"/>
+        </image>
+    </ImageView>
+
+    <!-- Centered Buttons -->
+    <VBox spacing="20" alignment="CENTER">
+        <Label text="Welcome to Munchoak"
+               style="-fx-font-size: 32; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+        <Button text="Admin Login" onAction="#adminLoginAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #2E8B57; -fx-text-fill: white;"/>
+
+        <Button text="User Login" onAction="#userLoginAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #4682B4; -fx-text-fill: white;"/>
+
+        <Button text="Register" onAction="#registerAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #DAA520; -fx-text-fill: white;"/>
+
+        <Button text="Browse as Guest" onAction="#guestBrowseAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #696969; -fx-text-fill: white;"/>
+    </VBox>
+</StackPane>
+
