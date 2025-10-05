@@ -1,74 +1,62 @@
 package com.example.munchoak;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.scene.Node;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 
 public class LoginController {
 
     @FXML
-    private TextField usernameField;
+    private TextField userNameField;
 
     @FXML
     private PasswordField passwordField;
 
     @FXML
-    private void handleLogin(ActionEvent event) {
-        String username = usernameField.getText();
+    private Button loginButton;
+
+    @FXML
+    private Button registerButton;
+
+    @FXML
+    private StackPane rootPane;
+
+    @FXML
+    public void initialize() {
+        userNameField.setText("");
+        passwordField.setText("");
+    }
+
+    @FXML
+    private void loginButtonActionPerformed() {
+        String username = userNameField.getText();
         String password = passwordField.getText();
 
-        try (Connection conn = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM users WHERE username=? AND password=?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String role = rs.getString("role");
-                FXMLLoader fxmlLoader;
-                if ("admin".equals(role)) {
-                    fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/munchoak/Admin.fxml"));
-                } else {
-                    fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/munchoak/User.fxml"));
-                }
-                Scene scene = new Scene(fxmlLoader.load());
-                Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-                stage.setScene(scene);
-                stage.show();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Failed");
-                alert.setHeaderText(null);
-                alert.setContentText("Incorrect username or password!");
-                alert.showAndWait();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if ("shahin".equalsIgnoreCase(username) && "shahin".equals(password)) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Access Granted");
+            alert.setHeaderText(null);
+            alert.setContentText("Welcome, " + username + "!");
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText(null);
+            alert.setContentText("Invalid credentials!");
+            alert.showAndWait();
         }
     }
 
     @FXML
-    private void handleSignup(ActionEvent event) {
+    private void registerButtonActionPerformed() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/munchoak/Signup.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/munchoak/Register.fxml"));
+            rootPane.getChildren().clear();
+            rootPane.getChildren().add(loader.load());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
+
