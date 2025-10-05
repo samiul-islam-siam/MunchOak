@@ -1,17 +1,15 @@
 package com.example.munchoak;
-import java.util.Map;
-import java.util.HashMap;
+
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.cell.PropertyValueFactory;
+
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -91,10 +89,15 @@ public class RestaurantDashboard extends Application {
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
         aboutBtn.setOnAction(e -> updateContentSimple("About Us",
                 "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
+//        historyBtn.setOnAction(e -> {
+//            HistoryPage historyPage = new HistoryPage();
+//            historyPage.getHistoryScene();
+//        });
         historyBtn.setOnAction(e -> {
-            HistoryPage historyPage = new HistoryPage();
-            historyPage.show();
+            contentPane.getChildren().clear();
+            contentPane.getChildren().add(new HistoryPage().getView());
         });
+
 
         // Layout
         root.setLeft(sidebar);
@@ -174,180 +177,6 @@ public class RestaurantDashboard extends Application {
     private void showHomePage() {
         contentPane.getChildren().clear();
         contentPane.getChildren().add(new HomePage().getView());
-    }
-    public class HistoryPage {
-
-        public void show() {
-            Stage stage = new Stage();
-            stage.setTitle("Payment History");
-
-            TableView<PaymentRecord> table = new TableView<>();
-
-            TableColumn<PaymentRecord, Integer> paymentCol = new TableColumn<>("Payment ID");
-            paymentCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
-
-            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
-            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
-
-            TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
-            amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-            TableColumn<PaymentRecord, String> methodCol = new TableColumn<>("Method");
-            methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
-
-            TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
-            dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
-
-            TableColumn<PaymentRecord, Void> billCol = new TableColumn<>("Bill");
-            billCol.setCellFactory(col -> new TableCell<>() {
-                private final Button btn = new Button("View Bill");
-
-                {
-                    btn.setOnAction(e -> {
-                        PaymentRecord record = getTableView().getItems().get(getIndex());
-                        showBill(record);
-                    });
-                }
-
-                @Override
-                protected void updateItem(Void item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setGraphic(empty ? null : btn);
-                }
-            });
-
-            table.getColumns().addAll(paymentCol, userCol, amountCol, methodCol, dateCol, billCol);
-
-            ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
-
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    data.add(new PaymentRecord(
-                            rs.getInt("Payment_ID"),
-                            rs.getInt("User_ID"),
-                            rs.getDouble("TotalAmount"),
-                            rs.getString("PaymentMethod"),
-                            rs.getString("PaymentDate")
-                    ));
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
-            table.setItems(data);
-
-            VBox root = new VBox(table);
-            Scene scene = new Scene(root, 800, 400);
-            stage.setScene(scene);
-            stage.show();
-        }
-
-        private void showBill(PaymentRecord record) {
-            try (Connection conn = DatabaseConnection.getConnection()) {
-
-                // 1. Build Cart object from PaymentItems
-                Cart cart = new Cart("dummy"); // temporary userId
-                String sqlCart = "SELECT Food_ID, Quantity FROM PaymentItems WHERE Payment_ID = ?";
-                PreparedStatement stmtCart = conn.prepareStatement(sqlCart);
-                stmtCart.setInt(1, record.getPaymentId());
-                ResultSet rsCart = stmtCart.executeQuery();
-                while (rsCart.next()) {
-                    int foodId = rsCart.getInt("Food_ID");
-                    int qty = rsCart.getInt("Quantity");
-                    cart.addToCart(foodId, qty);
-                }
-
-                // 2. Build foodMap for Bill
-                Map<Integer, FoodItems> foodMap = new HashMap<>();
-                String sqlFood = "SELECT Food_ID, Food_Name, Price FROM Details";
-                PreparedStatement stmtFood = conn.prepareStatement(sqlFood);
-                ResultSet rsFood = stmtFood.executeQuery();
-                while (rsFood.next()) {
-                    int id = rsFood.getInt("Food_ID");
-                    String name = rsFood.getString("Food_Name");
-                    double price = rsFood.getDouble("Price");
-                    foodMap.put(id, new FoodItems(id, name, "", price, 0, "", ""));
-                }
-
-                // 3. Build Payment object
-                Payment payment = new Payment(record.getAmount()); // true = paid
-
-                // 4. Generate receipt using your Bill class
-                Bill bill = new Bill(cart, payment);
-                String receiptText = bill.generateReceipt(foodMap);
-
-                // 5. Show in TextArea
-                Stage billStage = new Stage();
-                billStage.setTitle("Bill Receipt");
-
-                TextArea receiptArea = new TextArea(receiptText);
-                receiptArea.setEditable(false);
-                receiptArea.setStyle("-fx-font-family: monospace; -fx-font-size: 14px;");
-                receiptArea.setPrefSize(500, 400);
-
-                VBox vbox = new VBox(receiptArea);
-                vbox.setPadding(new Insets(20));
-
-                billStage.setScene(new Scene(vbox));
-                billStage.show();
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-
-
-        // PaymentRecord class
-        public static class PaymentRecord {
-            private int paymentId;
-            private int userId;
-            private double amount;
-            private String method;
-            private String date;
-
-            public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
-                this.paymentId = paymentId;
-                this.userId = userId;
-                this.amount = amount;
-                this.method = method;
-                this.date = date;
-            }
-
-            public int getPaymentId() { return paymentId; }
-            public int getUserId() { return userId; }
-            public double getAmount() { return amount; }
-            public String getMethod() { return method; }
-            public String getDate() { return date; }
-        }
-    }
-
-
-    // Update PaymentRecord class to include userId
-    public class PaymentRecord {
-        private int paymentId;
-        private int userId;
-        private double amount;
-        private String method;
-        private String date;
-
-        public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
-            this.paymentId = paymentId;
-            this.userId = userId;
-            this.amount = amount;
-            this.method = method;
-            this.date = date;
-        }
-
-        public int getPaymentId() { return paymentId; }
-        public int getUserId() { return userId; }
-        public double getAmount() { return amount; }
-        public String getMethod() { return method; }
-        public String getDate() { return date; }
     }
 
     public static void main(String[] args) {
