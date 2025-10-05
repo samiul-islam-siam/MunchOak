@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.login.WelcomeController"
+            prefWidth="600" prefHeight="400">
+
+    <!-- Background image -->
+    <ImageView fitWidth="600" fitHeight="400" pickOnBounds="true" preserveRatio="false"
+               image="@images/welcome_bg.png"/>
+
+    <!-- Overlay label -->
+    <Label fx:id="welcomeLabel" layoutX="50" layoutY="50"
+           text="Welcome to Restaurant!"
+           style="-fx-font-size: 30; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+</AnchorPane>

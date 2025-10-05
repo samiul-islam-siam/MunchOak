@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.login.LoginController"
+           fx:id="rootPane"
+           prefWidth="800" prefHeight="600">
+
+    <!-- Full background -->
+    <ImageView fitWidth="1500" fitHeight="700" preserveRatio="false">
+        <image>
+            <Image url="@images/welcome_bg.png"/>
+        </image>
+    </ImageView>
+
+    <!-- Login Form -->
+    <VBox spacing="15" alignment="CENTER">
+
+        <Label text="Munchoak Login"
+               style="-fx-font-size: 28; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="Username:" style="-fx-text-fill: white; -fx-font-size: 16;"/>
+            <TextField fx:id="userNameField" prefWidth="200"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Label text="Password:" style="-fx-text-fill: white; -fx-font-size: 16;"/>
+            <PasswordField fx:id="passwordField" prefWidth="200"/>
+        </HBox>
+
+        <HBox spacing="20" alignment="CENTER">
+            <Button fx:id="loginButton" text="Login" onAction="#loginButtonActionPerformed" prefWidth="100"/>
+            <Button fx:id="registerButton" text="Register" onAction="#registerButtonActionPerformed" prefWidth="100"/>
+        </HBox>
+
+    </VBox>
+
+</StackPane>
