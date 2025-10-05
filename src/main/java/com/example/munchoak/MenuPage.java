@@ -557,6 +557,8 @@ public class MenuPage {
             this.quantity = quantity;
             this.price = price;
             this.total = price * quantity;
+
+
         }
         public int getId() {return id;}
 
@@ -576,7 +578,11 @@ public class MenuPage {
             return total;
         }
 
-        public void setQuantity(int quantity) { this.quantity = quantity; }
+        //public void setQuantity(int quantity) { this.quantity = quantity; }
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+            this.total = this.price * quantity; // update total dynamically
+        }
     }
 
     private void showCart() {
