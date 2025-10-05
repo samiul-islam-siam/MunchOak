@@ -1,9 +1,12 @@
 package com.example.munchoak;
 
+import com.example.login.WelcomeController;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
@@ -91,16 +94,25 @@ public class RestaurantDashboard extends Application {
         loginBtn.setOnAction(e -> {
             try {
                 javafx.fxml.FXMLLoader loader =
-                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/login.fxml"));
-                javafx.scene.Parent loginRoot = loader.load();
+                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/welcome.fxml"));
+                javafx.scene.Parent welcomeRoot = loader.load();
 
-                contentPane.getChildren().clear();
-                contentPane.getChildren().add(loginRoot);
+                // Get controller from FXML
+                com.example.login.WelcomeController controller = loader.getController();
+
+                // Call a custom method to modify it
+                controller.openedFromDashboard();
+
+                // Switch to Welcome page (same stage)
+                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+                stage.setScene(new javafx.scene.Scene(welcomeRoot));
+                stage.setTitle("Welcome");
+                stage.show();
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
-
 
         // Layout
         root.setLeft(sidebar);
