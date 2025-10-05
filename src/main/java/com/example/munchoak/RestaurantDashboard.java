@@ -120,7 +120,7 @@ public class RestaurantDashboard extends Application {
         // Start in full view
         setCompact(false);
 
-        Scene scene = new Scene(root, 1000, 650);
+        Scene scene = new Scene(root, 1100, 650);
         primaryStage.setTitle("Restaurant Dashboard");
         primaryStage.setScene(scene);
         primaryStage.show();
