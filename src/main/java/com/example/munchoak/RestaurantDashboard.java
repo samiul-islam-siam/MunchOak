@@ -1,23 +1,15 @@
 package com.example.munchoak;
 
-
 import javafx.application.Application;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
-
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,9 +50,10 @@ public class RestaurantDashboard extends Application {
         Button reportsBtn = createMenuButton("📊", "Reports");
         Button aboutBtn = createMenuButton("ℹ️", "About Us");
         Button historyBtn = createMenuButton("📜", "History");
+        Button loginBtn = createMenuButton("🔐", "Login");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn, loginBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
@@ -89,13 +82,23 @@ public class RestaurantDashboard extends Application {
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
         aboutBtn.setOnAction(e -> updateContentSimple("About Us",
                 "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
-//        historyBtn.setOnAction(e -> {
-//            HistoryPage historyPage = new HistoryPage();
-//            historyPage.getHistoryScene();
-//        });
+
         historyBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
             contentPane.getChildren().add(new HistoryPage().getView());
+        });
+
+        loginBtn.setOnAction(e -> {
+            try {
+                javafx.fxml.FXMLLoader loader =
+                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/login.fxml"));
+                javafx.scene.Parent loginRoot = loader.load();
+
+                contentPane.getChildren().clear();
+                contentPane.getChildren().add(loginRoot);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
 
 

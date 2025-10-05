@@ -30,8 +30,8 @@ public class UserManager {
     }
 
     // Test
-    public static void main(String[] args) {
-        int id = getUserId("defaultuser");
-        System.out.println("User ID: " + id); // Should print 20250001
-    }
+//    public static void main(String[] args) {
+//        int id = getUserId("defaultuser");
+//        System.out.println("User ID: " + id); // Should print 20250001
+//    }
 }
