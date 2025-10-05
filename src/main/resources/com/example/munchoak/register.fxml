@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.example.munchoak.RegisterController"
-           prefWidth="1400" prefHeight="600">
+           prefWidth="500" prefHeight="400">
 
-    <!-- Full background -->
-    <ImageView fitWidth="1400" fitHeight="700" preserveRatio="false">
+    <!-- Background Image -->
+    <ImageView fitWidth="1450" fitHeight="800" preserveRatio="false">
         <image>
             <Image url="@images/register_bg.png"/>
         </image>
     </ImageView>
-
 
 </StackPane>
