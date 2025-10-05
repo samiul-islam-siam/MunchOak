@@ -93,9 +93,10 @@ public class RestaurantDashboard extends Application {
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
         aboutBtn.setOnAction(e -> updateContentSimple("About Us",
                 "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
+
         historyBtn.setOnAction(e -> {
-            HistoryPage historyPage = new HistoryPage();
-            historyPage.show();
+            contentPane.getChildren().clear();
+            contentPane.getChildren().add(new HistoryPage().getView());
         });
 
         loginBtn.setOnAction(e -> {
@@ -190,83 +191,6 @@ public class RestaurantDashboard extends Application {
     private void showHomePage() {
         contentPane.getChildren().clear();
         contentPane.getChildren().add(new HomePage().getView());
-    }
-
-    // ------------------- History Page -------------------
-    public class HistoryPage {
-        public void show() {
-            Stage stage = new Stage();
-            stage.setTitle("Payment History");
-
-            TableView<PaymentRecord> table = new TableView<>();
-
-            TableColumn<PaymentRecord, Integer> idCol = new TableColumn<>("Payment ID");
-            idCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
-
-            TableColumn<PaymentRecord, Integer> userCol = new TableColumn<>("User ID");
-            userCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
-
-            TableColumn<PaymentRecord, Double> amountCol = new TableColumn<>("Amount");
-            amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-            TableColumn<PaymentRecord, String> methodCol = new TableColumn<>("Method");
-            methodCol.setCellValueFactory(new PropertyValueFactory<>("method"));
-
-            TableColumn<PaymentRecord, String> dateCol = new TableColumn<>("Date");
-            dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
-
-            table.getColumns().addAll(userCol,idCol, amountCol, methodCol, dateCol);
-
-            ObservableList<PaymentRecord> data = FXCollections.observableArrayList();
-
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate FROM PaymentHistory";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    data.add(new PaymentRecord(
-                            rs.getInt("Payment_ID"),
-                            rs.getInt("User_ID"),
-                            rs.getDouble("TotalAmount"),
-                            rs.getString("PaymentMethod"),
-                            rs.getString("PaymentDate")
-                    ));
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
-            table.setItems(data);
-
-            VBox root = new VBox(table);
-            Scene scene = new Scene(root, 700, 400);
-            stage.setScene(scene);
-            stage.show();
-        }
-    }
-
-    // Update PaymentRecord class to include userId
-    public class PaymentRecord {
-        private int paymentId;
-        private int userId;
-        private double amount;
-        private String method;
-        private String date;
-
-        public PaymentRecord(int paymentId, int userId, double amount, String method, String date) {
-            this.paymentId = paymentId;
-            this.userId = userId;
-            this.amount = amount;
-            this.method = method;
-            this.date = date;
-        }
-
-        public int getPaymentId() { return paymentId; }
-        public int getUserId() { return userId; }
-        public double getAmount() { return amount; }
-        public String getMethod() { return method; }
-        public String getDate() { return date; }
     }
 
     public static void main(String[] args) {
