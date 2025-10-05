@@ -775,6 +775,18 @@ public class MenuPage {
                 ps.executeBatch();
             }
 
+            // 4️⃣ Insert PaymentItems
+            String insertPaymentItems = "INSERT INTO PaymentItems (Payment_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(insertPaymentItems)) {
+                for (var entry : cart.getBuyHistory().entrySet()) {
+                    ps.setInt(1, paymentId);
+                    ps.setInt(2, entry.getKey());
+                    ps.setInt(3, entry.getValue());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+
             Payment payment = new Payment(paymentId,total);
             payment.processPayment(cart, foodMap);
             conn.commit(); // commit all together
