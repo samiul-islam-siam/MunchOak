@@ -44,7 +44,6 @@ public class HomePageExtension {
         nextImageView.setFitHeight(768);
         nextImageView.setOpacity(0);
 
-        // Make clickable
         currentImageView.setOnMouseClicked(e -> handleImageClick(currentIndex));
         nextImageView.setOnMouseClicked(e -> handleImageClick(currentIndex));
 
@@ -60,6 +59,15 @@ public class HomePageExtension {
 
     public StackPane getExtensionRoot() {
         return extensionRoot;
+    }
+
+    // New method to include second extension
+    public VBox getFullExtension() {
+        HomePageSecondExtension secondExtension = new HomePageSecondExtension();
+
+        VBox extensionPage = new VBox();
+        extensionPage.getChildren().addAll(extensionRoot, secondExtension.getExtensionRoot());
+        return extensionPage;
     }
 
     private void startImageSlideshow() {
@@ -93,6 +101,5 @@ public class HomePageExtension {
 
     private void handleImageClick(int index) {
         System.out.println("Clicked on image " + index);
-        // TODO: add redirection logic here
     }
 }

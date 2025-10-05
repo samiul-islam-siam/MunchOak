@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -21,7 +22,13 @@ public class HomePage {
     private final List<Image> backgrounds = new ArrayList<>();
     private int currentBgIndex = 0;
 
-    public HomePage() {
+    private final Stage primaryStage;
+    private final HelloApplication app;
+
+    public HomePage(Stage stage, HelloApplication app) {
+        this.primaryStage = stage;
+        this.app = app;
+
         // Load background images
         backgrounds.add(new Image(getClass().getResource("/com/example/try2/images/bg1.png").toExternalForm()));
         backgrounds.add(new Image(getClass().getResource("/com/example/try2/images/bg2.png").toExternalForm()));
@@ -50,15 +57,12 @@ public class HomePage {
         loginBtn.getStyleClass().addAll("top-button", "login-button");
         signupBtn.getStyleClass().addAll("top-button", "signup-button");
 
-        // Left group of buttons (main navigation)
         HBox leftButtons = new HBox(20, menuBtn, locationBtn, fundBtn, callNowBtn);
         leftButtons.setAlignment(Pos.CENTER_LEFT);
 
-        // Right group of buttons (Log In / Sign Up)
         HBox rightButtons = new HBox(10, loginBtn, signupBtn);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
-        // Navigation bar layout
         BorderPane navBar = new BorderPane();
         navBar.setLeft(leftButtons);
         navBar.setRight(rightButtons);
@@ -74,14 +78,17 @@ public class HomePage {
         root = new StackPane(bgView, content);
         root.setPrefSize(1366, 768);
 
-        // Load CSS
         var css = getClass().getResource("/com/example/try2/style.css");
         if (css != null) root.getStylesheets().add(css.toExternalForm());
 
         startBackgroundSlideshow();
 
-        // Button actions
-        loginBtn.setOnAction(e -> System.out.println("Log In clicked"));
+        // Login button action
+        loginBtn.setOnAction(e -> {
+            LoginPage loginPage = new LoginPage();
+            primaryStage.setScene(loginPage.getLoginScene(primaryStage, app));
+        });
+
         signupBtn.setOnAction(e -> System.out.println("Sign Up clicked"));
         callNowBtn.setOnAction(e -> System.out.println("Calling now..."));
     }
@@ -93,7 +100,7 @@ public class HomePage {
     public VBox getFullPage() {
         HomePageExtension extension = new HomePageExtension();
         VBox fullPage = new VBox();
-        fullPage.getChildren().addAll(root, extension.getExtensionRoot());
+        fullPage.getChildren().addAll(root, extension.getFullExtension());
         return fullPage;
     }
 

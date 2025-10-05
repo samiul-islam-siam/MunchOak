@@ -8,25 +8,37 @@ import javafx.stage.Stage;
 
 public class HelloApplication extends Application {
 
+    private Stage primaryStage;
+    private Scene mainScene;
+
     @Override
     public void start(Stage stage) {
-        HomePage home = new HomePage();
+        this.primaryStage = stage;
 
-        // Full page (Home + Extension)
+        mainScene = createMainScene();
+
+        stage.setScene(mainScene);
+        stage.setTitle("Home Page + Extension");
+        stage.setFullScreen(true);
+        stage.show();
+    }
+
+    private Scene createMainScene() {
+        HomePage home = new HomePage(primaryStage, this); // pass HelloApplication
+
         VBox fullPage = home.getFullPage();
 
-        // Add scroll
         ScrollPane scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
 
-        Scene scene = new Scene(scrollPane, 1366, 768);
-        stage.setScene(scene);
-        stage.setTitle("Home Page + Extension");
-        stage.setFullScreen(true);
-        stage.show();
+        return new Scene(scrollPane, 1366, 768);
+    }
+
+    public Scene getMainScene() {
+        return mainScene;
     }
 
     public static void main(String[] args) {
