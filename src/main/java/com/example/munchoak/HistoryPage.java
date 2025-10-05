@@ -94,8 +94,18 @@ public class HistoryPage {
 
     private void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = loadFoodMap();
-        Cart cart = new Cart("historyCart");
 
+
+        //change in here
+
+
+
+
+        //Cart cart = new Cart("historyCart");
+        Cart cart = new Cart(record.getUserId(), "historyCart");
+
+
+        //
         String sql = "SELECT Food_ID, Quantity FROM PaymentItems WHERE Payment_ID=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

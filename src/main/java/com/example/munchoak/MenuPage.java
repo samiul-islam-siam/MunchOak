@@ -38,7 +38,12 @@ public class MenuPage {
     private FoodItems currentEditingFood = null;
 
     // Cart for the current user
-    private Cart cart = new Cart("customer123");  // demo token
+    // Cart change
+
+    int userId = UserManager.getUserId("defaultuser");
+    private Cart cart = new Cart(userId, "defaultuser");
+
+    //private Cart cart = new Cart(getCurrentUserid(),"customer123");  // demo token
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();
@@ -681,15 +686,40 @@ public class MenuPage {
 
     // ================== CHECKOUT ===================
 
-    private void checkout() {
-        // Step 1: Calculate total
-        double total = 0;
-        Map<Integer, FoodItems> foodMap = new HashMap<>();
-        for (FoodItems food : foodList) {
-            foodMap.put(food.getId(), food);
-        }
+//    private void checkout() {
+//        // Step 1: Calculate total
+//        double total = 0;
+//        Map<Integer, FoodItems> foodMap = new HashMap<>();
+//        for (FoodItems food : foodList) {
+//            foodMap.put(food.getId(), food);
+//        }
+//
+//        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+//            FoodItems food = foodMap.get(entry.getKey());
+//            if (food != null) {
+//                total += food.getPrice() * entry.getValue();
+//            }
+//        }
+//
+//        // Step 2: Process payment (pass cart + foodMap so bill can be generated later)
+//        Payment payment = new Payment(total);
+//        payment.processPayment(cart, foodMap);
+//    }
+private void checkout() {
+    if (cart.getBuyHistory().isEmpty()) {
+        new Alert(Alert.AlertType.INFORMATION, "Your cart is empty!").show();
+        return;
+    }
 
-        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+    // Map all food items by ID
+    Map<Integer, FoodItems> foodMap = new HashMap<>();
+    for (FoodItems food : foodList) {
+        foodMap.put(food.getId(), food);
+    }
+
+    //double totalAmount = cart.getTotalPrice(foodMap);
+    double total = 0;
+    for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             FoodItems food = foodMap.get(entry.getKey());
             if (food != null) {
                 total += food.getPrice() * entry.getValue();
@@ -699,7 +729,60 @@ public class MenuPage {
         // Step 2: Process payment (pass cart + foodMap so bill can be generated later)
         Payment payment = new Payment(total);
         payment.processPayment(cart, foodMap);
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        conn.setAutoCommit(false); // start transaction
+
+        // 1️⃣ Insert PaymentHistory
+        int paymentId;
+        String insertPayment = "INSERT INTO paymenthistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertPayment, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, cart.getUserId());
+            ps.setDouble(2, total);
+            ps.setString(3, "Cash"); // you can replace with actual method
+            ps.executeUpdate();
+
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) paymentId = rs.getInt(1);
+                else throw new SQLException("Payment_ID not generated");
+            }
+        }
+
+        // 2️⃣ Insert Cart
+        int cartId;
+        String insertCart = "INSERT INTO cart (User_ID, Payment_ID) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertCart, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, cart.getUserId());
+            ps.setInt(2, paymentId);
+            ps.executeUpdate();
+
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) cartId = rs.getInt(1);
+                else throw new SQLException("Cart_ID not generated");
+            }
+        }
+
+        // 3️⃣ Insert CartItems
+        String insertItems = "INSERT INTO cartitems (Cart_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertItems)) {
+            for (var entry : cart.getBuyHistory().entrySet()) {
+                ps.setInt(1, cartId);
+                ps.setInt(2, entry.getKey());
+                ps.setInt(3, entry.getValue());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+
+        conn.commit(); // commit all together
+        // Clear cart after checkout
+        cart.getBuyHistory().clear();
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        new Alert(Alert.AlertType.ERROR, "Checkout failed: " + e.getMessage()).show();
     }
+}
+
 
     // ================== EDIT ===================
 
