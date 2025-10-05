@@ -14,6 +14,9 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,9 +61,10 @@ public class RestaurantDashboard extends Application {
         Button reportsBtn = createMenuButton("📊", "Reports");
         Button aboutBtn = createMenuButton("ℹ️", "About Us");
         Button historyBtn = createMenuButton("📜", "History");
+        Button loginBtn = createMenuButton("🔐", "Login");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn, loginBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
@@ -93,6 +97,20 @@ public class RestaurantDashboard extends Application {
             HistoryPage historyPage = new HistoryPage();
             historyPage.show();
         });
+
+        loginBtn.setOnAction(e -> {
+            try {
+                javafx.fxml.FXMLLoader loader =
+                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/login.fxml"));
+                javafx.scene.Parent loginRoot = loader.load();
+
+                contentPane.getChildren().clear();
+                contentPane.getChildren().add(loginRoot);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
 
         // Layout
         root.setLeft(sidebar);

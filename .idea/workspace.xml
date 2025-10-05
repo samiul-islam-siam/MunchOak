@@ -4,40 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Cart updated">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/HomePageController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/MainMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/ModuleInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/ehcache.xsd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/logback.xsd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/HomePage.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/admin.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/images/login_bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/images/mn.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/images/p.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/images/register_bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/images/welcome_bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/styles/login.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/user.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logback.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/com/example/munchoak/Main.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/com/example/munchoak/background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/com/example/munchoak/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/com/example/munchoak/main.png" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Login package added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759555352689</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Login package added">
+      <option name="closed" value="true" />
+      <created>1759642364669</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1759642364669</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -232,6 +211,7 @@
     <MESSAGE value="Payment System updated" />
     <MESSAGE value="History updated" />
     <MESSAGE value="Cart updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cart updated" />
+    <MESSAGE value="Login package added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Login package added" />
   </component>
 </project>

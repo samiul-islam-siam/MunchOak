@@ -19,7 +19,7 @@
     <!-- Login Form -->
     <VBox spacing="15" alignment="CENTER">
 
-        <Label text="Munchoak Login"
+        <Label text="MunchOak Login"
                style="-fx-font-size: 28; -fx-text-fill: white; -fx-font-weight: bold;"/>
 
         <HBox spacing="10" alignment="CENTER">
