@@ -20,7 +20,8 @@ public class Payment {
     private static final int START_PAYMENT_ID = 3001;
     private static final int START_USER_ID = 20250001;
 
-    public Payment(double amount) {
+    public Payment(int id, double amount) {
+        this.id = id;
         this.amount = amount;
         this.timestamp = Instant.now().toString();
         this.success = false;
@@ -55,45 +56,10 @@ public class Payment {
                 return;
             }
 
-            this.success = true;
-
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                int userId = Session.getCurrentUserId();
-
-                if (!userExists(conn, userId)) {
-                    userId = getNextUserId(conn);
-                    createUser(conn, userId, "user" + userId, "defaultPassword");
-                    Session.setCurrentUserId(userId);
-                }
-
-                // Insert payment
-                String sql = "INSERT INTO PaymentHistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                stmt.setInt(1, userId);
-                stmt.setDouble(2, amount);
-                stmt.setString(3, "Card");
-                stmt.executeUpdate();
-
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) this.id = rs.getInt(1);
-
-                // Insert purchased items
-                String itemSql = "INSERT INTO PaymentItems (Payment_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
-                PreparedStatement itemStmt = conn.prepareStatement(itemSql);
-                for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-                    itemStmt.setInt(1, this.id);
-                    itemStmt.setInt(2, entry.getKey());
-                    itemStmt.setInt(3, entry.getValue());
-                    itemStmt.addBatch();
-                }
-                itemStmt.executeBatch();
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
+            this.success = true; // ✅ Payment marked successful
             paymentStage.close();
 
+            // ✅ Bill only (no DB insert here)
             Bill bill = new Bill(cart, this);
             String receipt = bill.generateReceipt(foodMap);
 
@@ -111,7 +77,8 @@ public class Payment {
 
             billStage.setScene(new Scene(billBox));
             billStage.show();
-            cart.getBuyHistory().clear();
+
+            cart.getBuyHistory().clear(); // empty cart after payment
         });
     }
 
@@ -128,14 +95,6 @@ public class Payment {
             return maxId >= START_USER_ID ? maxId + 1 : START_USER_ID;
         }
         return START_USER_ID;
-    }
-
-    private void createUser(Connection conn, int userId, String username, String password) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Users (User_ID, Username, Password) VALUES (?, ?, ?)");
-        stmt.setInt(1, userId);
-        stmt.setString(2, username);
-        stmt.setString(3, password);
-        stmt.executeUpdate();
     }
 
     public int getId() { return id; }

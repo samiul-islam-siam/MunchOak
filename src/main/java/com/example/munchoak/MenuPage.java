@@ -557,6 +557,8 @@ public class MenuPage {
             this.quantity = quantity;
             this.price = price;
             this.total = price * quantity;
+
+
         }
         public int getId() {return id;}
 
@@ -576,7 +578,11 @@ public class MenuPage {
             return total;
         }
 
-        public void setQuantity(int quantity) { this.quantity = quantity; }
+        //public void setQuantity(int quantity) { this.quantity = quantity; }
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+            this.total = this.price * quantity; // update total dynamically
+        }
     }
 
     private void showCart() {
@@ -604,11 +610,38 @@ public class MenuPage {
         TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
+//        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
+//        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+//
+//        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
+//        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
         TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceCol.setCellFactory(tc -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f", value));
+                }
+            }
+        });
 
         TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+        totalCol.setCellFactory(tc -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f", value));
+                }
+            }
+        });
 
         // 🧾 Define totalLabel first so it’s visible in the cell factory
         Label totalLabel = new Label("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
@@ -702,8 +735,7 @@ public class MenuPage {
         }
 
         // Step 2: Process payment (pass cart + foodMap so bill can be generated later)
-        Payment payment = new Payment(total);
-        payment.processPayment(cart, foodMap);
+
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false); // start transaction
@@ -714,7 +746,7 @@ public class MenuPage {
             try (PreparedStatement ps = conn.prepareStatement(insertPayment, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, cart.getUserId());
                 ps.setDouble(2, total);
-                ps.setString(3, "Cash"); // you can replace with actual method
+                ps.setString(3, "Card"); // you can replace with actual method
                 ps.executeUpdate();
 
                 try (var rs = ps.getGeneratedKeys()) {
@@ -749,6 +781,20 @@ public class MenuPage {
                 ps.executeBatch();
             }
 
+            // 4️⃣ Insert PaymentItems
+            String insertPaymentItems = "INSERT INTO PaymentItems (Payment_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(insertPaymentItems)) {
+                for (var entry : cart.getBuyHistory().entrySet()) {
+                    ps.setInt(1, paymentId);
+                    ps.setInt(2, entry.getKey());
+                    ps.setInt(3, entry.getValue());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+
+            Payment payment = new Payment(paymentId,total);
+            payment.processPayment(cart, foodMap);
             conn.commit(); // commit all together
             //cart.getBuyHistory().clear();
 

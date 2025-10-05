@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="New HistoryPage and Bill">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" afterDir="false" />
     </list>
@@ -216,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759650376423</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="update">
+      <option name="closed" value="true" />
+      <created>1759675114572</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1759675114572</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -230,6 +242,7 @@
     <MESSAGE value="Login package added" />
     <MESSAGE value="Login integration with Dashboard" />
     <MESSAGE value="New HistoryPage and Bill" />
-    <option name="LAST_COMMIT_MESSAGE" value="New HistoryPage and Bill" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
 </project>

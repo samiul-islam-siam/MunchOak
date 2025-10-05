@@ -28,10 +28,4 @@ public class UserManager {
 
         return userId;
     }
-
-    // Test
-    public static void main(String[] args) {
-        int id = getUserId("defaultuser");
-        System.out.println("User ID: " + id); // Should print 20250001
-    }
 }

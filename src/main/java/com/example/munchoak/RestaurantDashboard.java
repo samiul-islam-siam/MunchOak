@@ -1,26 +1,15 @@
 package com.example.munchoak;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,7 +109,7 @@ public class RestaurantDashboard extends Application {
         // Start in full view
         setCompact(false);
 
-        Scene scene = new Scene(root, 1100, 650);
+        Scene scene = new Scene(root, 1000, 650);
         primaryStage.setTitle("Restaurant Dashboard");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -197,4 +186,3 @@ public class RestaurantDashboard extends Application {
         launch(args);
     }
 }
-

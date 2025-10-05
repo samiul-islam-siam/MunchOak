@@ -36,6 +36,9 @@ public class HistoryPage {
         TableColumn<HistoryRecord, Double> totalCol = new TableColumn<>("Total Amount");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
+        TableColumn<HistoryRecord, String> methodCol = new TableColumn<>("Payment Method");
+        methodCol.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
+
         TableColumn<HistoryRecord, Void> billCol = new TableColumn<>("Bill");
         billCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("View");
@@ -54,7 +57,7 @@ public class HistoryPage {
             }
         });
 
-        historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, billCol);
+        historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol);
         historyTable.setItems(historyData);
 
         // Load data from DB
@@ -70,7 +73,7 @@ public class HistoryPage {
     private void loadHistory() {
         historyData.clear();
 
-        String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentDate " +
+        String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate " +
                 "FROM PaymentHistory ORDER BY Payment_ID DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -82,31 +85,29 @@ public class HistoryPage {
                 int userId = rs.getInt("User_ID");
                 double amount = rs.getDouble("TotalAmount");
                 String date = rs.getString("PaymentDate");
+                String method = rs.getString("PaymentMethod");
                 String status = "Success"; // temporary placeholder
 
-                historyData.add(new HistoryRecord(userId, paymentId, date, amount, status));
+                historyData.add(new HistoryRecord(userId, paymentId, date, amount, status, method));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     private void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = loadFoodMap();
 
-
-        //change in here
-
-
-
-
-        //Cart cart = new Cart("historyCart");
+        // Create a cart for displaying history
         Cart cart = new Cart(record.getUserId(), "historyCart");
 
+        String sql = """
+        SELECT ci.Food_ID, ci.Quantity
+        FROM CartItems ci
+        JOIN Cart c ON ci.Cart_ID = c.Cart_ID
+        WHERE c.Payment_ID = ?
+        """;
 
-        //
-        String sql = "SELECT Food_ID, Quantity FROM PaymentItems WHERE Payment_ID=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -122,7 +123,7 @@ public class HistoryPage {
             e.printStackTrace();
         }
 
-        Payment payment = new Payment(record.getAmount());
+        Payment payment = new Payment(record.paymentId, record.getAmount());
         try {
             java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -156,6 +157,7 @@ public class HistoryPage {
         stage.show();
     }
 
+
     private Map<Integer, FoodItems> loadFoodMap() {
         Map<Integer, FoodItems> map = new HashMap<>();
         String sql = "SELECT * FROM Details";
@@ -188,13 +190,16 @@ public class HistoryPage {
         private final String timestamp;
         private final double amount;
         private final String status;
+        private final String paymentMethod;
 
-        public HistoryRecord(int userId, int paymentId, String timestamp, double amount, String status) {
+        public HistoryRecord(int userId, int paymentId, String timestamp,
+                             double amount, String status, String paymentMethod) {
             this.userId = userId;
             this.paymentId = paymentId;
             this.timestamp = timestamp;
             this.amount = amount;
             this.status = status;
+            this.paymentMethod = paymentMethod;
         }
 
         public int getUserId() { return userId; }
@@ -202,5 +207,7 @@ public class HistoryPage {
         public String getTimestamp() { return timestamp; }
         public double getAmount() { return amount; }
         public String getStatus() { return status; }
+        public String getPaymentMethod() { return paymentMethod; }
     }
+
 }
