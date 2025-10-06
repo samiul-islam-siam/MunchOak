@@ -1,3 +1,4 @@
+
 package com.example.munchoak;
 
 import javafx.fxml.FXML;
@@ -10,6 +11,16 @@ public class WelcomeController {
     @FXML
     private void adminLoginAction() {
         // TODO: Add admin login window later
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/munchoak/AdminLogin.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(fxmlLoader.load()));
+            stage.setTitle("Admin Login");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         System.out.println("Admin login clicked");
     }
 
