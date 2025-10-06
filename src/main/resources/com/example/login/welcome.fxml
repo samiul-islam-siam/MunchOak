@@ -34,4 +34,3 @@
                 prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #696969; -fx-text-fill: white;"/>
     </VBox>
 </StackPane>
-
