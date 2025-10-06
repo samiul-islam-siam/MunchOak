@@ -68,4 +68,22 @@ public class RegisterController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private Button backButton;
+
+    @FXML
+    private void backButtonActionPerformed() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/welcome.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) backButton.getScene().getWindow(); // Get current window
+            stage.setScene(new Scene(root));
+            stage.setTitle("Welcome");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

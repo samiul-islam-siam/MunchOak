@@ -45,5 +45,10 @@
                     prefWidth="100" style="-fx-background-color: #4682B4; -fx-text-fill: white;"/>
         </HBox>
 
+        <HBox spacing="30" alignment="CENTER">
+            <Button fx:id="backButton" text="Back" onAction="#backButtonActionPerformed"
+                    prefWidth="100" style="-fx-background-color: #2E8B57; -fx-text-fill: white;"/>
+        </HBox>
+
     </VBox>
 </StackPane>
