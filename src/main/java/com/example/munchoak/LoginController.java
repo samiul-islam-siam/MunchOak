@@ -1,6 +1,3 @@
-import javafx.scene.control.*;
-import javafx.stage.Stage;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 public class LoginController {
