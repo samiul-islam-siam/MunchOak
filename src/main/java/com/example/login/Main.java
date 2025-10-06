@@ -10,7 +10,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Welcome.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("welcome.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 800, 600);
 
             stage.setTitle("MunchOak");

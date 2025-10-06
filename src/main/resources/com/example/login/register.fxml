@@ -44,6 +44,9 @@
                 style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"
                 onAction="#handleRegister"/>
 
+        <Button fx:id="backButton" text="Back" onAction="#backButtonActionPerformed"
+                prefWidth="100" style="-fx-background-color: #2E8B57; -fx-text-fill: white;"/>
+
         <Label fx:id="statusLabel" textFill="red" style="-fx-font-size: 14px;"/>
 
         <HBox alignment="CENTER" spacing="5">

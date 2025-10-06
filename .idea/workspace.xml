@@ -4,29 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Guest Browsing implemented">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Register page added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MySQL" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/MainMenu.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/DatabaseConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/HomePage.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/HomePage.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/admin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/admin.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/images/login_bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/images/mn.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/images/p.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,7 +252,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759684590098</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Register page added">
+      <option name="closed" value="true" />
+      <created>1759721276972</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1759721276972</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -283,6 +277,7 @@
     <MESSAGE value="update" />
     <MESSAGE value="login updated" />
     <MESSAGE value="Guest Browsing implemented" />
-    <option name="LAST_COMMIT_MESSAGE" value="Guest Browsing implemented" />
+    <MESSAGE value="Register page added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Register page added" />
   </component>
 </project>

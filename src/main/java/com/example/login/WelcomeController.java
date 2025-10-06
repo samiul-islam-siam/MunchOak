@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
 
 public class WelcomeController {
 
@@ -16,26 +17,34 @@ public class WelcomeController {
     }
 
     @FXML
-    private void userLoginAction() {
+    private void userLoginAction(javafx.event.ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("User Login");
             stage.show();
+
+            // Close the Welcome window
+            Stage currentStage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void registerAction() {
+    private void registerAction(javafx.event.ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/register.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("Register");
             stage.show();
+
+            // Close the Welcome window
+            Stage currentStage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            currentStage.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -45,15 +45,33 @@ public class RegisterController {
             return;
         }
 
-        // Simulated registration success (you can link to DB later)
-        statusLabel.setTextFill(Color.GREEN);
-        statusLabel.setText("Registration successful!");
+        // ✅ Insert into DB
+        try (java.sql.Connection conn = DBConnection.getConnection()) {
+            String sql = "INSERT INTO Users (Username, Email, Password) VALUES (?, ?, ?)";
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            stmt.setString(3, password);
 
-        // Optional: clear fields
-        usernameField.clear();
-        emailField.clear();
-        passwordField.clear();
-        confirmPasswordField.clear();
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted > 0) {
+                statusLabel.setTextFill(Color.GREEN);
+                statusLabel.setText("Registration successful!");
+
+                // Clear fields
+                usernameField.clear();
+                emailField.clear();
+                passwordField.clear();
+                confirmPasswordField.clear();
+            }
+        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
+            statusLabel.setTextFill(Color.RED);
+            statusLabel.setText("Username or email already exists!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setTextFill(Color.RED);
+            statusLabel.setText("Database error occurred!");
+        }
     }
 
     // Handle "Login" link click
@@ -64,6 +82,24 @@ public class RegisterController {
             Parent root = loader.load();
             Stage stage = (Stage) registerButton.getScene().getWindow();
             stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private Button backButton;
+
+    @FXML
+    private void backButtonActionPerformed() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/welcome.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) backButton.getScene().getWindow(); // Get current window
+            stage.setScene(new Scene(root));
+            stage.setTitle("Welcome");
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
