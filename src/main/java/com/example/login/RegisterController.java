@@ -1,45 +1,71 @@
 package com.example.login;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
+import javafx.scene.Parent;
+
+import java.io.IOException;
 
 public class RegisterController {
 
-    @FXML
-    private TextField regUserNameField;
+    @FXML private TextField usernameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private Button registerButton;
+    @FXML private Label statusLabel;
 
+    // Handle register button click
     @FXML
-    private PasswordField regPasswordField;
+    private void handleRegister() {
+        String username = usernameField.getText().trim();
+        String email = emailField.getText().trim();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
 
-    @FXML
-    private Button backButton;
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            statusLabel.setTextFill(Color.RED);
+            statusLabel.setText("All fields are required!");
+            return;
+        }
 
-    @FXML
-    private StackPane rootPane;
+        if (!password.equals(confirmPassword)) {
+            statusLabel.setTextFill(Color.RED);
+            statusLabel.setText("Passwords do not match!");
+            return;
+        }
 
+        if (!email.contains("@") || !email.contains(".")) {
+            statusLabel.setTextFill(Color.RED);
+            statusLabel.setText("Invalid email address!");
+            return;
+        }
+
+        // Simulated registration success (you can link to DB later)
+        statusLabel.setTextFill(Color.GREEN);
+        statusLabel.setText("Registration successful!");
+
+        // Optional: clear fields
+        usernameField.clear();
+        emailField.clear();
+        passwordField.clear();
+        confirmPasswordField.clear();
+    }
+
+    // Handle "Login" link click
     @FXML
-    private void backToLogin() {
+    private void goToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/Login.fxml"));
-            rootPane.getChildren().clear();
-            rootPane.getChildren().add(loader.load());
-        } catch (Exception e) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) registerButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    @FXML
-    private void registerConfirmAction() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Registered");
-        alert.setHeaderText(null);
-        alert.setContentText("User " + regUserNameField.getText() + " registered successfully!");
-        alert.showAndWait();
-    }
 }
-

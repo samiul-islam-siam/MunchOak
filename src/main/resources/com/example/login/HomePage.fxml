@@ -5,10 +5,10 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.login.controllers.HomePageController">
+            fx:controller="com.example.login.HomePageController">
 
     <top>
-        <Label text="🍽 Welcome to Munchoak" style="-fx-font-size: 28; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+        <Label text="🍽 Welcome to MunchOak" style="-fx-font-size: 28; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
     </top>
 
     <center>

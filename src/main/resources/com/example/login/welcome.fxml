@@ -1,19 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.login.WelcomeController"
+           prefWidth="800" prefHeight="600">
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.login.WelcomeController"
-            prefWidth="600" prefHeight="400">
+    <!-- Background Image -->
+    <ImageView fitWidth="800" fitHeight="600" preserveRatio="false">
+        <image>
+            <Image url="@images/welcome_bg.png"/>
+        </image>
+    </ImageView>
 
-    <!-- Background image -->
-    <ImageView fitWidth="600" fitHeight="400" pickOnBounds="true" preserveRatio="false"
-               image="@images/welcome_bg.png"/>
+    <!-- Centered Buttons -->
+    <VBox spacing="20" alignment="CENTER">
+        <Label  fx:id="welcomeLabel"
+                text="Welcome to MunchOak"
+                style="-fx-font-size: 32; -fx-text-fill: white; -fx-font-weight: bold;"/>
 
-    <!-- Overlay label -->
-    <Label fx:id="welcomeLabel" layoutX="50" layoutY="50"
-           text="Welcome to Restaurant!"
-           style="-fx-font-size: 30; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Button text="Admin Login" onAction="#adminLoginAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #2E8B57; -fx-text-fill: white;"/>
 
-</AnchorPane>
+        <Button text="User Login" onAction="#userLoginAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #4682B4; -fx-text-fill: white;"/>
+
+        <Button fx:id="registerBtn" text="Register" onAction="#registerAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #DAA520; -fx-text-fill: white;"/>
+
+        <Button fx:id="guestBrowseBtn" text="Browse as Guest" onAction="#guestBrowseAction"
+                prefWidth="200" style="-fx-font-size: 16; -fx-background-color: #696969; -fx-text-fill: white;"/>
+    </VBox>
+</StackPane>
+

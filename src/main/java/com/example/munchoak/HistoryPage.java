@@ -95,67 +95,67 @@ public class HistoryPage {
             e.printStackTrace();
         }
     }
-private void showBill(HistoryRecord record) {
-    Map<Integer, FoodItems> foodMap = loadFoodMap();
+    private void showBill(HistoryRecord record) {
+        Map<Integer, FoodItems> foodMap = loadFoodMap();
 
-    // Create a cart for displaying history
-    Cart cart = new Cart(record.getUserId(), "historyCart");
+        // Create a cart for displaying history
+        Cart cart = new Cart(record.getUserId(), "historyCart");
 
-    String sql = """
+        String sql = """
         SELECT ci.Food_ID, ci.Quantity
         FROM CartItems ci
         JOIN Cart c ON ci.Cart_ID = c.Cart_ID
         WHERE c.Payment_ID = ?
         """;
 
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setInt(1, record.getPaymentId());
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            int foodId = rs.getInt("Food_ID");
-            int qty = rs.getInt("Quantity");
-            cart.addToCart(foodId, qty);
+            stmt.setInt(1, record.getPaymentId());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int foodId = rs.getInt("Food_ID");
+                int qty = rs.getInt("Quantity");
+                cart.addToCart(foodId, qty);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-    } catch (SQLException e) {
-        e.printStackTrace();
+        Payment payment = new Payment(record.paymentId, record.getAmount());
+        try {
+            java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(payment, record.getPaymentId());
+
+            java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
+            successField.setAccessible(true);
+            successField.set(payment, record.getStatus().equals("Success"));
+
+            java.lang.reflect.Field timestampField = Payment.class.getDeclaredField("timestamp");
+            timestampField.setAccessible(true);
+            timestampField.set(payment, record.getTimestamp());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        Bill bill = new Bill(cart, payment);
+        String receipt = bill.generateReceipt(foodMap);
+
+        Stage stage = new Stage();
+        stage.setTitle("Bill Receipt - " + record.getPaymentId());
+
+        TextArea area = new TextArea(receipt);
+        area.setEditable(false);
+        area.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+
+        VBox box = new VBox(area);
+        box.setPadding(new Insets(15));
+
+        stage.setScene(new Scene(box, 500, 400));
+        stage.show();
     }
-
-    Payment payment = new Payment(record.paymentId, record.getAmount());
-    try {
-        java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
-        idField.setAccessible(true);
-        idField.set(payment, record.getPaymentId());
-
-        java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
-        successField.setAccessible(true);
-        successField.set(payment, record.getStatus().equals("Success"));
-
-        java.lang.reflect.Field timestampField = Payment.class.getDeclaredField("timestamp");
-        timestampField.setAccessible(true);
-        timestampField.set(payment, record.getTimestamp());
-    } catch (Exception ex) {
-        ex.printStackTrace();
-    }
-
-    Bill bill = new Bill(cart, payment);
-    String receipt = bill.generateReceipt(foodMap);
-
-    Stage stage = new Stage();
-    stage.setTitle("Bill Receipt - " + record.getPaymentId());
-
-    TextArea area = new TextArea(receipt);
-    area.setEditable(false);
-    area.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-
-    VBox box = new VBox(area);
-    box.setPadding(new Insets(15));
-
-    stage.setScene(new Scene(box, 500, 400));
-    stage.show();
-}
 
 
     private Map<Integer, FoodItems> loadFoodMap() {

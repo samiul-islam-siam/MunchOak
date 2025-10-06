@@ -1,6 +1,5 @@
 package com.example.login;
 
-import com.example.login.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,7 +27,7 @@ public class SignupController {
         String password = passwordField.getText();
 
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')";
+            String sql = "INSERT INTO Users (Username, Password) VALUES (?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -41,7 +40,7 @@ public class SignupController {
             alert.showAndWait();
 
             // Return to login
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/Login.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/munchoak/Login.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             stage.setScene(scene);
