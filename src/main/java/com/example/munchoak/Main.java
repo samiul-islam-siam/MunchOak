@@ -4,17 +4,19 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.Parent;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Welcome.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+            Parent root = FXMLLoader.load(getClass().getResource("FrontPage.fxml"));
+            Scene scene = new Scene(root, 800, 600);
 
             stage.setTitle("Munchoak");
             stage.setScene(scene);
+            stage.setResizable(true);
+            stage.centerOnScreen();
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
