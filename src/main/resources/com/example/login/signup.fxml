@@ -9,7 +9,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.login.SignupController"
-            prefHeight="300" prefWidth="400"
+            prefHeight="800" prefWidth="600"
             style="-fx-background-color: #f4f4f4;">
 
     <children>

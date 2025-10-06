@@ -9,7 +9,7 @@
            prefWidth="800" prefHeight="600">
 
     <!-- Background Image -->
-    <ImageView fitWidth="1500" fitHeight="800" preserveRatio="false">
+    <ImageView fitWidth="800" fitHeight="600" preserveRatio="false">
         <image>
             <Image url="@images/welcome_bg.png"/>
         </image>

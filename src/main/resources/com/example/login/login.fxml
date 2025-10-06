@@ -7,11 +7,11 @@
 
 <StackPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.example.login.LoginController"
-           prefWidth="1600" prefHeight="800"
+           prefWidth="800" prefHeight="600"
            style="-fx-background-color: transparent;">
 
     <!-- Full Background Image -->
-    <ImageView fitWidth="1600" fitHeight="800"
+    <ImageView fitWidth="800" fitHeight="600"
                preserveRatio="false" smooth="true">
         <image>
             <Image url="@images/lo_bg.jpg"/>

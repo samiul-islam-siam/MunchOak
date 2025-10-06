@@ -18,7 +18,7 @@ public class WelcomeController {
     @FXML
     private void userLoginAction() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("User Login");
@@ -31,7 +31,7 @@ public class WelcomeController {
     @FXML
     private void registerAction() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("register.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/register.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("Register");
