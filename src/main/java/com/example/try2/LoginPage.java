@@ -7,76 +7,110 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane; // ✅ add this
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+
 public class LoginPage {
 
-    public Scene getLoginScene(Stage primaryStage, HelloApplication app) {
-        BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: #2c3e50;");
+    private final Stage primaryStage;
 
-        // TOP bar with close button
+    public LoginPage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    public Scene getLoginScene() {
+        // Root layout, full-screen like homepage
+        BorderPane root = new BorderPane();
+        root.setPrefSize(1366, 768);
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #1f4037, #99f2c8);");
+
+        // --- Top bar with cross (❌) button ---
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10));
         topBar.setAlignment(Pos.TOP_RIGHT);
 
-        Button closeButton = new Button("✖");
-        closeButton.setStyle("-fx-font-size: 14px; -fx-background-color: transparent; -fx-text-fill: white;");
-        closeButton.setOnAction(e -> primaryStage.setScene(app.getMainScene()));
+        Button closeBtn = new Button("❌");
+        closeBtn.setStyle("""
+            -fx-background-color: transparent;
+            -fx-text-fill: white;
+            -fx-font-size: 18px;
+            -fx-cursor: hand;
+        """);
+        closeBtn.setOnAction(e -> returnToHome());
 
-        topBar.getChildren().add(closeButton);
-        borderPane.setTop(topBar);
+        topBar.getChildren().add(closeBtn);
+        root.setTop(topBar);
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        // --- Center login form ---
+        VBox formBox = new VBox(15);
+        formBox.setAlignment(Pos.CENTER);
+        formBox.setPadding(new Insets(40));
 
-        Label userName = new Label("Username:");
-        userName.setTextFill(Color.WHITE);
-        grid.add(userName, 0, 1);
+        Label title = new Label("User Login");
+        title.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-font-weight: bold;");
 
-        TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Username");
+        usernameField.setMaxWidth(300);
 
-        Label pw = new Label("Password:");
-        pw.setTextFill(Color.WHITE);
-        grid.add(pw, 0, 2);
-
-        PasswordField pwBox = new PasswordField();
-        grid.add(pwBox, 1, 2);
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+        passwordField.setMaxWidth(300);
 
         Button loginBtn = new Button("Login");
-        grid.add(loginBtn, 1, 3);
+        loginBtn.setStyle("""
+            -fx-background-color: #27ae60;
+            -fx-text-fill: white;
+            -fx-font-size: 16px;
+            -fx-cursor: hand;
+            -fx-padding: 8 20 8 20;
+            -fx-background-radius: 10;
+        """);
 
-        Label messageLabel = new Label();
-        messageLabel.setTextFill(Color.RED);
-        grid.add(messageLabel, 1, 4);
+        // Optional Return button (also returns to home)
+        Button returnBtn = new Button("← Return");
+        returnBtn.setStyle("""
+            -fx-background-color: transparent;
+            -fx-text-fill: white;
+            -fx-font-size: 14px;
+            -fx-cursor: hand;
+            -fx-underline: true;
+        """);
 
-        // Return button
-        Button returnBtn = new Button("Return");
-        returnBtn.setStyle("-fx-background-color: #444; -fx-text-fill: white;");
-        grid.add(returnBtn, 0, 3);
-
-        returnBtn.setOnAction(e -> primaryStage.setScene(app.getMainScene()));
-
+        // Actions
         loginBtn.setOnAction(e -> {
-            String username = userTextField.getText();
-            String password = pwBox.getText();
-
-            if (username.equals("admin") && password.equals("1234")) {
-                messageLabel.setText("Login successful!");
-                primaryStage.setScene(app.getMainScene());
-            } else {
-                messageLabel.setText("Invalid credentials");
-            }
+            // Dummy login validation
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            System.out.println("Login attempt: " + username + " / " + password);
+            // For now, just return to home after login
+            returnToHome();
         });
 
-        borderPane.setCenter(grid);
+        returnBtn.setOnAction(e -> returnToHome());
 
-        return new Scene(borderPane, 1366, 768);
+        formBox.getChildren().addAll(title, usernameField, passwordField, loginBtn, returnBtn);
+        root.setCenter(formBox);
+
+        return new Scene(root, 1366, 768);
+    }
+
+    // Return to homepage
+    private void returnToHome() {
+        HomePage homePage = new HomePage(primaryStage);
+        VBox fullPage = homePage.getFullPage();
+
+        ScrollPane scrollPane = new ScrollPane(fullPage);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+        Scene homeScene = new Scene(scrollPane, 1366, 768);
+        primaryStage.setScene(homeScene);
+
     }
 }

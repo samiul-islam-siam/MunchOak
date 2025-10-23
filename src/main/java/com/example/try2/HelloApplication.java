@@ -15,16 +15,16 @@ public class HelloApplication extends Application {
     public void start(Stage stage) {
         this.primaryStage = stage;
 
-        mainScene = createMainScene();
-
+        mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
+
         stage.setTitle("Home Page + Extension");
-        stage.setFullScreen(true);
+        // stage.setFullScreen(true);  <-- REMOVE or COMMENT this line
         stage.show();
     }
 
     private Scene createMainScene() {
-        HomePage home = new HomePage(primaryStage, this); // pass HelloApplication
+        HomePage home = new HomePage(primaryStage);
 
         VBox fullPage = home.getFullPage();
 

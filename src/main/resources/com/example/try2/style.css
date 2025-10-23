@@ -1,76 +1,116 @@
- /* ================================
-    Global JavaFX Stylesheet
-    ================================ */
+/* ================================
+   Global JavaFX Stylesheet
+   ================================ */
 
- .root {
-     -fx-font-family: "Segoe UI Emoji", "Segoe UI", sans-serif; /* Added emoji support */
-     -fx-background-color: transparent;
- }
+.root {
+    -fx-font-family: "Segoe UI Emoji", "Segoe UI", sans-serif; /* Added emoji support */
+    -fx-background-color: transparent;
+}
 
- .nav-buttons {
-     -fx-alignment: center;
-     -fx-padding: 4 15 4 15;
-     -fx-spacing: 10;
-     -fx-min-height: 30px;
-     -fx-max-height: 40px;
- }
+.nav-buttons {
+    -fx-alignment: center;
+    -fx-padding: 4 15 4 15;
+    -fx-spacing: 10;
+    -fx-min-height: 30px;
+    -fx-max-height: 40px;
+}
 
- .top-button {
-     -fx-background-color: rgba(255, 255, 255, 0.15);
-     -fx-text-fill: white;
-     -fx-font-size: 14px;
-     -fx-font-weight: bold;
-     -fx-background-radius: 20px;
-     -fx-border-radius: 20px;
-     -fx-border-color: rgba(255, 255, 255, 0.4);
-     -fx-border-width: 1.2;
-     -fx-padding: 4 15 4 15;
-     -fx-cursor: hand;
-     -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.15), 5, 0.3, 0, 1);
-     -fx-transition: all 0.3s ease;
-     -fx-min-width: 100px;
-     -fx-max-width: 120px;
- }
+.top-button {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+    -fx-border-width: 1.2;
+    -fx-padding: 4 15 4 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.15), 5, 0.3, 0, 1);
+    -fx-transition: all 0.3s ease;
+    -fx-min-width: 100px;
+    -fx-max-width: 120px;
+}
 
- .login-button {
-     -fx-background-color: rgba(255, 255, 255, 0.2);
- }
+.login-button {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
 
- .signup-button {
-     -fx-background-color: rgba(255, 255, 255, 0.3);
- }
+.signup-button {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+}
 
- .top-button:hover, .login-button:hover, .signup-button:hover {
-     -fx-background-color: rgba(255, 255, 255, 0.25);
-     -fx-border-color: white;
-     -fx-scale-x: 1.05;
-     -fx-scale-y: 1.05;
- }
+.top-button:hover, .login-button:hover, .signup-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+    -fx-border-color: white;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
 
- .scroll-pane {
-     -fx-background-color: transparent;
- }
+.scroll-pane {
+    -fx-background-color: transparent;
+}
 
- .label, .title-label {
-     -fx-text-fill: white;
-     -fx-font-weight: bold;
- }
+.label, .title-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
 
- .title-label {
-     -fx-font-size: 28px;
- }
+.title-label {
+    -fx-font-size: 28px;
+}
 
- .footer-label {
-     -fx-font-size: 12px;
-     -fx-text-fill: lightgray;
-     -fx-opacity: 0.8;
- }
+.footer-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: lightgray;
+    -fx-opacity: 0.8;
+}
 
- .image-view {
-     -fx-opacity: 1.0;
-     -fx-smooth: true;
- }
+.image-view {
+    -fx-opacity: 1.0;
+    -fx-smooth: true;
+}
 
- .shadow {
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.2, 0, 4);
- }
+.shadow {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.2, 0, 4);
+}
+
+/* ================================
+   Hamburger Button (☰) Styling
+   ================================ */
+.menu-icon-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: black;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-background-radius: 15;   /* rounded edges */
+    -fx-pref-width: 45;          /* square width */
+    -fx-pref-height: 45;         /* square height */
+    -fx-border-color: rgba(0,0,0,0.2);
+    -fx-border-radius: 15;
+}
+
+/* Hover effect */
+.menu-icon-button:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+/* ================================
+   Side Panel Styling
+   ================================ */
+.side-panel {
+    -fx-background-color: rgba(0, 0, 0, 0.85);
+    -fx-padding: 20;
+    -fx-spacing: 20;
+}
+
+.side-panel Button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+.side-panel Button:hover {
+    -fx-text-fill: #27ae60;
+}

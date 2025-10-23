@@ -1,20 +1,20 @@
 package com.example.try2;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomePageExtension {
+
     private final StackPane extensionRoot;
     private final ImageView currentImageView;
     private final ImageView nextImageView;
@@ -24,11 +24,8 @@ public class HomePageExtension {
     public HomePageExtension() {
         extensionRoot = new StackPane();
         extensionRoot.setPrefSize(1366, 768);
-        extensionRoot.setBackground(new Background(
-                new BackgroundFill(Color.color(0, 0, 0, 0.25), CornerRadii.EMPTY, null)
-        ));
 
-        // Load extension images
+        // --- Load extension images ---
         images.add(new Image(getClass().getResource("/com/example/try2/images/ext1.png").toExternalForm()));
         images.add(new Image(getClass().getResource("/com/example/try2/images/ext2.png").toExternalForm()));
         images.add(new Image(getClass().getResource("/com/example/try2/images/ext3.png").toExternalForm()));
@@ -42,7 +39,7 @@ public class HomePageExtension {
         nextImageView.setPreserveRatio(true);
         nextImageView.setFitWidth(1366);
         nextImageView.setFitHeight(768);
-        nextImageView.setOpacity(0);
+        nextImageView.setOpacity(1); // keep visible during slide
 
         currentImageView.setOnMouseClicked(e -> handleImageClick(currentIndex));
         nextImageView.setOnMouseClicked(e -> handleImageClick(currentIndex));
@@ -61,42 +58,38 @@ public class HomePageExtension {
         return extensionRoot;
     }
 
-    // New method to include second extension
-    public VBox getFullExtension() {
-        HomePageSecondExtension secondExtension = new HomePageSecondExtension();
-
-        VBox extensionPage = new VBox();
-        extensionPage.getChildren().addAll(extensionRoot, secondExtension.getExtensionRoot());
-        return extensionPage;
-    }
-
     private void startImageSlideshow() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(4), e -> fadeToNextImage()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(4), e -> slideToNextImage()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
-    private void fadeToNextImage() {
+    private void slideToNextImage() {
         int nextIndex = (currentIndex + 1) % images.size();
         nextImageView.setImage(images.get(nextIndex));
 
-        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.5), nextImageView);
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
+        // Position next image to the right of the current image
+        nextImageView.setTranslateX(1366);
 
-        FadeTransition fadeOut = new FadeTransition(Duration.seconds(1.5), currentImageView);
-        fadeOut.setFromValue(1);
-        fadeOut.setToValue(0);
+        Timeline slideTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(0),
+                        new KeyValue(currentImageView.translateXProperty(), 0),
+                        new KeyValue(nextImageView.translateXProperty(), 1366)
+                ),
+                new KeyFrame(Duration.seconds(1.5),
+                        new KeyValue(currentImageView.translateXProperty(), -1366), // slide out left
+                        new KeyValue(nextImageView.translateXProperty(), 0)         // slide in to center
+                )
+        );
 
-        fadeIn.play();
-        fadeOut.play();
-
-        fadeOut.setOnFinished(e -> {
+        slideTimeline.setOnFinished(e -> {
             currentImageView.setImage(images.get(nextIndex));
-            currentImageView.setOpacity(1);
-            nextImageView.setOpacity(0);
+            currentImageView.setTranslateX(0);
+            nextImageView.setTranslateX(0);
             currentIndex = nextIndex;
         });
+
+        slideTimeline.play();
     }
 
     private void handleImageClick(int index) {
