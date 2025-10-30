@@ -42,15 +42,15 @@ public class HomePage {
         bgView.setFitWidth(1366);
         bgView.setFitHeight(768);
 
-        // --- Top navigation buttons ---
+        // --- Navigation buttons ---
         Button homeBtn = new Button("HOME");
         Button menuBtn = new Button("MENU");
         Button fundBtn = new Button("FUND");
         Button callNowBtn = new Button("CALL NOW 📞");
         Button loginBtn = new Button("Log In");
-        Button menuIconBtn = new Button("☰"); // hamburger menu
+        Button menuIconBtn = new Button("☰"); // Hamburger icon
 
-        // Styling buttons
+        // --- Apply shared style class ---
         homeBtn.getStyleClass().add("top-button");
         menuBtn.getStyleClass().add("top-button");
         fundBtn.getStyleClass().add("top-button");
@@ -58,29 +58,33 @@ public class HomePage {
         loginBtn.getStyleClass().addAll("top-button", "login-button");
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
 
-        // Left side buttons: HOME, MENU, FUND, CALL NOW
+        // --- Square shape for hamburger button ---
+        menuIconBtn.setPrefSize(40, 40);
+        menuIconBtn.setMinSize(40, 40);
+        menuIconBtn.setMaxSize(40, 40);
+        menuIconBtn.setFont(javafx.scene.text.Font.font(18));
+
+        // --- Layout setup ---
         HBox leftButtons = new HBox(20, homeBtn, menuBtn, fundBtn, callNowBtn);
         leftButtons.setAlignment(Pos.CENTER_LEFT);
 
-        // Right side buttons: LOGIN, hamburger menu
         HBox rightButtons = new HBox(10, loginBtn, menuIconBtn);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
-        // Navigation bar (invisible)
         BorderPane navBar = new BorderPane();
         navBar.setLeft(leftButtons);
         navBar.setRight(rightButtons);
         navBar.setPadding(new Insets(5, 20, 5, 20));
-        navBar.setStyle("-fx-background-color: transparent;"); // invisible
+        navBar.setStyle("-fx-background-color: transparent;");
 
-        // Content overlay
+        // --- Content overlay ---
         BorderPane content = new BorderPane();
         content.setTop(navBar);
         content.setBackground(new Background(
                 new BackgroundFill(Color.color(0, 0, 0, 0.0), CornerRadii.EMPTY, Insets.EMPTY)
         ));
 
-        // Root StackPane
+        // --- Root layout ---
         root = new StackPane(bgView, content);
         root.setPrefSize(1366, 768);
 
@@ -88,7 +92,7 @@ public class HomePage {
         var css = getClass().getResource("/com/example/try2/style.css");
         if (css != null) root.getStylesheets().add(css.toExternalForm());
 
-        // Start background slideshow with wipe effect
+        // Start background slideshow (wipe transition)
         startBackgroundSlideshow();
 
         // --- Button Actions ---
@@ -107,14 +111,27 @@ public class HomePage {
     public VBox getFullPage() {
         HomePageExtension extension1 = new HomePageExtension();
         HomePageSecondExtension extension2 = new HomePageSecondExtension();
-        HomePageThirdExtension extension3 = new HomePageThirdExtension(); // NEW
+        HomePageThirdExtension extension3 = new HomePageThirdExtension();
+        HomePageFourthExtension extension4 = new HomePageFourthExtension();
+        HomePageFifthExtension extension5 = new HomePageFifthExtension();    // NEW
+        HomePageSixthExtension extension6 = new HomePageSixthExtension();    // NEW
 
         VBox fullPage = new VBox();
-        fullPage.getChildren().addAll(root, extension1.getExtensionRoot(), extension2.getExtensionRoot(), extension3.getExtensionRoot());
+        fullPage.getChildren().addAll(
+                root,
+                extension1.getExtensionRoot(),
+                extension2.getExtensionRoot(),
+                extension3.getExtensionRoot(),
+                extension4.getExtensionRoot(),
+                extension5.getExtensionRoot(),  // appended
+                extension6.getExtensionRoot()   // appended
+        );
         return fullPage;
     }
 
-    // --- Open full-screen login page ---
+
+
+    // --- Login page ---
     private void openLoginPage() {
         LoginPage loginPage = new LoginPage(primaryStage);
         Scene loginScene = loginPage.getLoginScene();
@@ -136,20 +153,16 @@ public class HomePage {
     private void wipeToNextImage() {
         int nextIndex = (currentBgIndex + 1) % backgrounds.size();
 
-        // Create a new ImageView for the next image
         ImageView nextImageView = new ImageView(backgrounds.get(nextIndex));
         nextImageView.setPreserveRatio(true);
         nextImageView.setFitWidth(1366);
         nextImageView.setFitHeight(768);
 
-        // Add new image on top
         root.getChildren().add(nextImageView);
 
-        // Clip rectangle starting with width 0
         Rectangle clip = new Rectangle(0, 768);
         nextImageView.setClip(clip);
 
-        // Animate clip width from 0 → full width (slide/wipe effect)
         Timeline wipeTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(0), new KeyValue(clip.widthProperty(), 0)),
                 new KeyFrame(Duration.seconds(1.5), new KeyValue(clip.widthProperty(), 1366))
