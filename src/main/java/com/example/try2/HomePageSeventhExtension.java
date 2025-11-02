@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 public class HomePageSeventhExtension {
 
@@ -16,7 +17,7 @@ public class HomePageSeventhExtension {
         extensionRoot = new AnchorPane();
         extensionRoot.setPrefSize(1366, 768);
 
-        // --- Optional Background ---
+        // --- Background image ---
         Image bgImage = new Image(getClass().getResource("/com/example/try2/images/seventh_ext_bg.png").toExternalForm());
         ImageView bgView = new ImageView(bgImage);
         bgView.setPreserveRatio(true);
@@ -27,50 +28,115 @@ public class HomePageSeventhExtension {
         AnchorPane.setLeftAnchor(bgView, 0.0);
         AnchorPane.setRightAnchor(bgView, 0.0);
 
-        // --- Horizontal container for 3 sections ---
+        // --- Fonts ---
+        Font titleFont = Font.font("The Seasons", 36);
+        Font subtitleFont = Font.font("The Seasons", 18);
+
+        // --- Headline ---
+        Label headline = new Label("UPCOMING EVENTS");
+        headline.setFont(titleFont);
+        headline.setStyle("""
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
+                """);
+        headline.setAlignment(Pos.CENTER);
+
+        // --- Container for 3 sections ---
         HBox threeSections = new HBox();
-        threeSections.setPrefSize(1366, 768);
-        threeSections.setSpacing(0); // spacing handled by borders
+        threeSections.setPrefSize(1366, 520);
+        threeSections.setSpacing(30); // spacing between sections
         threeSections.setPadding(new Insets(40, 60, 40, 60));
+        threeSections.setAlignment(Pos.CENTER);
 
-        // --- Section 1 ---
-        VBox section1 = createSection("Section 1", "This is the first section.");
-        section1.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, null, new BorderWidths(0, 1, 0, 0))));
+        // --- Create image sections ---
+        VBox section1 = createImageSection(
+                "/com/example/try2/images/event1.png",
+                "ILLISH UTTSOB",
+                "02 NOV, Sunday",
+                "Reservations 12.30 - 2 PM",
+                subtitleFont,
+                420, 280 // larger corner image
+        );
+        section1.setBorder(new Border(new BorderStroke(
+                Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0)
+        )));
 
-        // --- Section 2 ---
-        VBox section2 = createSection("Section 2", "This is the second section.");
-        section2.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, null, new BorderWidths(0, 1, 0, 0))));
+        VBox section2 = createImageSection(
+                "/com/example/try2/images/event2.png",
+                "FOOD FORWARDERS",
+                "20 NOV, Thursday",
+                "Join Us : 4 - 8 PM",
+                subtitleFont,
+                360, 220 // center image default
+        );
+        section2.setBorder(new Border(new BorderStroke(
+                Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0)
+        )));
 
-        // --- Section 3 ---
-        VBox section3 = createSection("Section 3", "This is the third section.");
-        // No right border for the last section
+        VBox section3 = createImageSection(
+                "/com/example/try2/images/event3.png",
+                "CHRISTMAS EVE",
+                "25 DEC, Thursday",
+                "Reservations 11 AM - 1 PM",
+                subtitleFont,
+                420, 280 // larger corner image
+        );
 
         threeSections.getChildren().addAll(section1, section2, section3);
         HBox.setHgrow(section1, Priority.ALWAYS);
         HBox.setHgrow(section2, Priority.ALWAYS);
         HBox.setHgrow(section3, Priority.ALWAYS);
 
+        // --- Combine headline + sections ---
+        VBox contentBox = new VBox(50, headline, threeSections); // slightly larger spacing for balance
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.setPadding(new Insets(60, 0, 0, 0));
+
         // --- Add to root ---
-        extensionRoot.getChildren().addAll(bgView, threeSections);
-        AnchorPane.setTopAnchor(threeSections, 0.0);
-        AnchorPane.setBottomAnchor(threeSections, 0.0);
-        AnchorPane.setLeftAnchor(threeSections, 0.0);
-        AnchorPane.setRightAnchor(threeSections, 0.0);
+        extensionRoot.getChildren().addAll(bgView, contentBox);
+        AnchorPane.setTopAnchor(contentBox, 0.0);
+        AnchorPane.setBottomAnchor(contentBox, 0.0);
+        AnchorPane.setLeftAnchor(contentBox, 0.0);
+        AnchorPane.setRightAnchor(contentBox, 0.0);
     }
 
-    private VBox createSection(String title, String content) {
-        VBox section = new VBox(20);
-        section.setAlignment(Pos.CENTER);
+    private VBox createImageSection(String imagePath, String eventTitle, String eventDate, String eventDetails, Font font, double width, double height) {
+        VBox section = new VBox(15);
+        section.setAlignment(Pos.TOP_CENTER);
         section.setPadding(new Insets(20));
 
-        Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+        // --- Event image ---
+        ImageView imgView = new ImageView();
+        try {
+            Image img = new Image(getClass().getResource(imagePath).toExternalForm());
+            imgView.setImage(img);
+            imgView.setPreserveRatio(true);
+            imgView.setFitWidth(width);
+            imgView.setFitHeight(height);
+            imgView.setSmooth(true);
+            imgView.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 4);");
+        } catch (Exception e) {
+            System.out.println("Image not found: " + imagePath);
+        }
 
-        Label contentLabel = new Label(content);
-        contentLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
-        contentLabel.setWrapText(true);
+        // --- Event text below image ---
+        Label titleLabel = new Label(eventTitle);
+        titleLabel.setFont(Font.font("The Seasons", 22));
+        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
 
-        section.getChildren().addAll(titleLabel, contentLabel);
+        Label dateLabel = new Label(eventDate);
+        dateLabel.setFont(font);
+        dateLabel.setStyle("-fx-text-fill: #ffd700;"); // golden highlight
+
+        Label detailsLabel = new Label(eventDetails);
+        detailsLabel.setFont(font);
+        detailsLabel.setStyle("-fx-text-fill: white;");
+
+        VBox textBox = new VBox(4, titleLabel, dateLabel, detailsLabel);
+        textBox.setAlignment(Pos.CENTER);
+
+        section.getChildren().addAll(imgView, textBox);
         return section;
     }
 
