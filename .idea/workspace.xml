@@ -4,20 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Back button created">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Login System update">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/MainHome.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageExtension.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageSecondExtension.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/ext1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/ext2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/ext3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/phone_icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/second_ext_bg.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/DatabaseConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/DatabaseConnection.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/HomePage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/HomePage.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,31 +75,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Launcher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Application.RestaurantDashboard.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/login&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.30804598&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Launcher.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Application.MainHome.executor": "Run",
+    "Application.RestaurantDashboard.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/munchoak",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.30804598",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\login" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java" />
@@ -273,7 +280,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759723441850</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Login System update">
+      <option name="closed" value="true" />
+      <created>1759732212391</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1759732212391</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -292,6 +307,7 @@
     <MESSAGE value="Guest Browsing implemented" />
     <MESSAGE value="Register page added" />
     <MESSAGE value="Back button created" />
-    <option name="LAST_COMMIT_MESSAGE" value="Back button created" />
+    <MESSAGE value="Login System update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Login System update" />
   </component>
 </project>
