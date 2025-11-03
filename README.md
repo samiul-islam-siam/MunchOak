@@ -1,5 +1,5 @@
 # MunchOak
-Academic project for CSE 2104. 
+Academic project for CSE 2104. This project is under development.
 
 ## Tools
   - IDE: IntelliJ IDEA Community Edition v2025.2.2
@@ -12,3 +12,5 @@ Academic project for CSE 2104.
   - Partho Kumar Mondal
   - Adiba Jahan
   - Suchita Islam Shuvra
+
+Run MainHome to start the application. Thank you.

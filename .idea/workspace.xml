@@ -4,18 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Back button created">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="UI updated">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/FileStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mysql-connector-j-9.4.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,15 +75,16 @@
   "keyToString": {
     "Application.Launcher.executor": "Run",
     "Application.Main.executor": "Run",
+    "Application.MainHome.executor": "Run",
     "Application.RestaurantDashboard.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "Database",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/login",
+    "last_opened_file_path": "C:/Users/User/IdeaProjects/MunchOak/src/main/java/com/example/login",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.30804598",
@@ -89,15 +93,19 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\login" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\resources" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\login" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.munchoak" />
     </key>
   </component>
   <component name="RunManager">
@@ -271,7 +279,31 @@
       <option name="project" value="LOCAL" />
       <updated>1759723441850</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Login System update">
+      <option name="closed" value="true" />
+      <created>1759732212391</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1759732212391</updated>
+    </task>
+    <task id="LOCAL-00021" summary="UI merged">
+      <option name="closed" value="true" />
+      <created>1762096474915</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1762096474915</updated>
+    </task>
+    <task id="LOCAL-00022" summary="UI updated">
+      <option name="closed" value="true" />
+      <created>1762180711333</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1762180711333</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -290,6 +322,9 @@
     <MESSAGE value="Guest Browsing implemented" />
     <MESSAGE value="Register page added" />
     <MESSAGE value="Back button created" />
-    <option name="LAST_COMMIT_MESSAGE" value="Back button created" />
+    <MESSAGE value="Login System update" />
+    <MESSAGE value="UI merged" />
+    <MESSAGE value="UI updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="UI updated" />
   </component>
 </project>

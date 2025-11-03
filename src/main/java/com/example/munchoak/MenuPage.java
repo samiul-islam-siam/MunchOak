@@ -3,15 +3,18 @@ package com.example.munchoak;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -21,7 +24,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.*;
 import java.util.*;
 
 public class MenuPage {
@@ -37,16 +39,22 @@ public class MenuPage {
 
     private FoodItems currentEditingFood = null;
 
-    // Cart for the current user
-    // Cart change
+    // In-memory category list (backed by file)
+    private List<String> categories = new ArrayList<>();
 
+    // Cart for the current user
     int userId = UserManager.getUserId("defaultuser");
     private Cart cart = new Cart(userId, "defaultuser");
 
-    //private Cart cart = new Cart(getCurrentUserid(),"customer123");  // demo token
-
     public Node getView() {
         foodList = FXCollections.observableArrayList();
+        // load menu into foodList from files
+        List<FoodItems> loaded = FileStorage.loadMenu();
+        foodList.addAll(loaded);
+
+        // load categories from files
+        categories = FileStorage.loadCategories();
+
         foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
 
@@ -139,7 +147,6 @@ public class MenuPage {
             }
         });
 
-
         // ===== MAIN LAYOUT ===== //
         VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
         vbox.setPadding(new Insets(5));
@@ -148,23 +155,12 @@ public class MenuPage {
         return vbox;
     }
 
-
     // ================== CATEGORY MANAGEMENT ===================
 
     private void loadCategories() {
         categoryBox.getItems().clear();
-        String sql = "SELECT Category_Name FROM Categories ORDER BY Category_Name";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                categoryBox.getItems().add(rs.getString("Category_Name"));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        categories = FileStorage.loadCategories();
+        categoryBox.getItems().addAll(categories);
     }
 
     private void addCategory() {
@@ -173,13 +169,16 @@ public class MenuPage {
         dialog.setHeaderText("Enter new category name:");
         dialog.setContentText("Category:");
         dialog.showAndWait().ifPresent(name -> {
-            try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement("INSERT INTO Categories (Category_Name) VALUES (?)")) {
-                stmt.setString(1, name);
-                stmt.executeUpdate();
+            if (name == null || name.isBlank()) {
+                showAlert("Error", "Invalid category name.");
+                return;
+            }
+            try {
+                FileStorage.addCategory(name);
                 loadCategories();
                 categoryBox.setValue(name);
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
+                ex.printStackTrace();
                 showAlert("Error", "Category already exists or invalid.");
             }
         });
@@ -197,21 +196,19 @@ public class MenuPage {
         dialog.setHeaderText("Enter new name for category:");
         dialog.setContentText("New Name:");
         dialog.showAndWait().ifPresent(newName -> {
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                PreparedStatement stmt = conn.prepareStatement("UPDATE Categories SET Category_Name=? WHERE Category_Name=?");
-                stmt.setString(1, newName);
-                stmt.setString(2, selected);
-                stmt.executeUpdate();
-
-                PreparedStatement stmt2 = conn.prepareStatement("UPDATE Details SET Category=? WHERE Category=?");
-                stmt2.setString(1, newName);
-                stmt2.setString(2, selected);
-                stmt2.executeUpdate();
-
+            if (newName.isBlank() || categories.contains(newName)) {
+                showAlert("Error", "Invalid or duplicate category name.");
+                return;
+            }
+            try {
+                FileStorage.replaceCategory(selected, newName);
                 loadCategories();
                 categoryBox.setValue(newName);
+                // reload menu and UI
+                foodList.setAll(FileStorage.loadMenu());
                 loadFoodItems();
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
+                ex.printStackTrace();
                 showAlert("Error", "Rename failed.");
             }
         });
@@ -229,19 +226,14 @@ public class MenuPage {
                 ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(res -> {
             if (res == ButtonType.YES) {
-                try (Connection conn = DatabaseConnection.getConnection()) {
-                    PreparedStatement stmt1 = conn.prepareStatement("DELETE FROM Details WHERE Category=?");
-                    stmt1.setString(1, selected);
-                    stmt1.executeUpdate();
-
-                    PreparedStatement stmt2 = conn.prepareStatement("DELETE FROM Categories WHERE Category_Name=?");
-                    stmt2.setString(1, selected);
-                    stmt2.executeUpdate();
-
+                try {
+                    FileStorage.deleteCategory(selected);
                     loadCategories();
                     categoryBox.setValue(null);
+                    foodList.setAll(FileStorage.loadMenu());
                     loadFoodItems();
-                } catch (SQLException ex) {
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                     showAlert("Error", "Delete failed.");
                 }
             }
@@ -258,52 +250,28 @@ public class MenuPage {
     // ================== FOOD ITEMS MANAGEMENT ===================
 
     private void loadFoodItems() {
-        foodList.clear();
         foodContainer.getChildren().clear();
-
-        String sql = "SELECT * FROM Details ORDER BY Category";
         Map<String, FlowPane> categoryFlows = new LinkedHashMap<>();
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        for (FoodItems food : foodList) {
+            String category = food.getCategory();
+            if (!categoryFlows.containsKey(category)) {
+                Label categoryLabel = new Label(category);
+                categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+                Separator separator = new Separator();
+                separator.setPrefWidth(500);
 
-            while (rs.next()) {
-                FoodItems food = new FoodItems(
-                        rs.getInt("Food_ID"),
-                        rs.getString("Food_Name"),
-                        rs.getString("Details"),
-                        rs.getDouble("Price"),
-                        rs.getDouble("Ratings"),
-                        rs.getString("ImagePath"),
-                        rs.getString("Category")
-                );
+                FlowPane flow = new FlowPane(15, 15);
+                flow.setPadding(new Insets(5));
 
-                foodList.add(food);
-                String category = food.getCategory();
+                VBox section = new VBox(10);
+                section.getChildren().addAll(categoryLabel, separator, flow);
+                section.setPadding(new Insets(10, 5, 20, 5));
 
-                if (!categoryFlows.containsKey(category)) {
-                    Label categoryLabel = new Label(category);
-                    categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
-                    Separator separator = new Separator();
-                    separator.setPrefWidth(500);
-
-                    FlowPane flow = new FlowPane(15, 15);
-                    flow.setPadding(new Insets(5));
-
-                    VBox section = new VBox(10);
-                    section.getChildren().addAll(categoryLabel, separator, flow);
-                    section.setPadding(new Insets(10, 5, 20, 5));
-
-                    foodContainer.getChildren().add(section);
-                    categoryFlows.put(category, flow);
-                }
-
-                categoryFlows.get(category).getChildren().add(createFoodCard(food));
+                foodContainer.getChildren().add(section);
+                categoryFlows.put(category, flow);
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            categoryFlows.get(category).getChildren().add(createFoodCard(food));
         }
     }
 
@@ -323,9 +291,8 @@ public class MenuPage {
         String imagePath = "/images/" + food.getImagePath();
         Image image = null;
         try (InputStream is = getClass().getResourceAsStream(imagePath)) {
-            if (is != null) {
-                image = new Image(is);
-            } else {
+            if (is != null) image = new Image(is);
+            else {
                 String filePath = "file:src/main/resources/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
@@ -333,9 +300,7 @@ public class MenuPage {
 
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
-                if (placeholder != null) {
-                    image = new Image(placeholder);
-                }
+                if (placeholder != null) image = new Image(placeholder);
             } catch (Exception ignored) {}
         }
 
@@ -381,7 +346,6 @@ public class MenuPage {
         return card;
     }
 
-
     private void addFoodItem() {
         if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
             showAlert("Error", "No category selected.");
@@ -418,23 +382,23 @@ public class MenuPage {
 
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
-        String sql = "INSERT INTO Details (Food_Name, Details, Price, Ratings, ImagePath, Category) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // compute next id from existing items to avoid ID collisions
+        int nextId = 1;
+        for (FoodItems f : FileStorage.loadMenu()) {
+            if (f.getId() >= nextId) nextId = f.getId() + 1;
+        }
 
-            stmt.setString(1, nameField.getText().trim());
-            stmt.setString(2, detailsField.getText().trim());
-            stmt.setDouble(3, price);
-            stmt.setDouble(4, rating);
-            stmt.setString(5, imageFilename);
-            stmt.setString(6, categoryBox.getValue());
+        FoodItems newFood = new FoodItems(nextId, nameField.getText().trim(), detailsField.getText().trim(),
+                price, rating, imageFilename, categoryBox.getValue());
 
-            stmt.executeUpdate();
+        try {
+            FileStorage.appendMenuItem(newFood);
+            // reload menu into list & UI
+            foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             showAlert("Error", "Failed to add food item.");
         }
     }
@@ -447,39 +411,33 @@ public class MenuPage {
             imageFilename = selectedImageFile.getName();
         }
 
-        String sql = "UPDATE Details SET Food_Name=?, Details=?, Price=?, Ratings=?, ImagePath=?, Category=? WHERE Food_ID=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        currentEditingFood.setName(nameField.getText().trim());
+        currentEditingFood.setDetails(detailsField.getText().trim());
+        currentEditingFood.setPrice(Double.parseDouble(priceField.getText().trim()));
+        currentEditingFood.setRatings(Double.parseDouble(ratingsField.getText().trim()));
+        currentEditingFood.setImagePath(imageFilename);
+        currentEditingFood.setCategory(categoryBox.getValue());
 
-            stmt.setString(1, nameField.getText().trim());
-            stmt.setString(2, detailsField.getText().trim());
-            stmt.setDouble(3, Double.parseDouble(priceField.getText().trim()));
-            stmt.setDouble(4, Double.parseDouble(ratingsField.getText().trim()));
-            stmt.setString(5, imageFilename);
-            stmt.setString(6, categoryBox.getValue());
-            stmt.setInt(7, currentEditingFood.getId());
-
-            stmt.executeUpdate();
+        try {
+            // rewrite full menu file from in-memory list
+            FileStorage.rewriteMenu(new ArrayList<>(foodList));
+            foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             showAlert("Error", "Failed to update food item.");
         }
     }
 
     private void deleteFoodItem(FoodItems food) {
-        String sql = "DELETE FROM Details WHERE Food_ID=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, food.getId());
-            stmt.executeUpdate();
+        foodList.remove(food);
+        try {
+            FileStorage.rewriteMenu(new ArrayList<>(foodList));
             loadFoodItems();
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            showAlert("Error", "Failed to delete item.");
         }
     }
 
@@ -499,7 +457,6 @@ public class MenuPage {
         ((VBox) addOrUpdateButton.getParent()).setManaged(true);
     }
 
-
     private void clearFields() {
         nameField.clear();
         detailsField.clear();
@@ -515,7 +472,6 @@ public class MenuPage {
         ((VBox) addOrUpdateButton.getParent()).setVisible(false);
         ((VBox) addOrUpdateButton.getParent()).setManaged(false);
     }
-
 
     private void chooseImage() {
         FileChooser fileChooser = new FileChooser();
@@ -557,8 +513,6 @@ public class MenuPage {
             this.quantity = quantity;
             this.price = price;
             this.total = price * quantity;
-
-
         }
         public int getId() {return id;}
 
@@ -578,7 +532,6 @@ public class MenuPage {
             return total;
         }
 
-        //public void setQuantity(int quantity) { this.quantity = quantity; }
         public void setQuantity(int quantity) {
             this.quantity = quantity;
             this.total = this.price * quantity; // update total dynamically
@@ -610,11 +563,6 @@ public class MenuPage {
         TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-//        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
-//        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-//
-//        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
-//        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
         TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceCol.setCellFactory(tc -> new TableCell<>() {
@@ -643,11 +591,9 @@ public class MenuPage {
             }
         });
 
-        // 🧾 Define totalLabel first so it’s visible in the cell factory
         Label totalLabel = new Label("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
         totalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        // 🧮 Action column (Edit & Remove)
         TableColumn<CartItemView, Void> actionCol = new TableColumn<>("Action");
         actionCol.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn = new Button("Edit");
@@ -698,7 +644,6 @@ public class MenuPage {
 
         cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol, actionCol);
 
-        // Close button
         Button closeBtn = new Button("Close");
         closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
 
@@ -715,15 +660,13 @@ public class MenuPage {
         stage.show();
     }
 
-
-
     // ================== CHECKOUT ===================
 
     private void checkout() {
         // Step 1: Calculate total
         double total = 0;
         Map<Integer, FoodItems> foodMap = new HashMap<>();
-        for (FoodItems food : foodList) {
+        for (FoodItems food : FileStorage.loadMenu()) {
             foodMap.put(food.getId(), food);
         }
 
@@ -734,75 +677,20 @@ public class MenuPage {
             }
         }
 
-        // Step 2: Process payment (pass cart + foodMap so bill can be generated later)
+        if (cart.getBuyHistory().isEmpty()) {
+            new Alert(Alert.AlertType.INFORMATION, "Your cart is empty!").show();
+            return;
+        }
 
-
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            conn.setAutoCommit(false); // start transaction
-
-            // 1️⃣ Insert PaymentHistory
-            int paymentId;
-            String insertPayment = "INSERT INTO paymenthistory (User_ID, TotalAmount, PaymentMethod) VALUES (?, ?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(insertPayment, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, cart.getUserId());
-                ps.setDouble(2, total);
-                ps.setString(3, "Card"); // you can replace with actual method
-                ps.executeUpdate();
-
-                try (var rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) paymentId = rs.getInt(1);
-                    else throw new SQLException("Payment_ID not generated");
-                }
-            }
-
-            // 2️⃣ Insert Cart
-            int cartId;
-            String insertCart = "INSERT INTO cart (User_ID, Payment_ID) VALUES (?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(insertCart, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, cart.getUserId());
-                ps.setInt(2, paymentId);
-                ps.executeUpdate();
-
-                try (var rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) cartId = rs.getInt(1);
-                    else throw new SQLException("Cart_ID not generated");
-                }
-            }
-
-            // 3️⃣ Insert CartItems
-            String insertItems = "INSERT INTO cartitems (Cart_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(insertItems)) {
-                for (var entry : cart.getBuyHistory().entrySet()) {
-                    ps.setInt(1, cartId);
-                    ps.setInt(2, entry.getKey());
-                    ps.setInt(3, entry.getValue());
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-            }
-
-            // 4️⃣ Insert PaymentItems
-            String insertPaymentItems = "INSERT INTO PaymentItems (Payment_ID, Food_ID, Quantity) VALUES (?, ?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(insertPaymentItems)) {
-                for (var entry : cart.getBuyHistory().entrySet()) {
-                    ps.setInt(1, paymentId);
-                    ps.setInt(2, entry.getKey());
-                    ps.setInt(3, entry.getValue());
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-            }
-
-            Payment payment = new Payment(paymentId,total);
+        try {
+            int paymentId = FileStorage.createPaymentAndCart(cart.getUserId(), cart, foodMap, "Card");
+            Payment payment = new Payment(paymentId, total);
+            // open payment UI which will show bill and clear cart in Payment.processPayment
             payment.processPayment(cart, foodMap);
-            conn.commit(); // commit all together
-            //cart.getBuyHistory().clear();
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Checkout failed: " + e.getMessage()).show();
         }
-
     }
 
     // ================== EDIT ===================
@@ -834,5 +722,4 @@ public class MenuPage {
         dialog.setScene(new Scene(vbox, 300, 200));
         dialog.show();
     }
-
 }

@@ -66,10 +66,10 @@ public class RestaurantDashboard extends Application {
         // Content area in center
         contentPane = new StackPane();
         contentPane.setPadding(new Insets(20));
-        showHomePage(); // default
+        // showHomePage(); // default
 
         // Wire up actions
-        homeBtn.setOnAction(e -> showHomePage());
+        // homeBtn.setOnAction(e -> showHomePage());
         ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders."));
         menuBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
@@ -189,10 +189,10 @@ public class RestaurantDashboard extends Application {
         contentPane.getChildren().add(v);
     }
 
-    private void showHomePage() {
-        contentPane.getChildren().clear();
-        contentPane.getChildren().add(new HomePage().getView());
-    }
+//    private void showHomePage() {
+//        contentPane.getChildren().clear();
+//        contentPane.getChildren().add(new HomePage().getView());
+//    }
 
     public static void main(String[] args) {
         launch(args);

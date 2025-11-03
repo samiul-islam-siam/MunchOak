@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.*;
 import java.time.Instant;
 import java.util.Map;
 
@@ -16,9 +15,6 @@ public class Payment {
     private double amount;
     private boolean success;
     private String timestamp;
-
-    private static final int START_PAYMENT_ID = 3001;
-    private static final int START_USER_ID = 20250001;
 
     public Payment(int id, double amount) {
         this.id = id;
@@ -56,10 +52,9 @@ public class Payment {
                 return;
             }
 
-            this.success = true; // ✅ Payment marked successful
+            this.success = true;
             paymentStage.close();
 
-            // ✅ Bill only (no DB insert here)
             Bill bill = new Bill(cart, this);
             String receipt = bill.generateReceipt(foodMap);
 
@@ -80,21 +75,6 @@ public class Payment {
 
             cart.getBuyHistory().clear(); // empty cart after payment
         });
-    }
-
-    private boolean userExists(Connection conn, int userId) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("SELECT 1 FROM Users WHERE User_ID = ?");
-        stmt.setInt(1, userId);
-        return stmt.executeQuery().next();
-    }
-
-    private int getNextUserId(Connection conn) throws SQLException {
-        ResultSet rs = conn.prepareStatement("SELECT MAX(User_ID) AS maxId FROM Users").executeQuery();
-        if (rs.next()) {
-            int maxId = rs.getInt("maxId");
-            return maxId >= START_USER_ID ? maxId + 1 : START_USER_ID;
-        }
-        return START_USER_ID;
     }
 
     public int getId() { return id; }

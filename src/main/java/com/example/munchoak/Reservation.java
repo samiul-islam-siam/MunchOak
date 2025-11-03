@@ -4,12 +4,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -97,7 +95,8 @@ public class Reservation {
 
             Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                if (saveReservationToDB(name, phone, guests, date.toString(), time, specialRequest.getText())) {
+                boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, specialRequest.getText());
+                if (saved) {
                     showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
                             "Your table has been successfully reserved!\nWe look forward to serving you.");
                     clearFields(nameField, phoneField, specialRequest, guestsSpinner, datePicker, timeBox);
@@ -111,28 +110,6 @@ public class Reservation {
             RestaurantDashboard mainMenu = new RestaurantDashboard();
             mainMenu.start(stage);
         });
-    }
-
-    // --- Save Reservation to Database ---
-    private boolean saveReservationToDB(String name, String phone, int guests, String date, String time, String request) {
-        String sql = "INSERT INTO Reservations (Name, Phone, Guests, ReservationDate, ReservationTime, SpecialRequests) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, name);
-            stmt.setString(2, phone);
-            stmt.setInt(3, guests);
-            stmt.setString(4, date);
-            stmt.setString(5, time + ":00"); // MySQL TIME format
-            stmt.setString(6, request);
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

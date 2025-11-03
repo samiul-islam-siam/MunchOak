@@ -10,9 +10,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class HistoryPage {
 
@@ -60,7 +60,7 @@ public class HistoryPage {
         historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol);
         historyTable.setItems(historyData);
 
-        // Load data from DB
+        // Load data from file storage
         loadHistory();
 
         VBox layout = new VBox(15, new Label("📜 Payment History"), historyTable);
@@ -72,70 +72,38 @@ public class HistoryPage {
 
     private void loadHistory() {
         historyData.clear();
-
-        String sql = "SELECT Payment_ID, User_ID, TotalAmount, PaymentMethod, PaymentDate " +
-                "FROM PaymentHistory ORDER BY Payment_ID DESC";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                int paymentId = rs.getInt("Payment_ID");
-                int userId = rs.getInt("User_ID");
-                double amount = rs.getDouble("TotalAmount");
-                String date = rs.getString("PaymentDate");
-                String method = rs.getString("PaymentMethod");
-                String status = "Success"; // temporary placeholder
-
-                historyData.add(new HistoryRecord(userId, paymentId, date, amount, status, method));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
+        for (FileStorage.HistoryRecordSimple s : list) {
+            // status defaults to "Success" here (FileStorage doesn't store status)
+            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
         }
     }
+
     private void showBill(HistoryRecord record) {
-        Map<Integer, FoodItems> foodMap = loadFoodMap();
+        Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
         // Create a cart for displaying history
         Cart cart = new Cart(record.getUserId(), "historyCart");
 
-        String sql = """
-        SELECT ci.Food_ID, ci.Quantity
-        FROM CartItems ci
-        JOIN Cart c ON ci.Cart_ID = c.Cart_ID
-        WHERE c.Payment_ID = ?
-        """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, record.getPaymentId());
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                int foodId = rs.getInt("Food_ID");
-                int qty = rs.getInt("Quantity");
-                cart.addToCart(foodId, qty);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
+        for (Map.Entry<Integer, Integer> e : items.entrySet()) {
+            cart.addToCart(e.getKey(), e.getValue());
         }
 
-        Payment payment = new Payment(record.paymentId, record.getAmount());
+        Payment payment = new Payment(record.getPaymentId(), record.getAmount());
+        // set private fields using reflection (timestamp and success/status)
         try {
             java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(payment, record.getPaymentId());
 
-            java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
-            successField.setAccessible(true);
-            successField.set(payment, record.getStatus().equals("Success"));
-
             java.lang.reflect.Field timestampField = Payment.class.getDeclaredField("timestamp");
             timestampField.setAccessible(true);
             timestampField.set(payment, record.getTimestamp());
+
+            java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
+            successField.setAccessible(true);
+            successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -155,33 +123,6 @@ public class HistoryPage {
 
         stage.setScene(new Scene(box, 500, 400));
         stage.show();
-    }
-
-
-    private Map<Integer, FoodItems> loadFoodMap() {
-        Map<Integer, FoodItems> map = new HashMap<>();
-        String sql = "SELECT * FROM Details";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                FoodItems food = new FoodItems(
-                        rs.getInt("Food_ID"),
-                        rs.getString("Food_Name"),
-                        rs.getString("Details"),
-                        rs.getDouble("Price"),
-                        rs.getDouble("Ratings"),
-                        rs.getString("ImagePath"),
-                        rs.getString("Category")
-                );
-                map.put(food.getId(), food);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return map;
     }
 
     public static class HistoryRecord {
@@ -209,5 +150,4 @@ public class HistoryPage {
         public String getStatus() { return status; }
         public String getPaymentMethod() { return paymentMethod; }
     }
-
 }
