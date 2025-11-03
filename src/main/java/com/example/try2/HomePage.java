@@ -109,23 +109,27 @@ public class HomePage {
     }
     public VBox getFullPage() {
         HomePageExtension extension1 = new HomePageExtension();
-        HomePageSecondExtension extension2 = new HomePageSecondExtension();
+
         HomePageThirdExtension extension3 = new HomePageThirdExtension();
         HomePageFourthExtension extension4 = new HomePageFourthExtension();
         HomePageFifthExtension extension5 = new HomePageFifthExtension();
         HomePageSixthExtension extension6 = new HomePageSixthExtension();
         HomePageSeventhExtension extension7 = new HomePageSeventhExtension();  // NEW
+        HomePageEighthExtension eighthExtension = new HomePageEighthExtension();
+
 
         VBox fullPage = new VBox();
         fullPage.getChildren().addAll(
                 root,                      // Original homepage
                 extension1.getExtensionRoot(),
-                extension2.getExtensionRoot(),
+
                 extension3.getExtensionRoot(),
                 extension4.getExtensionRoot(),
                 extension5.getExtensionRoot(),
                 extension6.getExtensionRoot(),
-                extension7.getExtensionRoot() // Append the new 7th extension
+                extension7.getExtensionRoot(),// Append the new 7th extension
+                eighthExtension.getExtensionRoot()
+
         );
 
         return fullPage;

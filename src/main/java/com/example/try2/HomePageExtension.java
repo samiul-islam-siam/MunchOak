@@ -13,7 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -35,50 +34,65 @@ public class HomePageExtension {
 
     public HomePageExtension() {
         extensionRoot = new StackPane();
-        extensionRoot.setPrefSize(1366, 768);
+        extensionRoot.setPrefSize(1366, 600);
+        extensionRoot.setMinSize(1366, 600);
 
         // --- Background Image ---
-        Image bgImage = new Image(getClass().getResource("/com/example/try2/images/ext_bg.png").toExternalForm());
+        Image bgImage;
+        try {
+            bgImage = new Image(getClass().getResource("/com/example/try2/images/ext_bg.png").toExternalForm());
+        } catch (Exception e) {
+            bgImage = null;
+            System.out.println("Background image not found: ext_bg.png");
+        }
         ImageView bgView = new ImageView(bgImage);
-        bgView.setPreserveRatio(true);
+        bgView.setPreserveRatio(false);
         bgView.setFitWidth(1366);
-        bgView.setFitHeight(768);
+        bgView.setFitHeight(600);
 
         // --- Fixed Logo ---
-        ImageView logoView = new ImageView(new Image(getClass().getResource("/com/example/try2/images/logo.png").toExternalForm()));
+        Image logoImg;
+        try {
+            logoImg = new Image(getClass().getResource("/com/example/try2/images/logo.png").toExternalForm());
+        } catch (Exception e) {
+            logoImg = null;
+            System.out.println("Logo image not found: logo.png");
+        }
+        ImageView logoView = new ImageView(logoImg);
+        logoView.setPreserveRatio(false);
         logoView.setFitWidth(50);
         logoView.setFitHeight(50);
         Circle logoClip = new Circle(25, 25, 25);
         logoView.setClip(logoClip);
         StackPane.setAlignment(logoView, Pos.TOP_LEFT);
-        StackPane.setMargin(logoView, new Insets(20, 0, 0, 20));
+        StackPane.setMargin(logoView, new Insets(10, 0, 0, 20));
 
         // --- Headline ---
         Text headline = new Text("C O N N E C T   W I T H   U S");
-        headline.setFont(Font.font("Arial", 36));
+        headline.setFont(Font.font("Arial", 24));
         headline.setFill(Color.WHITE);
         StackPane.setAlignment(headline, Pos.TOP_CENTER);
-        StackPane.setMargin(headline, new Insets(30, 0, 0, 0));
+        StackPane.setMargin(headline, new Insets(15, 0, 0, 0));
 
         // --- Subtext ---
         Text subtext = new Text("Make beautiful Memories with MUNCHOAK");
-        subtext.setFont(Font.font("Arial", 20));
+        subtext.setFont(Font.font("Arial", 14));
         subtext.setFill(Color.LIGHTGRAY);
         StackPane.setAlignment(subtext, Pos.TOP_CENTER);
-        StackPane.setMargin(subtext, new Insets(80, 0, 0, 0));
+        StackPane.setMargin(subtext, new Insets(45, 0, 0, 0));
 
         // --- Container for 3 sections ---
         sectionsContainer = new HBox();
-        sectionsContainer.setPrefSize(1366, 500);
+        sectionsContainer.setPrefSize(1366, 400);
         sectionsContainer.setSpacing(0);
-        sectionsContainer.setPadding(new Insets(140, 60, 40, 60));
+        sectionsContainer.setPadding(new Insets(70, 60, 20, 60));
         sectionsContainer.setAlignment(Pos.CENTER);
 
         // --- Create Sections ---
         for (int i = 0; i < sectionCount; i++) {
             StackPane section = new StackPane();
             section.setAlignment(Pos.CENTER);
-            section.setPadding(new Insets(10));
+            section.setPadding(new Insets(5));
             if (i < sectionCount - 1) {
                 section.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0))));
@@ -95,29 +109,33 @@ public class HomePageExtension {
         }
 
         // --- Load 5 images per section ---
-        // Section 1 (circle)
-        sectionImages.get(0).add(new Image(getClass().getResource("/com/example/try2/images/events1.png").toExternalForm()));
-        sectionImages.get(0).add(new Image(getClass().getResource("/com/example/try2/images/events2.png").toExternalForm()));
-        sectionImages.get(0).add(new Image(getClass().getResource("/com/example/try2/images/events3.png").toExternalForm()));
-        sectionImages.get(0).add(new Image(getClass().getResource("/com/example/try2/images/events4.png").toExternalForm()));
-        sectionImages.get(0).add(new Image(getClass().getResource("/com/example/try2/images/events5.png").toExternalForm()));
-
-        // Section 2 (rounded rectangle)
-        sectionImages.get(1).addAll(sectionImages.get(0)); // reuse for demo
-
-        // Section 3 (hexagon)
-        sectionImages.get(2).addAll(sectionImages.get(0)); // reuse for demo
+        // Section 1 (rounded rectangle)
+        List<Image> baseImages = new ArrayList<>();
+        try {
+            baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events1.png").toExternalForm()));
+            baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events2.png").toExternalForm()));
+            baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events3.png").toExternalForm()));
+            baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events4.png").toExternalForm()));
+            baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events5.png").toExternalForm()));
+        } catch (Exception e) {
+            System.out.println("Event images not found.");
+        }
+        sectionImages.get(0).addAll(baseImages);
+        sectionImages.get(1).addAll(baseImages);
+        sectionImages.get(2).addAll(baseImages);
 
         // --- Initialize images & apply frame shapes ---
-        final double imageWidth = 400;
-        final double imageHeight = 300;
+        final double imageWidth = 320;
+        final double imageHeight = 200;
         for (int i = 0; i < sectionCount; i++) {
             int startIndex = i % sectionImages.get(i).size();
             currentIndexes.set(i, startIndex);
 
             ImageView current = currentImageViews.get(i);
-            current.setImage(sectionImages.get(i).get(startIndex));
-            current.setPreserveRatio(true);
+            if (!sectionImages.get(i).isEmpty()) {
+                current.setImage(sectionImages.get(i).get(startIndex));
+            }
+            current.setPreserveRatio(false);
             current.setSmooth(true);
             current.setFitWidth(imageWidth);
             current.setFitHeight(imageHeight);
@@ -125,8 +143,10 @@ public class HomePageExtension {
 
             ImageView next = nextImageViews.get(i);
             int nextStartIndex = (startIndex + 1) % sectionImages.get(i).size();
-            next.setImage(sectionImages.get(i).get(nextStartIndex));
-            next.setPreserveRatio(true);
+            if (!sectionImages.get(i).isEmpty()) {
+                next.setImage(sectionImages.get(i).get(nextStartIndex));
+            }
+            next.setPreserveRatio(false);
             next.setSmooth(true);
             next.setFitWidth(imageWidth);
             next.setFitHeight(imageHeight);
@@ -142,32 +162,11 @@ public class HomePageExtension {
     }
 
     private void applyFrameShape(int sectionIndex, ImageView imageView, double width, double height) {
-        switch (sectionIndex) {
-            case 0 -> { // Circle
-                Circle clip = new Circle(width / 2, height / 2, Math.min(width, height) / 2);
-                imageView.setClip(clip);
-            }
-            case 1 -> { // Rounded rectangle
-                Rectangle clip = new Rectangle(width, height);
-                clip.setArcWidth(50);
-                clip.setArcHeight(50);
-                imageView.setClip(clip);
-            }
-            case 2 -> { // Hexagon
-                double cx = width / 2;
-                double cy = height / 2;
-                double size = Math.min(width, height) / 2;
-                Polygon clip = new Polygon(
-                        cx, cy - size,  // top
-                        cx + size * (Math.sqrt(3)/2), cy - size / 2,  // top-right
-                        cx + size * (Math.sqrt(3)/2), cy + size / 2,  // bottom-right
-                        cx, cy + size,  // bottom
-                        cx - size * (Math.sqrt(3)/2), cy + size / 2,  // bottom-left
-                        cx - size * (Math.sqrt(3)/2), cy - size / 2   // top-left
-                );
-                imageView.setClip(clip);
-            }
-        }
+        // All sections use rounded rectangle
+        Rectangle clip = new Rectangle(width, height);
+        clip.setArcWidth(25);
+        clip.setArcHeight(25);
+        imageView.setClip(clip);
     }
 
     private void startSlideshow() {
@@ -177,27 +176,28 @@ public class HomePageExtension {
     }
 
     private void slideToNextImages() {
-        final double imageWidth = 400;
+        final double imageWidth = 320;
+        final double imageHeight = 200;
         for (int i = 0; i < sectionCount; i++) {
             int nextIndex = (currentIndexes.get(i) + 1) % sectionImages.get(i).size();
             ImageView current = currentImageViews.get(i);
             ImageView next = nextImageViews.get(i);
-            next.setImage(sectionImages.get(i).get(nextIndex));
-            final double w = imageWidth;
-            final double h = 300;
-            applyFrameShape(i, next, w, h);
+            if (!sectionImages.get(i).isEmpty()) {
+                next.setImage(sectionImages.get(i).get(nextIndex));
+            }
+            applyFrameShape(i, next, imageWidth, imageHeight);
             next.setOpacity(0);
-            next.setTranslateX(w);
+            next.setTranslateX(imageWidth);
             next.setVisible(true);
 
             // Create smooth transitions
             TranslateTransition ttCurrent = new TranslateTransition(Duration.seconds(0.8), current);
             ttCurrent.setFromX(0);
-            ttCurrent.setToX(-w);
+            ttCurrent.setToX(-imageWidth);
             ttCurrent.setInterpolator(Interpolator.EASE_BOTH);
 
             TranslateTransition ttNext = new TranslateTransition(Duration.seconds(0.8), next);
-            ttNext.setFromX(w);
+            ttNext.setFromX(imageWidth);
             ttNext.setToX(0);
             ttNext.setInterpolator(Interpolator.EASE_BOTH);
 
@@ -223,9 +223,11 @@ public class HomePageExtension {
                 currentImageViews.get(index).setOpacity(1);
                 // Prepare new next
                 int newNextIdx = (currentIndexes.get(index) + 1) % sectionImages.get(index).size();
-                nextImageViews.get(index).setImage(sectionImages.get(index).get(newNextIdx));
-                applyFrameShape(index, nextImageViews.get(index), w, h);
-                nextImageViews.get(index).setTranslateX(w);
+                if (!sectionImages.get(index).isEmpty()) {
+                    nextImageViews.get(index).setImage(sectionImages.get(index).get(newNextIdx));
+                }
+                applyFrameShape(index, nextImageViews.get(index), imageWidth, imageHeight);
+                nextImageViews.get(index).setTranslateX(imageWidth);
                 nextImageViews.get(index).setOpacity(0);
                 nextImageViews.get(index).setVisible(false);
             });

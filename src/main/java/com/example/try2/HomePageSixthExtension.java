@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
@@ -31,7 +32,29 @@ public class HomePageSixthExtension {
         AnchorPane.setLeftAnchor(bgView, 0.0);
         AnchorPane.setRightAnchor(bgView, 0.0);
 
-        // --- Enter Menu button ---
+        // --- Three vertical divider lines ---
+        Region line1 = new Region();
+        line1.setPrefWidth(1);
+        line1.setStyle("-fx-background-color: rgba(255, 255, 255, 0.4);");
+        AnchorPane.setTopAnchor(line1, 0.0);
+        AnchorPane.setBottomAnchor(line1, 0.0);
+        AnchorPane.setLeftAnchor(line1, 1366.0 / 3);
+
+        Region line2 = new Region();
+        line2.setPrefWidth(1);
+        line2.setStyle("-fx-background-color: rgba(255, 255, 255, 0.4);");
+        AnchorPane.setTopAnchor(line2, 0.0);
+        AnchorPane.setBottomAnchor(line2, 0.0);
+        AnchorPane.setLeftAnchor(line2, (1366.0 / 3) * 2);
+
+        Region line3 = new Region();
+        line3.setPrefWidth(1);
+        line3.setStyle("-fx-background-color: rgba(255, 255, 255, 0.4);");
+        AnchorPane.setTopAnchor(line3, 0.0);
+        AnchorPane.setBottomAnchor(line3, 0.0);
+        AnchorPane.setLeftAnchor(line3, 1366.0 - 1);
+
+        // --- ENTER MENU button (kept from original code) ---
         enterMenuBtn = new Button("ENTER MENU");
         enterMenuBtn.getStyleClass().add("enter-menu-button");
 
@@ -42,13 +65,14 @@ public class HomePageSixthExtension {
         AnchorPane.setLeftAnchor(buttonContainer, 0.0);
         AnchorPane.setRightAnchor(buttonContainer, 0.0);
 
-        // --- Fade-in animation ---
+        // --- Fade-in animation for button ---
         FadeTransition fade = new FadeTransition(Duration.seconds(1.2), enterMenuBtn);
         fade.setFromValue(0);
         fade.setToValue(1);
         fade.play();
 
-        extensionRoot.getChildren().addAll(bgView, buttonContainer);
+        // --- Add all to root ---
+        extensionRoot.getChildren().addAll(bgView, line1, line2, line3, buttonContainer);
     }
 
     public AnchorPane getExtensionRoot() {

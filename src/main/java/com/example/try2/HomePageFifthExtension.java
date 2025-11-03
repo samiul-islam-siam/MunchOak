@@ -1,19 +1,14 @@
 package com.example.try2;
 
-import javafx.animation.FadeTransition;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
-import javafx.util.Duration;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 public class HomePageFifthExtension {
 
     private final AnchorPane extensionRoot;
     private final ImageView bgView;
-    private final Button enterMenuBtn;
 
     public HomePageFifthExtension() {
         extensionRoot = new AnchorPane();
@@ -31,24 +26,25 @@ public class HomePageFifthExtension {
         AnchorPane.setLeftAnchor(bgView, 0.0);
         AnchorPane.setRightAnchor(bgView, 0.0);
 
-        // --- Enter Menu button ---
-        enterMenuBtn = new Button("ENTIRE MENU");
-        enterMenuBtn.getStyleClass().add("enter-menu-button");
+        // --- Add thin vertical lines dividing page into 3 parts ---
+        // Line 1 (1/3 from left)
+        Region line1 = new Region();
+        line1.setPrefWidth(1);
+        line1.setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);"); // semi-transparent white
+        AnchorPane.setTopAnchor(line1, 0.0);
+        AnchorPane.setBottomAnchor(line1, 0.0);
+        AnchorPane.setLeftAnchor(line1, 1366.0 / 3);
 
-        // Center-bottom placement
-        StackPane buttonContainer = new StackPane(enterMenuBtn);
-        buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
-        AnchorPane.setBottomAnchor(buttonContainer, 60.0);
-        AnchorPane.setLeftAnchor(buttonContainer, 0.0);
-        AnchorPane.setRightAnchor(buttonContainer, 0.0);
+        // Line 2 (2/3 from left)
+        Region line2 = new Region();
+        line2.setPrefWidth(1);
+        line2.setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);");
+        AnchorPane.setTopAnchor(line2, 0.0);
+        AnchorPane.setBottomAnchor(line2, 0.0);
+        AnchorPane.setLeftAnchor(line2, (1366.0 / 3) * 2);
 
-        // --- Fade-in animation ---
-        FadeTransition fade = new FadeTransition(Duration.seconds(1.2), enterMenuBtn);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-        fade.play();
-
-        extensionRoot.getChildren().addAll(bgView, buttonContainer);
+        // --- Add everything to root ---
+        extensionRoot.getChildren().addAll(bgView, line1, line2);
     }
 
     public AnchorPane getExtensionRoot() {
