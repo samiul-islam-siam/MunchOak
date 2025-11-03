@@ -27,9 +27,9 @@ public class MainHome extends Application {
         var css = getClass().getResource("/com/example/munchoak/style.css");
         if (css != null) {
             mainScene.getStylesheets().add(css.toExternalForm());
-            System.out.println("✅ CSS loaded successfully: " + css);
+            System.out.println("CSS loaded successfully: " + css);
         } else {
-            System.out.println("❌ CSS not found! Check file path.");
+            System.out.println("CSS not found! Check file path.");
         }
 
         stage.show();
