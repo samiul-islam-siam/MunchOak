@@ -145,28 +145,11 @@ public class History {
             this.paymentMethod = paymentMethod;
         }
 
-        public int getUserId() {
-            return userId;
-        }
-
-        public int getPaymentId() {
-            return paymentId;
-        }
-
-        public String getTimestamp() {
-            return timestamp;
-        }
-
-        public double getAmount() {
-            return amount;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public String getPaymentMethod() {
-            return paymentMethod;
-        }
+        public int getUserId() { return userId; }
+        public int getPaymentId() { return paymentId; }
+        public String getTimestamp() { return timestamp; }
+        public double getAmount() { return amount; }
+        public String getStatus() { return status; }
+        public String getPaymentMethod() { return paymentMethod; }
     }
 }

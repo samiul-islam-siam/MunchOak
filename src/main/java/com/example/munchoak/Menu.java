@@ -1,7 +1,7 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.manager.UserManager;
+import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,8 +45,9 @@ public class Menu {
     private List<String> categories = new ArrayList<>();
 
     // Cart for the current user
-    int userId = UserManager.getUserId("defaultuser");
-    private Cart cart = new Cart(userId, "defaultuser");
+    int userId = Session.getCurrentUserId();
+
+    private Cart cart = new Cart(userId, "guest");
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();
@@ -690,7 +691,9 @@ public class Menu {
         }
 
         try {
-            int paymentId = FileStorage.createPaymentAndCart(cart.getUserId(), cart, foodMap, "Card");
+            int userId = (cart.getUserId() == -1) ? 2025000 : cart.getUserId();
+
+            int paymentId = FileStorage.createPaymentAndCart(userId, cart, foodMap, "Card");
             Payment payment = new Payment(paymentId, total);
             // open payment UI which will show bill and clear cart in Payment.processPayment
             payment.processPayment(cart, foodMap);

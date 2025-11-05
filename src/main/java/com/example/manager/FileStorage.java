@@ -175,9 +175,13 @@ public class FileStorage {
         return -1;
     }
 
+
     public static void appendUser(String username, String email, String password) throws IOException {
         ensureDataDir();
-        int uid = generateNextIdInFile(USERS_FILE, 4, 3, 20250001);
+
+        // Start from 2025001 for registered users
+        int uid = generateNextIdInFile(USERS_FILE, 4);
+
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
             dos.writeUTF(username);
             dos.writeUTF(email);
@@ -185,6 +189,31 @@ public class FileStorage {
             dos.writeInt(uid);
         }
     }
+
+    public static void ensureDefaultGuestUser() {
+        ensureDataDir();
+        List<String[]> users = loadUsers();
+
+        boolean guestExists = false;
+        for (String[] user : users) {
+            if (user[0].equals("guest")) {
+                guestExists = true;
+                break;
+            }
+        }
+
+        if (!guestExists) {
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
+                dos.writeUTF("guest");
+                dos.writeUTF("guest@system.local");
+                dos.writeUTF("nopass");
+                dos.writeInt(2025000);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public static List<String[]> loadUsers() {
         ensureDataDir();
@@ -208,9 +237,9 @@ public class FileStorage {
     public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method) throws IOException {
         ensureDataDir();
 
-        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 1, 0, 3001);
-        int cartId = generateNextIdInFile(CARTS_FILE, 1, 0, 1);
-        int paymentItemIdStart = generateNextIdInFile(PAYMENT_ITEMS_FILE, 1, 0, 1);
+        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);
+        int cartId = generateNextIdInFile(CARTS_FILE, 1);
+        int paymentItemIdStart = generateNextIdInFile(PAYMENT_ITEMS_FILE, 1);
 
         String timestamp = Instant.now().toString();
         try (DataOutputStream pw = new DataOutputStream(new FileOutputStream(PAYMENTS_FILE, true))) {
@@ -319,7 +348,7 @@ public class FileStorage {
     public static boolean saveReservation(String name, String phone, int guests, String date, String time, String request) {
         ensureDataDir();
         try {
-            int resId = generateNextIdInFile(RESERVATIONS_FILE, 1, 0, 1);
+            int resId = generateNextIdInFile(RESERVATIONS_FILE, 1);
             String createdAt = Instant.now().toString();
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(RESERVATIONS_FILE, true))) {
                 dos.writeInt(resId);
@@ -338,18 +367,28 @@ public class FileStorage {
         }
     }
 
-    // ----------------- UTIL -----------------
-    private static int generateNextIdInFile(File f, int minColumns, int idColumnIndex, int startIfEmpty) {
+    private static int generateNextIdInFile(File f, int startIfEmpty) {
         ensureDataDir();
         int lastId = startIfEmpty - 1;
+
         try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
-            while (dis.available() > 0) {
-                if (f == USERS_FILE) {
+            if (f == PAYMENTS_FILE) {
+                while (dis.available() > 0) {
+                    lastId = dis.readInt(); // paymentId
+                    dis.readInt();          // userId
+                    dis.readDouble();       // amount
+                    dis.readUTF();          // method
+                    dis.readUTF();          // timestamp
+                }
+            } else if (f == USERS_FILE) {
+                while (dis.available() > 0) {
                     dis.readUTF();
                     dis.readUTF();
                     dis.readUTF();
-                    lastId = dis.readInt();
-                } else if (f == MENU_FILE) {
+                    lastId = dis.readInt(); // userId
+                }
+            } else if (f == MENU_FILE) {
+                while (dis.available() > 0) {
                     dis.readInt();
                     dis.readUTF();
                     dis.readUTF();
@@ -357,27 +396,25 @@ public class FileStorage {
                     dis.readDouble();
                     dis.readUTF();
                     dis.readUTF();
-                } else if (f == CATEGORIES_FILE) dis.readUTF();
-                else if (f == PAYMENTS_FILE) {
-                    dis.readInt();
-                    dis.readInt();
-                    dis.readDouble();
-                    dis.readUTF();
-                    dis.readUTF();
-                    lastId = dis.readInt();
-                } else if (f == CARTS_FILE) {
-                    dis.readInt();
+                }
+            } else if (f == CATEGORIES_FILE) {
+                while (dis.available() > 0) dis.readUTF();
+            } else if (f == CARTS_FILE) {
+                while (dis.available() > 0) {
+                    lastId = dis.readInt(); // cartId
                     dis.readInt();
                     dis.readInt();
                     dis.readUTF();
-                    lastId = dis.readInt();
-                } else if (f == CART_ITEMS_FILE || f == PAYMENT_ITEMS_FILE) {
+                }
+            } else if (f == PAYMENT_ITEMS_FILE || f == CART_ITEMS_FILE) {
+                while (dis.available() > 0) {
+                    lastId = dis.readInt(); // itemId
                     dis.readInt();
                     dis.readInt();
-                    dis.readInt();
-                    lastId = dis.readInt();
-                } else if (f == RESERVATIONS_FILE) {
-                    dis.readInt();
+                }
+            } else if (f == RESERVATIONS_FILE) {
+                while (dis.available() > 0) {
+                    lastId = dis.readInt(); // resId
                     dis.readUTF();
                     dis.readUTF();
                     dis.readInt();
@@ -385,8 +422,7 @@ public class FileStorage {
                     dis.readUTF();
                     dis.readUTF();
                     dis.readUTF();
-                    lastId = dis.readInt();
-                } else dis.skipBytes(dis.available());
+                }
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -394,6 +430,7 @@ public class FileStorage {
         }
         return lastId + 1;
     }
+
 
     // ----------------- History Record -----------------
     public static class HistoryRecordSimple {
