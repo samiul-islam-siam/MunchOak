@@ -1,5 +1,6 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
 import com.example.view.HomePage;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -67,6 +68,7 @@ public class Home extends Application {
     }
 
     public static void main(String[] args) {
+        FileStorage.ensureDefaultGuestUser();
         launch();
     }
 }

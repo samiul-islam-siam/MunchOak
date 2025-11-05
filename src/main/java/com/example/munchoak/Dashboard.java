@@ -83,8 +83,11 @@ public class Dashboard extends Application {
 
 
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
-        aboutBtn.setOnAction(e -> updateContentSimple("About Us",
-                "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
+        aboutBtn.setOnAction(e -> {
+            contentPane.getChildren().setAll(AboutUs.getContent());
+        });
+
+
 
         historyBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
