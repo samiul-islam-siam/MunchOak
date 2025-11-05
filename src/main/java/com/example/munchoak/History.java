@@ -111,18 +111,20 @@ public class History {
         Bill bill = new Bill(cart, payment);
         String receipt = bill.generateReceipt(foodMap);
 
-        Stage stage = new Stage();
-        stage.setTitle("Bill Receipt - " + record.getPaymentId());
+        Stage billStage = new Stage();
+        billStage.setTitle("Bill Receipt");
 
-        TextArea area = new TextArea(receipt);
-        area.setEditable(false);
-        area.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+        TextArea receiptArea = new TextArea(receipt);
+        receiptArea.setEditable(false);
+        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+        receiptArea.setPrefSize(500, 400);
 
-        VBox box = new VBox(area);
-        box.setPadding(new Insets(15));
+        VBox billBox = new VBox(15, receiptArea);
+        billBox.setPadding(new Insets(20));
+        billBox.setAlignment(Pos.CENTER);
 
-        stage.setScene(new Scene(box, 500, 400));
-        stage.show();
+        billStage.setScene(new Scene(billBox));
+        billStage.show();
     }
 
     public static class HistoryRecord {

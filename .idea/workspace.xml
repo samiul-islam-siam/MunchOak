@@ -4,186 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="UI updated">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/UserManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/categories.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="new version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mysql-connector-j-9.4.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/DBConnection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/HomePageController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/MainHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/DatabaseConnection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HelloController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HistoryPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageFifthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageFourthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageSecondExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSecondExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageSeventhExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageSixthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/HomePageThirdExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Launcher.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Menu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/RestaurantDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/admin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/admin.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/homepage.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/homepage.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/signup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/user.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/user.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/welcome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/welcome.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/hello-view.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg3.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/bg4.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/event1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/event1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/event2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/event2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/event3.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/event3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/events1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/events2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/events3.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/events4.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/events5.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/fifth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fifth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/fourth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fourth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/phone_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/phone_icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/second_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/second_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/seventh_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/seventh_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/sixth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/sixth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/images/third_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/third_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/Chocolate-Strawberry-Cake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Chocolate-Strawberry-Cake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/Coffee.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Coffee.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/Fried-Chicken.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Fried-Chicken.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/Homemade-Mozzarella-Sticks.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Homemade-Mozzarella-Sticks.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/apple pie.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/apple pie.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/banasmoothie.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/banasmoothie.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/biriyani.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/biriyani.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/brownise.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/brownise.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/bruschetta.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/bruschetta.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/burger.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/burger.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/burrito.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/burrito.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/butter chicken.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/butter chicken.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/calamari.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/calamari.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/caprese-salad.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/caprese-salad.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/ceasar-salad.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/ceasar-salad.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chesscake.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chesscake.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chicken-chowmein.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-chowmein.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chicken-nuggets.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-nuggets.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chicken-tikka.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-tikka.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chicken-wings.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-wings.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chicken-wrap.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-wrap.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/chili paneer.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chili paneer.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/churros.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/churros.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/clam chowder.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/clam chowder.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/coca-cola.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/coca-cola.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/crab cakes.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/crab cakes.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/crepes.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/crepes.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/cup cake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/cup cake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/curry.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/curry.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/dal tadka.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/dal tadka.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/donut.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/donut.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/eclairs.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/eclairs.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/egg-fried-rice.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/egg-fried-rice.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/enchiladas.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/enchiladas.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/falafel.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/falafel.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/fish and chips.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fish and chips.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/fish curry.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fish curry.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/fried-rice.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fried-rice.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/fries.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fries.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/garlic-bread.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/garlic-bread.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/garlic-mushrooms.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/garlic-mushrooms.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/greek-salad.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/greek-salad.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/green-tea.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/green-tea.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/grilled chicken.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/grilled chicken.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/guacamole.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/guacamole.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/gulab jamun.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/gulab jamun.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/hot dog.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot dog.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/hot soup.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot soup.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/hummus.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hummus.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/ice cream.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/ice cream.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/iced-tea.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/iced-tea.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/kebab.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/kebab.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/kheer.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/kheer.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/lasagna.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/lasagna.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/lemonade.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/lemonade.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/lobster roll.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/lobster roll.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/macron.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/macron.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/mango-juice.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mango-juice.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/miso-soup.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/miso-soup.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/muffin.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/muffin.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/mutton biriyani.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mutton biriyani.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/mutton chops.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mutton chops.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/nachos.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/nachos.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/noodles.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/noodles.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/onion-rings.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/onion-rings.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/orange-juice.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/orange-juice.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/pancakes.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/pancakes.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/paneer butter masala.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/paneer butter masala.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/paneer tikka.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/paneer tikka.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/pasta.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/pasta.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/pealla.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/pealla.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/pizza.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/pizza.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/placeholder.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/placeholder.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/potatowages.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/potatowages.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/pudding.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/pudding.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/quesadillas.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/quesadillas.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/ramen.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/ramen.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/rasgulla.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/rasgulla.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/salad.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/salad.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/salmon grill.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/salmon grill.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/samosa.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/samosa.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/sandwich.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/sandwich.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/shashlik.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shashlik.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/shawrma.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shawrma.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/shirm-cocktail.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shirm-cocktail.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/spaghetti-bolognese.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/spaghetti-bolognese.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/spring-role.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/spring-role.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/stawberry tart.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/stawberry tart.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/strawberry-milkshake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/strawberry-milkshake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/stuffed mushroom.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/stuffed mushroom.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/sushi.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/sushi.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tacos.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tacos.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tandoori wings.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tandoori wings.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tempura.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tempura.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tiramisu.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tiramisu.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tortilla-chips.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tortilla-chips.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tuna sandwich.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna sandwich.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/tuna steak.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna steak.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/vanila-milkshake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/vanila-milkshake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/veg wrap.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/veg wrap.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/vegetable-fried-rice.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/vegetable-fried-rice.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/images/waffles.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/waffles.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/DatabaseConnection.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/HelloController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/HomePage.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/Launcher.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/MenuPage.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/munchoak/RestaurantDashboard.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -474,7 +303,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762180711333</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="new version">
+      <option name="closed" value="true" />
+      <created>1762347585378</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1762347585378</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -496,6 +333,7 @@
     <MESSAGE value="Login System update" />
     <MESSAGE value="UI merged" />
     <MESSAGE value="UI updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="UI updated" />
+    <MESSAGE value="new version" />
+    <option name="LAST_COMMIT_MESSAGE" value="new version" />
   </component>
 </project>
