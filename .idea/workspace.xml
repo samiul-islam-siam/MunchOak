@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="minor fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/UserManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Menu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" />
