@@ -1,7 +1,7 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.manager.UserManager;
+import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,7 +45,7 @@ public class Menu {
     private List<String> categories = new ArrayList<>();
 
     // Cart for the current user
-    int userId = FileStorage.getUserId("guest");
+    int userId = Session.getCurrentUserId();
 
     private Cart cart = new Cart(userId, "guest");
 

@@ -233,7 +233,7 @@ public static void appendUser(String username, String email, String password) th
     public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method) throws IOException {
         ensureDataDir();
 
-        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 1);
+        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);
         int cartId = generateNextIdInFile(CARTS_FILE, 1);
         int paymentItemIdStart = generateNextIdInFile(PAYMENT_ITEMS_FILE, 1);
 

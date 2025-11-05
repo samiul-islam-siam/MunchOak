@@ -1,6 +1,7 @@
 package com.example.login;
 import com.example.manager.FileStorage;
 import com.example.munchoak.Dashboard;
+import com.example.manager.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,6 +43,9 @@ public class LoginController {
             }
 
             if (found) {
+
+                int userId = FileStorage.getUserId(username);  // get the user's unique ID
+                Session.setCurrentUserId(userId);              // store it in the session
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Login Success");
                 alert.setHeaderText(null);
