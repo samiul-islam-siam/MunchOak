@@ -1,3 +1,4 @@
+// TODO : admin page and control
 package com.example.login;
 
 import javafx.fxml.FXML;
@@ -6,18 +7,11 @@ import javafx.scene.control.Button;
 
 public class AdminController {
 
-    @FXML
-    private Button viewOrdersButton;
+    @FXML private Button viewOrdersButton;
+    @FXML private Button manageMenuButton;
+    @FXML private Button viewUsersButton;
 
-    @FXML
-    private Button manageMenuButton;
-
-    @FXML
-    private Button viewUsersButton;
-
-    @FXML
-    private void handleViewOrders() {
-        // Show orders (for now, simple message)
+    @FXML private void handleViewOrders() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Orders");
         alert.setHeaderText(null);
@@ -25,9 +19,7 @@ public class AdminController {
         alert.showAndWait();
     }
 
-    @FXML
-    private void handleManageMenu() {
-        // Open menu management (add/update/delete items)
+    @FXML private void handleManageMenu() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Menu Management");
         alert.setHeaderText(null);
@@ -35,9 +27,7 @@ public class AdminController {
         alert.showAndWait();
     }
 
-    @FXML
-    private void handleViewUsers() {
-        // Show all registered users
+    @FXML private void handleViewUsers() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Users");
         alert.setHeaderText(null);
@@ -45,4 +35,3 @@ public class AdminController {
         alert.showAndWait();
     }
 }
-
