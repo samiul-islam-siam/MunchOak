@@ -1,6 +1,6 @@
 package com.example.login;
 
-import com.example.munchoak.FileStorage;
+import com.example.manager.FileStorage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,7 +53,7 @@ public class SignupController {
             alert.showAndWait();
 
             // Redirect to login
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/login.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             stage.setScene(scene);

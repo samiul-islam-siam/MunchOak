@@ -8,4 +8,8 @@ module com.example.munchoak {
 
     exports com.example.munchoak;
     exports com.example.login;
+    exports com.example.view;
+    opens com.example.view to javafx.fxml;
+    exports com.example.manager;
+    opens com.example.manager to javafx.fxml;
 }

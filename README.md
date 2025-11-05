@@ -13,4 +13,4 @@ Academic project for CSE 2104. This project is under development.
   - Adiba Jahan
   - Suchita Islam Shuvra
 
-Run MainHome to start the application. Thank you.
+Run Home in munchoak package to start the application. Thank you.

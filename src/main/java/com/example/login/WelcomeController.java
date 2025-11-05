@@ -1,12 +1,12 @@
 package com.example.login;
 
+import com.example.munchoak.Dashboard;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
 
 public class WelcomeController {
 
@@ -19,7 +19,7 @@ public class WelcomeController {
     @FXML
     private void userLoginAction(javafx.event.ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("User Login");
@@ -36,7 +36,7 @@ public class WelcomeController {
     @FXML
     private void registerAction(javafx.event.ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/register.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/register.fxml"));
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.load()));
             stage.setTitle("Register");
@@ -54,7 +54,7 @@ public class WelcomeController {
     private void guestBrowseAction(javafx.event.ActionEvent event) {
         try {
             // Create and show RestaurantDashboard window
-            com.example.munchoak.RestaurantDashboard dashboard = new com.example.munchoak.RestaurantDashboard();
+            Dashboard dashboard = new Dashboard();
             Stage stage = new Stage();
             dashboard.start(stage);
 
@@ -66,12 +66,9 @@ public class WelcomeController {
         }
     }
 
-    @FXML
-    private Label welcomeLabel;
-    @FXML
-    private Button guestBrowseBtn;
-    @FXML
-    private Button registerBtn;
+    @FXML private Label welcomeLabel;
+    @FXML private Button guestBrowseBtn;
+    @FXML private Button registerBtn;
 
     /* Called when Welcome screen is opened from Dashboard */
     public void openedFromDashboard() {

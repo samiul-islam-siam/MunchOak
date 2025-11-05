@@ -1,5 +1,6 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -107,7 +108,7 @@ public class Reservation {
         });
 
         backButton.setOnAction(e -> {
-            RestaurantDashboard mainMenu = new RestaurantDashboard();
+            Dashboard mainMenu = new Dashboard();
             mainMenu.start(stage);
         });
     }
