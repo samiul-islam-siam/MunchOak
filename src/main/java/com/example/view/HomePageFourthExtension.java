@@ -48,23 +48,23 @@ public class HomePageFourthExtension {
         // --- Text content ---
         previewText = """
                 At Munch-Oak, we believe that true luxury lies not only in exquisite taste — but in generosity, sustainability, and heart.
-
+                
                 Our journey began beneath the shade of an old oak tree — a place where friends gathered, stories were shared, and meals brought people together. From that spirit of connection, Munch-Oak was born: an elegant fine dining experience that celebrates nature’s bounty while giving back to the community that sustains us. We believe that the beauty of fine dining reaches its fullest meaning when it gives back.
                 """;
 
         fullText = """
                 At Munch-Oak, we believe that true luxury lies not only in exquisite taste — but in generosity, sustainability, and heart.
-
+                
                 Our journey began beneath the shade of an old oak tree — a place where friends gathered, stories were shared, and meals brought people together. From that spirit of connection, Munch-Oak was born: an elegant fine dining experience that celebrates nature’s bounty while giving back to the community that sustains us. We believe that the beauty of fine dining reaches its fullest meaning when it gives back.
-
+                
                 Through our “Oak of Hope” initiative, each surplus meal finds new life — shared with those in need, never wasted, always cherished.
-
+                
                 At Munch-Oak, sustainability isn’t a choice; it’s our tradition.
                 Compassion isn’t a gesture; it’s our flavor.
-
+                
                 When you dine with us, you become part of something timeless —
                 a movement that nourishes both people and planet.
-
+                
                 Because true elegance is generous.
                 """;
 

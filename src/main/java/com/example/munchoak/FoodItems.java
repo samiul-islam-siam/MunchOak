@@ -22,36 +22,89 @@ public class FoodItems {
     }
 
     // ----- ID -----
-    public int getId() { return id.get(); }
-    public IntegerProperty idProperty() { return id; }
+    public int getId() {
+        return id.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
 
     // ----- Name -----
-    public String getName() { return name.get(); }
-    public StringProperty nameProperty() { return name; }
-    public void setName(String name) { this.name.set(name); }
+    public String getName() {
+        return name.get();
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name.set(name);
+    }
 
     // ----- Details -----
-    public String getDetails() { return details.get(); }
-    public StringProperty detailsProperty() { return details; }
-    public void setDetails(String details) { this.details.set(details); }
+    public String getDetails() {
+        return details.get();
+    }
+
+    public StringProperty detailsProperty() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details.set(details);
+    }
 
     // ----- Price -----
-    public double getPrice() { return price.get(); }
-    public DoubleProperty priceProperty() { return price; }
-    public void setPrice(double price) { this.price.set(price); }
+    public double getPrice() {
+        return price.get();
+    }
+
+    public DoubleProperty priceProperty() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price.set(price);
+    }
 
     // ----- Ratings -----
-    public double getRatings() { return ratings.get(); }
-    public DoubleProperty ratingsProperty() { return ratings; }
-    public void setRatings(double ratings) { this.ratings.set(ratings); }
+    public double getRatings() {
+        return ratings.get();
+    }
+
+    public DoubleProperty ratingsProperty() {
+        return ratings;
+    }
+
+    public void setRatings(double ratings) {
+        this.ratings.set(ratings);
+    }
 
     // ----- Image Path -----
-    public String getImagePath() { return imagePath.get(); }
-    public StringProperty imagePathProperty() { return imagePath; }
-    public void setImagePath(String imagePath) { this.imagePath.set(imagePath); }
+    public String getImagePath() {
+        return imagePath.get();
+    }
+
+    public StringProperty imagePathProperty() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath.set(imagePath);
+    }
 
     // ----- Category -----
-    public String getCategory() { return category.get(); }
-    public StringProperty categoryProperty() { return category; }
-    public void setCategory(String category) { this.category.set(category); }
+    public String getCategory() {
+        return category.get();
+    }
+
+    public StringProperty categoryProperty() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category.set(category);
+    }
 }

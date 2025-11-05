@@ -7,11 +7,15 @@ import javafx.scene.control.Button;
 
 public class AdminController {
 
-    @FXML private Button viewOrdersButton;
-    @FXML private Button manageMenuButton;
-    @FXML private Button viewUsersButton;
+    @FXML
+    private Button viewOrdersButton;
+    @FXML
+    private Button manageMenuButton;
+    @FXML
+    private Button viewUsersButton;
 
-    @FXML private void handleViewOrders() {
+    @FXML
+    private void handleViewOrders() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Orders");
         alert.setHeaderText(null);
@@ -19,7 +23,8 @@ public class AdminController {
         alert.showAndWait();
     }
 
-    @FXML private void handleManageMenu() {
+    @FXML
+    private void handleManageMenu() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Menu Management");
         alert.setHeaderText(null);
@@ -27,7 +32,8 @@ public class AdminController {
         alert.showAndWait();
     }
 
-    @FXML private void handleViewUsers() {
+    @FXML
+    private void handleViewUsers() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Users");
         alert.setHeaderText(null);

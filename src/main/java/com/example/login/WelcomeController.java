@@ -66,9 +66,12 @@ public class WelcomeController {
         }
     }
 
-    @FXML private Label welcomeLabel;
-    @FXML private Button guestBrowseBtn;
-    @FXML private Button registerBtn;
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Button guestBrowseBtn;
+    @FXML
+    private Button registerBtn;
 
     /* Called when Welcome screen is opened from Dashboard */
     public void openedFromDashboard() {

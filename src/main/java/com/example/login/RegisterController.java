@@ -12,13 +12,20 @@ import java.io.IOException;
 
 public class RegisterController {
 
-    @FXML private TextField usernameField;
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private PasswordField confirmPasswordField;
-    @FXML private Button registerButton;
-    @FXML private Label statusLabel;
-    @FXML private Button backButton;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Button backButton;
 
     @FXML
     private void handleRegister() {

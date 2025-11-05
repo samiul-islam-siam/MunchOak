@@ -108,6 +108,7 @@ public class HomePage {
     public StackPane getRoot() {
         return root;
     }
+
     public VBox getFullPage() {
         HomePageExtension extension1 = new HomePageExtension();
         HomePageSecondExtension extension2 = new HomePageSecondExtension();

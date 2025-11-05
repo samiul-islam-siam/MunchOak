@@ -77,8 +77,19 @@ public class Payment {
         });
     }
 
-    public int getId() { return id; }
-    public double getAmount() { return amount; }
-    public boolean isSuccess() { return success; }
-    public String getTimestamp() { return timestamp; }
+    public int getId() {
+        return id;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
 }

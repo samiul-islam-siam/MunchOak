@@ -154,11 +154,11 @@ public class HomePageExtension {
                 double size = Math.min(width, height) / 2;
                 Polygon clip = new Polygon(
                         cx, cy - size,  // top
-                        cx + size * (Math.sqrt(3)/2), cy - size / 2,  // top-right
-                        cx + size * (Math.sqrt(3)/2), cy + size / 2,  // bottom-right
+                        cx + size * (Math.sqrt(3) / 2), cy - size / 2,  // top-right
+                        cx + size * (Math.sqrt(3) / 2), cy + size / 2,  // bottom-right
                         cx, cy + size,  // bottom
-                        cx - size * (Math.sqrt(3)/2), cy + size / 2,  // bottom-left
-                        cx - size * (Math.sqrt(3)/2), cy - size / 2   // top-left
+                        cx - size * (Math.sqrt(3) / 2), cy + size / 2,  // bottom-left
+                        cx - size * (Math.sqrt(3) / 2), cy - size / 2   // top-left
                 );
                 imageView.setClip(clip);
             }

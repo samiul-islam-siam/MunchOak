@@ -1,4 +1,5 @@
 package com.example.login;
+
 import com.example.manager.FileStorage;
 import com.example.munchoak.Dashboard;
 import javafx.fxml.FXML;
@@ -12,11 +13,16 @@ import java.io.*;
 
 public class LoginController {
 
-    @FXML private TextField userNameField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
-    @FXML private Button registerButton;
-    @FXML private Button backButton;
+    @FXML
+    private TextField userNameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Button backButton;
 
     @FXML
     private void loginButtonActionPerformed() {

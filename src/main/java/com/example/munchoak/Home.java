@@ -23,7 +23,6 @@ public class Home extends Application {
         stage.setScene(mainScene);
         stage.setTitle("Home Page + Extension");
 
-        // ✅ Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             mainScene.getStylesheets().add(css.toExternalForm());

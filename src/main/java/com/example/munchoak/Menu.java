@@ -298,12 +298,14 @@ public class Menu {
                 String filePath = "file:src/main/resources/com/example/manager/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
                 if (placeholder != null) image = new Image(placeholder);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         imgView.setImage(image);
@@ -516,7 +518,10 @@ public class Menu {
             this.price = price;
             this.total = price * quantity;
         }
-        public int getId() {return id;}
+
+        public int getId() {
+            return id;
+        }
 
         public String getName() {
             return name;

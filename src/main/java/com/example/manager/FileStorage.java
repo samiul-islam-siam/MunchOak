@@ -166,7 +166,10 @@ public class FileStorage {
         ensureDataDir();
         for (String[] user : loadUsers()) {
             if (user[0].equals(username)) {
-                try { return Integer.parseInt(user[3]); } catch (Exception ignored) {}
+                try {
+                    return Integer.parseInt(user[3]);
+                } catch (Exception ignored) {
+                }
             }
         }
         return -1;
@@ -292,7 +295,9 @@ public class FileStorage {
                     break;
                 }
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if (cartId == -1) return items;
 
@@ -303,7 +308,9 @@ public class FileStorage {
                 int qty = dis.readInt();
                 if (cid == cartId) items.put(foodId, qty);
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return items;
     }
@@ -338,18 +345,53 @@ public class FileStorage {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
             while (dis.available() > 0) {
                 if (f == USERS_FILE) {
-                    dis.readUTF(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    lastId = dis.readInt();
                 } else if (f == MENU_FILE) {
-                    dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readDouble(); dis.readDouble(); dis.readUTF(); dis.readUTF();
+                    dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readDouble();
+                    dis.readDouble();
+                    dis.readUTF();
+                    dis.readUTF();
                 } else if (f == CATEGORIES_FILE) dis.readUTF();
-                else if (f == PAYMENTS_FILE) { dis.readInt(); dis.readInt(); dis.readDouble(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt(); }
-                else if (f == CARTS_FILE) { dis.readInt(); dis.readInt(); dis.readInt(); dis.readUTF(); lastId = dis.readInt(); }
-                else if (f == CART_ITEMS_FILE || f == PAYMENT_ITEMS_FILE) { dis.readInt(); dis.readInt(); dis.readInt(); lastId = dis.readInt(); }
-                else if (f == RESERVATIONS_FILE) { dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt(); }
-                else dis.skipBytes(dis.available());
+                else if (f == PAYMENTS_FILE) {
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readDouble();
+                    dis.readUTF();
+                    dis.readUTF();
+                    lastId = dis.readInt();
+                } else if (f == CARTS_FILE) {
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readUTF();
+                    lastId = dis.readInt();
+                } else if (f == CART_ITEMS_FILE || f == PAYMENT_ITEMS_FILE) {
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readInt();
+                    lastId = dis.readInt();
+                } else if (f == RESERVATIONS_FILE) {
+                    dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    lastId = dis.readInt();
+                } else dis.skipBytes(dis.available());
             }
         } catch (EOFException ignored) {
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return lastId + 1;
     }
 
