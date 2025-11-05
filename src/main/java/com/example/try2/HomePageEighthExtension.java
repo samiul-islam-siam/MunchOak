@@ -1,33 +1,22 @@
 package com.example.try2;
 
 import javafx.geometry.Pos;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 
-public class HomePageEighthExtension {
-
+public class HomePageEighthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
 
     public HomePageEighthExtension() {
         extensionRoot = new AnchorPane();
-        extensionRoot.setPrefSize(1366, 384); // 🔹 Half of 768 height
+        extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
+        extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
 
-        // --- Background Image ---
-        Image bgImage = new Image(getClass().getResource("/com/example/try2/images/eighth_ext_bg.png").toExternalForm());
-        ImageView bgView = new ImageView(bgImage);
-        bgView.setPreserveRatio(false);
-        bgView.setFitWidth(1366);
-        bgView.setFitHeight(384);
+        // --- SOLID BLACK BACKGROUND ---
+        extensionRoot.setStyle("-fx-background-color: #000000;");
 
-        AnchorPane.setTopAnchor(bgView, 0.0);
-        AnchorPane.setBottomAnchor(bgView, 0.0);
-        AnchorPane.setLeftAnchor(bgView, 0.0);
-        AnchorPane.setRightAnchor(bgView, 0.0);
-
-        // --- Optional Text / Footer Message ---
+        // --- Footer Message ---
         Label footerLabel = new Label("THANK YOU FOR VISITING MUNCHOAK");
         footerLabel.setTextFill(Color.WHITE);
         footerLabel.setStyle("""
@@ -35,15 +24,36 @@ public class HomePageEighthExtension {
                 -fx-font-weight: bold;
                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
                 """);
-        AnchorPane.setTopAnchor(footerLabel, 150.0);
+
+        // Center the label
+        AnchorPane.setTopAnchor(footerLabel, 0.0);
+        AnchorPane.setBottomAnchor(footerLabel, 0.0);
         AnchorPane.setLeftAnchor(footerLabel, 0.0);
         AnchorPane.setRightAnchor(footerLabel, 0.0);
         footerLabel.setAlignment(Pos.CENTER);
 
-        extensionRoot.getChildren().addAll(bgView, footerLabel);
+        extensionRoot.getChildren().add(footerLabel);
+
+        initialize();
     }
 
-    public AnchorPane getExtensionRoot() {
+    @Override
+    public void initialize() {
+        // No animation needed
+    }
+
+    @Override
+    public double getPrefHeight() {
+        return 384; // Footer height
+    }
+
+    @Override
+    public double getPrefWidth() {
+        return 1000;
+    }
+
+    @Override
+    public AnchorPane getRoot() {
         return extensionRoot;
     }
 }

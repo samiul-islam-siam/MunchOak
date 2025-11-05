@@ -1,11 +1,6 @@
 package com.example.try2;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.ParallelTransition;
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -17,38 +12,30 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomePageExtension {
-
+public class HomePageExtension implements HomePageComponent {
     private final StackPane extensionRoot;
     private final HBox sectionsContainer;
-
     private final int sectionCount = 3;
     private final List<List<Image>> sectionImages = new ArrayList<>();
     private final List<ImageView> currentImageViews = new ArrayList<>();
     private final List<ImageView> nextImageViews = new ArrayList<>();
     private final List<Integer> currentIndexes = new ArrayList<>();
 
+    private static final double PREF_WIDTH = 1000;
+    private static final double PREF_HEIGHT = 525;  // 700 * 0.75 = 525
+
     public HomePageExtension() {
         extensionRoot = new StackPane();
-        extensionRoot.setPrefSize(1366, 600);
-        extensionRoot.setMinSize(1366, 600);
+        extensionRoot.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
+        extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
-        // --- Background Image ---
-        Image bgImage;
-        try {
-            bgImage = new Image(getClass().getResource("/com/example/try2/images/ext_bg.png").toExternalForm());
-        } catch (Exception e) {
-            bgImage = null;
-            System.out.println("Background image not found: ext_bg.png");
-        }
-        ImageView bgView = new ImageView(bgImage);
-        bgView.setPreserveRatio(false);
-        bgView.setFitWidth(1366);
-        bgView.setFitHeight(600);
+        // --- DEEP INDIGO BACKGROUND: #100267 ---
+        extensionRoot.setBackground(new Background(new BackgroundFill(
+                Color.web("#100267"), CornerRadii.EMPTY, Insets.EMPTY
+        )));
 
         // --- Fixed Logo ---
         Image logoImg;
@@ -83,9 +70,9 @@ public class HomePageExtension {
 
         // --- Container for 3 sections ---
         sectionsContainer = new HBox();
-        sectionsContainer.setPrefSize(1366, 400);
+        sectionsContainer.setPrefSize(PREF_WIDTH, 273); // 364 * 0.75
         sectionsContainer.setSpacing(0);
-        sectionsContainer.setPadding(new Insets(70, 60, 20, 60));
+        sectionsContainer.setPadding(new Insets(38, 33, 11, 33)); // 51*0.75, 44*0.75, 15*0.75
         sectionsContainer.setAlignment(Pos.CENTER);
 
         // --- Create Sections ---
@@ -99,17 +86,14 @@ public class HomePageExtension {
             }
             sectionsContainer.getChildren().add(section);
             HBox.setHgrow(section, Priority.ALWAYS);
-
             sectionImages.add(new ArrayList<>());
             currentImageViews.add(new ImageView());
             nextImageViews.add(new ImageView());
             currentIndexes.add(0);
-
             section.getChildren().addAll(currentImageViews.get(i), nextImageViews.get(i));
         }
 
         // --- Load 5 images per section ---
-        // Section 1 (rounded rectangle)
         List<Image> baseImages = new ArrayList<>();
         try {
             baseImages.add(new Image(getClass().getResource("/com/example/try2/images/events1.png").toExternalForm()));
@@ -125,12 +109,11 @@ public class HomePageExtension {
         sectionImages.get(2).addAll(baseImages);
 
         // --- Initialize images & apply frame shapes ---
-        final double imageWidth = 320;
-        final double imageHeight = 200;
+        final double imageWidth = 234;
+        final double imageHeight = 182;
         for (int i = 0; i < sectionCount; i++) {
             int startIndex = i % sectionImages.get(i).size();
             currentIndexes.set(i, startIndex);
-
             ImageView current = currentImageViews.get(i);
             if (!sectionImages.get(i).isEmpty()) {
                 current.setImage(sectionImages.get(i).get(startIndex));
@@ -156,17 +139,21 @@ public class HomePageExtension {
             next.setVisible(false);
         }
 
-        extensionRoot.getChildren().addAll(bgView, sectionsContainer, logoView, headline, subtext);
+        extensionRoot.getChildren().addAll(sectionsContainer, logoView, headline, subtext);
 
-        startSlideshow();
+        initialize();
     }
 
     private void applyFrameShape(int sectionIndex, ImageView imageView, double width, double height) {
-        // All sections use rounded rectangle
         Rectangle clip = new Rectangle(width, height);
-        clip.setArcWidth(25);
-        clip.setArcHeight(25);
+        clip.setArcWidth(18);
+        clip.setArcHeight(18);
         imageView.setClip(clip);
+    }
+
+    @Override
+    public void initialize() {
+        startSlideshow();
     }
 
     private void startSlideshow() {
@@ -176,8 +163,8 @@ public class HomePageExtension {
     }
 
     private void slideToNextImages() {
-        final double imageWidth = 320;
-        final double imageHeight = 200;
+        final double imageWidth = 234;
+        final double imageHeight = 182;
         for (int i = 0; i < sectionCount; i++) {
             int nextIndex = (currentIndexes.get(i) + 1) % sectionImages.get(i).size();
             ImageView current = currentImageViews.get(i);
@@ -190,7 +177,6 @@ public class HomePageExtension {
             next.setTranslateX(imageWidth);
             next.setVisible(true);
 
-            // Create smooth transitions
             TranslateTransition ttCurrent = new TranslateTransition(Duration.seconds(0.8), current);
             ttCurrent.setFromX(0);
             ttCurrent.setToX(-imageWidth);
@@ -212,16 +198,12 @@ public class HomePageExtension {
             ParallelTransition pt = new ParallelTransition(ttCurrent, ttNext, ftCurrent, ftNext);
             final int index = i;
             pt.setOnFinished(ev -> {
-                // Update index
                 currentIndexes.set(index, nextIndex);
-                // Swap roles
                 ImageView temp = currentImageViews.get(index);
                 currentImageViews.set(index, nextImageViews.get(index));
                 nextImageViews.set(index, temp);
-                // Reset new current position
                 currentImageViews.get(index).setTranslateX(0);
                 currentImageViews.get(index).setOpacity(1);
-                // Prepare new next
                 int newNextIdx = (currentIndexes.get(index) + 1) % sectionImages.get(index).size();
                 if (!sectionImages.get(index).isEmpty()) {
                     nextImageViews.get(index).setImage(sectionImages.get(index).get(newNextIdx));
@@ -235,7 +217,18 @@ public class HomePageExtension {
         }
     }
 
-    public StackPane getExtensionRoot() {
+    @Override
+    public StackPane getRoot() {
         return extensionRoot;
+    }
+
+    @Override
+    public double getPrefWidth() {
+        return PREF_WIDTH;
+    }
+
+    @Override
+    public double getPrefHeight() {
+        return PREF_HEIGHT; // 525 = 700 * 0.75
     }
 }
