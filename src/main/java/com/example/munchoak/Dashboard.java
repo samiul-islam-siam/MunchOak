@@ -95,25 +95,40 @@ public class Dashboard extends Application {
         });
 
         loginBtn.setOnAction(e -> {
+//            try {
+//                javafx.fxml.FXMLLoader loader =
+//                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
+//                javafx.scene.Parent welcomeRoot = loader.load();
+//
+//                // Get controller from FXML
+//                com.example.login.WelcomeController controller = loader.getController();
+//
+//                // Call a custom method to modify it
+//                controller.openedFromDashboard();
+//
+//                // Switch to Welcome page (same stage)
+//                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+//                stage.setScene(new javafx.scene.Scene(welcomeRoot));
+//                stage.setTitle("Welcome");
+//                stage.show();
+//
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
             try {
-                javafx.fxml.FXMLLoader loader =
-                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
-                javafx.scene.Parent welcomeRoot = loader.load();
+                // Get current stage from the clicked button
+                Stage currentStage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
 
-                // Get controller from FXML
-                com.example.login.WelcomeController controller = loader.getController();
+                // Create and show the LoginPage again
+                com.example.view.LoginPage loginPage = new com.example.view.LoginPage(currentStage);
+                Scene loginScene = loginPage.getLoginScene();
 
-                // Call a custom method to modify it
-                controller.openedFromDashboard();
+                currentStage.setScene(loginScene);
+                currentStage.setTitle("Login");
+                currentStage.show();
 
-                // Switch to Welcome page (same stage)
-                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                stage.setScene(new javafx.scene.Scene(welcomeRoot));
-                stage.setTitle("Welcome");
-                stage.show();
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception err) {
+                err.printStackTrace();
             }
         });
 

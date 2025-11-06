@@ -40,8 +40,6 @@
         <HBox spacing="30" alignment="CENTER">
             <Button fx:id="loginButton" text="Login" onAction="#loginButtonActionPerformed"
                     prefWidth="100" style="-fx-background-color: #2E8B57; -fx-text-fill: white;"/>
-            <Button fx:id="registerButton" text="Register" onAction="#registerButtonActionPerformed"
-                    prefWidth="100" style="-fx-background-color: #4682B4; -fx-text-fill: white;"/>
         </HBox>
 
         <HBox spacing="30" alignment="CENTER">
