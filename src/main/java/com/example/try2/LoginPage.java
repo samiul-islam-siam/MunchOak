@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,19 +19,16 @@ import java.util.Random;
 public class LoginPage {
     private final Stage primaryStage;
     private final Random random = new Random();
-
     private VBox loginPane;
     private VBox registerPane;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmField;
     private Label statusLabel;
-
-    private static final double NORMAL_WIDTH  = 1000;
+    private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
-
-    private Scene loginScene;           // Only one scene ever
-    private BorderPane root;            // Reusable root
+    private Scene loginScene; // Only one scene ever
+    private BorderPane root; // Reusable root
 
     public LoginPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -40,10 +36,13 @@ public class LoginPage {
 
     public Scene getLoginScene() {
         if (loginScene == null) {
-            root = buildRoot();                    // Build layout once
-            loginScene = new Scene(root, NORMAL_WIDTH, NORMAL_HEIGHT);
+            // Use current stage size if already in full screen/maximized, else normal
+            double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH) : NORMAL_WIDTH;
+            double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT) : NORMAL_HEIGHT;
+            root = buildRoot(); // Build layout once
+            loginScene = new Scene(root, initWidth, initHeight);
             loginScene.getStylesheets().add(getClass().getResource("/com/example/try2/style.css").toExternalForm());
-            attachMaximizedListener();
+            attachResizeListeners(); // Renamed and fixed to handle full screen too
         }
         return loginScene;
     }
@@ -57,7 +56,6 @@ public class LoginPage {
         topBar.setPadding(new Insets(10));
         topBar.setAlignment(Pos.TOP_RIGHT);
         topBar.setStyle("-fx-background-color: transparent;");
-
         Button closeBtn = new Button("X");
         closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-cursor: hand; -fx-font-weight: bold;");
         closeBtn.setOnAction(e -> returnToHome());
@@ -68,7 +66,6 @@ public class LoginPage {
         VBox leftPane = new VBox();
         leftPane.setAlignment(Pos.CENTER);
         leftPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #a8e6cf, #dcedc1);");
-
         Pane doodlePane = new Pane();
         doodlePane.setMinSize(0, 0);
         leftPane.getChildren().add(doodlePane);
@@ -78,7 +75,6 @@ public class LoginPage {
         StackPane rightContainer = new StackPane();
         rightContainer.setAlignment(Pos.CENTER);
         rightContainer.setStyle("-fx-background-color: linear-gradient(to bottom right, #283c86, #45a247);");
-
         loginPane = createLoginPane();
         registerPane = createRegisterPane();
         registerPane.setVisible(false);
@@ -95,7 +91,6 @@ public class LoginPage {
         mainLayout.getChildren().addAll(leftPane, divider, rightContainer);
         HBox.setHgrow(leftPane, Priority.ALWAYS);
         HBox.setHgrow(rightContainer, Priority.ALWAYS);
-
         mainLayout.widthProperty().addListener((obs, old, newVal) -> {
             if (newVal.doubleValue() > 0) {
                 double total = newVal.doubleValue();
@@ -103,30 +98,26 @@ public class LoginPage {
                 rightContainer.setPrefWidth(total * 0.4);
             }
         });
-
         root.setCenter(mainLayout);
+
         setupDoodles(doodlePane, leftPane);
         return root;
     }
 
-    // --- PANES (unchanged from your original) ---
+    // --- PANES (unchanged) ---
     private VBox createLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(40));
-
         Label brandTitle = new Label("WELCOME TO MUNCHOAK");
         brandTitle.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);");
-
         VBox buttonsVBox = new VBox(7);
         buttonsVBox.setAlignment(Pos.CENTER);
-
         Button adminBtn = createLoginButton("ADMIN");
         Button userBtn = createLoginButton("USER");
         Button registerBtn = createLoginButton("REGISTER");
         registerBtn.setOnAction(e -> showRegisterForm());
         Button guestBtn = createLoginButton("GUEST");
-
         buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn);
         pane.getChildren().addAll(brandTitle, buttonsVBox);
         return pane;
@@ -137,21 +128,17 @@ public class LoginPage {
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(30, 40, 30, 40));
         pane.setMaxWidth(300);
-
         Label title = new Label("Create Account");
         title.setStyle("-fx-font-size: 28px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
-
         emailField = createStyledTextField("Email");
         passwordField = createStyledPasswordField("Password");
         confirmField = createStyledPasswordField("Confirm Password");
-
         Button registerBtn = new Button("Register");
         registerBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;");
         registerBtn.setOnAction(e -> {
             String email = emailField.getText().trim();
             String pwd = passwordField.getText();
             String conf = confirmField.getText();
-
             if (email.isEmpty() || pwd.isEmpty() || conf.isEmpty()) {
                 showStatus("All fields are required!", true);
                 return;
@@ -164,31 +151,24 @@ public class LoginPage {
                 showStatus("Invalid email format!", true);
                 return;
             }
-
             showStatus("Registration successful!", false);
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override public void run() {
-                            javafx.application.Platform.runLater(() -> showLoginForm());
-                        }
-                    }, 1500);
+            new java.util.Timer().schedule( new java.util.TimerTask() {
+                @Override public void run() {
+                    javafx.application.Platform.runLater(() -> showLoginForm());
+                }
+            }, 1500);
         });
-
         Button backBtn = new Button("Back");
         backBtn.setStyle("-fx-background-color: #16a085; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 8 25; -fx-background-radius: 20; -fx-cursor: hand;");
         backBtn.setOnAction(e -> showLoginForm());
-
         VBox buttonBox = new VBox(10, registerBtn, backBtn);
         buttonBox.setAlignment(Pos.CENTER);
-
         Hyperlink loginLink = new Hyperlink("Already have an account? Login");
         loginLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
         loginLink.setOnAction(e -> showLoginForm());
-
         statusLabel = new Label("");
         statusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
         statusLabel.setMinHeight(20);
-
         pane.getChildren().addAll(title, emailField, passwordField, confirmField, statusLabel, buttonBox, loginLink);
         return pane;
     }
@@ -219,10 +199,7 @@ public class LoginPage {
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle(isError
-                ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
-                : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
-
+        statusLabel.setStyle(isError ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
         FadeTransition fade = new FadeTransition(Duration.millis(3000), statusLabel);
         fade.setFromValue(1.0);
         fade.setToValue(0.0);
@@ -259,7 +236,6 @@ public class LoginPage {
         double[] speeds = {0.02, 0.03, 0.025, 0.015, 0.035};
         double[] targetX = new double[5];
         double[] targetY = new double[5];
-
         for (int i = 0; i < 5; i++) {
             double radius = 3 + random.nextDouble() * 7;
             Circle doodle = new Circle(radius, Color.rgb(255, 255, 255, 0.6 + random.nextDouble() * 0.4));
@@ -268,7 +244,6 @@ public class LoginPage {
             doodlePane.getChildren().add(doodle);
             doodles.add(doodle);
         }
-
         leftPane.setOnMouseMoved(e -> {
             double mx = e.getX();
             double my = e.getY();
@@ -277,7 +252,6 @@ public class LoginPage {
                 targetY[i] = my;
             }
         });
-
         AnimationTimer timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 for (int i = 0; i < 5; i++) {
@@ -293,6 +267,13 @@ public class LoginPage {
     }
 
     private void returnToHome() {
+        // Preserve current state before switching
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+        // Capture current dimensions to initialize the new scene properly
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         HomePage homePage = new HomePage(primaryStage);
         VBox fullPage = homePage.getFullPage();
         ScrollPane scrollPane = new ScrollPane(fullPage);
@@ -301,36 +282,40 @@ public class LoginPage {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
 
-        double w = primaryStage.isMaximized() ? primaryStage.getWidth() : NORMAL_WIDTH;
-        double h = primaryStage.isMaximized() ? primaryStage.getHeight() : NORMAL_HEIGHT;
-
-        Scene homeScene = new Scene(scrollPane, w, h);
+        // Create new scene with current dimensions to prevent size reset
+        Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
         primaryStage.setScene(homeScene);
+
+        // Reapply state AFTER setting scene to ensure it takes effect on the new scene
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        }
     }
 
-    // --- FIXED: Resize existing scene instead of replacing root ---
-    private void attachMaximizedListener() {
-        ChangeListener<Boolean> listener = (obs, wasMax, isNowMax) -> {
-            if (loginScene == null) return;
-
-            double width = isNowMax ? primaryStage.getWidth() : NORMAL_WIDTH;
-            double height = isNowMax ? primaryStage.getHeight() : NORMAL_HEIGHT;
-
-            // Resize the *existing* scene
-            loginScene.getWindow().setWidth(width);
-            loginScene.getWindow().setHeight(height);
-
-            // Optional: force layout
-            root.requestLayout();
+    // --- FIXED: Handle both full screen and maximized without manual resizing ---
+    private void attachResizeListeners() {
+        // Full screen listener: No manual resize needed; just force layout refresh
+        ChangeListener<Boolean> fullScreenListener = (obs, wasFull, isNowFull) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
         };
+        primaryStage.fullScreenProperty().addListener(fullScreenListener);
 
-        primaryStage.maximizedProperty().addListener(listener);
+        // Maximized listener: Same as above
+        ChangeListener<Boolean> maximizedListener = (obs, wasMax, isNowMax) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
+        };
+        primaryStage.maximizedProperty().addListener(maximizedListener);
 
-        // Also react when the scene is first shown
+        // Scene attach listener: Trigger layout if scene is set while in special mode
         primaryStage.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene == loginScene) {
-                listener.changed(primaryStage.maximizedProperty(),
-                        primaryStage.isMaximized(), primaryStage.isMaximized());
+            if (newScene == loginScene && (primaryStage.isFullScreen() || primaryStage.isMaximized())) {
+                root.requestLayout();
             }
         });
     }

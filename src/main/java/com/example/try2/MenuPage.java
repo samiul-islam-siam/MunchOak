@@ -1,4 +1,5 @@
 package com.example.try2;
+
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -15,6 +16,7 @@ public class MenuPage {
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
     private Scene menuScene;
+    private BorderPane root;  // Reusable root
 
     public MenuPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -22,13 +24,25 @@ public class MenuPage {
 
     public Scene getMenuScene() {
         if (menuScene == null) {
-            menuScene = buildScene();
-            attachMaximizedListener();
+            // Use current stage size if already in full screen/maximized, else normal
+            double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized()
+                    ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH)
+                    : NORMAL_WIDTH;
+            double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized()
+                    ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT)
+                    : NORMAL_HEIGHT;
+
+            root = buildRoot();  // Build layout once
+            menuScene = new Scene(root, initWidth, initHeight);
+            menuScene.getStylesheets().add(
+                    getClass().getResource("/com/example/try2/style.css").toExternalForm()
+            );
+            attachResizeListeners();  // Fixed to handle full screen too
         }
         return menuScene;
     }
 
-    private Scene buildScene() {
+    private BorderPane buildRoot() {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #FFE4C4;");
 
@@ -144,13 +158,7 @@ public class MenuPage {
         root.setTop(navBar);
         root.setCenter(scrollPane);
 
-        double w = primaryStage.isMaximized() ? primaryStage.getWidth() : NORMAL_WIDTH;
-        double h = primaryStage.isMaximized() ? primaryStage.getHeight() : NORMAL_HEIGHT;
-        Scene scene = new Scene(root, w, h);
-        scene.getStylesheets().add(
-                getClass().getResource("/com/example/try2/style.css").toExternalForm()
-        );
-        return scene;
+        return root;
     }
 
     // NEW HELPER METHOD: Creates a styled box for each menu category
@@ -174,19 +182,53 @@ public class MenuPage {
         return label;
     }
 
-    private void attachMaximizedListener() {
-        ChangeListener<Boolean> listener = (obs, wasMax, isNowMax) -> {
-            Scene newScene = buildScene();
-            BorderPane oldRoot = (BorderPane) menuScene.getRoot();
-            newScene.setRoot(oldRoot);
-            menuScene = newScene;
-            primaryStage.setScene(menuScene);
+    private void returnToHome() {
+        // Preserve current state before switching
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        HomePage homePage = new HomePage(primaryStage);
+        VBox fullPage = homePage.getFullPage();
+        ScrollPane scrollPane = new ScrollPane(fullPage);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+        // Create new scene without explicit size—let stage dictate
+        Scene homeScene = new Scene(scrollPane);
+        primaryStage.setScene(homeScene);
+
+        // Reapply state AFTER setting scene to ensure it takes effect on the new scene
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        }
+    }
+
+    // --- FIXED: Handle both full screen and maximized without recreating scenes/roots ---
+    private void attachResizeListeners() {
+        // Full screen listener: No manual resize needed; just force layout refresh
+        ChangeListener<Boolean> fullScreenListener = (obs, wasFull, isNowFull) -> {
+            if (menuScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
         };
-        primaryStage.maximizedProperty().addListener(listener);
+        primaryStage.fullScreenProperty().addListener(fullScreenListener);
+
+        // Maximized listener: Same as above
+        ChangeListener<Boolean> maximizedListener = (obs, wasMax, isNowMax) -> {
+            if (menuScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
+        };
+        primaryStage.maximizedProperty().addListener(maximizedListener);
+
+        // Scene attach listener: Trigger layout if scene is set while in special mode
         primaryStage.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene == menuScene) {
-                listener.changed(primaryStage.maximizedProperty(),
-                        primaryStage.isMaximized(), primaryStage.isMaximized());
+            if (newScene == menuScene && (primaryStage.isFullScreen() || primaryStage.isMaximized())) {
+                root.requestLayout();
             }
         });
     }
