@@ -4,40 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="update">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageComponent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/cart.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/cocktail1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/cocktails.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/eighth_ext_bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/hamburger.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/left_dish.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/left_dish2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/menu_banner.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/overlay_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/right_dish.png" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="merging ui">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/ProfileController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/profile.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSecondExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSecondExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fifth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fifth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fourth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fourth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/seventh_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/seventh_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/sixth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/sixth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/third_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/third_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +79,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/view",
+    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/login/FXMLs",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.30804598",
@@ -114,11 +88,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
@@ -131,6 +105,7 @@
       <recent name="com.example.munchoak" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.login" />
       <recent name="com.example.view" />
       <recent name="com.example.munchoak" />
     </key>
@@ -378,7 +353,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762365495189</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="merging ui">
+      <option name="closed" value="true" />
+      <created>1762395372935</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1762395372935</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -404,6 +387,7 @@
     <MESSAGE value="minor fix" />
     <MESSAGE value="user id update" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="merging ui" />
+    <option name="LAST_COMMIT_MESSAGE" value="merging ui" />
   </component>
 </project>

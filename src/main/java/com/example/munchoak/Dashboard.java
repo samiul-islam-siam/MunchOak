@@ -1,6 +1,8 @@
 package com.example.munchoak;
 
+import com.example.login.ProfileController;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -53,10 +55,11 @@ public class Dashboard extends Application {
         Button reportsBtn = createMenuButton("📊", "Reports");
         Button historyBtn = createMenuButton("📜", "History");
         Button loginBtn = createMenuButton("🔐", "Login");
+        Button profileBtn = createMenuButton("👤", "Profile");
         Button aboutBtn = createMenuButton("/com/example/munchoak/about-us-icon.png", "About Us");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, historyBtn, loginBtn, aboutBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, historyBtn, loginBtn, profileBtn, aboutBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
@@ -86,8 +89,6 @@ public class Dashboard extends Application {
         aboutBtn.setOnAction(e -> {
             contentPane.getChildren().setAll(AboutUs.getContent());
         });
-
-
 
         historyBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
@@ -131,6 +132,22 @@ public class Dashboard extends Application {
                 err.printStackTrace();
             }
         });
+
+        profileBtn.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
+                Node profileView = loader.load();
+
+                // Pass the logged-in username (you can store it globally or fetch dynamically)
+                ProfileController controller = loader.getController();
+                controller.setCurrentUsername("currentUser123"); // replace with actual username variable
+
+                contentPane.getChildren().setAll(profileView);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
 
         // Layout
         root.setLeft(sidebar);

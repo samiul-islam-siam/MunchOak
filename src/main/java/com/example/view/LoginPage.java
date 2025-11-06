@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.manager.FileStorage;
 import com.example.munchoak.Dashboard;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
@@ -14,6 +15,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +26,7 @@ public class LoginPage {
 
     private VBox loginPane;
     private VBox registerPane;
+    private TextField usernameField;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmField;
@@ -175,6 +178,7 @@ public class LoginPage {
         Label title = new Label("Create Account");
         title.setStyle("-fx-font-size: 28px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
 
+        usernameField = createStyledTextField("Username");
         emailField = createStyledTextField("Email");
         passwordField = createStyledPasswordField("Password");
         confirmField = createStyledPasswordField("Confirm Password");
@@ -182,11 +186,13 @@ public class LoginPage {
         Button registerBtn = new Button("Register");
         registerBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;");
         registerBtn.setOnAction(e -> {
+
+            String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String pwd = passwordField.getText();
             String conf = confirmField.getText();
 
-            if (email.isEmpty() || pwd.isEmpty() || conf.isEmpty()) {
+            if (username.isEmpty() || email.isEmpty() || pwd.isEmpty() || conf.isEmpty()) {
                 showStatus("All fields are required!", true);
                 return;
             }
@@ -199,7 +205,28 @@ public class LoginPage {
                 return;
             }
 
-            showStatus("Registration successful!", false);
+            try {
+                if (FileStorage.userExists(username)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Signup Failed");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Username already exists!");
+                    alert.showAndWait();
+                    return;
+                }
+
+                FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
+
+                showStatus("Registration successful!", false);
+
+            } catch (IOException err) {
+                err.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("An error occurred while registering the user.");
+                alert.showAndWait();
+            }
             new java.util.Timer().schedule(
                     new java.util.TimerTask() {
                         @Override
@@ -224,7 +251,7 @@ public class LoginPage {
         statusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
         statusLabel.setMinHeight(20);
 
-        pane.getChildren().addAll(title, emailField, passwordField, confirmField, statusLabel, buttonBox, loginLink);
+        pane.getChildren().addAll(title, usernameField, emailField, passwordField, confirmField, statusLabel, buttonBox, loginLink);
         return pane;
     }
 
@@ -244,6 +271,7 @@ public class LoginPage {
         fadeOut.setOnFinished(e -> {
             registerPane.setVisible(false);
             loginPane.setVisible(true);
+            usernameField.clear();
             emailField.clear();
             passwordField.clear();
             confirmField.clear();
