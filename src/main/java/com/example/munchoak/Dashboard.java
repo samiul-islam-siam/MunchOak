@@ -138,10 +138,6 @@ public class Dashboard extends Application {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
                 Node profileView = loader.load();
 
-                // Pass the logged-in username (you can store it globally or fetch dynamically)
-                ProfileController controller = loader.getController();
-                controller.setCurrentUsername("currentUser123"); // replace with actual username variable
-
                 contentPane.getChildren().setAll(profileView);
             } catch (Exception ex) {
                 ex.printStackTrace();

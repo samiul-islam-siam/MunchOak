@@ -38,7 +38,7 @@ public class Bill {
         }
 
         sb.append("--------------------------------------------\n");
-        sb.append(String.format("%-20s %15.2f\n", "TOTAL:", total));
+        sb.append(String.format("%-21s %15.2f\n", "TOTAL: ", total));
         sb.append("============================================\n");
         sb.append("         Thank you for dining with us!       \n");
         sb.append("============================================\n");

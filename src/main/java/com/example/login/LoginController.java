@@ -51,6 +51,7 @@ public class LoginController {
 
             if (found) {
                 int userId = FileStorage.getUserId(username);  // get the user's unique ID
+                Session.setCurrentUsername(username);
                 Session.setCurrentUserId(userId);              // store it in the session
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Login Success");

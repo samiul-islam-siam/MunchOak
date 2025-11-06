@@ -16,7 +16,7 @@
             <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <Label fx:id="emailLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Name:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label text="Your ID:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
             <Label fx:id="nameLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
             <Label text="Address:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
