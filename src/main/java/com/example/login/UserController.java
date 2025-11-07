@@ -6,11 +6,15 @@ import javafx.scene.control.Button;
 
 public class UserController {
 
-    @FXML private Button viewMenuButton;
-    @FXML private Button placeOrderButton;
-    @FXML private Button orderHistoryButton;
+    @FXML
+    private Button viewMenuButton;
+    @FXML
+    private Button placeOrderButton;
+    @FXML
+    private Button orderHistoryButton;
 
-    @FXML private void handleViewMenu() {
+    @FXML
+    private void handleViewMenu() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Menu");
         alert.setHeaderText(null);
@@ -18,7 +22,8 @@ public class UserController {
         alert.showAndWait();
     }
 
-    @FXML private void handlePlaceOrder() {
+    @FXML
+    private void handlePlaceOrder() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Place Order");
         alert.setHeaderText(null);
@@ -26,7 +31,8 @@ public class UserController {
         alert.showAndWait();
     }
 
-    @FXML private void handleOrderHistory() {
+    @FXML
+    private void handleOrderHistory() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Order History");
         alert.setHeaderText(null);

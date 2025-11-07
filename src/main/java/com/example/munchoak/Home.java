@@ -1,7 +1,7 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
 import com.example.view.HomePage;
-import  com.example.manager.FileStorage;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -19,40 +19,34 @@ public class Home extends Application {
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-
         mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
         stage.setTitle("Home Page + Extension");
-
         // ✅ Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             mainScene.getStylesheets().add(css.toExternalForm());
-            System.out.println("CSS loaded successfully: " + css);
+            System.out.println("✅ CSS loaded successfully: " + css);
         } else {
-            System.out.println("CSS not found! Check file path.");
+            System.out.println("❌ CSS not found! Check file path.");
         }
-
         stage.show();
     }
 
     private Scene createMainScene() {
         HomePage home = new HomePage(primaryStage);
         VBox fullPage = home.getFullPage();
-
         // --- ScrollPane with smoother scroll ---
         ScrollPane scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
-
         // 🔹 Smooth scroll effect (gradual movement)
         scrollPane.setOnScroll(e -> {
             double deltaY = e.getDeltaY() * 0.002; // scroll speed factor
             double targetV = scrollPane.getVvalue() - deltaY;
             targetV = Math.max(0, Math.min(targetV, 1));
-
             Timeline smoothScroll = new Timeline();
             smoothScroll.getKeyFrames().add(
                     new KeyFrame(Duration.millis(180),
@@ -60,8 +54,7 @@ public class Home extends Application {
             );
             smoothScroll.play();
         });
-
-        return new Scene(scrollPane, 1366, 768);
+        return new Scene(scrollPane, 1000, 700);
     }
 
     public Scene getMainScene() {

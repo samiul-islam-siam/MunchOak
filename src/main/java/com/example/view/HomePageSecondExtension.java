@@ -10,15 +10,13 @@ public class HomePageSecondExtension {
 
     public HomePageSecondExtension() {
         extensionRoot = new StackPane();
-        extensionRoot.setPrefSize(1366, 768);
-
+        extensionRoot.setPrefSize(1000, 700);
         // Load background image
-        Image bgImage = new Image(getClass().getResource("/com/example/view/images/second_ext_bg.png").toExternalForm());
+        Image bgImage = new Image(getClass().getResource("/com/example/try2/view/second_ext_bg.png").toExternalForm());
         bgView = new ImageView(bgImage);
         bgView.setPreserveRatio(true);
-        bgView.setFitWidth(1366);
-        bgView.setFitHeight(768);
-
+        bgView.setFitWidth(1000);
+        bgView.setFitHeight(700);
         extensionRoot.getChildren().add(bgView);
     }
 

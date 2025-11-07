@@ -15,8 +15,10 @@ import java.io.IOException;
 
 public class SignupController {
 
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
 
     @FXML
     private void handleRegister(ActionEvent event) {
@@ -55,7 +57,7 @@ public class SignupController {
             // Redirect to login
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.show();
 

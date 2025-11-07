@@ -7,26 +7,28 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 
-public class HomePageSeventhExtension {
-
+public class HomePageSeventhExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
 
     public HomePageSeventhExtension() {
         extensionRoot = new AnchorPane();
-        extensionRoot.setPrefSize(1366, 768);
+        extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
+        extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
 
-        // --- Background image ---
-        Image bgImage = new Image(getClass().getResource("/com/example/view/images/seventh_ext_bg.png").toExternalForm());
-        ImageView bgView = new ImageView(bgImage);
-        bgView.setPreserveRatio(true);
-        bgView.setFitWidth(1366);
-        bgView.setFitHeight(768);
-        AnchorPane.setTopAnchor(bgView, 0.0);
-        AnchorPane.setBottomAnchor(bgView, 0.0);
-        AnchorPane.setLeftAnchor(bgView, 0.0);
-        AnchorPane.setRightAnchor(bgView, 0.0);
+        // --- 90° LINEAR GRADIENT BACKGROUND ---
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.web("#5de0e6")),
+                new Stop(1.0, Color.web("#004aad"))
+        );
+        extensionRoot.setBackground(new Background(new BackgroundFill(
+                gradient, CornerRadii.EMPTY, Insets.EMPTY
+        )));
 
         // --- Fonts ---
         Font titleFont = Font.font("The Seasons", 36);
@@ -44,9 +46,9 @@ public class HomePageSeventhExtension {
 
         // --- Container for 3 sections ---
         HBox threeSections = new HBox();
-        threeSections.setPrefSize(1366, 520);
-        threeSections.setSpacing(30); // spacing between sections
-        threeSections.setPadding(new Insets(40, 60, 40, 60));
+        threeSections.setPrefSize(getPrefWidth(), 473);
+        threeSections.setSpacing(22);
+        threeSections.setPadding(new Insets(29, 44, 29, 44));
         threeSections.setAlignment(Pos.CENTER);
 
         // --- Create image sections ---
@@ -56,7 +58,7 @@ public class HomePageSeventhExtension {
                 "02 NOV, Sunday",
                 "Reservations 12.30 - 2 PM",
                 subtitleFont,
-                420, 280 // larger corner image
+                307, 255
         );
         section1.setBorder(new Border(new BorderStroke(
                 Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0)
@@ -68,7 +70,7 @@ public class HomePageSeventhExtension {
                 "20 NOV, Thursday",
                 "Join Us : 4 - 8 PM",
                 subtitleFont,
-                360, 220 // center image default
+                263, 200
         );
         section2.setBorder(new Border(new BorderStroke(
                 Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0)
@@ -80,7 +82,7 @@ public class HomePageSeventhExtension {
                 "25 DEC, Thursday",
                 "Reservations 11 AM - 1 PM",
                 subtitleFont,
-                420, 280 // larger corner image
+                307, 255
         );
 
         threeSections.getChildren().addAll(section1, section2, section3);
@@ -89,22 +91,24 @@ public class HomePageSeventhExtension {
         HBox.setHgrow(section3, Priority.ALWAYS);
 
         // --- Combine headline + sections ---
-        VBox contentBox = new VBox(50, headline, threeSections); // slightly larger spacing for balance
+        VBox contentBox = new VBox(36, headline, threeSections);
         contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.setPadding(new Insets(60, 0, 0, 0));
+        contentBox.setPadding(new Insets(44, 0, 0, 0));
 
         // --- Add to root ---
-        extensionRoot.getChildren().addAll(bgView, contentBox);
+        extensionRoot.getChildren().add(contentBox);
         AnchorPane.setTopAnchor(contentBox, 0.0);
         AnchorPane.setBottomAnchor(contentBox, 0.0);
         AnchorPane.setLeftAnchor(contentBox, 0.0);
         AnchorPane.setRightAnchor(contentBox, 0.0);
+
+        initialize();
     }
 
     private VBox createImageSection(String imagePath, String eventTitle, String eventDate, String eventDetails, Font font, double width, double height) {
-        VBox section = new VBox(15);
+        VBox section = new VBox(11);
         section.setAlignment(Pos.TOP_CENTER);
-        section.setPadding(new Insets(20));
+        section.setPadding(new Insets(15));
 
         // --- Event image ---
         ImageView imgView = new ImageView();
@@ -127,20 +131,36 @@ public class HomePageSeventhExtension {
 
         Label dateLabel = new Label(eventDate);
         dateLabel.setFont(font);
-        dateLabel.setStyle("-fx-text-fill: #ffd700;"); // golden highlight
+        dateLabel.setStyle("-fx-text-fill: #ffd700;");
 
         Label detailsLabel = new Label(eventDetails);
         detailsLabel.setFont(font);
         detailsLabel.setStyle("-fx-text-fill: white;");
 
-        VBox textBox = new VBox(4, titleLabel, dateLabel, detailsLabel);
+        VBox textBox = new VBox(3, titleLabel, dateLabel, detailsLabel);
         textBox.setAlignment(Pos.CENTER);
 
         section.getChildren().addAll(imgView, textBox);
         return section;
     }
 
-    public AnchorPane getExtensionRoot() {
+    @Override
+    public void initialize() {
+        // No animation needed
+    }
+
+    @Override
+    public AnchorPane getRoot() {
         return extensionRoot;
+    }
+
+    @Override
+    public double getPrefWidth() {
+        return 1000;
+    }
+
+    @Override
+    public double getPrefHeight() {
+        return 700;
     }
 }

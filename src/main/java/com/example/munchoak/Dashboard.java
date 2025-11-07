@@ -1,15 +1,20 @@
 package com.example.munchoak;
 
+import com.example.manager.Session;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,33 +49,40 @@ public class Dashboard extends Application {
 
         // Create menu buttons
         Button homeBtn = createMenuButton("🏠", "Home");
-        Button ordersBtn = createMenuButton("🧾", "Orders");
-        Button menuBtn   = createMenuButton("🍔", "Menu");
+        Button ordersBtn = createMenuButton("com/example/munchoak/order-icon.jpg", "Orders");
+        Button menuBtn = createMenuButton("🍔", "Menu");
         Button reservationBtn = createMenuButton("📅", "Reservation");
         Button reportsBtn = createMenuButton("📊", "Reports");
-        Button aboutBtn = createMenuButton("ℹ️", "About Us");
         Button historyBtn = createMenuButton("📜", "History");
         Button loginBtn = createMenuButton("🔐", "Login");
+        Button profileBtn = createMenuButton("👤", "Profile");
+        Button aboutBtn = createMenuButton("/com/example/munchoak/about-us-icon.png", "About Us");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, aboutBtn, historyBtn, loginBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, historyBtn, loginBtn, profileBtn, aboutBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
         sidebar.getChildren().add(topBox);
         sidebar.getChildren().addAll(menuButtons);
 
-        // Content area in center
+
         contentPane = new StackPane();
         contentPane.setPadding(new Insets(20));
-        // showHomePage(); // default
 
-        // Wire up actions
-        // homeBtn.setOnAction(e -> showHomePage());
-        ordersBtn.setOnAction(e -> updateContentSimple("🧾 Orders", "List and manage current orders."));
+        ordersBtn.setOnAction(e -> updateContentSimple("Orders", "List and manage current orders."));
         menuBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
-            contentPane.getChildren().add(new Menu().getView());
+
+            String username = Session.getCurrentUsername();
+            if ("admin".equalsIgnoreCase(username)) {
+                //System.out.println("Admin Logged in");
+                contentPane.getChildren().add(new AdminMenu().getView());
+            } else {
+                //System.out.println("User/Guest Logged in");
+                contentPane.getChildren().add(new UserMenu().getView());
+            }
+
         });
 
         reservationBtn.setOnAction(e -> {
@@ -80,8 +92,9 @@ public class Dashboard extends Application {
 
 
         reportsBtn.setOnAction(e -> updateContentSimple("📊 Reports", "Sales and analytics."));
-        aboutBtn.setOnAction(e -> updateContentSimple("About Us",
-                "MunchOak — we cook with passion. Open daily 10:00 - 23:00."));
+        aboutBtn.setOnAction(e -> {
+            contentPane.getChildren().setAll(AboutUs.getContent());
+        });
 
         historyBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
@@ -89,27 +102,54 @@ public class Dashboard extends Application {
         });
 
         loginBtn.setOnAction(e -> {
+//            try {
+//                javafx.fxml.FXMLLoader loader =
+//                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
+//                javafx.scene.Parent welcomeRoot = loader.load();
+//
+//                // Get controller from FXML
+//                com.example.login.WelcomeController controller = loader.getController();
+//
+//                // Call a custom method to modify it
+//                controller.openedFromDashboard();
+//
+//                // Switch to Welcome page (same stage)
+//                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+//                stage.setScene(new javafx.scene.Scene(welcomeRoot));
+//                stage.setTitle("Welcome");
+//                stage.show();
+//
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
             try {
-                javafx.fxml.FXMLLoader loader =
-                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
-                javafx.scene.Parent welcomeRoot = loader.load();
+                // Get current stage from the clicked button
+                Stage currentStage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
 
-                // Get controller from FXML
-                com.example.login.WelcomeController controller = loader.getController();
+                // Create and show the LoginPage again
+                com.example.view.LoginPage loginPage = new com.example.view.LoginPage(currentStage);
+                Scene loginScene = loginPage.getLoginScene();
 
-                // Call a custom method to modify it
-                controller.openedFromDashboard();
+                currentStage.setScene(loginScene);
+                currentStage.setTitle("Login");
+                currentStage.show();
 
-                // Switch to Welcome page (same stage)
-                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                stage.setScene(new javafx.scene.Scene(welcomeRoot));
-                stage.setTitle("Welcome");
-                stage.show();
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        });
 
+        profileBtn.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
+                Node profileView = loader.load();
+
+                contentPane.getChildren().setAll(profileView);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
+
 
         // Layout
         root.setLeft(sidebar);
@@ -126,9 +166,27 @@ public class Dashboard extends Application {
 
     private Button createMenuButton(String icon, String labelText) {
         Button btn = new Button(labelText);
-        Label iconLabel = new Label(icon);
-        iconLabel.setFont(Font.font(18));
-        btn.setGraphic(iconLabel);
+
+        // Check if the icon is an image path or emoji/text
+        if (icon.endsWith(".png") || icon.endsWith(".jpg") || icon.endsWith(".jpeg")) {
+            try {
+                Image image = new Image(getClass().getResourceAsStream(icon.startsWith("/") ? icon : "/" + icon));
+                ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(20);
+                imageView.setFitHeight(20);
+                btn.setGraphic(imageView);
+            } catch (Exception e) {
+                // fallback if image not found
+                Label fallbackLabel = new Label("❓");
+                fallbackLabel.setFont(Font.font(18));
+                btn.setGraphic(fallbackLabel);
+            }
+        } else {
+            Label iconLabel = new Label(icon);
+            iconLabel.setFont(Font.font(18));
+            btn.setGraphic(iconLabel);
+        }
+
         btn.setContentDisplay(ContentDisplay.LEFT);
         btn.setPrefWidth(200);
         btn.setMaxWidth(Double.MAX_VALUE);
@@ -138,17 +196,22 @@ public class Dashboard extends Application {
         btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px;"));
         btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-size: 14px;"));
 
-        btn.setUserData(labelText); // save the full label for toggling
+        btn.setUserData(labelText);
         return btn;
     }
 
-    /** Toggle between compact and full sidebar */
+
+    /**
+     * Toggle between compact and full sidebar
+     */
     private void toggleCompact() {
         compact = !compact;
         setCompact(compact);
     }
 
-    /** Apply compact/full mode to sidebar and menu buttons */
+    /**
+     * Apply compact/full mode to sidebar and menu buttons
+     */
     private void setCompact(boolean compactMode) {
         if (compactMode) {
             // icons only

@@ -166,26 +166,30 @@ public class FileStorage {
         ensureDataDir();
         for (String[] user : loadUsers()) {
             if (user[0].equals(username)) {
-                try { return Integer.parseInt(user[3]); } catch (Exception ignored) {}
+                try {
+                    return Integer.parseInt(user[3]);
+                } catch (Exception ignored) {
+                }
             }
         }
         return -1;
     }
 
 
-public static void appendUser(String username, String email, String password) throws IOException {
-    ensureDataDir();
+    public static void appendUser(String username, String email, String password) throws IOException {
+        ensureDataDir();
 
-    // Start from 2025001 for registered users
-    int uid = generateNextIdInFile(USERS_FILE, 4);
+        // Start from 2025001 for registered users
+        int uid = generateNextIdInFile(USERS_FILE, 4);
 
-    try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
-        dos.writeUTF(username);
-        dos.writeUTF(email);
-        dos.writeUTF(password);
-        dos.writeInt(uid);
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
+            dos.writeUTF(username);
+            dos.writeUTF(email);
+            dos.writeUTF(password);
+            dos.writeInt(uid);
+        }
     }
-}
+
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
         List<String[]> users = loadUsers();
@@ -320,7 +324,9 @@ public static void appendUser(String username, String email, String password) th
                     break;
                 }
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if (cartId == -1) return items;
 
@@ -331,7 +337,9 @@ public static void appendUser(String username, String email, String password) th
                 int qty = dis.readInt();
                 if (cid == cartId) items.put(foodId, qty);
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return items;
     }
@@ -359,34 +367,6 @@ public static void appendUser(String username, String email, String password) th
         }
     }
 
-    // ----------------- UTIL -----------------
-//    private static int generateNextIdInFile(File f, int minColumns, int idColumnIndex, int startIfEmpty) {
-//        ensureDataDir();
-//        int lastId = startIfEmpty - 1;
-//        try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
-//            while (dis.available() > 0) {
-//                if (f == PAYMENTS_FILE) {
-//                    lastId = dis.readInt(); // paymentId
-//                    dis.readInt();          // userId
-//                    dis.readDouble();       // amount
-//                    dis.readUTF();          // method
-//                    dis.readUTF();          // timestamp
-//                }
-//                if (f == USERS_FILE) {
-//                    dis.readUTF(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt();
-//                } else if (f == MENU_FILE) {
-//                    dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readDouble(); dis.readDouble(); dis.readUTF(); dis.readUTF();
-//                } else if (f == CATEGORIES_FILE) dis.readUTF();
-//                //else if (f == PAYMENTS_FILE) { dis.readInt(); dis.readInt(); dis.readDouble(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt(); }
-//                else if (f == CARTS_FILE) { dis.readInt(); dis.readInt(); dis.readInt(); dis.readUTF(); lastId = dis.readInt(); }
-//                else if (f == CART_ITEMS_FILE || f == PAYMENT_ITEMS_FILE) { dis.readInt(); dis.readInt(); dis.readInt(); lastId = dis.readInt(); }
-//                else if (f == RESERVATIONS_FILE) { dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readInt(); dis.readUTF(); dis.readUTF(); dis.readUTF(); dis.readUTF(); lastId = dis.readInt(); }
-//                else dis.skipBytes(dis.available());
-//            }
-//        } catch (EOFException ignored) {
-//        } catch (IOException e) { e.printStackTrace(); }
-//        return lastId + 1;
-//    }
     private static int generateNextIdInFile(File f, int startIfEmpty) {
         ensureDataDir();
         int lastId = startIfEmpty - 1;
@@ -402,34 +382,46 @@ public static void appendUser(String username, String email, String password) th
                 }
             } else if (f == USERS_FILE) {
                 while (dis.available() > 0) {
-                    dis.readUTF(); dis.readUTF(); dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
                     lastId = dis.readInt(); // userId
                 }
             } else if (f == MENU_FILE) {
                 while (dis.available() > 0) {
-                    dis.readInt(); dis.readUTF(); dis.readUTF();
-                    dis.readDouble(); dis.readDouble();
-                    dis.readUTF(); dis.readUTF();
+                    dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readDouble();
+                    dis.readDouble();
+                    dis.readUTF();
+                    dis.readUTF();
                 }
             } else if (f == CATEGORIES_FILE) {
                 while (dis.available() > 0) dis.readUTF();
             } else if (f == CARTS_FILE) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // cartId
-                    dis.readInt(); dis.readInt();
+                    dis.readInt();
+                    dis.readInt();
                     dis.readUTF();
                 }
             } else if (f == PAYMENT_ITEMS_FILE || f == CART_ITEMS_FILE) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // itemId
-                    dis.readInt(); dis.readInt();
+                    dis.readInt();
+                    dis.readInt();
                 }
             } else if (f == RESERVATIONS_FILE) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // resId
-                    dis.readUTF(); dis.readUTF();
-                    dis.readInt(); dis.readUTF(); dis.readUTF();
-                    dis.readUTF(); dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readInt();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
+                    dis.readUTF();
                 }
             }
         } catch (EOFException ignored) {
