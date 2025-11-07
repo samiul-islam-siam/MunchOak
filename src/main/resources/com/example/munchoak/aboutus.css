@@ -1,0 +1,37 @@
+.about-root {
+    -fx-background-color: linear-gradient(to bottom right, #fff8f0, #ffe5cc);
+}
+
+.restaurant-name {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e67e22;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.owner-name {
+    -fx-font-size: 18px;
+    -fx-text-fill: #5a4633;
+}
+
+.intro-text {
+    -fx-font-size: 16px;
+    -fx-text-fill: #3b3b3b;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 10px 20px;
+    -fx-background-color: rgba(255, 255, 255, 0.6);
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 2, 2);
+}
+
+.about-image {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+.contact-info {
+    -fx-font-size: 15px;
+    -fx-text-fill: #4a4a4a;
+    -fx-padding: 20px 0;
+}
