@@ -28,7 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-public class Menu {
+public class BaseMenu {
 
     private ObservableList<FoodItems> foodList;
     private VBox foodContainer;
@@ -40,6 +40,22 @@ public class Menu {
     private Button addOrUpdateButton;
 
     private FoodItems currentEditingFood = null;
+
+
+    // ===== make UI sections accessible to subclasses =====
+    protected VBox mainLayout;
+    protected Button showAddFormBtn;
+    protected HBox categoryButtons;
+    protected VBox formBox;
+    protected HBox cartButtons;
+
+    protected VBox cartBox;
+
+
+    protected Button viewCartButton;
+    protected Button checkoutButton;
+    protected Button addToCartBtn;
+
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
@@ -97,7 +113,7 @@ public class Menu {
         Button addCatBtn = new Button("Add Category");
         Button renameCatBtn = new Button("Rename Category");
         Button deleteCatBtn = new Button("Delete Category");
-        HBox categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
+        categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
         inputGrid.add(categoryButtons, 1, 5);
 
         addCatBtn.setOnAction(e -> addCategory());
@@ -122,21 +138,21 @@ public class Menu {
             }
         });
 
-        VBox formBox = new VBox(10, inputGrid, addOrUpdateButton);
+        formBox = new VBox(10, inputGrid, addOrUpdateButton);
         formBox.setVisible(false);
         formBox.setManaged(false);
 
         // Cart buttons
-        Button viewCartButton = new Button("View Cart");
+        viewCartButton = new Button("View Cart");
         viewCartButton.setOnAction(e -> showCart());
 
-        Button checkoutButton = new Button("Checkout");
+        checkoutButton = new Button("Checkout");
         checkoutButton.setOnAction(e -> checkout());
 
-        HBox cartButtons = new HBox(15, viewCartButton, checkoutButton);
+        cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
         // ===== TOP "Add Food" BUTTON =====
-        Button showAddFormBtn = new Button("Add Food");
+        showAddFormBtn = new Button("Add Food");
         showAddFormBtn.setOnAction(e -> {
             if (formBox.isVisible()) {
                 // Hide the form
@@ -151,22 +167,27 @@ public class Menu {
         });
 
         // ===== MAIN LAYOUT ===== //
-        VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
-        vbox.setPadding(new Insets(5));
-
+//        VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
+//        vbox.setPadding(new Insets(5));
+//
+//        loadFoodItems();
+//        return vbox;
+        mainLayout = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
+        mainLayout.setPadding(new Insets(5));
         loadFoodItems();
-        return vbox;
+        return mainLayout;
+
     }
 
     // ================== CATEGORY MANAGEMENT ===================
 
-    private void loadCategories() {
+    protected void loadCategories() {
         categoryBox.getItems().clear();
         categories = FileStorage.loadCategories();
         categoryBox.getItems().addAll(categories);
     }
 
-    private void addCategory() {
+    protected void addCategory() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Category");
         dialog.setHeaderText("Enter new category name:");
@@ -187,7 +208,7 @@ public class Menu {
         });
     }
 
-    private void renameCategory() {
+    protected void renameCategory() {
         String selected = categoryBox.getValue();
         if (selected == null) {
             showAlert("Error", "Select a category first.");
@@ -217,7 +238,7 @@ public class Menu {
         });
     }
 
-    private void deleteCategory() {
+    protected void deleteCategory() {
         String selected = categoryBox.getValue();
         if (selected == null) {
             showAlert("Error", "Select a category to delete.");
@@ -243,7 +264,7 @@ public class Menu {
         });
     }
 
-    private void showAlert(String title, String message) {
+    protected void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setContentText(message);
@@ -252,7 +273,7 @@ public class Menu {
 
     // ================== FOOD ITEMS MANAGEMENT ===================
 
-    private void loadFoodItems() {
+    protected void loadFoodItems() {
         foodContainer.getChildren().clear();
         Map<String, FlowPane> categoryFlows = new LinkedHashMap<>();
 
@@ -278,7 +299,7 @@ public class Menu {
         }
     }
 
-    private VBox createFoodCard(FoodItems food) {
+    protected VBox createFoodCard(FoodItems food) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(10));
         card.setAlignment(Pos.TOP_CENTER);
@@ -318,40 +339,50 @@ public class Menu {
         Label price = new Label("Price: $" + food.getPrice());
         Label rating = new Label("⭐ " + food.getRatings());
 
-        Button addToCartBtn = new Button("Add to Cart");
-        addToCartBtn.setOnAction(e -> {
-            cart.addToCart(food.getId(), 1);
 
-            Stage popup = new Stage();
-            popup.initStyle(StageStyle.UNDECORATED);
-            popup.setAlwaysOnTop(true);
+        if (!(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
+            addToCartBtn = new Button("Add to Cart");
+            addToCartBtn.setOnAction(e -> {
+                cart.addToCart(food.getId(), 1);
 
-            Label label = new Label(food.getName() + " added to cart!");
-            label.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px; -fx-font-size: 14px;");
+                Stage popup = new Stage();
+                popup.initStyle(StageStyle.UNDECORATED);
+                popup.setAlwaysOnTop(true);
 
-            VBox box = new VBox(label);
-            box.setAlignment(Pos.CENTER);
+                Label label = new Label(food.getName() + " added to cart!");
+                label.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px; -fx-font-size: 14px;");
 
-            popup.setScene(new Scene(box));
-            popup.show();
+                VBox box = new VBox(label);
+                box.setAlignment(Pos.CENTER);
 
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e2 -> popup.close());
-            delay.play();
+                popup.setScene(new Scene(box));
+                popup.show();
 
-        });
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> popup.close());
+                delay.play();
 
-        Button editBtn = new Button("Edit");
-        editBtn.setOnAction(e -> showEditDialog(food));
+            });
+        }
 
-        HBox buttons = new HBox(10, addToCartBtn, editBtn);
+        Button editBtn = null;
+        if (!(this instanceof UserMenu)) {
+            editBtn = new Button("Edit");
+            editBtn.setOnAction(e -> showEditDialog(food));
+        }
+
+        HBox buttons;
+        if (addToCartBtn != null && editBtn != null) buttons = new HBox(10, addToCartBtn, editBtn);
+        else if (addToCartBtn != null) buttons = new HBox(10, addToCartBtn);
+        else if (editBtn != null) buttons = new HBox(10, editBtn);
+        else buttons = new HBox();
+
         buttons.setAlignment(Pos.CENTER);
-
         card.getChildren().addAll(imgView, name, desc, price, rating, buttons);
         return card;
     }
 
-    private void addFoodItem() {
+    protected void addFoodItem() {
         if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
             showAlert("Error", "No category selected.");
             return;
@@ -408,7 +439,7 @@ public class Menu {
         }
     }
 
-    private void updateFoodItem() {
+    protected void updateFoodItem() {
         if (currentEditingFood == null) return;
 
         String imageFilename = currentEditingFood.getImagePath();
@@ -435,7 +466,7 @@ public class Menu {
         }
     }
 
-    private void deleteFoodItem(FoodItems food) {
+    protected void deleteFoodItem(FoodItems food) {
         foodList.remove(food);
         try {
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
@@ -446,7 +477,7 @@ public class Menu {
         }
     }
 
-    private void populateFieldsForEdit(FoodItems food) {
+    protected void populateFieldsForEdit(FoodItems food) {
         currentEditingFood = food;
         nameField.setText(food.getName());
         detailsField.setText(food.getDetails());
@@ -462,7 +493,7 @@ public class Menu {
         ((VBox) addOrUpdateButton.getParent()).setManaged(true);
     }
 
-    private void clearFields() {
+    protected void clearFields() {
         nameField.clear();
         detailsField.clear();
         priceField.clear();
@@ -478,7 +509,7 @@ public class Menu {
         ((VBox) addOrUpdateButton.getParent()).setManaged(false);
     }
 
-    private void chooseImage() {
+    protected void chooseImage() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Food Image");
         fileChooser.getExtensionFilters().addAll(
@@ -546,7 +577,7 @@ public class Menu {
         }
     }
 
-    private void showCart() {
+    protected void showCart() {
         // Map all FoodItems by ID
         Map<Integer, FoodItems> foodMap = new HashMap<>();
         for (FoodItems item : foodList) {
@@ -670,7 +701,7 @@ public class Menu {
 
     // ================== CHECKOUT ===================
 
-    private void checkout() {
+    protected void checkout() {
         // Step 1: Calculate total
         double total = 0;
         Map<Integer, FoodItems> foodMap = new HashMap<>();
@@ -705,7 +736,7 @@ public class Menu {
 
     // ================== EDIT ===================
 
-    private void showEditDialog(FoodItems food) {
+    protected void showEditDialog(FoodItems food) {
         Stage dialog = new Stage();
         dialog.setTitle("Edit " + food.getName());
 

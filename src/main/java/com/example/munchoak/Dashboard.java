@@ -1,6 +1,7 @@
 package com.example.munchoak;
 
 import com.example.login.ProfileController;
+import com.example.manager.Session;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -76,7 +77,16 @@ public class Dashboard extends Application {
         ordersBtn.setOnAction(e -> updateContentSimple("Orders", "List and manage current orders."));
         menuBtn.setOnAction(e -> {
             contentPane.getChildren().clear();
-            contentPane.getChildren().add(new Menu().getView());
+
+            String username = Session.getCurrentUsername();
+            if ("admin".equalsIgnoreCase(username)) {
+                //System.out.println("Admin Logged in");
+                contentPane.getChildren().add(new AdminMenu().getView());
+            } else {
+                //System.out.println("User/Guest Logged in");
+                contentPane.getChildren().add(new UserMenu().getView());
+            }
+
         });
 
         reservationBtn.setOnAction(e -> {
