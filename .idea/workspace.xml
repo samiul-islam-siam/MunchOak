@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="profile added">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/BaseMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
-    </list>
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="User and Admin Split" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,7 +20,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Database" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -46,12 +31,12 @@
     &quot;assignee&quot;: &quot;samiul-islam-siam&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/samiul-islam-siam/MunchOak.git",
-    "accountId": "e658a277-d71f-446e-85d0-6d46ea0e0d5f"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/samiul-islam-siam/MunchOak.git&quot;,
+    &quot;accountId&quot;: &quot;e658a277-d71f-446e-85d0-6d46ea0e0d5f&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -73,7 +58,6 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;Application.Dashboard.executor&quot;: &quot;Run&quot;,
     &quot;Application.Home.executor&quot;: &quot;Run&quot;,
     &quot;Application.Launcher.executor&quot;: &quot;Run&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
@@ -83,10 +67,10 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/login/FXMLs&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/MunchOak/src/main/java/com/example/login&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.30804598&quot;,
@@ -95,25 +79,18 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\resources" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\login" />
+      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak\styles" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
     </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="com.example.munchoak" />
-    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.example.login" />
-      <recent name="com.example.view" />
       <recent name="com.example.munchoak" />
     </key>
   </component>
@@ -312,71 +289,39 @@
       <option name="project" value="LOCAL" />
       <updated>1762180711333</updated>
     </task>
-    <task id="LOCAL-00023" summary="new version">
+    <task id="LOCAL-00023" summary="id update">
       <option name="closed" value="true" />
-      <created>1762347585378</created>
+      <created>1762357239061</created>
       <option name="number" value="00023" />
       <option name="presentableId" value="LOCAL-00023" />
       <option name="project" value="LOCAL" />
-      <updated>1762347585378</updated>
+      <updated>1762357239061</updated>
     </task>
-    <task id="LOCAL-00024" summary="new version">
+    <task id="LOCAL-00024" summary="id update">
       <option name="closed" value="true" />
-      <created>1762348400480</created>
+      <created>1762357268652</created>
       <option name="number" value="00024" />
       <option name="presentableId" value="LOCAL-00024" />
       <option name="project" value="LOCAL" />
-      <updated>1762348400480</updated>
+      <updated>1762357268652</updated>
     </task>
-    <task id="LOCAL-00025" summary="README update">
+    <task id="LOCAL-00025" summary="User and Admin Split">
       <option name="closed" value="true" />
-      <created>1762348543294</created>
+      <created>1762490143828</created>
       <option name="number" value="00025" />
       <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1762348543294</updated>
+      <updated>1762490143828</updated>
     </task>
-    <task id="LOCAL-00026" summary="minor fix">
+    <task id="LOCAL-00026" summary="User and Admin Split">
       <option name="closed" value="true" />
-      <created>1762351458502</created>
+      <created>1762490353315</created>
       <option name="number" value="00026" />
       <option name="presentableId" value="LOCAL-00026" />
       <option name="project" value="LOCAL" />
-      <updated>1762351458502</updated>
+      <updated>1762490353315</updated>
     </task>
-    <task id="LOCAL-00027" summary="user id update">
-      <option name="closed" value="true" />
-      <created>1762363743884</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1762363743884</updated>
-    </task>
-    <task id="LOCAL-00028" summary="update">
-      <option name="closed" value="true" />
-      <created>1762365495189</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1762365495189</updated>
-    </task>
-    <task id="LOCAL-00029" summary="merging ui">
-      <option name="closed" value="true" />
-      <created>1762395372935</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1762395372935</updated>
-    </task>
-    <task id="LOCAL-00030" summary="profile added">
-      <option name="closed" value="true" />
-      <created>1762398829295</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1762398829295</updated>
-    </task>
-    <option name="localTasksCounter" value="31" />
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -390,6 +335,7 @@
     <MESSAGE value="Login package added" />
     <MESSAGE value="Login integration with Dashboard" />
     <MESSAGE value="New HistoryPage and Bill" />
+    <MESSAGE value="update" />
     <MESSAGE value="login updated" />
     <MESSAGE value="Guest Browsing implemented" />
     <MESSAGE value="Register page added" />
@@ -397,13 +343,8 @@
     <MESSAGE value="Login System update" />
     <MESSAGE value="UI merged" />
     <MESSAGE value="UI updated" />
-    <MESSAGE value="new version" />
-    <MESSAGE value="README update" />
-    <MESSAGE value="minor fix" />
-    <MESSAGE value="user id update" />
-    <MESSAGE value="update" />
-    <MESSAGE value="merging ui" />
-    <MESSAGE value="profile added" />
-    <option name="LAST_COMMIT_MESSAGE" value="profile added" />
+    <MESSAGE value="id update" />
+    <MESSAGE value="User and Admin Split" />
+    <option name="LAST_COMMIT_MESSAGE" value="User and Admin Split" />
   </component>
 </project>
