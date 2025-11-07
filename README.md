@@ -1,6 +1,34 @@
 # MunchOak
 Academic project for CSE 2104. This project is under development.
 
+## Directory
+    MunchOak/
+    │
+    ├── src/                        
+    │   └── main/                   
+    │       ├── java/
+    │       │   └── com/
+    │       │       ├── example/
+    │       │       │       ├── login/ 
+    │       │       │       ├── manager/
+    │       │       │       ├── munchoak/
+    │       │       │       └── view/ 
+    │       │       └── module-info.java                    
+    │       └── resources/          
+    │               └── com/
+    │                   └── example/
+    │                           ├── login/ 
+    │                           ├── manager/
+    │                           ├── munchoak/
+    │                           └── view/
+    ├── .idea/
+    ├── .mvn/ 
+    ├── target/
+    ├── .gigintore                       
+    ├── pom.xml
+    └── README.md
+
+
 ## Tools
   - IDE: IntelliJ IDEA Community Edition v2025.2.2
   - Programming Language: Java
