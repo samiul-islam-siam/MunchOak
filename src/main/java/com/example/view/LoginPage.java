@@ -357,11 +357,8 @@ public class LoginPage {
     }
 
     private void returnToHome() {
-
-        // Preserve current state before switching
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
-        // Capture current dimensions to initialize the new scene properly
         double currentWidth = primaryStage.getWidth();
         double currentHeight = primaryStage.getHeight();
 
@@ -373,16 +370,29 @@ public class LoginPage {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
 
-        // Create new scene with current dimensions to prevent size reset
         Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
+
+        // ✅ Reapply global stylesheet here
+        var css = getClass().getResource("/com/example/view/styles/style.css");
+        if (css != null) {
+            homeScene.getStylesheets().add(css.toExternalForm());
+            System.out.println("✅ CSS reapplied successfully: " + css);
+        } else {
+            System.out.println("❌ CSS not found! Check file path.");
+        }
+
         primaryStage.setScene(homeScene);
-        // Reapply state AFTER setting scene to ensure it takes effect on the new scene
+
         if (wasFullScreen) {
             primaryStage.setFullScreen(true);
         } else if (wasMaximized) {
             primaryStage.setMaximized(true);
         }
+
+        primaryStage.setTitle("Home Page + Extension");
+        primaryStage.show();
     }
+
 
     // --- FIXED: Handle both full screen and maximized without manual resizing ---
     private void attachResizeListeners() {

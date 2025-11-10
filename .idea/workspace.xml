@@ -4,13 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Chat service updated">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Chat service testing">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fidalgo-logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/location.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/reservation-bg.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/aboutus-style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/reservation-style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/network/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/network/ChatHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/network/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/network/chat_history.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/network/chat_history.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +89,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/munchoak",
+    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/view/styles",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.30804598",
@@ -90,11 +98,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\styles" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
@@ -107,8 +115,8 @@
       <recent name="com.example.munchoak" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.example.login" />
       <recent name="com.example.view" />
+      <recent name="com.example.login" />
       <recent name="com.example.munchoak" />
     </key>
   </component>
@@ -411,11 +419,18 @@
       <option name="project" value="LOCAL" />
       <updated>1762790625785</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Chat service testing">
+      <option name="closed" value="true" />
+      <created>1762793890352</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1762793890352</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Payment System updated" />
     <MESSAGE value="History updated" />
     <MESSAGE value="Cart updated" />
     <MESSAGE value="Login package added" />
@@ -440,6 +455,7 @@
     <MESSAGE value="history page update" />
     <MESSAGE value="Chat service added" />
     <MESSAGE value="Chat service updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Chat service updated" />
+    <MESSAGE value="Chat service testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chat service testing" />
   </component>
 </project>
