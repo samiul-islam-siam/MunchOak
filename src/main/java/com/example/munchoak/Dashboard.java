@@ -1,8 +1,9 @@
 package com.example.munchoak;
 
-import com.example.login.ProfileController;
 import com.example.manager.Session;
+import com.example.network.ChatClient;
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,9 +60,10 @@ public class Dashboard extends Application {
         Button loginBtn = createMenuButton("🔐", "Login");
         Button profileBtn = createMenuButton("👤", "Profile");
         Button aboutBtn = createMenuButton("/com/example/munchoak/about-us-icon.png", "About Us");
+        Button chatBtn = createMenuButton("/com/example/munchoak/chat-icon.png", "Chat");
 
         menuButtons.addAll(Arrays.asList(
-                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, historyBtn, loginBtn, profileBtn, aboutBtn
+                homeBtn, ordersBtn, menuBtn, reservationBtn, reportsBtn, historyBtn, loginBtn, profileBtn, aboutBtn, chatBtn
         ));
 
         // Put hamburger + menu buttons in sidebar
@@ -106,26 +109,6 @@ public class Dashboard extends Application {
         });
 
         loginBtn.setOnAction(e -> {
-//            try {
-//                javafx.fxml.FXMLLoader loader =
-//                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
-//                javafx.scene.Parent welcomeRoot = loader.load();
-//
-//                // Get controller from FXML
-//                com.example.login.WelcomeController controller = loader.getController();
-//
-//                // Call a custom method to modify it
-//                controller.openedFromDashboard();
-//
-//                // Switch to Welcome page (same stage)
-//                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-//                stage.setScene(new javafx.scene.Scene(welcomeRoot));
-//                stage.setTitle("Welcome");
-//                stage.show();
-//
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
             try {
                 // Get current stage from the clicked button
                 Stage currentStage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
@@ -154,6 +137,9 @@ public class Dashboard extends Application {
             }
         });
 
+        chatBtn.setOnAction(e -> {
+            openChatWindow();
+        });
 
         // Layout
         root.setLeft(sidebar);
@@ -253,10 +239,28 @@ public class Dashboard extends Application {
         contentPane.getChildren().add(v);
     }
 
-//    private void showHomePage() {
-//        contentPane.getChildren().clear();
-//        contentPane.getChildren().add(new HomePage().getView());
-//    }
+    @FXML
+    private void openChatWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
+            Stage chatStage = new Stage();
+            chatStage.setTitle("MunchOak - Live Chat");
+            chatStage.setScene(new Scene(loader.load()));
+            chatStage.show();
+
+            // ✅ Fix: use ChatClient, not ChatController
+            ChatClient controller = loader.getController();
+            chatStage.setOnCloseRequest(e -> {
+                try {
+                    // optional: add a closeConnection() method to ChatClient
+                    controller.closeConnection();
+                } catch (Exception ignored) {}
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         launch(args);
