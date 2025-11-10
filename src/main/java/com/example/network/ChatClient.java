@@ -31,18 +31,16 @@ public class ChatClient {
     @FXML
     public void initialize() {
         connectToServer();
-        askUserName();
+        getUserName();
         setupSendButton();
         setupCloseButton();   // ADDED
     }
 
-    private void askUserName() {
-        TextInputDialog dialog = new TextInputDialog("Guest");
-        dialog.setTitle("Enter Name");
-        dialog.setHeaderText("Welcome to MunchOak Chat Support");
-        dialog.setContentText("Enter your name:");
-        dialog.showAndWait().ifPresent(name -> username = name.trim());
+    private void getUserName() {
+        // Get logged-in username from session
+        username = com.example.manager.Session.getCurrentUsername();
 
+        // Fallback if somehow username is null
         if (username == null || username.isEmpty()) {
             username = "Guest";
         }

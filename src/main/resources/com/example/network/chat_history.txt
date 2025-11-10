@@ -1,8 +1,2 @@
-[customer]: Hello
-[manager]: Hi
-[manager]: How can I help you?
-[customer]: How to buy?
-[manager]: Goto menu page please, then add to cart.
-[customer]: Okay, thank you
-[manager]: You are most welcome
-[Guest]: Hello
+[guest]: Hello
+[admin]: Hi, there! How can I help you today?
