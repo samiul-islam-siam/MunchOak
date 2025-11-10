@@ -1,2 +1,9 @@
 [guest]: Hello
 [admin]: Hi, there! How can I help you today?
+null
+[Siam]: Hey
+null
+[guest]: Hello
+null
+[admin]: Hmm
+User: null had joined the chat.

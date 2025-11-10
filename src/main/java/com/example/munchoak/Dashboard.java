@@ -244,15 +244,22 @@ public class Dashboard extends Application {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage chatStage = new Stage();
-            chatStage.setTitle("MunchOak - Live Chat");
             chatStage.setScene(new Scene(loader.load()));
+
+            // Get the controller and set username explicitly
+            ChatClient controller = loader.getController();
+            String username = Session.getCurrentUsername();
+            if (username == null || username.isEmpty()) {
+                username = "Guest";
+            }
+            controller.setUsername(username);  // <-- pass username here
+
+            // Set stage title with username
+            chatStage.setTitle("Chatting as [" + username + "]");
             chatStage.show();
 
-            // ✅ Fix: use ChatClient, not ChatController
-            ChatClient controller = loader.getController();
             chatStage.setOnCloseRequest(e -> {
                 try {
-                    // optional: add a closeConnection() method to ChatClient
                     controller.closeConnection();
                 } catch (Exception ignored) {}
             });
@@ -261,6 +268,7 @@ public class Dashboard extends Application {
             e.printStackTrace();
         }
     }
+
 
     public static void main(String[] args) {
         launch(args);

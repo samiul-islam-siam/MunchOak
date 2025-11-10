@@ -31,7 +31,7 @@ public class ChatServer {
         }
     }
 
-    // ✅ Broadcast message to all clients
+    // ✅ Broadcast message to all clients (For Testing)
     static void broadcast(String message) {
         chatHistory.add(message);
         saveMessageToFile(message); // ✅ also save it
@@ -105,7 +105,8 @@ public class ChatServer {
             } finally {
                 try {
                     socket.close();
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
                 clients.remove(this);
             }
         }

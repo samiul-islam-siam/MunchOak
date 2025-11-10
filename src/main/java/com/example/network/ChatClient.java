@@ -1,6 +1,5 @@
 package com.example.network;
 
-import com.example.munchoak.Dashboard;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -20,7 +19,7 @@ public class ChatClient {
     @FXML
     private Button sendButton;
     @FXML
-    private Button closeButton;   // ADDED
+    private Button closeButton;
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -30,14 +29,14 @@ public class ChatClient {
 
     @FXML
     public void initialize() {
-        connectToServer();
-        getUserName();
-        setupSendButton();
-        setupCloseButton();   // ADDED
+        connectToServer();  // connect to the server
+        getUserName();  // get the username
+        setupSendButton();  // to send messages
+        setupCloseButton(); // to close the chat window
     }
 
     private void getUserName() {
-        // Get logged-in username from session
+        // Get username from session
         username = com.example.manager.Session.getCurrentUsername();
 
         // Fallback if somehow username is null
@@ -45,6 +44,12 @@ public class ChatClient {
             username = "Guest";
         }
     }
+
+    // Add this method in ChatClient
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
 
     private void setupSendButton() {
         sendButton.setOnAction(e -> sendMessage());
@@ -73,13 +78,14 @@ public class ChatClient {
         });
     }
 
-
-
     private void connectToServer() {
         try {
             socket = new Socket("localhost", 5050);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
+
+            // Send username to server immediately
+            // writer.println("User: " + username + " had joined the chat.");
 
             Thread listener = new Thread(() -> {
                 try {
@@ -113,6 +119,7 @@ public class ChatClient {
             if (socket != null && !socket.isClosed()) socket.close();
             if (reader != null) reader.close();
             if (writer != null) writer.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 }

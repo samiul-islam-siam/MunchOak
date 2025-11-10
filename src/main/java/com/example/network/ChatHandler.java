@@ -22,8 +22,6 @@ public class ChatHandler implements Runnable {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
 
-            // Ask username
-            output.println("Enter your name:");
             username = input.readLine();
             broadcast("🟢 " + username + " joined the chat");
 
@@ -51,6 +49,7 @@ public class ChatHandler implements Runnable {
         try {
             clients.remove(this);
             if (socket != null) socket.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 }
