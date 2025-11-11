@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.menu.MenuPage;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -67,7 +68,7 @@ public class HomePage implements HomePageComponent {
 
         Button menuBtn = new Button("MENU");
         menuBtn.getStyleClass().add("top-button");
-        menuBtn.setOnAction(e -> System.out.println("Menu button clicked"));
+        menuBtn.setOnAction(e -> openMenu());
 
         Button reservationBtn = new Button("Reservation");
         reservationBtn.getStyleClass().add("top-button");
@@ -529,5 +530,10 @@ public class HomePage implements HomePageComponent {
             System.out.println("🔄 Fallback to Modena stylesheet applied.");
         }
         return scene;
+    }
+
+    private void openMenu() {
+        MenuPage menuPage = new MenuPage(primaryStage);
+        primaryStage.setScene(menuPage.getMenuScene());
     }
 }
