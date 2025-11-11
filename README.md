@@ -42,3 +42,10 @@ Academic project for CSE 2104. This project is under development.
   - Suchita Islam Shuvra
 
 Run Home in munchoak package to start the application. Thank you.
+
+Chat Server Connection: (For Windows)
+Turn off Windows Defender Firewall.
+
+Use this command to check the connection:
+"ping x.x.x.x" (IPv4 address of the server e.g. 10.33.22.87)
+

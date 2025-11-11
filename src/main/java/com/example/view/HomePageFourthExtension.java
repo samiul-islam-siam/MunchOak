@@ -2,23 +2,23 @@ package com.example.view;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class HomePageFourthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
-    private final ImageView bgView;
     private final ImageView mainImageView;
     private final Label textLabel;
     private final ScrollPane scrollPane;
@@ -34,27 +34,22 @@ public class HomePageFourthExtension implements HomePageComponent {
         extensionRoot = new AnchorPane();
         extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
-        // Set background color #004aad
-        extensionRoot.setStyle("-fx-background-color: #004aad;");
-
-        // --- Background image ---
-        Image bgImage = new Image(getClass().getResource("/com/example/view/images/fourth_ext_bg.png").toExternalForm());
-        bgView = new ImageView(bgImage);
-        bgView.setPreserveRatio(true);
-        bgView.setFitWidth(getPrefWidth());
-        bgView.setFitHeight(getPrefHeight());
-        // Anchor background to fill the entire pane
-        AnchorPane.setTopAnchor(bgView, 0.0);
-        AnchorPane.setBottomAnchor(bgView, 0.0);
-        AnchorPane.setLeftAnchor(bgView, 0.0);
-        AnchorPane.setRightAnchor(bgView, 0.0);
+        // Set linear gradient background (horizontal: left to right)
+        Stop[] stops = new Stop[] {
+                new Stop(0, Color.web("#49bad8")),
+                new Stop(1, Color.web("#1c71bd"))
+        };
+        LinearGradient lg = new LinearGradient(
+                0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops
+        );
+        extensionRoot.setBackground(new Background(new BackgroundFill(lg, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- Single Image: Rectangular frame at left center ---
         Image mainImage = new Image(getClass().getResource("/com/example/view/images/cocktails.png").toExternalForm());
         mainImageView = new ImageView(mainImage);
         mainImageView.setPreserveRatio(false);
         double initialImgWidth = 0.4 * getPrefWidth();
-        double initialImgHeight = 0.8 * getPrefHeight();
+        double initialImgHeight = 0.7 * getPrefHeight();
         mainImageView.setFitWidth(initialImgWidth);
         mainImageView.setFitHeight(initialImgHeight);
         mainImageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 20, 0.3, 2, 8); -fx-border-color: white; -fx-border-width: 3; -fx-border-radius: 10;");
@@ -64,7 +59,9 @@ public class HomePageFourthExtension implements HomePageComponent {
         // --- Text content ---
         previewText = """
                 At Munch-Oak, we believe that true luxury lies not only in exquisite taste — but in generosity, sustainability, and heart.
-                Our journey began beneath the shade of an old oak tree — 
+                Our journey began beneath the shade of an old oak tree — a place where friends gathered, stories were shared, and meals brought people together.
+                From that spirit of connection, Munch-Oak was born: an elegant fine dining experience that celebrates nature's bounty while giving back to the 
+                community that sustains us. We believe that the beauty of fine dining reaches its fullest meaning when it gives back.
                 """;
         fullText = """
                 At Munch-Oak, we believe that true luxury lies not only in exquisite taste — but in generosity, sustainability, and heart.
@@ -80,13 +77,11 @@ public class HomePageFourthExtension implements HomePageComponent {
         textLabel.setFont(Font.font("Segoe UI", 16));
         textLabel.setTextFill(Color.WHITE);
         textLabel.setWrapText(true);
-        textLabel.setMaxWidth(366); // Initial
         textLabel.setAlignment(Pos.TOP_LEFT); // Ensure text aligns left within the label for readability
         textLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.2, 0, 1);");
 
         // --- Scrollable container - FIXED: No scrollbars, transparent ---
         scrollPane = new ScrollPane(textLabel);
-        scrollPane.setPrefWidth(381); // Initial
         // COMPLETELY REMOVE SCROLLBARS AND MAKE FULLY TRANSPARENT
         scrollPane.setStyle("""
                 -fx-background-color: transparent;
@@ -148,15 +143,15 @@ public class HomePageFourthExtension implements HomePageComponent {
             });
         });
 
-        // *** MOVED TO RIGHT BOTTOM ***
-        // Anchor textContainer to bottom-right instead of top-right
-        AnchorPane.setBottomAnchor(textContainer, 50.0);
+        // Position textContainer closer to the image
+        double initialGap = 50.0;
+        AnchorPane.setLeftAnchor(textContainer, 50.0 + initialImgWidth + initialGap);
         AnchorPane.setRightAnchor(textContainer, 50.0);
+        AnchorPane.setBottomAnchor(textContainer, 50.0);
         AnchorPane.setTopAnchor(textContainer, null); // Remove top anchor
-        AnchorPane.setLeftAnchor(textContainer, null); // Remove left anchor
 
         // --- Add all to root ---
-        extensionRoot.getChildren().addAll(bgView, mainImageView, textContainer);
+        extensionRoot.getChildren().addAll(mainImageView, textContainer);
 
         // Dynamic layout listeners
         ChangeListener<Number> layoutListener = (observable, oldValue, newValue) -> updateLayout();
@@ -176,11 +171,19 @@ public class HomePageFourthExtension implements HomePageComponent {
         if (width <= 0 || height <= 0) return;
 
         double imgW = 0.4 * width;
-        double imgH = 0.8 * height;
+        double imgH = 0.7 * height;
         mainImageView.setFitWidth(imgW);
         mainImageView.setFitHeight(imgH);
         AnchorPane.setTopAnchor(mainImageView, (height - imgH) / 2);
         AnchorPane.setLeftAnchor(mainImageView, 50.0);
+
+        // Position textContainer closer to the image
+        double gap = 50.0;
+        double leftPos = 50.0 + imgW + gap;
+        AnchorPane.setLeftAnchor(textContainer, leftPos);
+        AnchorPane.setRightAnchor(textContainer, 50.0);
+        AnchorPane.setBottomAnchor(textContainer, 50.0);
+        AnchorPane.setTopAnchor(textContainer, null); // Remove top anchor
 
         // *** Text container stays anchored to bottom-right, no left positioning needed ***
         // Just ensure it takes available width from right edge

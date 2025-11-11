@@ -138,8 +138,8 @@ public class LoginPage {
                         new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
                 javafx.scene.Parent welcomeRoot = loader.load();
 
-                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                stage.setScene(new javafx.scene.Scene(welcomeRoot));
+                Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(welcomeRoot));
                 stage.setTitle("Welcome");
                 stage.show();
 
@@ -155,7 +155,7 @@ public class LoginPage {
         guestBtn.setOnAction(e -> {
             try {
                 // Launch the main Dashboard as guest
-                com.example.munchoak.Dashboard dashboard = new com.example.munchoak.Dashboard();
+                Dashboard dashboard = new Dashboard();
                 Stage stage = new Stage();
                 dashboard.start(stage);
 

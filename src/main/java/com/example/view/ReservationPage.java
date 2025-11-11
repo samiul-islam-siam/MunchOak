@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.URL;
-import java.time.LocalDate;
 
 public class ReservationPage {
     private final Stage primaryStage;
@@ -55,42 +54,42 @@ public class ReservationPage {
         extensionSection.setAlignment(Pos.CENTER);
         extensionSection.setPadding(new Insets(60, 20, 100, 20));
         extensionSection.setStyle("""
-                    -fx-background-color: linear-gradient(to bottom, #FFDAB9, #FFF5E1);
-                    -fx-background-radius: 60 60 0 0;
-                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);
-                """);
+            -fx-background-color: linear-gradient(to bottom, #FFDAB9, #FFF5E1);
+            -fx-background-radius: 60 60 0 0;
+            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);
+        """);
 
         Label headline = new Label("Reserve Your Table");
         headline.setStyle("""
-                    -fx-font-size: 52px;
-                    -fx-text-fill: #001F3F;
-                    -fx-font-weight: bold;
-                    -fx-font-family: 'Arial Rounded MT Bold';
-                """);
+            -fx-font-size: 52px;
+            -fx-text-fill: #001F3F;
+            -fx-font-weight: bold;
+            -fx-font-family: 'Arial Rounded MT Bold';
+        """);
 
         // FULL NAME & PHONE
         TextField nameField = new TextField();
         nameField.setPromptText("Full Name");
         nameField.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 10;
-                    -fx-background-radius: 10;
-                    -fx-font-size: 16px;
-                    -fx-padding: 10 15 10 15;
-                """);
+            -fx-background-color: white;
+            -fx-border-color: #ccc;
+            -fx-border-radius: 10;
+            -fx-background-radius: 10;
+            -fx-font-size: 16px;
+            -fx-padding: 10 15 10 15;
+        """);
         nameField.setMaxWidth(350);
 
         TextField phoneField = new TextField();
         phoneField.setPromptText("Phone Number");
         phoneField.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 10;
-                    -fx-background-radius: 10;
-                    -fx-font-size: 16px;
-                    -fx-padding: 10 15 10 15;
-                """);
+            -fx-background-color: white;
+            -fx-border-color: #ccc;
+            -fx-border-radius: 10;
+            -fx-background-radius: 10;
+            -fx-font-size: 16px;
+            -fx-padding: 10 15 10 15;
+        """);
         phoneField.setMaxWidth(350);
 
         VBox personalBox = new VBox(15, nameField, phoneField);
@@ -123,19 +122,19 @@ public class ReservationPage {
         Label dateLabel = new Label("Date:");
         dateLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
 
-        DatePicker datePicker = new DatePicker(LocalDate.now());
+        DatePicker datePicker = new DatePicker();
         datePicker.setEditable(true); // allow manual typing
         datePicker.setStyle("""
-                    -fx-background-color: #FFB266;
-                    -fx-text-fill: #001F3F;
-                    -fx-font-weight: bold;
-                    -fx-font-size: 16px;
-                    -fx-background-radius: 10;
-                    -fx-border-radius: 10;
-                    -fx-padding: 6 15 6 15;
-                    -fx-cursor: hand;
-                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
-                """);
+            -fx-background-color: #FFB266;
+            -fx-text-fill: #001F3F;
+            -fx-font-weight: bold;
+            -fx-font-size: 16px;
+            -fx-background-radius: 10;
+            -fx-border-radius: 10;
+            -fx-padding: 6 15 6 15;
+            -fx-cursor: hand;
+            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+        """);
         datePicker.setPrefWidth(150);
 
         HBox topRow = new HBox(50, guestsBox, new HBox(5, dateLabel, datePicker));
@@ -151,12 +150,12 @@ public class ReservationPage {
         requestArea.setPrefWidth(400);
         requestArea.setWrapText(true);
         requestArea.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 0;
-                    -fx-background-radius: 0;
-                    -fx-font-size: 16px;
-                """);
+            -fx-background-color: white;
+            -fx-border-color: #ccc;
+            -fx-border-radius: 0;
+            -fx-background-radius: 0;
+            -fx-font-size: 16px;
+        """);
 
         // BOOK BUTTON
         Button bookButton = new Button("Book Now");
@@ -167,7 +166,8 @@ public class ReservationPage {
             String guests = guestsButton.getText();
             String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
             String request = requestArea.getText();
-            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone + "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
+            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
+                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
         });
 
         // FINAL EXTENSION LAYOUT
@@ -235,11 +235,11 @@ public class ReservationPage {
         dashboard.setPrefWidth(220);
         dashboard.setStyle("-fx-background-color: #F4A460;");
 
-        Button homeBtn = createDashboardButton("HOME");
-        Button menuBtn = createDashboardButton("MENU");
+        Button homeBtn    = createDashboardButton("HOME");
+        Button menuBtn    = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
-        Button aboutBtn = createDashboardButton("ABOUT US");
-        Button reviewBtn = createDashboardButton("REVIEW");
+        Button aboutBtn   = createDashboardButton("ABOUT US");
+        Button reviewBtn  = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
             HomePage homePage = new HomePage(primaryStage);

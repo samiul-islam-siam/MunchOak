@@ -80,7 +80,7 @@ public class ChatClient {
 
     private void connectToServer() {
         try {
-            socket = new Socket("localhost", 5050);
+            socket = new Socket("10.33.22.87", 5050);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
 

@@ -3,7 +3,10 @@ package com.example.view;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -23,13 +26,13 @@ public class HomePageEighthExtension implements HomePageComponent {
         // -----------------------------------------------------------------
         // 1. Three columns with content
         // -----------------------------------------------------------------
-        VBox left = createContactColumn();
+        VBox left   = createContactColumn();
         VBox center = createAddressColumn();
-        VBox right = createHoursColumn();
+        VBox right  = createHoursColumn();
 
-        HBox.setHgrow(left, Priority.ALWAYS);
+        HBox.setHgrow(left,   Priority.ALWAYS);
         HBox.setHgrow(center, Priority.ALWAYS);
-        HBox.setHgrow(right, Priority.ALWAYS);
+        HBox.setHgrow(right,  Priority.ALWAYS);
 
         // -----------------------------------------------------------------
         // 2. Layout: HBox for columns
@@ -171,8 +174,7 @@ public class HomePageEighthExtension implements HomePageComponent {
     }
 
     @Override
-    public void initialize() {
-    }
+    public void initialize() {}
 
     @Override
     public double getPrefHeight() {

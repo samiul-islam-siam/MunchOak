@@ -10,15 +10,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class HomePageFifthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
-    private final Region line1;
-    private final Region line2;
     private final ImageView leftImageView;
     private final ImageView rightImageView;
     private final VBox middleMenu;
@@ -28,23 +26,22 @@ public class HomePageFifthExtension implements HomePageComponent {
     private static final double PARALLAX_SPEED = 0.5;
 
     // Dynamic image limits
-    private static final double MAX_IMAGE_PERCENT = 0.28; // 28% of width
+    private static final double MAX_IMAGE_PERCENT = 0.25; // Reduced to 25% to prevent overlap
     private static final double ASPECT_RATIO = 440.0 / 300.0; // H:W
 
     // Spacing
-    private static final double EDGE_PADDING_PERCENT = 0.03; // 3% from edges
-    private static final double LINE_PADDING_PERCENT = 0.06; // 6% padding from lines
+    private static final double EDGE_PADDING_PERCENT = 0.05; // Increased to 5% for better spacing
 
     public HomePageFifthExtension() {
         extensionRoot = new AnchorPane();
         extensionRoot.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
-        // --- GRADIENT BACKGROUND ---
-        LinearGradient gradient = new LinearGradient(
-                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#000000")),
-                new Stop(1.0, Color.web("#3533cd"))
+        // --- RADIAL GRADIENT BACKGROUND ---
+        RadialGradient gradient = new RadialGradient(
+                0, 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.web("#5de0e6")),
+                new Stop(1.0, Color.web("#004aad"))
         );
         extensionRoot.setBackground(new Background(new BackgroundFill(
                 gradient, CornerRadii.EMPTY, Insets.EMPTY
@@ -57,23 +54,6 @@ public class HomePageFifthExtension implements HomePageComponent {
         leftImageView = createFramedImage(leftImg);
         rightImageView = createFramedImage(rightImg);
 
-        // --- GLOWING LINES (moved inward) ---
-        line1 = createGlowingLine();
-        line2 = createGlowingLine();
-
-        AnchorPane.setTopAnchor(line1, 0.0);
-        AnchorPane.setBottomAnchor(line1, 0.0);
-        AnchorPane.setTopAnchor(line2, 0.0);
-        AnchorPane.setBottomAnchor(line2, 0.0);
-
-        // Dynamic line positions with padding
-        line1.translateXProperty().bind(
-                extensionRoot.widthProperty().multiply(0.33).subtract(line1.widthProperty().divide(2))
-        );
-        line2.translateXProperty().bind(
-                extensionRoot.widthProperty().multiply(0.67).subtract(line2.widthProperty().divide(2))
-        );
-
         // --- MENU ---
         middleMenu = createMenuSection();
 
@@ -82,7 +62,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         extensionRoot.heightProperty().addListener((obs, old, newVal) -> updateLayout());
 
         // --- Add all ---
-        extensionRoot.getChildren().addAll(leftImageView, rightImageView, line1, line2, middleMenu);
+        extensionRoot.getChildren().addAll(leftImageView, rightImageView, middleMenu);
 
         initialize();
     }
@@ -188,33 +168,12 @@ public class HomePageFifthExtension implements HomePageComponent {
         rightImageView.setLayoutX(width - imageWidth - edgePadding);
         rightImageView.setLayoutY((height - imageHeight) / 2);
 
-        // --- GLOW LINES (inward) ---
-        double line1X = width * 0.33;
-        double line2X = width * 0.67;
-
-        // --- MENU: BETWEEN LINES + PADDING ---
-        double linePadding = width * LINE_PADDING_PERCENT; // 6%
-        double menuX = line1X + linePadding;
-        double menuWidth = line2X - line1X - 2 * linePadding;
-
-        middleMenu.setLayoutX(menuX);
+        // --- MENU: CENTERED ---
+        double menuWidth = width * 0.3; // Reduced to 30% to avoid overlap
         middleMenu.setPrefWidth(menuWidth);
         middleMenu.setMaxWidth(menuWidth);
+        middleMenu.setLayoutX((width - menuWidth) / 2);
         middleMenu.setLayoutY((height - middleMenu.getHeight()) / 2);
-    }
-
-    // --- Glowing line ---
-    private Region createGlowingLine() {
-        Region line = new Region();
-        line.setPrefWidth(2);
-        line.setStyle("-fx-background-color: white;");
-
-        DropShadow glow = new DropShadow();
-        glow.setColor(Color.rgb(255, 255, 255, 0.8));
-        glow.setRadius(10);
-        glow.setSpread(0.4);
-        line.setEffect(glow);
-        return line;
     }
 
     @Override
