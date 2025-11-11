@@ -1,0 +1,18 @@
+.text-field, .password-field {
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #27ae60;
+    -fx-border-width: 2;
+}
+
+.button:hover {
+    -fx-background-color: #2ecc71;
+}
+
+.hyperlink {
+    -fx-text-fill: #2980b9;
+}

@@ -1,0 +1,37 @@
+ /* styles/aboutus-styles.css - Additional styles for side panel and buttons */
+
+ .side-panel {
+     -fx-background-color: linear-gradient(to bottom, #ffecd2, #fcb69f);
+     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);
+ }
+
+ .top-button {
+     -fx-background-color: #d00000;
+     -fx-text-fill: white;
+     -fx-font-weight: bold;
+     -fx-font-size: 14px;
+     -fx-padding: 10 20 10 20;
+     -fx-background-radius: 5;
+     -fx-cursor: hand;
+     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+ }
+
+ .top-button:hover {
+     -fx-background-color: #a00000;
+     -fx-scale-x: 1.05;
+     -fx-scale-y: 1.05;
+     -fx-transition: all 0.2s ease;
+ }
+
+ .login-button {
+     -fx-background-color: #ff6b6b;
+ }
+
+ .login-button:hover {
+     -fx-background-color: #ff5252;
+ }
+
+ .home-nav {
+     -fx-background-color: linear-gradient(to bottom, rgba(208, 0, 0, 0.9), rgba(139, 0, 0, 0.9));
+     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 5);
+ }
