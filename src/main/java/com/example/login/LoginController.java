@@ -2,11 +2,8 @@ package com.example.login;
 
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
-import com.example.munchoak.Dashboard;
 import com.example.view.*;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -59,12 +56,14 @@ public class LoginController {
                 alert.setContentText("Welcome, " + username + "!");
                 alert.showAndWait();
 
-                Dashboard dashboard = new Dashboard();
-                Stage stage = new Stage();
-                dashboard.start(stage);
+                // ✅ Use the existing stage instead of creating a new one
+                Stage primaryStage = (Stage) loginButton.getScene().getWindow();
 
-                Stage currentStage = (Stage) loginButton.getScene().getWindow();
-                currentStage.close();
+                // ✅ Create LoginPage with the same stage and call returnToHome
+                LoginPage mainApp = new LoginPage(primaryStage);
+                mainApp.returnToHome();
+
+
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Login Failed");
@@ -77,36 +76,6 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-
-    @FXML
-    private void registerButtonActionPerformed() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/register.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) registerButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("Register");
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-//    ------Previous Version------
-//    @FXML
-//    private void backButtonActionPerformed() {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/welcome.fxml"));
-//            Parent root = loader.load();
-//            Stage stage = (Stage) backButton.getScene().getWindow();
-//            stage.setScene(new Scene(root));
-//            stage.setTitle("Welcome");
-//            stage.show();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     @FXML
     private void backButtonActionPerformed() {

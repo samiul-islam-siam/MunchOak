@@ -36,11 +36,4 @@ public interface HomePageComponent {
     default void initialize() {
         // Default: no-op. Subclasses can implement specific init logic.
     }
-    /**
-     * A human-readable name for this section (for debugging or logging).
-     * @return the section name.
-     */
-    default String getSectionName() {
-        return getClass().getSimpleName();
-    }
 }

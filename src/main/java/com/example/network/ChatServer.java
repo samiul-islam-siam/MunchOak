@@ -113,8 +113,13 @@ public class ChatServer {
 
         void sendMessage(String message) {
             if (out != null) {
-                out.println(message);
+                try {
+                    out.println(message);
+                } catch (Exception e) {
+                    System.err.println("Failed to send message to client: " + e.getMessage());
+                }
             }
         }
+
     }
 }

@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.manager.FileStorage;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
@@ -15,6 +16,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.Optional;
 
 public class ReservationPage {
     private final Stage primaryStage;
@@ -54,69 +57,79 @@ public class ReservationPage {
         extensionSection.setAlignment(Pos.CENTER);
         extensionSection.setPadding(new Insets(60, 20, 100, 20));
         extensionSection.setStyle("""
-            -fx-background-color: linear-gradient(to bottom, #FFDAB9, #FFF5E1);
-            -fx-background-radius: 60 60 0 0;
-            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);
-        """);
+                    -fx-background-color: linear-gradient(to bottom, #FFDAB9, #FFF5E1);
+                    -fx-background-radius: 60 60 0 0;
+                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, -2);
+                """);
 
         Label headline = new Label("Reserve Your Table");
         headline.setStyle("""
-            -fx-font-size: 52px;
-            -fx-text-fill: #001F3F;
-            -fx-font-weight: bold;
-            -fx-font-family: 'Arial Rounded MT Bold';
-        """);
+                    -fx-font-size: 52px;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-family: 'Arial Rounded MT Bold';
+                """);
 
         // FULL NAME & PHONE
         TextField nameField = new TextField();
         nameField.setPromptText("Full Name");
         nameField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #ccc;
-            -fx-border-radius: 10;
-            -fx-background-radius: 10;
-            -fx-font-size: 16px;
-            -fx-padding: 10 15 10 15;
-        """);
+                    -fx-background-color: white;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 10;
+                    -fx-background-radius: 10;
+                    -fx-font-size: 16px;
+                    -fx-padding: 10 15 10 15;
+                """);
         nameField.setMaxWidth(350);
 
         TextField phoneField = new TextField();
         phoneField.setPromptText("Phone Number");
         phoneField.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #ccc;
-            -fx-border-radius: 10;
-            -fx-background-radius: 10;
-            -fx-font-size: 16px;
-            -fx-padding: 10 15 10 15;
-        """);
+                    -fx-background-color: white;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 10;
+                    -fx-background-radius: 10;
+                    -fx-font-size: 16px;
+                    -fx-padding: 10 15 10 15;
+                """);
         phoneField.setMaxWidth(350);
 
         VBox personalBox = new VBox(15, nameField, phoneField);
         personalBox.setAlignment(Pos.CENTER);
 
-        // GUESTS COUNTER
+        // GUESTS SPINNER
         Label guestsLabel = new Label("Guests:");
         guestsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
 
-        Button guestsButton = new Button("1");
-        guestsButton.getStyleClass().add("dashboard-button");
-        guestsButton.setPrefWidth(120);
+        Spinner<Integer> guestSpinner = new Spinner<>(1, 20, 1); // min=1, max=20, initial=1
+        guestSpinner.setEditable(true);
+        guestSpinner.setPrefWidth(100);
+        // Match time/date style
+        guestSpinner.setStyle("""
+                    -fx-background-color: #FFB266;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 16px;
+                    -fx-background-radius: 10;
+                    -fx-border-radius: 10;
+                    -fx-border-color: transparent;
+                    -fx-cursor: hand;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+                """);
 
-        ContextMenu guestMenu = new ContextMenu();
-        MenuItem plus = new MenuItem("+");
-        MenuItem minus = new MenuItem("−");
-        guestMenu.getItems().addAll(plus, minus);
+// Style inner text field (the spinner editor)
+        guestSpinner.getEditor().setStyle("""
+                    -fx-background-color: transparent;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 16px;
+                    -fx-alignment: center;
+                """);
 
-        plus.setOnAction(e -> guestsButton.setText(String.valueOf(Integer.parseInt(guestsButton.getText()) + 1)));
-        minus.setOnAction(e -> {
-            int val = Integer.parseInt(guestsButton.getText());
-            if (val > 1) guestsButton.setText(String.valueOf(val - 1));
-        });
-
-        guestsButton.setOnMouseClicked(e -> guestMenu.show(guestsButton, e.getScreenX(), e.getScreenY()));
-        HBox guestsBox = new HBox(10, guestsLabel, guestsButton);
+        HBox guestsBox = new HBox(10, guestsLabel, guestSpinner);
         guestsBox.setAlignment(Pos.CENTER);
+
 
         // DATE PICKER
         Label dateLabel = new Label("Date:");
@@ -125,20 +138,49 @@ public class ReservationPage {
         DatePicker datePicker = new DatePicker();
         datePicker.setEditable(true); // allow manual typing
         datePicker.setStyle("""
-            -fx-background-color: #FFB266;
-            -fx-text-fill: #001F3F;
-            -fx-font-weight: bold;
-            -fx-font-size: 16px;
-            -fx-background-radius: 10;
-            -fx-border-radius: 10;
-            -fx-padding: 6 15 6 15;
-            -fx-cursor: hand;
-            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
-        """);
+                    -fx-background-color: #FFB266;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 16px;
+                    -fx-background-radius: 10;
+                    -fx-border-radius: 10;
+                    -fx-padding: 6 15 6 15;
+                    -fx-cursor: hand;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+                """);
         datePicker.setPrefWidth(150);
+// TIME SELECTOR
+        Label timeLabel = new Label("Time:");
+        timeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
 
-        HBox topRow = new HBox(50, guestsBox, new HBox(5, dateLabel, datePicker));
+        ComboBox<String> timeBox = new ComboBox<>();
+        for (int hour = 10; hour <= 22; hour++) {
+            timeBox.getItems().add(String.format("%02d:00", hour));
+        }
+        timeBox.setPromptText("Select Time");
+        timeBox.setStyle("""
+                    -fx-background-color: #FFB266;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 16px;
+                    -fx-background-radius: 10;
+                    -fx-border-radius: 10;
+                    -fx-padding: 6 15 6 15;
+                    -fx-cursor: hand;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+                """);
+        timeBox.setPrefWidth(150);
+
+// ROW CONTAINING GUESTS, DATE & TIME
+        HBox topRow = new HBox(50,
+                guestsBox,
+                new HBox(5, dateLabel, datePicker),
+                new HBox(5, timeLabel, timeBox)
+        );
         topRow.setAlignment(Pos.CENTER);
+
+        //topRow = new HBox(50, guestsBox, new HBox(5, dateLabel, datePicker));
+        //topRow.setAlignment(Pos.CENTER);
 
         // ADDITIONAL REQUESTS
         Label requestLabel = new Label("Additional Requests:");
@@ -150,24 +192,56 @@ public class ReservationPage {
         requestArea.setPrefWidth(400);
         requestArea.setWrapText(true);
         requestArea.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #ccc;
-            -fx-border-radius: 0;
-            -fx-background-radius: 0;
-            -fx-font-size: 16px;
-        """);
+                    -fx-background-color: white;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 0;
+                    -fx-background-radius: 0;
+                    -fx-font-size: 16px;
+                """);
+
 
         // BOOK BUTTON
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            String fullName = nameField.getText();
-            String phone = phoneField.getText();
-            String guests = guestsButton.getText();
-            String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
-            String request = requestArea.getText();
-            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
-                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
+//            String fullName = nameField.getText();
+//            String phone = phoneField.getText();
+//            String guests = guestsButton.getText();
+//            String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
+//            String request = requestArea.getText();
+//            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
+//                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
+            String name = nameField.getText().trim();
+            String phone = phoneField.getText().trim();
+            int guests = guestSpinner.getValue();
+            LocalDate date = datePicker.getValue();
+            String time = timeBox.getValue();
+
+            if (name.isEmpty() || phone.isEmpty() || date == null || time == null) {
+                showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
+                return;
+            }
+
+            String summary = "Reservation Summary:\n\n" +
+                    "Name: " + name + "\n" +
+                    "Phone: " + phone + "\n" +
+                    "Guests: " + guests + "\n" +
+                    "Date: " + date + "\n" +
+                    "Time: " + time + "\n" +
+                    "Requests: " + requestArea.getText();
+
+            Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
+                if (saved) {
+                    showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
+                            "Your table has been successfully reserved!\nWe look forward to serving you.");
+                    clearFields(nameField, phoneField, requestArea, datePicker, timeBox, guestSpinner);
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
+                }
+            }
+
         });
 
         // FINAL EXTENSION LAYOUT
@@ -212,6 +286,24 @@ public class ReservationPage {
         return scene;
     }
 
+    private Optional<ButtonType> showConfirm(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        return alert.showAndWait();
+    }
+
+    private void clearFields(TextField nameField, TextField phoneField, TextArea requestArea,
+                             DatePicker datePicker, ComboBox<String> timeBox, Spinner<Integer> guestSpinner) {
+        nameField.clear();
+        phoneField.clear();
+        requestArea.clear();
+        guestSpinner.getValueFactory().setValue(1);
+        datePicker.setValue(null);
+        timeBox.setValue(null);
+    }
+
     private HBox createNavBar() {
         HBox navBar = new HBox();
         navBar.setPadding(new Insets(15, 30, 15, 30));
@@ -235,11 +327,11 @@ public class ReservationPage {
         dashboard.setPrefWidth(220);
         dashboard.setStyle("-fx-background-color: #F4A460;");
 
-        Button homeBtn    = createDashboardButton("HOME");
-        Button menuBtn    = createDashboardButton("MENU");
+        Button homeBtn = createDashboardButton("HOME");
+        Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
-        Button aboutBtn   = createDashboardButton("ABOUT US");
-        Button reviewBtn  = createDashboardButton("REVIEW");
+        Button aboutBtn = createDashboardButton("ABOUT US");
+        Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
             HomePage homePage = new HomePage(primaryStage);
@@ -270,10 +362,11 @@ public class ReservationPage {
         }
     }
 
-    private void showAlert(String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(msg);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 }

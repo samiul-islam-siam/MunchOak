@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class ChatClient {
@@ -29,10 +30,10 @@ public class ChatClient {
 
     @FXML
     public void initialize() {
-        connectToServer();  // connect to the server
-        getUserName();  // get the username
-        setupSendButton();  // to send messages
-        setupCloseButton(); // to close the chat window
+        getUserName();        // ✅ First: ensure username exists
+        connectToServer();    // ✅ Then connect
+        setupSendButton();
+        setupCloseButton();
     }
 
     private void getUserName() {
@@ -80,12 +81,11 @@ public class ChatClient {
 
     private void connectToServer() {
         try {
-            socket = new Socket("10.33.22.87", 5050);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress("localhost", 5050), 5000);
+
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
-
-            // Send username to server immediately
-            // writer.println("User: " + username + " had joined the chat.");
 
             Thread listener = new Thread(() -> {
                 try {
@@ -102,11 +102,21 @@ public class ChatClient {
             listener.start();
 
         } catch (IOException e) {
-            chatArea.appendText("Unable to connect to server.\n");
+            Platform.runLater(() -> {
+                chatArea.appendText("Unable to connect to server.\n");
+                sendButton.setDisable(true);
+                messageField.setDisable(true);
+            });
         }
     }
 
+
     private void sendMessage() {
+        if (writer == null) {
+            chatArea.appendText("⚠️ Not connected to server.\n");
+            return;
+        }
+
         String text = messageField.getText().trim();
         if (!text.isEmpty()) {
             writer.println("[" + username + "]: " + text);
@@ -114,12 +124,17 @@ public class ChatClient {
         }
     }
 
+
     public void closeConnection() {
         try {
+            if (writer != null) {
+                writer.println("/exit"); // ✅ notify server before disconnecting
+            }
+
             if (socket != null && !socket.isClosed()) socket.close();
             if (reader != null) reader.close();
             if (writer != null) writer.close();
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
     }
+
 }

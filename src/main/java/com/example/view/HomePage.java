@@ -1,14 +1,20 @@
 package com.example.view;
 
+import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.History;
+import com.example.network.ChatClient;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,6 +30,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,13 +41,16 @@ public class HomePage implements HomePageComponent {
     private final Stage primaryStage;
     private final double WIDTH = 1000;
     private final double HEIGHT = 700;
+
     // --- Side Panel Dashboard ---
     private VBox sidePanel;
     private Pane overlay;
     private boolean panelOpen = false;
     private boolean loggedIn = false;
+
     // References to background layers
     private BorderPane content;
+
     // ScrollPane reference for reset
     private ScrollPane scrollPane;
     private List<HBox> heroGroups = new ArrayList<>();
@@ -49,6 +59,7 @@ public class HomePage implements HomePageComponent {
 
     public HomePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
         // --- HAMBURGER ICON ---
         Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
         ImageView hamburgerIcon = new ImageView(hamburgerImg);
@@ -158,6 +169,7 @@ public class HomePage implements HomePageComponent {
         for (HBox group : heroGroups) {
             group.prefWidthProperty().bind(content.widthProperty());
         }
+
         // Listen for width to be set before performing first transition
         ChangeListener<Number> widthListener = new ChangeListener<Number>() {
             @Override
@@ -192,6 +204,7 @@ public class HomePage implements HomePageComponent {
         fadeOut.setToValue(0.0);
         fadeOut.setOnFinished(e -> {
             content.setCenter(nextGroup);
+
             // Reset translates if any
             ImageView nextImg = (ImageView) nextGroup.getChildren().get(0);
             VBox nextTxt = (VBox) nextGroup.getChildren().get(1);
@@ -283,7 +296,7 @@ public class HomePage implements HomePageComponent {
     public VBox getFullPage() {
         VBox fullPage = new VBox();
         // Set linear gradient background for the full page (horizontal: left to right)
-        Stop[] stops = new Stop[] {
+        Stop[] stops = new Stop[]{
                 new Stop(0, Color.web("#49bad8")),
                 new Stop(1, Color.web("#1c71bd"))
         };
@@ -381,9 +394,31 @@ public class HomePage implements HomePageComponent {
         });
 
         Button profileBtn = createSideButton("Profile");
+        Button historyBtn = createSideButton("History");
         Button cartBtn = createSideButton("Cart");
         Button reserveBtn = createSideButton("Reservation");
+        Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
+
+        // TODO: Implement History Page, show when logged in
+// History Button Logic here
+//        historyBtn.setOnAction(e -> {
+//            content.getChildren().clear();
+//            content.getChildren().add(new History().getView());
+//        });
+
+        // TODO: Implement Profile Page and button logic
+// Profile Button Logic here
+//        profileBtn.setOnAction(e -> {
+//            try {
+//                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
+//                Node profileView = loader.load();
+//
+//                content.getChildren().setAll(profileView);
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//        });
 
         reserveBtn.setOnAction(e -> {
             e.consume();
@@ -394,6 +429,13 @@ public class HomePage implements HomePageComponent {
             PauseTransition pause = new PauseTransition(Duration.millis(10));
             pause.setOnFinished(evt -> openReservationPageDirectly());
             pause.play();
+        });
+
+        // TODO: Chat can be only done when logged in
+        chatBtn.setOnAction(e -> {
+            // if(loggedIn) {
+            openChatWindow();
+            // }
         });
 
         aboutBtn.setOnAction(e -> {
@@ -429,7 +471,7 @@ public class HomePage implements HomePageComponent {
             pause.play();
         });
 
-        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, aboutBtn, authBtn);
+        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn, authBtn);
         items.setAlignment(Pos.CENTER_LEFT);
         items.setFillWidth(true);
 
@@ -535,5 +577,36 @@ public class HomePage implements HomePageComponent {
     private void openMenu() {
         MenuPage menuPage = new MenuPage(primaryStage);
         primaryStage.setScene(menuPage.getMenuScene());
+    }
+
+    @FXML
+    private void openChatWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
+            Stage chatStage = new Stage();
+            chatStage.setScene(new Scene(loader.load()));
+
+            // Get the controller and set username explicitly
+            ChatClient controller = loader.getController();
+            String username = Session.getCurrentUsername();
+            if (username == null || username.isEmpty()) {
+                username = "Guest";
+            }
+            controller.setUsername(username);  // <-- pass username here
+
+            // Set stage title with username
+            chatStage.setTitle("Chatting as [" + username + "]");
+            chatStage.show();
+
+            chatStage.setOnCloseRequest(e -> {
+                try {
+                    controller.closeConnection();
+                } catch (Exception ignored) {
+                }
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
