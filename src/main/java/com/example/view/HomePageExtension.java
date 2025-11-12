@@ -33,9 +33,9 @@ public class HomePageExtension implements HomePageComponent {
         extensionRoot.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
-        // --- DEEP INDIGO BACKGROUND: #100267 ---
+        // --- BACKGROUND: #72a3ff ---
         extensionRoot.setBackground(new Background(new BackgroundFill(
-                Color.web("#100267"), CornerRadii.EMPTY, Insets.EMPTY
+                Color.web("#72a3ff"), CornerRadii.EMPTY, Insets.EMPTY
         )));
 
         // --- Fixed Logo ---
@@ -82,7 +82,7 @@ public class HomePageExtension implements HomePageComponent {
             section.setAlignment(Pos.CENTER);
             section.setPadding(new Insets(5));
             if (i < sectionCount - 1) {
-                section.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID,
+                section.setBorder(new Border(new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0))));
             }
             sectionsContainer.getChildren().add(section);

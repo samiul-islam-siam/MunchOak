@@ -4,15 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="User and Admin Split">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="menu page added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/AppetizersPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/DrinksPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/FastFoodPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/FromTheSeaPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MainCoursePage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuCategoryPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/SoupPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/SweetsPage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/BaseMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +35,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="FxmlFile" />
         <option value="Class" />
       </list>
     </option>
@@ -29,7 +43,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -67,6 +81,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Application.ChatServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Dashboard.executor&quot;: &quot;Run&quot;,
     &quot;Application.Home.executor&quot;: &quot;Run&quot;,
     &quot;Application.Launcher.executor&quot;: &quot;Run&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
@@ -74,12 +90,13 @@
     &quot;Application.RestaurantDashboard.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/MunchOak/src/main/java/com/example/login&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/example/view/images&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.30804598&quot;,
@@ -88,31 +105,27 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\resources" />
-      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\login" />
-      <recent name="C:\Users\User\IdeaProjects\MunchOak\src\main\java\com\example\munchoak" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\styles" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak\styles" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
     </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.munchoak" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.view" />
+      <recent name="com.example.login" />
+      <recent name="com.example.munchoak" />
+    </key>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -298,61 +311,148 @@
       <option name="project" value="LOCAL" />
       <updated>1762180711333</updated>
     </task>
-    <task id="LOCAL-00023" summary="id update">
+    <task id="LOCAL-00023" summary="new version">
       <option name="closed" value="true" />
-      <created>1762357239061</created>
+      <created>1762347585378</created>
       <option name="number" value="00023" />
       <option name="presentableId" value="LOCAL-00023" />
       <option name="project" value="LOCAL" />
-      <updated>1762357239061</updated>
+      <updated>1762347585378</updated>
     </task>
-    <task id="LOCAL-00024" summary="id update">
+    <task id="LOCAL-00024" summary="new version">
       <option name="closed" value="true" />
-      <created>1762357268652</created>
+      <created>1762348400480</created>
       <option name="number" value="00024" />
       <option name="presentableId" value="LOCAL-00024" />
       <option name="project" value="LOCAL" />
-      <updated>1762357268652</updated>
+      <updated>1762348400480</updated>
     </task>
-    <task id="LOCAL-00025" summary="User and Admin Split">
+    <task id="LOCAL-00025" summary="README update">
       <option name="closed" value="true" />
-      <created>1762490143828</created>
+      <created>1762348543294</created>
       <option name="number" value="00025" />
       <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1762490143828</updated>
+      <updated>1762348543294</updated>
     </task>
-    <task id="LOCAL-00026" summary="User and Admin Split">
+    <task id="LOCAL-00026" summary="minor fix">
       <option name="closed" value="true" />
-      <created>1762490353315</created>
+      <created>1762351458502</created>
       <option name="number" value="00026" />
       <option name="presentableId" value="LOCAL-00026" />
       <option name="project" value="LOCAL" />
-      <updated>1762490353315</updated>
+      <updated>1762351458502</updated>
     </task>
-    <task id="LOCAL-00027" summary="User and Admin Split">
+    <task id="LOCAL-00027" summary="user id update">
       <option name="closed" value="true" />
-      <created>1762490384237</created>
+      <created>1762363743884</created>
       <option name="number" value="00027" />
       <option name="presentableId" value="LOCAL-00027" />
       <option name="project" value="LOCAL" />
-      <updated>1762490384237</updated>
+      <updated>1762363743884</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="update">
+      <option name="closed" value="true" />
+      <created>1762365495189</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1762365495189</updated>
+    </task>
+    <task id="LOCAL-00029" summary="merging ui">
+      <option name="closed" value="true" />
+      <created>1762395372935</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1762395372935</updated>
+    </task>
+    <task id="LOCAL-00030" summary="profile added">
+      <option name="closed" value="true" />
+      <created>1762398829295</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1762398829295</updated>
+    </task>
+    <task id="LOCAL-00031" summary="resizing fixed">
+      <option name="closed" value="true" />
+      <created>1762446984354</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1762446984355</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Login system update">
+      <option name="closed" value="true" />
+      <created>1762495480624</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1762495480624</updated>
+    </task>
+    <task id="LOCAL-00033" summary="history page update">
+      <option name="closed" value="true" />
+      <created>1762496076366</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1762496076366</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Chat service added">
+      <option name="closed" value="true" />
+      <created>1762788729365</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1762788729365</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Chat service updated">
+      <option name="closed" value="true" />
+      <created>1762790625785</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1762790625785</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Chat service testing">
+      <option name="closed" value="true" />
+      <created>1762793890352</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1762793890352</updated>
+    </task>
+    <task id="LOCAL-00037" summary="UI update">
+      <option name="closed" value="true" />
+      <created>1762797697361</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1762797697361</updated>
+    </task>
+    <task id="LOCAL-00038" summary="new UI">
+      <option name="closed" value="true" />
+      <created>1762837370575</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1762837370575</updated>
+    </task>
+    <task id="LOCAL-00039" summary="menu page added">
+      <option name="closed" value="true" />
+      <created>1762838791723</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1762838791723</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="init commit" />
-    <MESSAGE value="Cart added" />
-    <MESSAGE value="updated" />
-    <MESSAGE value="Database update" />
-    <MESSAGE value="Payment System updated" />
-    <MESSAGE value="History updated" />
-    <MESSAGE value="Cart updated" />
-    <MESSAGE value="Login package added" />
     <MESSAGE value="Login integration with Dashboard" />
     <MESSAGE value="New HistoryPage and Bill" />
-    <MESSAGE value="update" />
     <MESSAGE value="login updated" />
     <MESSAGE value="Guest Browsing implemented" />
     <MESSAGE value="Register page added" />
@@ -360,8 +460,22 @@
     <MESSAGE value="Login System update" />
     <MESSAGE value="UI merged" />
     <MESSAGE value="UI updated" />
-    <MESSAGE value="id update" />
-    <MESSAGE value="User and Admin Split" />
-    <option name="LAST_COMMIT_MESSAGE" value="User and Admin Split" />
+    <MESSAGE value="new version" />
+    <MESSAGE value="README update" />
+    <MESSAGE value="minor fix" />
+    <MESSAGE value="user id update" />
+    <MESSAGE value="update" />
+    <MESSAGE value="merging ui" />
+    <MESSAGE value="profile added" />
+    <MESSAGE value="resizing fixed" />
+    <MESSAGE value="Login system update" />
+    <MESSAGE value="history page update" />
+    <MESSAGE value="Chat service added" />
+    <MESSAGE value="Chat service updated" />
+    <MESSAGE value="Chat service testing" />
+    <MESSAGE value="UI update" />
+    <MESSAGE value="new UI" />
+    <MESSAGE value="menu page added" />
+    <option name="LAST_COMMIT_MESSAGE" value="menu page added" />
   </component>
 </project>

@@ -1,18 +1,24 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
+import javafx.animation.FadeTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.util.Duration;
+import java.net.URL;
+import java.util.List;
 import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -20,7 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
+
 
 import java.io.File;
 import java.io.InputStream;
@@ -50,6 +56,8 @@ public class BaseMenu {
     protected HBox cartButtons;
 
     protected VBox cartBox;
+    private HBox navBar;
+
 
 
     protected Button viewCartButton;
@@ -59,7 +67,44 @@ public class BaseMenu {
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
+    public BaseMenu() {
+        mainLayout = new VBox();
+        mainLayout.setAlignment(Pos.TOP_CENTER);
+        mainLayout.setSpacing(0);
+        mainLayout.setStyle("-fx-background-color: white;");
 
+        // --- Navigation Bar ---
+        navBar = createNavBar();
+
+        // --- Banner Section ---
+        StackPane bannerSection = createBannerSection();
+
+        // --- Food Grid Section ---
+        foodContainer = new VBox();
+        foodContainer.setAlignment(Pos.TOP_CENTER);
+        foodContainer.setPadding(new Insets(20, 40, 40, 40));
+//        foodContainer.Hgap(30);
+//        foodContainer.setVgap(30);
+        foodContainer.setStyle("-fx-background-color: white;");
+        foodList = FXCollections.observableArrayList();
+        // --- Cart Buttons Section ---
+        cartButtons = new HBox(20);
+        cartButtons.setAlignment(Pos.CENTER);
+        cartButtons.setPadding(new Insets(20, 0, 40, 0));
+
+        Button viewCart = new Button("View Cart");
+        Button checkout = new Button("Checkout");
+        styleMainButton(viewCart);
+        styleMainButton(checkout);
+
+        cartButtons.getChildren().addAll(viewCart, checkout);
+
+        // --- Assemble Layout ---
+        mainLayout.getChildren().addAll(navBar, bannerSection, foodContainer, cartButtons);
+
+        // --- Load Foods ---
+        loadFoodItems();
+    }
     // Cart for the current user
     int userId = Session.getCurrentUserId();
 
@@ -115,7 +160,12 @@ public class BaseMenu {
         Button deleteCatBtn = new Button("Delete Category");
         categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
         inputGrid.add(categoryButtons, 1, 5);
+        categoryButtons.setSpacing(12);
+        categoryButtons.setPadding(new Insets(10, 0, 10, 0));
 
+        for (Node n : categoryButtons.getChildren()) {
+            if (n instanceof Button b) styleMainButton(b);
+        }
         addCatBtn.setOnAction(e -> addCategory());
         renameCatBtn.setOnAction(e -> renameCategory());
         deleteCatBtn.setOnAction(e -> deleteCategory());
@@ -147,12 +197,16 @@ public class BaseMenu {
         viewCartButton.setOnAction(e -> showCart());
 
         checkoutButton = new Button("Checkout");
-        checkoutButton.setOnAction(e -> checkout());
 
+        checkoutButton.setOnAction(e -> checkout());
+        styleMainButton(viewCartButton);
+        styleMainButton(checkoutButton);
         cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
         // ===== TOP "Add Food" BUTTON =====
         showAddFormBtn = new Button("Add Food");
+        styleMainButton(showAddFormBtn);
+
         showAddFormBtn.setOnAction(e -> {
             if (formBox.isVisible()) {
                 // Hide the form
@@ -166,17 +220,19 @@ public class BaseMenu {
             }
         });
 
-        // ===== MAIN LAYOUT ===== //
-//        VBox vbox = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
-//        vbox.setPadding(new Insets(5));
-//
-//        loadFoodItems();
-//        return vbox;
         mainLayout = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
         mainLayout.setPadding(new Insets(5));
         loadFoodItems();
         return mainLayout;
 
+    }
+    private void animateAddToCart(Node node) {
+        FadeTransition fade = new FadeTransition(Duration.millis(300), node);
+        fade.setFromValue(1);
+        fade.setToValue(0.6);
+        fade.setAutoReverse(true);
+        fade.setCycleCount(2);
+        fade.play();
     }
 
     // ================== CATEGORY MANAGEMENT ===================
@@ -185,6 +241,77 @@ public class BaseMenu {
         categoryBox.getItems().clear();
         categories = FileStorage.loadCategories();
         categoryBox.getItems().addAll(categories);
+    }
+
+
+    private StackPane createBannerSection() {
+        StackPane banner = new StackPane();
+        banner.setPrefHeight(250);
+
+        URL bannerUrl = getClass().getResource("/com/example/images/menu_banner.png");
+        ImageView bannerImage = new ImageView();
+        if (bannerUrl != null)
+            bannerImage.setImage(new Image(bannerUrl.toExternalForm()));
+        bannerImage.setFitHeight(250);
+        bannerImage.setPreserveRatio(true);
+
+        URL logoUrl = getClass().getResource("/com/example/images/overlay_logo.png");
+        ImageView logo = new ImageView();
+        if (logoUrl != null)
+            logo.setImage(new Image(logoUrl.toExternalForm()));
+        logo.setFitWidth(150);
+        logo.setPreserveRatio(true);
+
+        banner.getChildren().addAll(bannerImage, logo);
+        StackPane.setAlignment(logo, Pos.CENTER);
+
+        return banner;
+    }
+
+    private HBox createNavBar() {
+        HBox nav = new HBox(30);
+        nav.setAlignment(Pos.CENTER);
+        nav.setPadding(new Insets(20, 0, 20, 0));
+        nav.setStyle("-fx-background-color: #E53935;");
+
+        String[] buttons = {"Home", "About Us", "Reservation", "Cart", "Profile"};
+        for (String label : buttons) {
+            Button btn = new Button(label);
+            //btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold;");
+            btn.setStyle(
+                    "-fx-background-color: transparent;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 14px;" +
+                            "-fx-font-weight: bold;"
+            );
+            nav.getChildren().add(btn);
+        }
+        return nav;
+    }
+
+    private void styleMainButton(Button button) {
+        button.setStyle(
+                "-fx-background-color: #E53935;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 12;" +
+                        "-fx-cursor: hand;"
+        );
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: #C62828;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 12;"
+        ));
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: #E53935;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 12;"
+        ));
     }
 
     protected void addCategory() {
@@ -281,7 +408,7 @@ public class BaseMenu {
             String category = food.getCategory();
             if (!categoryFlows.containsKey(category)) {
                 Label categoryLabel = new Label(category);
-                categoryLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+                categoryLabel.setStyle("-fx-font-size: 22px; -fx-text-fill: #E53935; -fx-font-weight: bold;");
                 Separator separator = new Separator();
                 separator.setPrefWidth(500);
 
@@ -303,7 +430,15 @@ public class BaseMenu {
         VBox card = new VBox(8);
         card.setPadding(new Insets(10));
         card.setAlignment(Pos.TOP_CENTER);
-        card.setStyle("-fx-background-color: #f4f4f4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #000;-fx-border-width: 2;");
+        //card.setStyle("-fx-background-color: #fff; -fx-border-color: #e0e0e0; -fx-border-radius: 15; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);");
+        card.setStyle(
+                "-fx-background-color: #fff;" +
+                        "-fx-border-color: #e0e0e0;" +
+                        "-fx-border-radius: 15;" +
+                        "-fx-background-radius: 15;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 3);"
+        );
+
         card.setPrefWidth(220);
 
         ImageView imgView = new ImageView();
@@ -333,15 +468,18 @@ public class BaseMenu {
         imgView.setImage(image);
 
         Label name = new Label(food.getName());
-        name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
         Label desc = new Label(food.getDetails());
         desc.setWrapText(true);
+        desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
         Label price = new Label("Price: $" + food.getPrice());
+        price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
         Label rating = new Label("⭐ " + food.getRatings());
-
+        rating.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
 
         if (!(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
             addToCartBtn = new Button("Add to Cart");
+            styleMainButton(addToCartBtn);
             addToCartBtn.setOnAction(e -> {
                 cart.addToCart(food.getId(), 1);
 
@@ -350,7 +488,7 @@ public class BaseMenu {
                 popup.setAlwaysOnTop(true);
 
                 Label label = new Label(food.getName() + " added to cart!");
-                label.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px; -fx-font-size: 14px;");
+                label.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
 
                 VBox box = new VBox(label);
                 box.setAlignment(Pos.CENTER);
@@ -368,6 +506,7 @@ public class BaseMenu {
         Button editBtn = null;
         if (!(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
+            styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));
         }
 
@@ -439,6 +578,7 @@ public class BaseMenu {
         }
     }
 
+
     protected void updateFoodItem() {
         if (currentEditingFood == null) return;
 
@@ -480,17 +620,24 @@ public class BaseMenu {
     protected void populateFieldsForEdit(FoodItems food) {
         currentEditingFood = food;
         nameField.setText(food.getName());
+        nameField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333; -fx-padding: 5;");
         detailsField.setText(food.getDetails());
+        detailsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         priceField.setText(String.valueOf(food.getPrice()));
+        priceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         ratingsField.setText(String.valueOf(food.getRatings()));
+        ratingsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         imageFilenameLabel.setText(food.getImagePath());
         categoryBox.setValue(food.getCategory());
+        categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         selectedImageFile = null;
         addOrUpdateButton.setText("Update");
 
         // show form
         ((VBox) addOrUpdateButton.getParent()).setVisible(true);
         ((VBox) addOrUpdateButton.getParent()).setManaged(true);
+        styleMainButton(addOrUpdateButton);
+
     }
 
     protected void clearFields() {
@@ -741,18 +888,21 @@ public class BaseMenu {
         dialog.setTitle("Edit " + food.getName());
 
         Button updateBtn = new Button("Update");
+        styleMainButton(updateBtn);
         updateBtn.setOnAction(e -> {
             populateFieldsForEdit(food);  // fill input fields
             dialog.close();
         });
 
         Button deleteBtn = new Button("Delete");
+        styleMainButton(deleteBtn);
         deleteBtn.setOnAction(e -> {
             deleteFoodItem(food);
             dialog.close();
         });
 
         Button cancelBtn = new Button("Cancel");
+        styleMainButton(cancelBtn);
         cancelBtn.setOnAction(e -> dialog.close());
 
         VBox vbox = new VBox(15, new Label("Choose an action for " + food.getName()),

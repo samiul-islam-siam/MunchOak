@@ -12,7 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -21,60 +21,40 @@ import javafx.util.Duration;
 
 public class HomePageSixthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
-    private final Region line1;
-    private final Region line2;
     private final ImageView leftImageView;
     private final ImageView rightImageView;
     private final VBox middleMenu;
     private final Button enterMenuBtn;
-    private final Stage primaryStage; // Required for navigation
 
     private static final double PREF_WIDTH = 1000;
     private static final double PREF_HEIGHT = 700;
     private static final double PARALLAX_SPEED = 0.5;
 
-    private static final double MAX_IMAGE_PERCENT = 0.28;
-    private static final double ASPECT_RATIO = 440.0 / 300.0;
-    private static final double EDGE_PADDING_PERCENT = 0.03;
-    private static final double LINE_PADDING_PERCENT = 0.06;
-    private static final double MENU_TOP_PADDING = 60;
+    private static final double MAX_IMAGE_PERCENT = 0.25; // Reduced to prevent overlap
+    private static final double ASPECT_RATIO = 440.0 / 300.0; // H:W
+    private static final double EDGE_PADDING_PERCENT = 0.05; // Increased for better spacing
+    private static final double MENU_TOP_PADDING = 200; // Increased further to move text more downward
 
     public HomePageSixthExtension(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-
         extensionRoot = new AnchorPane();
         extensionRoot.setPrefSize(PREF_WIDTH, PREF_HEIGHT);
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
-        // --- GRADIENT BACKGROUND ---
-        LinearGradient gradient = new LinearGradient(
-                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#000000")),
-                new Stop(1.0, Color.web("#3533cd"))
+        // --- RADIAL GRADIENT BACKGROUND (UPSIDE DOWN: DARK CENTER, LIGHT EDGES) ---
+        RadialGradient gradient = new RadialGradient(
+                0, 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.web("#004aad")),
+                new Stop(1.0, Color.web("#5de0e6"))
         );
         extensionRoot.setBackground(new Background(new BackgroundFill(
                 gradient, CornerRadii.EMPTY, Insets.EMPTY
         )));
 
         // --- LEFT & RIGHT IMAGES ---
-        Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish.png").toExternalForm());
-        Image rightImg = new Image(getClass().getResource("/com/example/view/images/right_dish.png").toExternalForm());
+        Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish2.png").toExternalForm());
+        Image rightImg = new Image(getClass().getResource("/com/example/view/images/right_dish2.png").toExternalForm());
         leftImageView = createFramedImage(leftImg);
         rightImageView = createFramedImage(rightImg);
-
-        // --- GLOWING LINES ---
-        line1 = createGlowingLine();
-        line2 = createGlowingLine();
-        AnchorPane.setTopAnchor(line1, 0.0);
-        AnchorPane.setBottomAnchor(line1, 0.0);
-        AnchorPane.setTopAnchor(line2, 0.0);
-        AnchorPane.setBottomAnchor(line2, 0.0);
-        line1.translateXProperty().bind(
-                extensionRoot.widthProperty().multiply(0.33).subtract(line1.widthProperty().divide(2))
-        );
-        line2.translateXProperty().bind(
-                extensionRoot.widthProperty().multiply(0.67).subtract(line2.widthProperty().divide(2))
-        );
 
         // --- MIDDLE MENU: TOP-ALIGNED ---
         middleMenu = createMenuSection();
@@ -82,11 +62,10 @@ public class HomePageSixthExtension implements HomePageComponent {
         // --- ENTER MENU BUTTON ---
         enterMenuBtn = new Button("ENTER MENU");
         enterMenuBtn.getStyleClass().add("top-button");
-        //enterMenuBtn.setOnAction(e -> openMenuPage()); // Opens MenuPage
 
         StackPane buttonContainer = new StackPane(enterMenuBtn);
         buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
-        buttonContainer.setPadding(new Insets(0, 0, 44, 0));
+        buttonContainer.setPadding(new Insets(0, 0, 100, 0)); // Increased bottom padding to move button upward
         AnchorPane.setLeftAnchor(buttonContainer, 0.0);
         AnchorPane.setRightAnchor(buttonContainer, 0.0);
         AnchorPane.setBottomAnchor(buttonContainer, 0.0);
@@ -96,7 +75,7 @@ public class HomePageSixthExtension implements HomePageComponent {
         extensionRoot.heightProperty().addListener((obs, old, newVal) -> updateLayout());
 
         // --- Add all ---
-        extensionRoot.getChildren().addAll(leftImageView, rightImageView, line1, line2, middleMenu, buttonContainer);
+        extensionRoot.getChildren().addAll(leftImageView, rightImageView, middleMenu, buttonContainer);
 
         initialize();
     }
@@ -170,19 +149,6 @@ public class HomePageSixthExtension implements HomePageComponent {
         return item;
     }
 
-    // --- Glowing line ---
-    private Region createGlowingLine() {
-        Region line = new Region();
-        line.setPrefWidth(2);
-        line.setStyle("-fx-background-color: white;");
-        DropShadow glow = new DropShadow();
-        glow.setColor(Color.rgb(255, 255, 255, 0.8));
-        glow.setRadius(10);
-        glow.setSpread(0.4);
-        line.setEffect(glow);
-        return line;
-    }
-
     // --- UPDATE LAYOUT ---
     private void updateLayout() {
         double width = extensionRoot.getWidth();
@@ -211,11 +177,8 @@ public class HomePageSixthExtension implements HomePageComponent {
         rightImageView.setLayoutY((height - imageHeight) / 2);
 
         // --- MIDDLE MENU ---
-        double line1X = width * 0.33;
-        double line2X = width * 0.67;
-        double linePadding = width * LINE_PADDING_PERCENT;
-        double menuX = line1X + linePadding;
-        double menuWidth = line2X - line1X - 2 * linePadding;
+        double menuWidth = width * 0.3; // Reduced to avoid overlap
+        double menuX = (width - menuWidth) / 2;
         double menuTopY = MENU_TOP_PADDING * (width / PREF_WIDTH);
 
         middleMenu.setLayoutX(menuX);
@@ -253,12 +216,6 @@ public class HomePageSixthExtension implements HomePageComponent {
                 scrollPane.vvalueProperty().multiply(-PREF_HEIGHT * PARALLAX_SPEED)
         );
     }
-
-    // --- OPEN MENU PAGE ---
-//    private void openMenuPage() {
-//        MenuPage menuPage = new MenuPage(primaryStage);
-//        primaryStage.setScene(menuPage.getMenuScene());
-//    }
 
     @Override
     public AnchorPane getRoot() {

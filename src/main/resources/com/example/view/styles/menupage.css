@@ -1,0 +1,119 @@
+/* ================================
+   Menu Page Stylesheet
+   ================================ */
+
+/* Root background */
+.root {
+    -fx-background-color: #FFE4C4;
+}
+
+/* Top navigation bar */
+.nav-bar {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+    -fx-padding: 15 30 15 30;
+}
+
+.top-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+/* Back button arrow */
+.back-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.back-label {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 28px;
+}
+
+/* Title section */
+.menu-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: red;
+}
+
+/* Grid styling */
+.menu-grid {
+    -fx-hgap: 40;
+    -fx-vgap: 35;
+    -fx-alignment: center;
+}
+
+ /* Menu button (default state) */
+ .menu-button {
+     -fx-border-color: red;
+     -fx-border-width: 2;
+     -fx-background-color: white;
+     -fx-padding: 18 24 18 24;
+     -fx-font-size: 13px;
+     -fx-font-weight: bold;
+     -fx-text-fill: black;
+     -fx-alignment: center;
+     -fx-background-radius: 10;
+     -fx-cursor: hand;
+     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+     -fx-min-width: 160;
+     -fx-min-height: 80;
+     -fx-max-width: 180;
+     -fx-max-height: 100;
+     -fx-scale-x: 1;
+     -fx-scale-y: 1;
+     -fx-transition: all 0.25s ease-in-out;
+ }
+
+ /* Hover effect — red background + slight zoom */
+ .menu-button:hover {
+     -fx-background-color: red;
+     -fx-text-fill: white;
+     -fx-effect: dropshadow(three-pass-box, rgba(255,0,0,0.4), 8, 0, 0, 3);
+     -fx-scale-x: 1.08;
+     -fx-scale-y: 1.08;
+ }
+
+
+/* ScrollPane background */
+.scroll-pane {
+    -fx-background: #FFE4C4;
+    -fx-background-color: #FFE4C4;
+}
+/* Search field styling */
+.search-field {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-padding: 6 30 6 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+.search-field:focused {
+    -fx-border-color: red;
+    -fx-border-width: 2;
+}
+
+.search-field .text {
+    -fx-prompt-text-fill: gray;
+}
+ .nav-text-button {
+     -fx-background-color: transparent;
+     -fx-text-fill: #333;
+     -fx-font-size: 16px;
+     -fx-font-weight: bold;
+     -fx-cursor: hand;
+     -fx-padding: 6 12;
+     -fx-border-color: transparent;
+     -fx-border-width: 0 0 2 0; /* bottom border for underline */
+     -fx-border-style: solid;
+     -fx-transition: all 0.25s ease;
+ }
+
+ .nav-text-button:hover {
+     -fx-text-fill: red;
+     -fx-border-color: red; /* bottom underline appears */
+ }

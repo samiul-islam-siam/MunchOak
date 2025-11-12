@@ -174,7 +174,7 @@
    Labels & Text
    ================================ */
 .label, .title-label {
-    -fx-text-fill: white;
+    -fx-text-fill: #E53935;;
     -fx-font-weight: bold;
 }
 .title-label {

@@ -44,10 +44,13 @@ public class LoginPage {
 
     public Scene getLoginScene() {
         if (loginScene == null) {
-            root = buildRoot();                    // Build layout once
-            loginScene = new Scene(root, NORMAL_WIDTH, NORMAL_HEIGHT);
+            // Use current stage size if already in full screen/maximized, else normal
+            double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH) : NORMAL_WIDTH;
+            double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT) : NORMAL_HEIGHT;
+            root = buildRoot(); // Build layout once
+            loginScene = new Scene(root, initWidth, initHeight);
             loginScene.getStylesheets().add(getClass().getResource("/com/example/view/styles/style.css").toExternalForm());
-            attachMaximizedListener();
+            attachResizeListeners(); // Renamed and fixed to handle full screen too
         }
         return loginScene;
     }
@@ -135,8 +138,8 @@ public class LoginPage {
                         new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
                 javafx.scene.Parent welcomeRoot = loader.load();
 
-                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                stage.setScene(new javafx.scene.Scene(welcomeRoot));
+                Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(welcomeRoot));
                 stage.setTitle("Welcome");
                 stage.show();
 
@@ -152,7 +155,7 @@ public class LoginPage {
         guestBtn.setOnAction(e -> {
             try {
                 // Launch the main Dashboard as guest
-                com.example.munchoak.Dashboard dashboard = new com.example.munchoak.Dashboard();
+                Dashboard dashboard = new Dashboard();
                 Stage stage = new Stage();
                 dashboard.start(stage);
 
@@ -227,13 +230,12 @@ public class LoginPage {
                 alert.setContentText("An error occurred while registering the user.");
                 alert.showAndWait();
             }
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            javafx.application.Platform.runLater(() -> showLoginForm());
-                        }
-                    }, 1500);
+            new java.util.Timer().schedule(new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    javafx.application.Platform.runLater(() -> showLoginForm());
+                }
+            }, 1500);
         });
 
         Button backBtn = new Button("Back");
@@ -282,9 +284,7 @@ public class LoginPage {
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle(isError
-                ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
-                : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+        statusLabel.setStyle(isError ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
 
         FadeTransition fade = new FadeTransition(Duration.millis(3000), statusLabel);
         fade.setFromValue(1.0);
@@ -357,6 +357,11 @@ public class LoginPage {
     }
 
     private void returnToHome() {
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         HomePage homePage = new HomePage(primaryStage);
         VBox fullPage = homePage.getFullPage();
         ScrollPane scrollPane = new ScrollPane(fullPage);
@@ -365,36 +370,52 @@ public class LoginPage {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
 
-        double w = primaryStage.isMaximized() ? primaryStage.getWidth() : NORMAL_WIDTH;
-        double h = primaryStage.isMaximized() ? primaryStage.getHeight() : NORMAL_HEIGHT;
+        Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
 
-        Scene homeScene = new Scene(scrollPane, w, h);
+        // ✅ Reapply global stylesheet here
+        var css = getClass().getResource("/com/example/view/styles/style.css");
+        if (css != null) {
+            homeScene.getStylesheets().add(css.toExternalForm());
+            System.out.println("✅ CSS reapplied successfully: " + css);
+        } else {
+            System.out.println("❌ CSS not found! Check file path.");
+        }
+
         primaryStage.setScene(homeScene);
+
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        }
+
+        primaryStage.setTitle("Home Page + Extension");
+        primaryStage.show();
     }
 
-    // --- FIXED: Resize existing scene instead of replacing root ---
-    private void attachMaximizedListener() {
-        ChangeListener<Boolean> listener = (obs, wasMax, isNowMax) -> {
-            if (loginScene == null) return;
 
-            double width = isNowMax ? primaryStage.getWidth() : NORMAL_WIDTH;
-            double height = isNowMax ? primaryStage.getHeight() : NORMAL_HEIGHT;
-
-            // Resize the *existing* scene
-            loginScene.getWindow().setWidth(width);
-            loginScene.getWindow().setHeight(height);
-
-            // Optional: force layout
-            root.requestLayout();
+    // --- FIXED: Handle both full screen and maximized without manual resizing ---
+    private void attachResizeListeners() {
+        // Full screen listener: No manual resize needed; just force layout refresh
+        ChangeListener<Boolean> fullScreenListener = (obs, wasFull, isNowFull) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
         };
+        primaryStage.fullScreenProperty().addListener(fullScreenListener);
 
-        primaryStage.maximizedProperty().addListener(listener);
+        // Maximized listener: Same as above
+        ChangeListener<Boolean> maximizedListener = (obs, wasMax, isNowMax) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
+        };
+        primaryStage.maximizedProperty().addListener(maximizedListener);
 
-        // Also react when the scene is first shown
+        // Scene attach listener: Trigger layout if scene is set while in special mode
         primaryStage.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene == loginScene) {
-                listener.changed(primaryStage.maximizedProperty(),
-                        primaryStage.isMaximized(), primaryStage.isMaximized());
+            if (newScene == loginScene && (primaryStage.isFullScreen() || primaryStage.isMaximized())) {
+                root.requestLayout();
             }
         });
     }
