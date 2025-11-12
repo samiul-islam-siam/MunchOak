@@ -2,8 +2,6 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
-import com.example.munchoak.History;
-import com.example.network.ChatClient;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
