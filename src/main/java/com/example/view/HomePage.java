@@ -2,6 +2,7 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.network.ChatClient;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
