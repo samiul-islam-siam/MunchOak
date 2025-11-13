@@ -24,9 +24,39 @@ public class Payment {
         this.success = false;
     }
 
+    // Main payment entry point (don’t change arguments)
     public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
+        Stage stage = new Stage();
+        stage.setTitle("Select Payment Method");
+
+        Button cardBtn = new Button("Pay with Card");
+        Button cashBtn = new Button("Pay Cash");
+
+        cardBtn.setPrefWidth(180);
+        cashBtn.setPrefWidth(180);
+
+        VBox vbox = new VBox(20, new Label("Choose Payment Method:"), cardBtn, cashBtn);
+        vbox.setPadding(new Insets(25));
+        vbox.setAlignment(Pos.CENTER);
+
+        stage.setScene(new Scene(vbox, 300, 200));
+        stage.show();
+
+        cardBtn.setOnAction(e -> {
+            stage.close();
+            cardPayment(cart, foodMap);
+        });
+
+        cashBtn.setOnAction(e -> {
+            stage.close();
+            cashOnDelivery(cart, foodMap);
+        });
+    }
+
+    // --- CARD PAYMENT METHOD ---
+    private void cardPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
         Stage paymentStage = new Stage();
-        paymentStage.setTitle("Payment");
+        paymentStage.setTitle("Card Payment");
 
         Label cardLabel = new Label("Card Number:");
         TextField cardField = new TextField();
@@ -36,48 +66,79 @@ public class Payment {
         PasswordField pinField = new PasswordField();
         pinField.setPromptText("Enter PIN");
 
-        Button payButton = new Button("Pay");
+        Button payButton = new Button("Pay Now");
         payButton.setDefaultButton(true);
 
         VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
         vbox.setPadding(new Insets(20));
         vbox.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(vbox, 300, 200);
+        Scene scene = new Scene(vbox, 320, 220);
         paymentStage.setScene(scene);
         paymentStage.show();
 
         payButton.setOnAction(e -> {
-            if (cardField.getText().trim().isEmpty() || pinField.getText().trim().isEmpty()) {
+            String card = cardField.getText().trim();
+            String pin = pinField.getText().trim();
+
+            // simple validation
+            if (card.isEmpty() || pin.isEmpty()) {
                 new Alert(Alert.AlertType.ERROR, "Please fill all fields!").show();
                 return;
             }
+            if (card.length() < 8 || pin.length() < 4) {
+                new Alert(Alert.AlertType.ERROR, "Invalid card or PIN!").show();
+                return;
+            }
 
+            // payment success
             this.success = true;
             paymentStage.close();
 
             Bill bill = new Bill(cart, this);
             String receipt = bill.generateReceipt(foodMap);
 
-            Stage billStage = new Stage();
-            billStage.setTitle("Bill Receipt");
-
-            TextArea receiptArea = new TextArea(receipt);
-            receiptArea.setEditable(false);
-            receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-            receiptArea.setPrefSize(500, 400);
-
-            VBox billBox = new VBox(15, receiptArea);
-            billBox.setPadding(new Insets(20));
-            billBox.setAlignment(Pos.CENTER);
-
-            billStage.setScene(new Scene(billBox));
-            billStage.show();
-
-            cart.getBuyHistory().clear(); // empty cart after payment
+            showBill(receipt);
+            cart.getBuyHistory().clear();
         });
     }
 
+    // --- CASH ON DELIVERY METHOD ---
+    private void cashOnDelivery(Cart cart, Map<Integer, FoodItems> foodMap) {
+        this.success = false; // not paid yet
+
+        Bill bill = new Bill(cart, this);
+        String receipt = bill.generateReceipt(foodMap);
+
+        // modify receipt to reflect pending payment
+        receipt += "\n-----------------------------------\n";
+        receipt += "Payment Method: Cash\n";
+        receipt += "Status: Pending Payment\n";
+        receipt += "-----------------------------------\n";
+
+        showBill(receipt);
+        cart.getBuyHistory().clear();
+    }
+
+    // --- Helper to show receipt window ---
+    private void showBill(String receipt) {
+        Stage billStage = new Stage();
+        billStage.setTitle("Bill Receipt");
+
+        TextArea receiptArea = new TextArea(receipt);
+        receiptArea.setEditable(false);
+        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+        receiptArea.setPrefSize(500, 400);
+
+        VBox box = new VBox(15, receiptArea);
+        box.setPadding(new Insets(20));
+        box.setAlignment(Pos.CENTER);
+
+        billStage.setScene(new Scene(box));
+        billStage.show();
+    }
+
+    // --- Getters ---
     public int getId() {
         return id;
     }

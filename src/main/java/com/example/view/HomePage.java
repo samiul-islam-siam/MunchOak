@@ -2,6 +2,7 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.History;
 import com.example.network.ChatClient;
 import javafx.animation.*;
 import javafx.application.Application;
@@ -366,6 +367,23 @@ public class HomePage implements HomePageComponent {
         });
     }
 
+    private void openHistoryPageDirectly() {
+        Platform.runLater(() -> {
+            History history = new History(primaryStage);
+            Scene historyScene = history.getScene();
+            double w = primaryStage.getWidth();
+            double h = primaryStage.getHeight();
+            boolean fs = primaryStage.isFullScreen();
+            boolean max = primaryStage.isMaximized();
+            primaryStage.setScene(historyScene);
+            primaryStage.setWidth(w);
+            primaryStage.setHeight(h);
+            if (fs) primaryStage.setFullScreen(true);
+            else if (max) primaryStage.setMaximized(true);
+            primaryStage.centerOnScreen();
+        });
+    }
+
     private void createOverlay() {
         overlay = new Pane();
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
@@ -400,10 +418,16 @@ public class HomePage implements HomePageComponent {
 
         // TODO: Implement History Page, show when logged in
 // History Button Logic here
-//        historyBtn.setOnAction(e -> {
-//            content.getChildren().clear();
-//            content.getChildren().add(new History().getView());
-//        });
+        historyBtn.setOnAction(e -> {
+            e.consume();
+            if (scrollPane != null) {
+                scrollPane.setVvalue(0.0);
+            }
+            toggleSidePanel();
+            PauseTransition pause = new PauseTransition(Duration.millis(10));
+            pause.setOnFinished(evt -> openHistoryPageDirectly());
+            pause.play();
+        });
 
         // TODO: Implement Profile Page and button logic
 // Profile Button Logic here

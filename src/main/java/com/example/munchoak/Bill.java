@@ -19,7 +19,7 @@ public class Bill {
         sb.append("Payment ID : ").append(payment.getId()).append("\n");
         sb.append("Date/Time  : ").append(payment.getTimestamp()
                 .substring(0, 19).replace("T", " ")).append("\n");
-        sb.append("Status     : ").append(payment.isSuccess() ? "Paid" : "Failed").append("\n");
+        sb.append("Pay Status : ").append(payment.isSuccess() ? "Paid" : "Pending").append("\n");
         sb.append("--------------------------------------------\n");
         sb.append(String.format("%-20s %5s %10s\n", "Item", "Qty", "Price"));
         sb.append("--------------------------------------------\n");

@@ -11,7 +11,9 @@ Academic project for CSE 2104. This project is under development.
     │       │       ├── example/
     │       │       │       ├── login/ 
     │       │       │       ├── manager/
+    │       │       │       ├── menu/
     │       │       │       ├── munchoak/
+    │       │       │       ├── network/
     │       │       │       └── view/ 
     │       │       └── module-info.java                    
     │       └── resources/          
@@ -20,6 +22,7 @@ Academic project for CSE 2104. This project is under development.
     │                           ├── login/ 
     │                           ├── manager/
     │                           ├── munchoak/
+    │                           ├── network/
     │                           └── view/
     ├── .idea/
     ├── .mvn/ 
