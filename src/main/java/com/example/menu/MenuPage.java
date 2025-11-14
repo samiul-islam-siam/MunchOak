@@ -1,7 +1,6 @@
 package com.example.menu;
 import javafx.scene.Node;
 import com.example.view.HomePage;
-import com.example.munchoak.guestMenu;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -17,8 +16,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import com.example.munchoak.BaseMenu;
-import java.util.List;
 
 public class MenuPage {
     private final Stage primaryStage;
@@ -55,7 +52,7 @@ public class MenuPage {
         BaseMenu menu;
         String username = com.example.manager.Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
-            menu = new com.example.munchoak.AdminMenu();
+            menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if("guest".equalsIgnoreCase(username))
         {
@@ -63,7 +60,7 @@ public class MenuPage {
             System.out.println("Guest Menu loaded in MenuPage");
         }
         else {
-            menu = new com.example.munchoak.UserMenu();
+            menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
         Node menuView = menu.getView();

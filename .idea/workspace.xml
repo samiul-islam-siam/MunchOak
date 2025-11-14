@@ -127,19 +127,6 @@
       <recent name="com.example.munchoak" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="MunchOak" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="MunchOak" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="" />

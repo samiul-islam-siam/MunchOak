@@ -1,6 +1,7 @@
-package com.example.munchoak;
+package com.example.menu;
 
 import com.example.manager.FileStorage;
+import com.example.munchoak.FoodItems;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 

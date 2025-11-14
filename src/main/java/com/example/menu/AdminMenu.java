@@ -1,5 +1,5 @@
 
-package com.example.munchoak;
+package com.example.menu;
 
 import javafx.scene.Node;
 

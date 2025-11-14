@@ -24,6 +24,8 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
+    private static final File USER_FILE = new File("src/main/resources/com/example/manager/data/users.dat");
+
     static {
         ensureDataDir();
     }
@@ -113,7 +115,7 @@ public class FileStorage {
                 String category = dis.readUTF();
                 list.add(new FoodItems(id, name, details, price, ratings, imagePath, category));
             }
-        }catch (EOFException ignored) {
+        } catch (EOFException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -501,6 +503,223 @@ public class FileStorage {
             this.timestamp = timestamp;
             this.amount = amount;
             this.paymentMethod = paymentMethod;
+        }
+    }
+
+    // Shuvra added
+//    public static File getUserFile() {
+//        return USER_FILE; // or whatever variable holds your user data file
+//    }
+
+    // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
+    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+
+    static {
+        try {
+            ensureAdminFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    private static void ensureAdminFile() throws IOException {
+//        ensureDataDir();
+//        if (!ADMIN_FILE.exists()) {
+//            try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
+//                fw.write("admin123"); // default admin password
+//            }
+//        }
+//    }
+//
+//    public static boolean verifyAdminPassword(String password) throws IOException {
+//        return password.equals(readText(ADMIN_FILE).trim());
+//    }
+//
+//    public static void setAdminPassword(String newPassword) throws IOException {
+//        try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
+//            fw.write(newPassword);
+//        }
+//    }
+
+    // ---------------- ADMIN USER MANAGEMENT ----------------
+//    public static List<String[]> readAllUsersSimple() throws IOException {
+//        List<String[]> users = new ArrayList<>();
+//        for (String[] user : loadUsers()) {
+//            users.add(user);
+//        }
+//        return users;
+//    }
+//
+//    public static int getUserCount() {
+//        return loadUsers().size();
+//    }
+//
+//    // ---------------- HELPERS ----------------
+//    private static String readText(File f) throws IOException {
+//        StringBuilder sb = new StringBuilder();
+//        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+//            String line;
+//            while ((line = br.readLine()) != null) sb.append(line);
+//        }
+//        return sb.toString();
+//    }
+//
+//    // USER FILE Handling
+//    public static List<String> readAllUsers() throws IOException {
+//        List<String> users = new ArrayList<>();
+//        if (!USERS_FILE.exists()) return users;
+//
+//        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
+//            String line;
+//            while ((line = br.readLine()) != null) {
+//                users.add(line); // Or format as "username - email"
+//            }
+//        }
+//        return users;
+//    }
+//
+
+    ////    public static void appendUser(String username, String email, String password) throws IOException {
+    ////        String salt = PasswordUtils.generateSalt();
+    ////        String hashedPassword = PasswordUtils.hashPassword(password, salt);
+    ////
+    ////        // Store like: username,email,salt:hash
+    ////        String line = username + "," + email + "," + salt + ":" + hashedPassword + "\n";
+    ////        java.nio.file.Files.write(USERS_FILE.toPath(), line.getBytes(), java.nio.file.StandardOpenOption.APPEND, java.nio.file.StandardOpenOption.CREATE);
+    ////    }
+//
+//    public static boolean verifyUserPassword(String username, String password) throws IOException {
+//        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
+//        for (String line : lines) {
+//            String[] parts = line.split(",");
+//            if (parts[0].equals(username)) {
+//                String[] saltAndHash = parts[2].split(":");
+//                return PasswordUtils.verifyPassword(password, saltAndHash[0], saltAndHash[1]);
+//            }
+//        }
+//        return false;
+//    }
+//
+//    // Example update password
+//    public static void updateUserPassword(String username, String newPassword) throws IOException {
+//        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
+//        for (int i = 0; i < lines.size(); i++) {
+//            String[] parts = lines.get(i).split(",");
+//            if (parts[0].equals(username)) {
+//                String salt = PasswordUtils.generateSalt();
+//                String hash = PasswordUtils.hashPassword(newPassword, salt);
+//                lines.set(i, parts[0] + "," + parts[1] + "," + salt + ":" + hash);
+//                break;
+//            }
+//        }
+//        java.nio.file.Files.write(USERS_FILE.toPath(), lines);
+//    }
+//}
+// ---------------- ADMIN PASSWORD MANAGEMENT ----------------
+//private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+
+    static {
+        try {
+            ensureDataDir();
+            ensureAdminFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void ensureAdminFile() throws IOException {
+        if (!ADMIN_FILE.exists()) {
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(ADMIN_FILE))) {
+                dos.writeUTF("admin123"); // default admin password
+            }
+        }
+    }
+
+    public static boolean verifyAdminPassword(String password) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(ADMIN_FILE))) {
+            String saved = dis.readUTF().trim();
+            return password.equals(saved);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void setAdminPassword(String newPassword) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(ADMIN_FILE, false))) {
+            dos.writeUTF(newPassword);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ---------------- ADMIN USER MANAGEMENT ----------------
+    public static List<String[]> readAllUsersSimple() {
+        return new ArrayList<>(loadUsers());
+    }
+
+    public static int getUserCount() {
+        return loadUsers().size();
+    }
+
+    // ---------------- USER PASSWORD UTILITIES ----------------
+    public static boolean verifyUserPassword(String username, String password) {
+        ensureDataDir();
+        if (!USERS_FILE.exists()) return false;
+
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(USERS_FILE))) {
+            while (dis.available() > 0) {
+                String uname = dis.readUTF();
+                String email = dis.readUTF();
+                String pwd = dis.readUTF();
+                dis.readInt();
+//                String saltAndHash = dis.readUTF();
+//                dis.readInt(); // userId, ignored here
+//
+//                if (uname.equals(username)) {
+//                    String[] parts = saltAndHash.split(":");
+//                    if (parts.length != 2) return false;
+//                    return PasswordUtils.verifyPassword(password, parts[0], parts[1]);
+//                }
+                if (uname.equals(username)) {
+                    return pwd.equals(password); // compare directly
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void updateUserPassword(String username, String newPassword) {
+        ensureDataDir();
+        List<String[]> users = loadUsers(); // load all users
+        boolean updated = false;
+
+        for (int i = 0; i < users.size(); i++) {
+            String[] u = users.get(i);
+            if (u[0].equals(username)) {
+                String salt = PasswordUtils.generateSalt();
+                String hash = PasswordUtils.hashPassword(newPassword, salt);
+                //u[2] = salt + ":" + hash; // replace password field
+                u[2]=newPassword;
+                updated = true;
+                break;
+            }
+        }
+
+        if (updated) {
+            // rewrite the USERS_FILE
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, false))) {
+                for (String[] u : users) {
+                    dos.writeUTF(u[0]);  // username
+                    dos.writeUTF(u[1]);  // email
+                    dos.writeUTF(u[2]);  // salt:hash
+                    dos.writeInt(Integer.parseInt(u[3])); // userId
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

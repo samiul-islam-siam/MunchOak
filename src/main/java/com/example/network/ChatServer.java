@@ -26,7 +26,7 @@ public class ChatServer {
     public static void main(String[] args) {
         ensureHistoryDir();
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("💬 Chat Server on port " + PORT);
+            System.out.println("Chat Server running on port " + PORT);
             while (true) {
                 Socket socket = serverSocket.accept();
                 ClientHandler ch = new ClientHandler(socket);

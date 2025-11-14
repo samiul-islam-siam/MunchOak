@@ -1,6 +1,9 @@
-package com.example.munchoak;
+package com.example.menu;
 
 import com.example.manager.FileStorage;
+import com.example.munchoak.Cart;
+import com.example.munchoak.FoodItems;
+import com.example.munchoak.Payment;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
