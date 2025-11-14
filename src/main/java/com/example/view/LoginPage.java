@@ -406,7 +406,7 @@ public class LoginPage {
         fadeOut.play();
     }
 
-    private void openAdminDashboard() {
+    public void openAdminDashboard() {
         BorderPane dashboard = new BorderPane();
         dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
 
