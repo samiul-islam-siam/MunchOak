@@ -1,7 +1,8 @@
 module com.example.munchoak {
     requires javafx.controls;
     requires javafx.fxml;
-
+    requires javafx.graphics;
+    requires java.desktop;
 
     opens com.example.munchoak to javafx.fxml;
     opens com.example.login to javafx.fxml;

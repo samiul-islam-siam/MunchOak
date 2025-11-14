@@ -12,12 +12,19 @@ public class Session {
         currentUserId = id;
     }
 
-    public static String getCurrentUsername()
-    {
+    public static String getCurrentUsername() {
         return currentUsername;
     }
-    public static void setCurrentUsername(String name)
-    {
+
+    public static void setCurrentUsername(String name) {
         currentUsername = name;
+    }
+
+    public static String getCurrentRole() {
+        if (currentUsername.equals("admin")) {
+            return "ADMIN";
+        } else {
+            return "USER";
+        }
     }
 }

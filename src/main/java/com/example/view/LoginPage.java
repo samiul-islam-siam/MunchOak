@@ -1,7 +1,6 @@
 package com.example.view;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.Dashboard;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
@@ -153,18 +152,7 @@ public class LoginPage {
 
         Button guestBtn = createLoginButton("GUEST");
         guestBtn.setOnAction(e -> {
-            try {
-                // Launch the main Dashboard as guest
-                Dashboard dashboard = new Dashboard();
-                Stage stage = new Stage();
-                dashboard.start(stage);
-
-                // Close the Login window
-                Stage currentStage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                currentStage.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            returnToHome();
         });
 
         buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn);
@@ -356,7 +344,7 @@ public class LoginPage {
         timer.start();
     }
 
-    private void returnToHome() {
+    public void returnToHome() {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
         double currentWidth = primaryStage.getWidth();
@@ -376,7 +364,7 @@ public class LoginPage {
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             homeScene.getStylesheets().add(css.toExternalForm());
-            System.out.println("✅ CSS reapplied successfully: " + css);
+            // System.out.println("✅ CSS reapplied successfully: " + css);
         } else {
             System.out.println("❌ CSS not found! Check file path.");
         }

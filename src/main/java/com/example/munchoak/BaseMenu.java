@@ -10,8 +10,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+
 import java.net.URL;
 import java.util.List;
+
 import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
@@ -46,7 +48,7 @@ public class BaseMenu {
     private Button addOrUpdateButton;
 
     private FoodItems currentEditingFood = null;
-
+    protected Button deleteMenuButton;
 
     // ===== make UI sections accessible to subclasses =====
     protected VBox mainLayout;
@@ -59,14 +61,14 @@ public class BaseMenu {
     private HBox navBar;
 
 
-
     protected Button viewCartButton;
     protected Button checkoutButton;
     protected Button addToCartBtn;
-
-
+    protected Button buttonMenu;
+    protected Button editBtn;
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
+
     public BaseMenu() {
         mainLayout = new VBox();
         mainLayout.setAlignment(Pos.TOP_CENTER);
@@ -105,6 +107,7 @@ public class BaseMenu {
         // --- Load Foods ---
         loadFoodItems();
     }
+
     // Cart for the current user
     int userId = Session.getCurrentUserId();
 
@@ -172,6 +175,7 @@ public class BaseMenu {
 
         // Image selection
         Button browseBtn = new Button("Browse...");
+        styleMainButton(browseBtn);
         browseBtn.setOnAction(e -> chooseImage());
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
@@ -180,6 +184,7 @@ public class BaseMenu {
 
         // Add / Update button inside form
         addOrUpdateButton = new Button("Add");
+        styleMainButton(addOrUpdateButton);
         addOrUpdateButton.setOnAction(e -> {
             if (currentEditingFood == null) {
                 addFoodItem();
@@ -188,9 +193,13 @@ public class BaseMenu {
             }
         });
 
+
         formBox = new VBox(10, inputGrid, addOrUpdateButton);
         formBox.setVisible(false);
         formBox.setManaged(false);
+
+        // Inside BaseMenu.java — where you initialize admin buttons
+
 
         // Cart buttons
         viewCartButton = new Button("View Cart");
@@ -203,29 +212,81 @@ public class BaseMenu {
         styleMainButton(checkoutButton);
         cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
-        // ===== TOP "Add Food" BUTTON =====
-        showAddFormBtn = new Button("Add Food");
-        styleMainButton(showAddFormBtn);
 
-        showAddFormBtn.setOnAction(e -> {
-            if (formBox.isVisible()) {
-                // Hide the form
-                formBox.setVisible(false);
-                formBox.setManaged(false);
-            } else {
-                // Show the form for adding new food
-                clearFields(); // reset form
-                formBox.setVisible(true);
-                formBox.setManaged(true);
-            }
-        });
+        HBox adminButtons = null;
+        if (this instanceof AdminMenu) {
+            // --- Top buttons for admin ---
+            showAddFormBtn = new Button("Add Food");
+            styleMainButton(showAddFormBtn);
+            showAddFormBtn.setOnAction(e -> {
+                if (formBox.isVisible()) {
+                    formBox.setVisible(false);
+                    formBox.setManaged(false);
+                } else {
+                    clearFields();
+                    formBox.setVisible(true);
+                    formBox.setManaged(true);
+                }
+            });
 
-        mainLayout = new VBox(15, showAddFormBtn, scrollPane, formBox, cartButtons);
+            buttonMenu = new Button("Add Menu");
+            styleMainButton(buttonMenu);
+            buttonMenu.setOnAction(e -> chooseMenu());
+
+            deleteMenuButton = new Button("Delete Menu");
+            styleMainButton(deleteMenuButton);
+            deleteMenuButton.setOnAction(e -> deleteMenuFile());
+
+            adminButtons = new HBox(15, showAddFormBtn, buttonMenu, deleteMenuButton);
+            adminButtons.setAlignment(Pos.CENTER);
+            adminButtons.setPadding(new Insets(10, 0, 10, 0));
+
+            //mainLayout.getChildren().add(adminButtons); // add at top
+            // Add admin buttons **before other sections**
+            //mainLayout.getChildren().add(0, adminButtons);
+        }
+
+        // --- Assemble final layout ---
+        mainLayout = new VBox(15);
         mainLayout.setPadding(new Insets(5));
+
+        if (adminButtons != null) mainLayout.getChildren().add(adminButtons); // top for admin
+        mainLayout.getChildren().addAll(scrollPane, formBox, cartButtons);
+
         loadFoodItems();
         return mainLayout;
 
     }
+
+    protected void deleteMenuFile() {
+        File menuFile = FileStorage.getMenuFile();
+
+        if (!menuFile.exists()) {
+            showAlert("Menu file not found.", "There’s no menu file to delete.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Menu File");
+        confirm.setContentText("Are you sure you want to delete the entire menu file?\nThis action cannot be undone.");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                boolean deleted = menuFile.delete();
+
+                if (deleted) {
+                    foodList.clear();
+                    loadFoodItems();
+                    showAlert("Menu Deleted", "The menu file has been deleted successfully.");
+                } else {
+                    showAlert("Error", "Failed to delete the menu file.");
+                }
+            }
+        });
+    }
+
+
     private void animateAddToCart(Node node) {
         FadeTransition fade = new FadeTransition(Duration.millis(300), node);
         fade.setFromValue(1);
@@ -287,6 +348,49 @@ public class BaseMenu {
             nav.getChildren().add(btn);
         }
         return nav;
+    }
+
+    protected void chooseMenu() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Add Menu File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Data Files", "*.dat")
+        );
+
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                // 1. Copy the file to local resource folder
+                File destDir = new File("src/main/resources/com/example/manager/data/");
+                if (!destDir.exists()) destDir.mkdirs();
+
+                File destFile = new File(destDir, file.getName());
+                Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                FileStorage.setMenuFile(file);
+
+                // 2. Load FoodItems from selected file
+                List<FoodItems> importedItems = FileStorage.loadMenu();
+
+                if (importedItems == null || importedItems.isEmpty()) {
+                    showAlert("Info", "The selected menu file is empty or invalid.");
+                    return;
+                }
+                foodList.setAll(importedItems);
+                loadFoodItems();
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Menu items imported successfully!");
+                alert.showAndWait();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error", "Failed to import menu file.");
+            }
+        }
     }
 
     private void styleMainButton(Button button) {
@@ -477,7 +581,7 @@ public class BaseMenu {
         Label rating = new Label("⭐ " + food.getRatings());
         rating.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
 
-        if (!(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
+        if (!(this instanceof guestMenu) && !(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
             addToCartBtn.setOnAction(e -> {
@@ -503,8 +607,8 @@ public class BaseMenu {
             });
         }
 
-        Button editBtn = null;
-        if (!(this instanceof UserMenu)) {
+        editBtn = null;
+        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));

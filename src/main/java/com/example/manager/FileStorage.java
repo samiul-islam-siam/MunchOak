@@ -2,6 +2,7 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
+import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.time.Instant;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class FileStorage {
     private static final File DATA_DIR = new File("src/main/resources/com/example/manager/data");
     private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
-    private static final File MENU_FILE = new File(DATA_DIR, "menu.dat");
+    //private static final File MENU_FILE = new File(DATA_DIR, "menu.dat");
     private static final File CATEGORIES_FILE = new File(DATA_DIR, "categories.dat");
     private static final File PAYMENTS_FILE = new File(DATA_DIR, "payments.dat");
     private static final File CARTS_FILE = new File(DATA_DIR, "carts.dat");
@@ -21,16 +22,55 @@ public class FileStorage {
     private static final File PAYMENT_ITEMS_FILE = new File(DATA_DIR, "paymentitems.dat");
     private static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
+    private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
+    private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
+    static {
+        ensureDataDir();
+    }
 
     static {
         ensureDataDir();
+        loadAttachedMenu(); // Load admin-attached menu at startup
+    }
+
+    // default
+    public static void setMenuFile(File file) {
+        MENU_FILE = file;
+        saveAttachedMenu(file); // persist the attached menu
+    }
+
+    public static File getMenuFile() {
+        return MENU_FILE;
+    }
+
+    private static void saveAttachedMenu(File menuFile) {
+        ensureDataDir();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_POINTER_FILE, false))) {
+            dos.writeUTF(menuFile.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadAttachedMenu() {
+        ensureDataDir();
+        if (!MENU_POINTER_FILE.exists() || MENU_POINTER_FILE.length() == 0) return; // <-- check length
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(MENU_POINTER_FILE))) {
+            String filename = dis.readUTF();
+            File file = new File(DATA_DIR, filename);
+            if (file.exists()) {
+                MENU_FILE = file;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void ensureDataDir() {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs();
         try {
             if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
-            if (!MENU_FILE.exists()) MENU_FILE.createNewFile();
+            //if (!MENU_FILE.exists()) MENU_FILE.createNewFile();
             if (!CATEGORIES_FILE.exists()) CATEGORIES_FILE.createNewFile();
             if (!PAYMENTS_FILE.exists()) PAYMENTS_FILE.createNewFile();
             if (!CARTS_FILE.exists()) CARTS_FILE.createNewFile();
@@ -38,16 +78,31 @@ public class FileStorage {
             if (!PAYMENT_ITEMS_FILE.exists()) PAYMENT_ITEMS_FILE.createNewFile();
             if (!ORDERS_FILE.exists()) ORDERS_FILE.createNewFile();
             if (!RESERVATIONS_FILE.exists()) RESERVATIONS_FILE.createNewFile();
+            if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.show();
     }
 
     // ----------------- MENU / FOOD -----------------
     public static List<FoodItems> loadMenu() {
         ensureDataDir();
         List<FoodItems> list = new ArrayList<>();
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(MENU_FILE))) {
+        File menuFile = getMenuFile();
+        if (!menuFile.exists() || menuFile.length() == 0) {
+            // menu is empty or missing
+            //showAlert("Warning", "Empty Menu");
+            return list; // return empty list, UI can show "Empty menu"
+        }
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(getMenuFile()))) {
             while (dis.available() > 0) {
                 int id = dis.readInt();
                 String name = dis.readUTF();
@@ -58,7 +113,7 @@ public class FileStorage {
                 String category = dis.readUTF();
                 list.add(new FoodItems(id, name, details, price, ratings, imagePath, category));
             }
-        } catch (EOFException ignored) {
+        }catch (EOFException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,7 +128,7 @@ public class FileStorage {
 
     public static void appendMenuItem(FoodItems item) throws IOException {
         ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_FILE, true))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), true))) {
             dos.writeInt(item.getId());
             dos.writeUTF(item.getName());
             dos.writeUTF(item.getDetails());
@@ -86,7 +141,7 @@ public class FileStorage {
 
     public static void rewriteMenu(List<FoodItems> items) throws IOException {
         ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_FILE, false))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), false))) {
             for (FoodItems item : items) {
                 dos.writeInt(item.getId());
                 dos.writeUTF(item.getName());

@@ -18,25 +18,30 @@ import javafx.scene.paint.Color;
 import java.io.File;
 
 
-public class UserMenu extends BaseMenu {
+public class guestMenu extends BaseMenu {
 
     @Override
     public Node getView() {
         Node node = super.getView();
 
         if (node instanceof VBox vbox) {
-            // Remove admin-only controls
+
             vbox.getChildren().remove(showAddFormBtn);   // Remove "Add Food"
             vbox.getChildren().remove(formBox);          // Hide Add/Edit form
             vbox.getChildren().remove(categoryButtons);  // Remove category management buttons
 
             vbox.getChildren().remove(buttonMenu);
+
+            if (cartButtons != null) {
+                cartButtons.setVisible(false);
+                cartButtons.setManaged(false);
+            }
             File menuFile = FileStorage.getMenuFile();
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
                     viewCartButton.setVisible(false);
                     checkoutButton.setVisible(false);
-                    // === Create nice empty state message ===
+
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));
 
@@ -61,28 +66,27 @@ public class UserMenu extends BaseMenu {
             }
         }
 
-        System.out.println("User Menu Loaded");
+        System.out.println("Guest Menu Loaded");
         return node;
     }
 
-    // Override admin-only functions to disable them
     @Override
     protected void addCategory() {
-        System.out.println("User cannot manage categories.");
+        System.out.println("Guest cannot manage categories.");
     }
 
     @Override
     protected void addFoodItem() {
-        System.out.println("User cannot add food items.");
+        System.out.println("Guest cannot add food items.");
     }
 
     @Override
     protected void deleteFoodItem(FoodItems food) {
-        System.out.println("User cannot delete food items.");
+        System.out.println("Guest cannot delete food items.");
     }
 
     @Override
     protected void updateFoodItem() {
-        System.out.println("User cannot update food items.");
+        System.out.println("Guest cannot update food items.");
     }
 }
