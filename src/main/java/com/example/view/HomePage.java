@@ -608,27 +608,32 @@ public class HomePage implements HomePageComponent {
             Stage chatStage = new Stage();
             chatStage.setScene(new Scene(loader.load()));
 
-            // Get the controller and set username explicitly
+            // Get the controller
             ChatClient controller = loader.getController();
-            String username = Session.getCurrentUsername();
-            if (username == null || username.isEmpty()) {
-                username = "Guest";
-            }
-            controller.setUsername(username);  // <-- pass username here
 
-            // Set stage title with username
+            // Get current session info
+            String username = Session.getCurrentUsername();
+            if (username == null || username.isEmpty()) username = "Guest";
+
+            String role = Session.getCurrentRole();
+            boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
+
+            // Pass username and role to controller
+            controller.setUsername(username);
+            controller.setAdmin(isAdmin);
+
+            // Set stage title
             chatStage.setTitle("Chatting as [" + username + "]");
+
+            // Show window
             chatStage.show();
 
-            chatStage.setOnCloseRequest(e -> {
-                try {
-                    controller.closeConnection();
-                } catch (Exception ignored) {
-                }
-            });
+            // Ensure connection closes when window closes
+            chatStage.setOnCloseRequest(e -> controller.closeConnection());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
