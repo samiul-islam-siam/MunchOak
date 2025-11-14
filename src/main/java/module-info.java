@@ -1,7 +1,7 @@
 module com.example.munchoak {
     requires javafx.controls;
     requires javafx.fxml;
-    requires java.sql;
+    requires javafx.graphics;
 
     opens com.example.munchoak to javafx.fxml;
     opens com.example.login to javafx.fxml;
@@ -12,4 +12,7 @@ module com.example.munchoak {
     opens com.example.view to javafx.fxml;
     exports com.example.manager;
     opens com.example.manager to javafx.fxml;
+
+    opens com.example.network to javafx.fxml; // newly added
+    exports com.example.network;
 }

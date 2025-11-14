@@ -1,20 +1,25 @@
 package com.example.view;
-
+import javafx.stage.Modality;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.Stop;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Background;
+import javafx.geometry.Insets;
 import com.example.manager.FileStorage;
-import com.example.munchoak.Dashboard;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+import com.example.manager.AdminFileStorage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,9 @@ public class LoginPage {
 
     private VBox loginPane;
     private VBox registerPane;
+    private VBox userLoginPane;
+    private VBox adminLoginPane;
+
     private TextField usernameField;
     private TextField emailField;
     private PasswordField passwordField;
@@ -44,10 +52,13 @@ public class LoginPage {
 
     public Scene getLoginScene() {
         if (loginScene == null) {
-            root = buildRoot();                    // Build layout once
-            loginScene = new Scene(root, NORMAL_WIDTH, NORMAL_HEIGHT);
+            // Use current stage size if already in full screen/maximized, else normal
+            double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH) : NORMAL_WIDTH;
+            double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT) : NORMAL_HEIGHT;
+            root = buildRoot(); // Build layout once
+            loginScene = new Scene(root, initWidth, initHeight);
             loginScene.getStylesheets().add(getClass().getResource("/com/example/view/styles/style.css").toExternalForm());
-            attachMaximizedListener();
+            attachResizeListeners(); // Renamed and fixed to handle full screen too
         }
         return loginScene;
     }
@@ -85,9 +96,13 @@ public class LoginPage {
 
         loginPane = createLoginPane();
         registerPane = createRegisterPane();
+        userLoginPane = createUserLoginPane();
+        adminLoginPane = createAdminLoginPane();
         registerPane.setVisible(false);
+        userLoginPane.setVisible(false);
+        adminLoginPane.setVisible(false);
         registerPane.setOpacity(0);
-        rightContainer.getChildren().addAll(loginPane, registerPane);
+        rightContainer.getChildren().addAll(loginPane, registerPane, userLoginPane, adminLoginPane);
 
         // --- Divider ---
         Pane divider = new Pane();
@@ -127,41 +142,17 @@ public class LoginPage {
 
 //------Button Logics-------------------------------------//
         Button adminBtn = createLoginButton("ADMIN");
+        adminBtn.setOnAction(e -> showAdminLoginForm());
 
         Button userBtn = createLoginButton("USER");
-        userBtn.setOnAction(e -> {
-            try {
-                javafx.fxml.FXMLLoader loader =
-                        new javafx.fxml.FXMLLoader(getClass().getResource("/com/example/login/FXMLs/login.fxml"));
-                javafx.scene.Parent welcomeRoot = loader.load();
-
-                javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                stage.setScene(new javafx.scene.Scene(welcomeRoot));
-                stage.setTitle("Welcome");
-                stage.show();
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        userBtn.setOnAction(e -> showUserLoginForm());
 
         Button registerBtn = createLoginButton("REGISTER");
         registerBtn.setOnAction(e -> showRegisterForm());
 
         Button guestBtn = createLoginButton("GUEST");
         guestBtn.setOnAction(e -> {
-            try {
-                // Launch the main Dashboard as guest
-                com.example.munchoak.Dashboard dashboard = new com.example.munchoak.Dashboard();
-                Stage stage = new Stage();
-                dashboard.start(stage);
-
-                // Close the Login window
-                Stage currentStage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
-                currentStage.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            returnToHome();
         });
 
         buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn);
@@ -227,16 +218,16 @@ public class LoginPage {
                 alert.setContentText("An error occurred while registering the user.");
                 alert.showAndWait();
             }
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            javafx.application.Platform.runLater(() -> showLoginForm());
-                        }
-                    }, 1500);
-        });
 
-        Button backBtn = new Button("Back");
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                javafx.application.Platform.runLater(() -> showLoginForm());
+            }
+        }, 1500);
+    });
+
+    Button backBtn = new Button("Back");
         backBtn.setStyle("-fx-background-color: #16a085; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 8 25; -fx-background-radius: 20; -fx-cursor: hand;");
         backBtn.setOnAction(e -> showLoginForm());
 
@@ -254,7 +245,171 @@ public class LoginPage {
         pane.getChildren().addAll(title, usernameField, emailField, passwordField, confirmField, statusLabel, buttonBox, loginLink);
         return pane;
     }
+   /* // === USER LOGIN PANE ===
+    private VBox createUserLoginPane() {
+        VBox pane = new VBox(15);
+        pane.setAlignment(Pos.CENTER);
+        pane.setPadding(new Insets(30));
+        pane.setMaxWidth(300);
 
+        Label title = new Label("User Login");
+        title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
+
+        TextField usernameField = createStyledTextField("Username");
+        PasswordField passwordField = createStyledPasswordField("Password");
+
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 30;");
+       loginBtn.setOnAction(e -> {
+            try {
+                if (usernameField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+                    showStatus("All fields required!", true);
+                    return;
+                }
+                if (!com.example.manager.FileStorage.userExists(usernameField.getText())) {
+                    showStatus("User not found!", true);
+                    return;
+                }
+                if (!com.example.manager.FileStorage.verifyUserPassword(usernameField.getText(), passwordField.getText())) {
+                    showStatus("Incorrect password!", true);
+                    return;
+                }
+                showStatus("Login successful!", false);
+                openUserDashboard();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showStatus("Error logging in!", true);
+            }
+        });
+
+        Hyperlink forgotLink = new Hyperlink("Forgot Password?");
+        forgotLink.setOnAction(e -> openForgotPasswordWindow(false)); // false = user mode
+
+        Button backBtn = new Button("Back");
+        backBtn.setStyle("-fx-background-color: #16a085; -fx-text-fill: white; -fx-background-radius: 25;");
+        backBtn.setOnAction(e -> switchPane(userLoginPane, loginPane));
+
+        Button forgotPasswordBtn = new Button("Forgot Password");
+        forgotPasswordBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-underline: true;");
+        forgotPasswordBtn.setOnAction(e -> showForgotPasswordPopup(primaryStage));
+        // Add it to your existing layout (example)
+       // root.getChildren().add(forgotPasswordBtn);
+       // Hyperlink forgotLink = new Hyperlink("Forgot Password?");
+        //forgotLink.setOnAction(e -> showForgotPasswordPopup(primaryStage)); // Opens modal
+
+        VBox btnBox = new VBox(10, loginBtn, backBtn, forgotLink);
+        btnBox.setAlignment(Pos.CENTER);
+
+        pane.getChildren().addAll(title, usernameField, passwordField, btnBox);
+        return pane;
+    }
+    */
+
+    private VBox createUserLoginPane() {
+        VBox pane = new VBox(15);
+        pane.setAlignment(Pos.CENTER);
+        pane.setPadding(new Insets(30));
+        pane.setMaxWidth(300);
+
+        Label title = new Label("User Login");
+        title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
+
+        // --- Input Fields ---
+        TextField usernameField = createStyledTextField("Username");
+        PasswordField passwordField = createStyledPasswordField("Password");
+
+        // --- Buttons ---
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 30;");
+        loginBtn.setOnAction(e -> {
+            try {
+                if (usernameField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+                    showStatus("All fields required!", true);
+                    return;
+                }
+                if (!FileStorage.userExists(usernameField.getText())) {
+                    showStatus("User not found!", true);
+                    return;
+                }
+                if (!FileStorage.verifyUserPassword(usernameField.getText(), passwordField.getText())) {
+                    showStatus("Incorrect password!", true);
+                    return;
+                }
+                showStatus("Login successful!", false);
+                openUserDashboard();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showStatus("Error logging in!", true);
+            }
+        });
+
+        Button backBtn = new Button("Back");
+        backBtn.setStyle("-fx-background-color: #16a085; -fx-text-fill: white; -fx-background-radius: 25;");
+        backBtn.setOnAction(e -> switchPane(userLoginPane, loginPane));
+
+        Hyperlink forgotLink = new Hyperlink("Forgot Password?");
+        forgotLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
+        forgotLink.setOnAction(e -> showUserForgotPasswordPopup(primaryStage));
+
+        VBox btnBox = new VBox(10, loginBtn, backBtn, forgotLink);
+        btnBox.setAlignment(Pos.CENTER);
+
+        pane.getChildren().addAll(title, usernameField, passwordField, btnBox);
+
+        return pane;
+    }
+
+    private VBox createAdminLoginPane() {
+        VBox pane = new VBox(15);
+        pane.setAlignment(Pos.CENTER);
+        pane.setPadding(new Insets(30));
+        pane.setMaxWidth(300);
+
+        Label title = new Label("Admin Login");
+        title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
+
+        TextField adminIDField = createStyledTextField("Enter Admin ID");
+        PasswordField adminPasswordField = createStyledPasswordField("Enter Admin Password");
+
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 30;");
+
+        // ✅ Login Action
+        loginBtn.setOnAction(e -> {
+            String idEntered = adminIDField.getText().trim();
+            String passEntered = adminPasswordField.getText();
+
+            try {
+                if (!AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                    showStatus("Incorrect ID or password!", true);
+                    return;
+                }
+                showStatus("Admin login successful!", false);
+                openAdminDashboard();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                showStatus("Error verifying password!", true);
+            }
+        });
+
+        // ✅ Forgot Password Button (for admin only)
+        Hyperlink forgotLink = new Hyperlink("Forgot Password?");
+        forgotLink.setOnAction(e -> openForgotPasswordWindow(true)); // true = admin mode
+        forgotLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
+
+        // ✅ Back Button
+        Button backBtn = new Button("Back");
+        backBtn.setStyle("-fx-background-color: #16a085; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 8 25;");
+        backBtn.setOnAction(e -> switchPane(adminLoginPane, loginPane)); // Go back to main login
+
+        VBox btnBox = new VBox(10, loginBtn, forgotLink, backBtn);
+        btnBox.setAlignment(Pos.CENTER);
+
+        pane.getChildren().addAll(title, adminIDField, adminPasswordField, btnBox);
+        return pane;
+    }
+
+    // shopwing register form
     private void showRegisterForm() {
         loginPane.setVisible(false);
         registerPane.setVisible(true);
@@ -279,12 +434,363 @@ public class LoginPage {
         });
         fadeOut.play();
     }
+    private void showUserLoginForm() {
+        switchPane(loginPane, userLoginPane);
+    }
+
+    private void showAdminLoginForm() {
+        switchPane(loginPane, adminLoginPane);
+    }
+
+    private void switchPane(VBox from, VBox to) {
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(300), from);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(e -> {
+            from.setVisible(false);
+            to.setVisible(true);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(400), to);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        });
+        fadeOut.play();
+    }
+
+    private void openAdminDashboard() {
+        BorderPane dashboard = new BorderPane();
+        dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
+
+        // --- Top Bar ---
+        Label title = new Label("Admin Dashboard");
+        title.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold;");
+        HBox topBar = new HBox(title);
+        topBar.setAlignment(Pos.CENTER);
+        topBar.setPadding(new Insets(20, 0, 20, 0));
+
+        // --- Center Content Placeholder ---
+        Label infoLabel = new Label("Select an action from the left menu.");
+        infoLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
+        StackPane centerPane = new StackPane(infoLabel);
+
+        // --- Left Menu ---
+        VBox menuBox = new VBox(15);
+        menuBox.setPadding(new Insets(30));
+        menuBox.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-pref-width: 220;");
+        menuBox.setAlignment(Pos.TOP_CENTER);
+
+        Button viewUsersBtn = new Button("View All Users");
+        Button countUsersBtn = new Button("Count Users");
+        Button manageMenuBtn = new Button("Manage Menu");
+        Button changePassBtn = new Button("Change Password");
+        Button logoutBtn = new Button("Logout");
+
+        for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn, logoutBtn}) {
+            btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
+            btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
+            btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
+        }
+
+        menuBox.getChildren().addAll(viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn, logoutBtn);
+
+        dashboard.setTop(topBar);
+        dashboard.setLeft(menuBox);
+        dashboard.setCenter(centerPane);
+
+        Scene scene = new Scene(dashboard, 1000, 700);
+        primaryStage.setScene(scene);
+
+        // --- Button Functionalities ---
+
+        viewUsersBtn.setOnAction(e -> {
+            try {
+                List<String> users = FileStorage.readAllUsers();
+                TextArea area = new TextArea(String.join("\n", users));
+                area.setEditable(false);
+                centerPane.getChildren().setAll(area);
+            } catch (IOException ex) {
+                infoLabel.setText("Error reading users!");
+                ex.printStackTrace();
+            }
+        });
+
+        manageMenuBtn.setOnAction(e -> {
+            Label msg = new Label("Manage Menu (Coming soon...)");
+            msg.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
+            centerPane.getChildren().setAll(msg);
+        });
+
+        changePassBtn.setOnAction(e -> com.example.login.ChangeAdminPasswordPage.show(primaryStage));
+
+        logoutBtn.setOnAction(e -> {
+            // Go back to LoginPage
+            primaryStage.setScene(getLoginScene());
+        });
+    }
+
+    private void openUserDashboard() {
+        Label label = new Label("Welcome, User!");
+        label.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+        BorderPane pane = new BorderPane(label);
+        pane.setStyle("-fx-background-color: linear-gradient(to right, #56ab2f, #a8e063);");
+        primaryStage.setScene(new Scene(pane, 1000, 700));
+    }
+
+    private void showUserForgotPasswordPopup(Stage parentStage) {
+        Stage popup = new Stage();
+        popup.initOwner(parentStage);
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("Reset Password");
+
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(20));
+        root.setAlignment(Pos.CENTER);
+
+        // Gradient background
+        Stop[] stops = new Stop[]{new Stop(0, Color.web("#36D1DC")), new Stop(1, Color.web("#5B86E5"))};
+        LinearGradient gradient = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
+        root.setBackground(new Background(new BackgroundFill(gradient, new CornerRadii(12), Insets.EMPTY)));
+
+        Label title = new Label("Reset Your Password");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        // Username field
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter your username");
+
+        // Password fields
+        PasswordField newPass = new PasswordField();
+        newPass.setPromptText("New Password (min 8 chars)");
+        PasswordField confirmPass = new PasswordField();
+        confirmPass.setPromptText("Confirm Password");
+
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: yellow; -fx-font-weight: bold;");
+
+        // Buttons
+        Button saveBtn = new Button("Save");
+        Button backBtn = new Button("Back");
+        HBox btnBox = new HBox(15, saveBtn, backBtn);
+        btnBox.setAlignment(Pos.CENTER);
+
+        saveBtn.setOnAction(e -> {
+            String username = usernameField.getText().trim();
+            String np = newPass.getText().trim();
+            String cp = confirmPass.getText().trim();
+
+            if (username.isEmpty() || np.isEmpty() || cp.isEmpty()) {
+                errorLabel.setText("Please fill in all fields.");
+                return;
+            }
+
+            if (!FileStorage.userExists(username)) {
+                errorLabel.setText("User not found!");
+                return;
+            }
+
+            if (np.length() < 8) {
+                errorLabel.setText("Password must be at least 8 characters.");
+                return;
+            }
+
+            if (!np.equals(cp)) {
+                errorLabel.setText("Passwords do not match!");
+                return;
+            }
+
+            try {
+                FileStorage.updateUserPassword(username, np);
+                errorLabel.setStyle("-fx-text-fill: lightgreen;");
+                errorLabel.setText("Password updated successfully!");
+            } catch (IOException ex) {
+                errorLabel.setStyle("-fx-text-fill: red;");
+                errorLabel.setText("Error updating password.");
+                ex.printStackTrace();
+            }
+        });
+
+        backBtn.setOnAction(e -> popup.close());
+
+        root.getChildren().addAll(
+                title,
+                new Label("Username:"), usernameField,
+                new Label("New Password:"), newPass,
+                new Label("Confirm Password:"), confirmPass,
+                btnBox, errorLabel
+        );
+
+        Scene scene = new Scene(root, 400, 400);
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+    // Put these at the class level, not inside a method
+    private boolean isValidPassword(String password) {
+        if (password.length() < 8) return false;
+        boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
+        boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
+        boolean hasDigit = password.chars().anyMatch(Character::isDigit);
+        boolean hasSpecial = password.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:'\",.<>/?".indexOf(ch) >= 0);
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+
+    private String getPasswordStrength(String password) {
+        int score = 0;
+        if (password.length() >= 8) score++;
+        if (password.chars().anyMatch(Character::isUpperCase)) score++;
+        if (password.chars().anyMatch(Character::isLowerCase)) score++;
+        if (password.chars().anyMatch(Character::isDigit)) score++;
+        if (password.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:'\",.<>/?".indexOf(ch) >= 0)) score++;
+
+        return switch (score) {
+            case 0, 1, 2 -> "Weak";
+            case 3, 4 -> "Normal";
+            case 5 -> "Strong";
+            default -> "Weak";
+        };
+    }
+
+    private void openForgotPasswordWindow(boolean isAdmin) {
+       Stage popup = new Stage();
+        popup.setTitle(isAdmin ? "Admin Password Reset" : "User Password Reset");
+
+        VBox box = new VBox(10);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20));
+
+        PasswordField newPass = new PasswordField();
+        newPass.setPromptText("Enter new password");
+
+        Label status = new Label();
+
+
+/*
+        if (isAdmin) {
+            TextField adminIDField = new TextField();
+            adminIDField.setPromptText("Enter Admin ID");
+
+            Button saveBtn = new Button("Save");
+            saveBtn.setOnAction(ev -> {
+                String idEntered = adminIDField.getText().trim();
+                String newP = newPass.getText().trim();
+
+                if (idEntered.isEmpty() || !idEntered.equals(AdminFileStorage.ADMIN_ID)) {
+                    status.setText("❌ Invalid Admin ID!");
+                    status.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+                if (newP.isEmpty()) {
+                    status.setText("❌ Password cannot be empty!");
+                    status.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+
+                try {
+                    AdminFileStorage.setAdminPassword(newP);
+                    status.setText("✅ Admin password reset successfully!");
+                    status.setStyle("-fx-text-fill: green;");
+                } catch (IOException e) {
+                    status.setText("Error saving password!");
+                    status.setStyle("-fx-text-fill: red;");
+                    e.printStackTrace();
+                }
+            });
+
+            box.getChildren().addAll(
+                    new Label("Enter Admin ID:"),
+                    adminIDField,
+                    new Label("Enter New Password:"),
+                    newPass,
+                    saveBtn,
+                    status
+            );
+
+        } else {
+            box.getChildren().addAll(new Label("User password reset not implemented yet."));
+        }
+   */
+        if (isAdmin) {
+            TextField adminIDField = new TextField();
+            adminIDField.setPromptText("Enter Admin ID");
+
+            //PasswordField newPass = new PasswordField();
+            //newPass.setPromptText("Enter New Password");
+
+           // Label status = new Label();
+            //status.setStyle("-fx-font-weight: bold;");
+
+            Label strengthLabel = new Label("Password Strength: ");
+            strengthLabel.setStyle("-fx-font-weight: bold;");
+
+            // ✅ Update strength as user types
+            newPass.textProperty().addListener((obs, oldText, newText) -> {
+                strengthLabel.setText("Password Strength: " + getPasswordStrength(newText));
+                switch (getPasswordStrength(newText)) {
+                    case "Weak" -> strengthLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                    case "Normal" -> strengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+                    case "Strong" -> strengthLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                }
+            });
+
+            Button saveBtn = new Button("Save");
+            saveBtn.setOnAction(ev -> {
+                String idEntered = adminIDField.getText().trim();
+                String np = newPass.getText().trim();
+
+                if (idEntered.isEmpty() || !idEntered.equals(AdminFileStorage.ADMIN_ID)) {
+                    status.setText("❌ Invalid Admin ID!");
+                    status.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+
+                if (np.isEmpty()) {
+                    status.setText("❌ Password cannot be empty!");
+                    status.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+
+                if (!isValidPassword(np)) {
+                    status.setText("❌ Password must be at least 8 chars, include upper, lower, number & special!");
+                    status.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+
+                try {
+                    AdminFileStorage.setAdminPassword(np);
+                    status.setText("✅ Admin password reset successfully!");
+                    status.setStyle("-fx-text-fill: green;");
+                } catch (IOException e) {
+                    status.setText("❌ Error saving password!");
+                    status.setStyle("-fx-text-fill: red;");
+                    e.printStackTrace();
+                }
+            });
+
+            box.getChildren().addAll(
+                    new Label("Enter Admin ID:"), adminIDField,
+                    new Label("Enter New Password:"), newPass,
+                    strengthLabel,
+                    saveBtn,
+                    status
+            );
+        }
+
+        popup.setScene(new Scene(box, 350, 250));
+       popup.show();
+    }
+
+    // Helper: ask for username when user resets password
+    private String askForUsername() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Username Required");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Enter your username:");
+        return dialog.showAndWait().orElse(null);
+    }
+
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle(isError
-                ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
-                : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+        statusLabel.setStyle(isError ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;" : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
 
         FadeTransition fade = new FadeTransition(Duration.millis(3000), statusLabel);
         fade.setFromValue(1.0);
@@ -356,7 +862,12 @@ public class LoginPage {
         timer.start();
     }
 
-    private void returnToHome() {
+    public void returnToHome() {
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         HomePage homePage = new HomePage(primaryStage);
         VBox fullPage = homePage.getFullPage();
         ScrollPane scrollPane = new ScrollPane(fullPage);
@@ -365,36 +876,52 @@ public class LoginPage {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
 
-        double w = primaryStage.isMaximized() ? primaryStage.getWidth() : NORMAL_WIDTH;
-        double h = primaryStage.isMaximized() ? primaryStage.getHeight() : NORMAL_HEIGHT;
+        Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
 
-        Scene homeScene = new Scene(scrollPane, w, h);
+        // ✅ Reapply global stylesheet here
+        var css = getClass().getResource("/com/example/view/styles/style.css");
+        if (css != null) {
+            homeScene.getStylesheets().add(css.toExternalForm());
+            // System.out.println("✅ CSS reapplied successfully: " + css);
+        } else {
+            System.out.println("❌ CSS not found! Check file path.");
+        }
+
         primaryStage.setScene(homeScene);
+
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        }
+
+        primaryStage.setTitle("Home Page + Extension");
+        primaryStage.show();
     }
 
-    // --- FIXED: Resize existing scene instead of replacing root ---
-    private void attachMaximizedListener() {
-        ChangeListener<Boolean> listener = (obs, wasMax, isNowMax) -> {
-            if (loginScene == null) return;
 
-            double width = isNowMax ? primaryStage.getWidth() : NORMAL_WIDTH;
-            double height = isNowMax ? primaryStage.getHeight() : NORMAL_HEIGHT;
-
-            // Resize the *existing* scene
-            loginScene.getWindow().setWidth(width);
-            loginScene.getWindow().setHeight(height);
-
-            // Optional: force layout
-            root.requestLayout();
+    // --- FIXED: Handle both full screen and maximized without manual resizing ---
+    private void attachResizeListeners() {
+        // Full screen listener: No manual resize needed; just force layout refresh
+        ChangeListener<Boolean> fullScreenListener = (obs, wasFull, isNowFull) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
         };
+        primaryStage.fullScreenProperty().addListener(fullScreenListener);
 
-        primaryStage.maximizedProperty().addListener(listener);
+        // Maximized listener: Same as above
+        ChangeListener<Boolean> maximizedListener = (obs, wasMax, isNowMax) -> {
+            if (loginScene != null) {
+                root.requestLayout(); // Ensures layout adapts instantly
+            }
+        };
+        primaryStage.maximizedProperty().addListener(maximizedListener);
 
-        // Also react when the scene is first shown
+        // Scene attach listener: Trigger layout if scene is set while in special mode
         primaryStage.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene == loginScene) {
-                listener.changed(primaryStage.maximizedProperty(),
-                        primaryStage.isMaximized(), primaryStage.isMaximized());
+            if (newScene == loginScene && (primaryStage.isFullScreen() || primaryStage.isMaximized())) {
+                root.requestLayout();
             }
         });
     }

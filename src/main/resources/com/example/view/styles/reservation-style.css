@@ -1,0 +1,78 @@
+/* ================================
+   Reservation Page Navigation Styles
+   ================================ */
+
+/* Navigation Bar Title */
+.nav-title {
+    -fx-text-fill: #FFD700;              /* gold tone for contrast */
+    -fx-font-family: "Georgia", "Serif"; /* elegant font */
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 4, 0, 0, 1);
+    -fx-letter-spacing: 1px;
+}
+
+/* Hamburger Button */
+.hamburger-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 6;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.hamburger-button:hover {
+    -fx-background-color: #D4AF37;  /* gold hover */
+}
+
+.hamburger-button:pressed {
+    -fx-background-color: #F4D03F;  /* lighter gold */
+}
+
+/* Page Background */
+.root {
+    -fx-background-color: #FFDAB9; /* peach tone */
+}
+/* ==========================
+   Dashboard / Side Panel Buttons
+   ========================== */
+.dashboard-button {
+    -fx-background-color: #FFB266;  /* Deep peach/orange */
+    -fx-text-fill: #001F3F;         /* Dark navy text */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+    -fx-transition: all 0.3s ease; /* smooth transition */
+}
+
+/* Hover effect: glow + scale */
+.dashboard-button:hover {
+    -fx-background-color: #FFD699;  /* lighter peach */
+    -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.6), 10, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Pressed effect: darker shade + inset shadow */
+.dashboard-button:pressed {
+    -fx-background-color: #FFA366;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 3, 0, 0, 1);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+.combo-label {
+    -fx-text-fill: #FFD700;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.combo-field {
+    -fx-background-color: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 4;
+}

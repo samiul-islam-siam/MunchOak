@@ -1,6 +1,7 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -73,7 +74,14 @@ public class History {
     private void loadHistory() {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
+        int currentUserId = Session.getCurrentUserId();
+        boolean isAdmin = false;
+        if(Session.getCurrentUsername().equals("admin")) {// assuming admin has userId = 1
+            isAdmin = true;
+        }
         for (FileStorage.HistoryRecordSimple s : list) {
+
+            if (!isAdmin && s.userId != currentUserId) continue;
             // status defaults to "Success" here (FileStorage doesn't store status)
             historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
         }

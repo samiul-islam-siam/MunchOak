@@ -1,6 +1,8 @@
 package com.example.view;
 
-import javafx.animation.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -13,26 +15,25 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.util.Duration;
 
 public class HomePageThirdExtension implements HomePageComponent {
     private final StackPane extensionRoot;
     private final ImageView imageView;
     private final VBox textContainer;
-    private final double WIDTH = getPrefWidth();
-    private final double HEIGHT = getPrefHeight();
+    private final double HEIGHT_RATIO = 0.7; // Reduced height ratio for image
 
     public HomePageThirdExtension() {
         extensionRoot = new StackPane();
-        extensionRoot.setPrefSize(WIDTH, HEIGHT);
-        extensionRoot.setMinSize(WIDTH, HEIGHT);
+        extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
+        extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
         // Set exact gradient background color: linear 90 degrees (#5de0e6 to #004aad)
         extensionRoot.setStyle("-fx-background-color: linear-gradient(to right, #5de0e6, #004aad);");
+
         // --- Text Container (Left Side) ---
         textContainer = new VBox(10);
         textContainer.setAlignment(Pos.CENTER_LEFT);
-        textContainer.setPrefWidth(WIDTH * 0.5);
-        textContainer.setMinHeight(HEIGHT * 0.8); // Ensure container takes sufficient height
+        textContainer.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> extensionRoot.getWidth() * 0.55, extensionRoot.widthProperty()));
+        textContainer.setMinHeight(HEIGHT_RATIO * getPrefHeight() * 0.9); // Ensure container takes sufficient height
         // Title parts (staggered lines) with "The Seasons" font, increased sizes, explicit black color
         Label title1 = new Label("ONLY THE");
         title1.setFont(Font.font("The Seasons", FontWeight.BOLD, 32));
@@ -67,61 +68,61 @@ public class HomePageThirdExtension implements HomePageComponent {
         paragraph.setTextFill(Color.BLACK);
         paragraph.setStyle("-fx-text-fill: black;");
         paragraph.setWrapText(true);
-        paragraph.setMaxWidth(WIDTH * 0.45); // Slightly increased for better fit
+        paragraph.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> textContainer.getWidth() * 0.9, textContainer.widthProperty()));
         paragraph.setPrefHeight(Region.USE_COMPUTED_SIZE); // Allow natural height
         VBox.setVgrow(paragraph, Priority.ALWAYS); // Allow expansion in VBox
         // Add to container
         textContainer.getChildren().addAll(title1, title2, title3, title4, title5, paragraph);
-        // Position text container on left with padding
+        // Position text container on left with reduced padding
         StackPane.setAlignment(textContainer, Pos.CENTER_LEFT);
-        StackPane.setMargin(textContainer, new Insets(50, 0, 50, 50)); // top=50, right=0, bottom=50, left=50
-        // Initially off-screen to the left
-        textContainer.setTranslateX(-WIDTH * 0.5);
+        StackPane.setMargin(textContainer, new Insets(30, 0, 30, 70)); // Reduced margins: top=30, right=0, bottom=30, left=30
+        // No initial off-screen; appear immediately
+        textContainer.setTranslateX(0);
         extensionRoot.getChildren().add(textContainer);
+
         // --- Image (Right Side) ---
         Image image = new Image(getClass().getResource("/com/example/view/images/third_ext_bg.png").toExternalForm());
         imageView = new ImageView(image);
         imageView.setPreserveRatio(false);
-        imageView.setFitWidth(WIDTH * 0.5); // 50% width
-        imageView.setFitHeight(HEIGHT * 0.8); // 80% height
+        imageView.fitWidthProperty().bind(Bindings.createDoubleBinding(() -> extensionRoot.getWidth() * 0.35, extensionRoot.widthProperty())); // Reduced to 40% width
+        imageView.fitHeightProperty().bind(Bindings.createDoubleBinding(() -> extensionRoot.getHeight() * HEIGHT_RATIO, extensionRoot.heightProperty())); // Responsive height
         StackPane.setAlignment(imageView, Pos.CENTER_RIGHT);
-        // Add padding for image: space from top, bottom, right
-        StackPane.setMargin(imageView, new Insets(50, 20, 50, 0)); // top=50, right=20, bottom=50, left=0
-        // Initially off-screen to the right
-        imageView.setTranslateX(WIDTH * 0.5);
+        // Add reduced padding for image: space from top, bottom, right
+        StackPane.setMargin(imageView, new Insets(30, 30, 30, 70)); // Reduced: top=30, right=10, bottom=30, left=0
+        // No initial off-screen; appear immediately
+        imageView.setTranslateX(0);
         extensionRoot.getChildren().add(imageView);
+
+        // Dynamic layout listener for responsiveness
+        ChangeListener<Number> layoutListener = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLayout();
+            }
+        };
+        extensionRoot.widthProperty().addListener(layoutListener);
+        extensionRoot.heightProperty().addListener(layoutListener);
+
         // Call initialize for this component
         initialize();
     }
 
+    private void updateLayout() {
+        double width = extensionRoot.getWidth();
+        double height = extensionRoot.getHeight();
+        if (width <= 0 || height <= 0) return;
+
+        // No translates needed since no transition; elements appear immediately
+
+        // Ensure margins and alignments are updated
+        StackPane.setMargin(textContainer, new Insets(30, 30, 30, 70));
+        StackPane.setMargin(imageView, new Insets(30, 50, 30, 20));
+    }
+
     @Override
     public void initialize() {
-        // --- Text Slide-in from Left ---
-        TranslateTransition textSlideIn = new TranslateTransition(Duration.seconds(1.5), textContainer);
-        textSlideIn.setFromX(-WIDTH * 0.5);
-        textSlideIn.setToX(0);
-        textSlideIn.setCycleCount(1);
-        textSlideIn.setAutoReverse(false);
-        // --- Image Slide-in from Right ---
-        TranslateTransition imageSlideIn = new TranslateTransition(Duration.seconds(1.5), imageView);
-        imageSlideIn.setFromX(WIDTH * 0.5);
-        imageSlideIn.setToX(0);
-        imageSlideIn.setCycleCount(1);
-        imageSlideIn.setAutoReverse(false);
-        // --- Floating Effect for Image (after slide-in) ---
-        Timeline imageFloating = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(imageView.translateYProperty(), 0)),
-                new KeyFrame(Duration.seconds(2), new KeyValue(imageView.translateYProperty(), -10)),
-                new KeyFrame(Duration.seconds(4), new KeyValue(imageView.translateYProperty(), 0))
-        );
-        imageFloating.setCycleCount(Timeline.INDEFINITE);
-        imageFloating.setAutoReverse(true);
-        // --- Sequential for Image: slide then float ---
-        SequentialTransition imageSeq = new SequentialTransition(imageSlideIn, imageFloating);
-        // --- Parallel: text and image slide in together ---
-        ParallelTransition parallelSlide = new ParallelTransition(textSlideIn, imageSeq);
-        parallelSlide.play();
-        // Note: This triggers on page load. For scroll-triggered, add listener in main ScrollPane.
+        // No transitions; elements appear immediately
+        updateLayout();
     }
 
     @Override

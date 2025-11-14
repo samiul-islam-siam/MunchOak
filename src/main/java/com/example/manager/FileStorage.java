@@ -2,7 +2,7 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-
+import com.example.manager.PasswordUtils;
 import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,6 +21,7 @@ public class FileStorage {
     private static final File PAYMENT_ITEMS_FILE = new File(DATA_DIR, "paymentitems.dat");
     private static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
+    private static final File USER_FILE = new File("src/main/resources/com/example/manager/data/users.dat");
 
     static {
         ensureDataDir();
@@ -162,6 +163,8 @@ public class FileStorage {
         return false;
     }
 
+
+
     public static int getUserId(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
@@ -176,19 +179,8 @@ public class FileStorage {
     }
 
 
-    public static void appendUser(String username, String email, String password) throws IOException {
-        ensureDataDir();
 
-        // Start from 2025001 for registered users
-        int uid = generateNextIdInFile(USERS_FILE, 4);
 
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
-            dos.writeUTF(username);
-            dos.writeUTF(email);
-            dos.writeUTF(password);
-            dos.writeInt(uid);
-        }
-    }
 
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
@@ -448,4 +440,160 @@ public class FileStorage {
             this.paymentMethod = paymentMethod;
         }
     }
+
+
+    //update users password
+/*
+    public static void updateUserPassword(String username, String newPassword) throws IOException {
+        File tempFile = new File("src/main/resources/com/example/manager/data/temp_users.dat");
+        File userFile = getUserFile(); // your existing users file path
+        try (BufferedReader br = new BufferedReader(new FileReader(userFile));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 3 && parts[0].equals(username)) {
+                    parts[2] = newPassword; // update password
+                    bw.write(String.join(",", parts));
+                } else {
+                    bw.write(line);
+                }
+                bw.newLine();
+            }
+        }
+        if (!userFile.delete() || !tempFile.renameTo(userFile)) {
+            throw new IOException("Failed to update user password file.");
+        }
+    }
+*/
+    public static File getUserFile() {
+        return USER_FILE; // or whatever variable holds your user data file
+    }
+
+    // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
+    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+
+    static {
+        try {
+            ensureAdminFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void ensureAdminFile() throws IOException {
+        ensureDataDir();
+        if (!ADMIN_FILE.exists()) {
+            try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
+                fw.write("admin123"); // default admin password
+            }
+        }
+    }
+
+    public static boolean verifyAdminPassword(String password) throws IOException {
+        return password.equals(readText(ADMIN_FILE).trim());
+    }
+
+    public static void setAdminPassword(String newPassword) throws IOException {
+        try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
+            fw.write(newPassword);
+        }
+    }
+
+    // ---------------- ADMIN USER MANAGEMENT ----------------
+    public static List<String[]> readAllUsersSimple() throws IOException {
+        List<String[]> users = new ArrayList<>();
+        for (String[] user : loadUsers()) {
+            users.add(user);
+        }
+        return users;
+    }
+
+    public static int getUserCount() {
+        return loadUsers().size();
+    }
+
+    // ---------------- HELPERS ----------------
+    private static String readText(File f) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line;
+            while ((line = br.readLine()) != null) sb.append(line);
+        }
+        return sb.toString();
+    }
+
+    // Inside FileStorage.java
+    public static List<String> readAllUsers() throws IOException {
+        List<String> users = new ArrayList<>();
+        if (!USERS_FILE.exists()) return users;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                users.add(line); // Or format as "username - email"
+            }
+        }
+        return users;
+    }
+    // Example method for adding a user
+    /*
+    public static void appendUser(String username, String email, String password) throws IOException {
+        String salt = PasswordUtils.generateSalt();
+        String hashedPassword = PasswordUtils.hashPassword(password, salt);
+
+        // Store like: username,email,salt:hash
+        String line = username + "," + email + "," + salt + ":" + hashedPassword + "\n";
+        java.nio.file.Files.write(USERS_FILE.toPath(), line.getBytes(), java.nio.file.StandardOpenOption.APPEND, java.nio.file.StandardOpenOption.CREATE);
+    }
+*/
+    public static void appendUser(String username, String email, String password) throws IOException {
+        String salt = PasswordUtils.generateSalt();
+        String hashedPassword = PasswordUtils.hashPassword(password, salt);
+
+        // Store like: username,email,salt:hash
+        String line = username + "," + email + "," + salt + ":" + hashedPassword + "\n";
+        java.nio.file.Files.write(USERS_FILE.toPath(), line.getBytes(), java.nio.file.StandardOpenOption.APPEND, java.nio.file.StandardOpenOption.CREATE);
+    }
+
+    // Example verify method
+   /* public static boolean verifyUserPassword(String username, String password) throws IOException {
+        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(username)) {
+                String[] saltAndHash = parts[2].split(":");
+                return PasswordUtils.verifyPassword(password, saltAndHash[0], saltAndHash[1]);
+            }
+        }
+        return false;
+    }
+   */
+    public static boolean verifyUserPassword(String username, String password) throws IOException {
+        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(username)) {
+                String[] saltAndHash = parts[2].split(":");
+                return PasswordUtils.verifyPassword(password, saltAndHash[0], saltAndHash[1]);
+            }
+        }
+        return false;
+    }
+    // Example update password
+    public static void updateUserPassword(String username, String newPassword) throws IOException {
+        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
+        for (int i = 0; i < lines.size(); i++) {
+            String[] parts = lines.get(i).split(",");
+            if (parts[0].equals(username)) {
+                String salt = PasswordUtils.generateSalt();
+                String hash = PasswordUtils.hashPassword(newPassword, salt);
+                lines.set(i, parts[0] + "," + parts[1] + "," + salt + ":" + hash);
+                break;
+            }
+        }
+        java.nio.file.Files.write(USERS_FILE.toPath(), lines);
+    }
+
+
 }
