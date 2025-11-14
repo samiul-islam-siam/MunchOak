@@ -1,6 +1,6 @@
 package com.example.menu;
-import com.example.manager.Session;
 import com.example.view.LoginPage;
+import com.example.manager.Session;
 import javafx.scene.Node;
 import com.example.view.HomePage;
 import javafx.animation.*;
@@ -145,7 +145,6 @@ public class MenuPage {
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
 
-
         if(Session.getCurrentUsername().equalsIgnoreCase("admin"))
         {
             LoginPage lgoinpage = new LoginPage(primaryStage);
@@ -155,7 +154,6 @@ public class MenuPage {
             backButton.setOnAction(e -> returnToHomePerfectly());
         }
         backPanel.getChildren().add(backButton);
-
 
         VBox topSection = new VBox(navBar, backPanel);
         topSection.setAlignment(Pos.TOP_RIGHT);
