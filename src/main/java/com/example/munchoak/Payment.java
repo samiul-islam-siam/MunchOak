@@ -87,7 +87,7 @@ public class Payment {
                 return;
             }
             if (card.length() < 8 || pin.length() < 4) {
-                new Alert(Alert.AlertType.ERROR, "Invalid card or PIN!").show();
+                new Alert(Alert.AlertType.ERROR, "Invalid card (8-digit) or PIN (4-digit)!").show();
                 return;
             }
 

@@ -170,11 +170,21 @@
 .side-panel Button:hover {
     -fx-text-fill: #27ae60;
 }
+
+.label {
+    -fx-text-fill: #000000;
+}
+.foods {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E53935;
+}
 /* ================================
    Labels & Text
    ================================ */
 .label, .title-label {
-    -fx-text-fill: #E53935;;
+    /*-fx-text-fill: #E53935;;*/
+    -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 .title-label {

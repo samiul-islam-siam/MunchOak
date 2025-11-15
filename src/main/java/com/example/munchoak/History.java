@@ -22,20 +22,22 @@ public class History {
 
     private final Stage primaryStage;
     private TableView<HistoryRecord> historyTable;
-    private ObservableList<HistoryRecord> historyData;
+    public ObservableList<HistoryRecord> historyData;
 
     public History(Stage primaryStage) {
+
         this.primaryStage = primaryStage;
+        this.historyData = FXCollections.observableArrayList();  // <--- FIX
     }
 
-    public Scene getScene() {
+    public VBox getView() {
         historyTable = new TableView<>();
         historyTable.setPlaceholder(new Label("No payment history available."));
         historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         historyTable.setPrefHeight(Region.USE_COMPUTED_SIZE);
         historyTable.setMaxWidth(700); // keep table nicely centered
 
-        historyData = FXCollections.observableArrayList();
+
 
         // --- Table Columns ---
         TableColumn<HistoryRecord, Integer> userIdCol = new TableColumn<>("User ID");
@@ -99,10 +101,10 @@ public class History {
         layout.setAlignment(Pos.TOP_CENTER);
 
 
-        Scene scene = new Scene(layout, 900, 600);
+        //Scene scene = new Scene(layout, 900, 600);
         // Optional CSS file (if you create one)
         // scene.getStylesheets().add(getClass().getResource("/com/example/munchoak/history.css").toExternalForm());
-        return scene;
+        return layout;
     }
 
     private void goBack() {
@@ -115,7 +117,7 @@ public class History {
     }
 
     // ------------------ Data Handling ------------------
-    private void loadHistory() {
+    public void loadHistory() {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();

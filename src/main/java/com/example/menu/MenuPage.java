@@ -147,8 +147,8 @@ public class MenuPage {
 
         if(Session.getCurrentUsername().equalsIgnoreCase("admin"))
         {
-            LoginPage lgoinpage = new LoginPage(primaryStage);
-            backButton.setOnAction(e -> lgoinpage.openAdminDashboard());
+            LoginPage loginpage = new LoginPage(primaryStage);
+            backButton.setOnAction(e -> loginpage.openAdminDashboard());
         }else
         {
             backButton.setOnAction(e -> returnToHomePerfectly());

@@ -160,6 +160,12 @@ public class BaseMenu {
         inputGrid.add(new Label("Category:"), 0, 4);
         inputGrid.add(categoryBox, 1, 4);
 
+//        for (Node node : inputGrid.getChildren()) {
+//            if (node instanceof Label lbl) {
+//                lbl.setStyle("-fx-text-fill:#E53935;");
+//            }
+//        }
+
         // Category management buttons
         Button addCatBtn = new Button("Add Category");
         Button renameCatBtn = new Button("Rename Category");
@@ -185,6 +191,11 @@ public class BaseMenu {
         inputGrid.add(new Label("Image:"), 0, 6);
         inputGrid.add(imageBox, 1, 6);
 
+        for (Node node : inputGrid.getChildren()) {
+            if (node instanceof Label lbl) {
+                lbl.setStyle("-fx-text-fill:#E53935;");
+            }
+        }
         // Add / Update button inside form
         addOrUpdateButton = new Button("Add");
         styleMainButton(addOrUpdateButton);
@@ -736,7 +747,7 @@ public class BaseMenu {
         ratingsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         imageFilenameLabel.setText(food.getImagePath());
         categoryBox.setValue(food.getCategory());
-        categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #798965;");
         selectedImageFile = null;
         addOrUpdateButton.setText("Update");
 
@@ -753,6 +764,7 @@ public class BaseMenu {
         priceField.clear();
         ratingsField.clear();
         imageFilenameLabel.setText("No image selected");
+        imageFilenameLabel.setStyle("-fx-text-fill:#E53935;");
         categoryBox.setValue(null);
         selectedImageFile = null;
         currentEditingFood = null;
@@ -976,7 +988,7 @@ public class BaseMenu {
         }
 
         try {
-            int userId = (cart.getUserId() == -1) ? 2025000 : cart.getUserId();
+            int userId = Session.getCurrentUserId();
 
             int paymentId = FileStorage.createPaymentAndCart(userId, cart, foodMap, "Card");
             Payment payment = new Payment(paymentId, total);

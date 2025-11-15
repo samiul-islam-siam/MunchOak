@@ -3,7 +3,7 @@ Academic project for CSE 2104. This project is under development.
 
 ## Directory
     MunchOak/
-    │
+    |
     ├── src/                        
     │   └── main/                   
     │       ├── java/

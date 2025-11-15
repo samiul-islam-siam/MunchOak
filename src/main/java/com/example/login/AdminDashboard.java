@@ -14,7 +14,8 @@ import java.util.List;
 
 public class AdminDashboard {
 
-    public static void show(Stage stage) {
+    public static void show(Stage stage)
+    {
         Label title = new Label("Welcome to the Admin Dashboard!");
         title.setStyle("-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;");
 

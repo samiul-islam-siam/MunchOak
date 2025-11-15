@@ -574,8 +574,8 @@ public class FileStorage {
                 String email = dis.readUTF();
                 //String pwd = dis.readUTF();
 
-               String saltAndHash = dis.readUTF();
-               dis.readInt(); // userId, ignored here
+                String saltAndHash = dis.readUTF();
+                dis.readInt(); // userId, ignored here
                 if (uname.equals(username)) {
                     String[] parts = saltAndHash.split(":");
                     if (parts.length != 2) return false;

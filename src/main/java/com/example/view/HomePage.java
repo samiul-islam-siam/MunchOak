@@ -370,12 +370,12 @@ public class HomePage implements HomePageComponent {
     private void openHistoryPageDirectly() {
         Platform.runLater(() -> {
             History history = new History(primaryStage);
-            Scene historyScene = history.getScene();
+            //Scene historyScene = history.getScene();
             double w = primaryStage.getWidth();
             double h = primaryStage.getHeight();
             boolean fs = primaryStage.isFullScreen();
             boolean max = primaryStage.isMaximized();
-            primaryStage.setScene(historyScene);
+            //primaryStage.setScene(historyScene);
             primaryStage.setWidth(w);
             primaryStage.setHeight(h);
             if (fs) primaryStage.setFullScreen(true);
@@ -602,33 +602,38 @@ public class HomePage implements HomePageComponent {
     }
 
     @FXML
-    private void openChatWindow() {
+    public void openChatWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage chatStage = new Stage();
             chatStage.setScene(new Scene(loader.load()));
 
-            // Get the controller and set username explicitly
+            // Get the controller
             ChatClient controller = loader.getController();
-            String username = Session.getCurrentUsername();
-            if (username == null || username.isEmpty()) {
-                username = "Guest";
-            }
-            controller.setUsername(username);  // <-- pass username here
 
-            // Set stage title with username
+            // Get current session info
+            String username = Session.getCurrentUsername();
+            if (username == null || username.isEmpty()) username = "Guest";
+
+            String role = Session.getCurrentRole();
+            boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
+
+            // Pass username and role to controller
+            controller.setUsername(username);
+            controller.setAdmin(isAdmin);
+
+            // Set stage title
             chatStage.setTitle("Chatting as [" + username + "]");
+
+            // Show window
             chatStage.show();
 
-            chatStage.setOnCloseRequest(e -> {
-                try {
-                    controller.closeConnection();
-                } catch (Exception ignored) {
-                }
-            });
+            // Ensure connection closes when window closes
+            chatStage.setOnCloseRequest(e -> controller.closeConnection());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
