@@ -3,6 +3,7 @@ package com.example.munchoak;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.view.HomePage;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -56,6 +57,7 @@ public class History {
         TableColumn<HistoryRecord, Void> billCol = new TableColumn<>("Bill");
         billCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("View");
+
             {
                 btn.setOnAction(e -> {
                     HistoryRecord record = getTableView().getItems().get(getIndex());
@@ -192,11 +194,28 @@ public class History {
             this.paymentMethod = paymentMethod;
         }
 
-        public int getUserId() { return userId; }
-        public int getPaymentId() { return paymentId; }
-        public String getTimestamp() { return timestamp; }
-        public double getAmount() { return amount; }
-        public String getStatus() { return status; }
-        public String getPaymentMethod() { return paymentMethod; }
+        public int getUserId() {
+            return userId;
+        }
+
+        public int getPaymentId() {
+            return paymentId;
+        }
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getPaymentMethod() {
+            return paymentMethod;
+        }
     }
 }

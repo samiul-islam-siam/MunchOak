@@ -1,6 +1,7 @@
 package com.example.view;
 
 import com.example.manager.FileStorage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;

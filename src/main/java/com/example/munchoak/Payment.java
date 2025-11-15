@@ -1,6 +1,5 @@
 package com.example.munchoak;
 
-import com.example.manager.FileStorage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,7 +23,7 @@ public class Payment {
         this.success = false;
     }
 
-    // Main payment entry point (don’t change arguments)
+    // Main payment entry point
     public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
         Stage stage = new Stage();
         stage.setTitle("Select Payment Method");

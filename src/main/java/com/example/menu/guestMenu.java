@@ -2,6 +2,7 @@ package com.example.menu;
 
 import com.example.manager.FileStorage;
 import com.example.munchoak.FoodItems;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,9 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-
 import java.io.File;
-
 
 public class guestMenu extends BaseMenu {
 

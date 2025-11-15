@@ -339,7 +339,6 @@ public class AboutUsPage {
 
     // Helper to open map links
     private javafx.application.HostServices getHostServices() {
-        return javafx.application.Application.getUserAgentStylesheet() == null ?
-                null : null; // override when called from actual Application
+        return null; // override when called from actual Application
     }
 }

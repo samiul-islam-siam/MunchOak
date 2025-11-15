@@ -23,7 +23,6 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
-    private static final File USER_FILE = new File("src/main/resources/com/example/manager/data/users.dat");
 
     static {
         ensureDataDir();

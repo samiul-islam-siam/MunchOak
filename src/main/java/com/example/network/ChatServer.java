@@ -3,20 +3,19 @@ package com.example.network;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * Private chats: USER <-> ADMIN
- * - Users cannot see other users.
- * - Admin can see all users, select one, and reply privately.
- * - Per-user chat histories stored in user's home directory under MunchOakChatHistory/<username>.txt
- */
 public class ChatServer {
     private static final int PORT = 5050;
-    private static final String HISTORY_DIR =
-            System.getProperty("user.home") + "/MunchOakChatHistory";
+    private static final String HISTORY_DIR = "src/main/resources/com/example/network/Chats";
 
     private static final Map<String, ClientHandler> users = new ConcurrentHashMap<>();
     private static final Set<ClientHandler> admins = ConcurrentHashMap.newKeySet();
@@ -43,14 +42,17 @@ public class ChatServer {
     }
 
     private static File historyFileFor(String username) {
-        return new File(HISTORY_DIR, username + ".txt");
+        return new File(HISTORY_DIR, username + ".dat");
     }
 
     private static void appendHistory(String username, String role, String text) {
         File f = historyFileFor(username);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(f, true))) {
-            bw.write(role + "|" + text);
-            bw.newLine();
+        try (DataOutputStream dos = new DataOutputStream(
+                new BufferedOutputStream(new FileOutputStream(f, true)))) {
+
+            dos.writeUTF(role);  // binary UTF → unreadable in text editors
+            dos.writeUTF(text);
+            dos.writeLong(System.currentTimeMillis());
         } catch (IOException e) {
             System.err.println("⚠️ Error saving history for " + username + ": " + e.getMessage());
         }
@@ -60,9 +62,22 @@ public class ChatServer {
         File f = historyFileFor(username);
         if (!f.exists()) return Collections.emptyList();
         List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String ln;
-            while ((ln = br.readLine()) != null) lines.add(ln);
+        try (DataInputStream dis = new DataInputStream(
+                new BufferedInputStream(new FileInputStream(f)))) {
+
+            while (true) {
+                try {
+                    String role = dis.readUTF();
+                    String text = dis.readUTF();
+                    long ts = dis.readLong();
+
+                    lines.add(role + "|" + text);
+
+                } catch (EOFException eof) {
+                    break;
+                }
+            }
+
         } catch (IOException e) {
             System.err.println("⚠️ Error reading history for " + username + ": " + e.getMessage());
         }
@@ -154,21 +169,35 @@ public class ChatServer {
                     if (line.startsWith("MSG|")) {
                         handleUserMessageToAdmin(line.substring(4));
                     } else if (line.startsWith("MSGTO|")) {
-                        if (!isAdmin) { send("SYS|Only admin can send MSGTO"); continue; }
+                        if (!isAdmin) {
+                            send("SYS|Only admin can send MSGTO");
+                            continue;
+                        }
                         String[] p = line.split("\\|", 3);
-                        if (p.length < 3) { send("SYS|Bad MSGTO format"); continue; }
+                        if (p.length < 3) {
+                            send("SYS|Bad MSGTO format");
+                            continue;
+                        }
                         handleAdminMessageToUser(p[1].trim(), p[2]);
                     } else if (line.startsWith("GETHIST|")) {
-                        if (!isAdmin) { send("SYS|Only admin can request history"); continue; }
+                        if (!isAdmin) {
+                            send("SYS|Only admin can request history");
+                            continue;
+                        }
                         String[] p = line.split("\\|", 2);
-                        if (p.length < 2) { send("SYS|Bad GETHIST format"); continue; }
+                        if (p.length < 2) {
+                            send("SYS|Bad GETHIST format");
+                            continue;
+                        }
                         sendHistoryToAdmin(p[1].trim());
                     } else {
                         send("SYS|Unknown command");
                     }
                 }
-            } catch (IOException ignored) {}
-            finally { close(); }
+            } catch (IOException ignored) {
+            } finally {
+                close();
+            }
         }
 
         private void handleUserMessageToAdmin(String text) {
@@ -179,7 +208,10 @@ public class ChatServer {
 
         private void handleAdminMessageToUser(String targetUser, String text) {
             ClientHandler target = users.get(targetUser);
-            if (target == null) { send("SYS|User not online: " + targetUser); return; }
+            if (target == null) {
+                send("SYS|User not online: " + targetUser);
+                return;
+            }
             appendHistory(targetUser, "ADMIN", text);
             target.send("INCOMING|ADMIN|" + text);
         }
@@ -195,7 +227,9 @@ public class ChatServer {
             send("HIST_END|" + targetUser);
         }
 
-        private void send(String msg) { if (out != null) out.println(msg); }
+        private void send(String msg) {
+            if (out != null) out.println(msg);
+        }
 
         private void close() {
             try {
@@ -208,7 +242,8 @@ public class ChatServer {
                 if (socket != null && !socket.isClosed()) socket.close();
                 if (in != null) in.close();
                 if (out != null) out.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 }

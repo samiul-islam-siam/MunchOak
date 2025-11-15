@@ -21,7 +21,8 @@ public class Home extends Application {
         this.primaryStage = stage;
         mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
-        stage.setTitle("Home Page + Extension");
+        stage.setTitle("Home Page");
+
         // ✅ Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
@@ -36,13 +37,15 @@ public class Home extends Application {
     private Scene createMainScene() {
         HomePage home = new HomePage(primaryStage);
         VBox fullPage = home.getFullPage();
+
         // --- ScrollPane with smoother scroll ---
         ScrollPane scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
-        // 🔹 Smooth scroll effect (gradual movement)
+
+        // --- Smooth scroll effect (gradual movement) ---
         scrollPane.setOnScroll(e -> {
             double deltaY = e.getDeltaY() * 0.002; // scroll speed factor
             double targetV = scrollPane.getVvalue() - deltaY;
@@ -54,11 +57,7 @@ public class Home extends Application {
             );
             smoothScroll.play();
         });
-        return new Scene(scrollPane, 1000, 700);
-    }
-
-    public Scene getMainScene() {
-        return mainScene;
+        return new Scene(scrollPane, 1000, 700); // Scene area
     }
 
     public static void main(String[] args) {

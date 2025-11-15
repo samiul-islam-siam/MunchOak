@@ -8,8 +8,8 @@ public class Session {
         return currentUserId;
     }
 
-    public static void setCurrentUserId(int id) {
-        currentUserId = id;
+    public static void setCurrentUserId(String name) {
+        currentUserId = FileStorage.getUserId(name);
     }
 
     public static String getCurrentUsername() {

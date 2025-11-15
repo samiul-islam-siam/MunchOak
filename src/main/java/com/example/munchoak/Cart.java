@@ -1,7 +1,6 @@
 package com.example.munchoak;
 
 import java.io.Serializable;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;

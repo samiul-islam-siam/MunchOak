@@ -1,8 +1,10 @@
 package com.example.menu;
+
 import com.example.view.LoginPage;
 import com.example.manager.Session;
-import javafx.scene.Node;
 import com.example.view.HomePage;
+
+import javafx.scene.Node;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
