@@ -1,4 +1,6 @@
 package com.example.view;
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import javafx.stage.Modality;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
@@ -276,6 +278,7 @@ public class LoginPage {
                     showStatus("Incorrect password!", true);
                     return;
                 }
+                Session.setCurrentUsername(usernameField.getText());
                 showStatus("Login successful!", false);
                 returnToHome();
             } catch (Exception ex) {
@@ -329,6 +332,7 @@ public class LoginPage {
                     showStatus("Incorrect ID or password!", true);
                     return;
                 }
+                Session.setCurrentUsername("admin");
                 showStatus("Admin login successful!", false);
                 openAdminDashboard();
             } catch (IOException ex) {
@@ -402,7 +406,7 @@ public class LoginPage {
         fadeOut.play();
     }
 
-    private void openAdminDashboard() {
+    public void openAdminDashboard() {
         BorderPane dashboard = new BorderPane();
         dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
 
@@ -448,21 +452,55 @@ public class LoginPage {
         // --- Button Functionalities ---
 
         viewUsersBtn.setOnAction(e -> {
-            try {
-                List<String> users = FileStorage.readAllUsers();
-                TextArea area = new TextArea(String.join("\n", users));
-                area.setEditable(false);
-                centerPane.getChildren().setAll(area);
-            } catch (IOException ex) {
-                infoLabel.setText("Error reading users!");
-                ex.printStackTrace();
-            }
+            List<String[]> users = FileStorage.loadUsers();
+            TableView<String[]> table = new TableView<>();
+            // Column for User ID (last element)
+            TableColumn<String[], String> idCol = new TableColumn<>("User ID");
+            idCol.setCellValueFactory(data ->
+                    new javafx.beans.property.SimpleStringProperty(data.getValue()[3])
+            );
+            idCol.setPrefWidth(100);
+
+            // Column for Username (first element)
+            TableColumn<String[], String> usernameCol = new TableColumn<>("Username");
+            usernameCol.setCellValueFactory(data ->
+                    new javafx.beans.property.SimpleStringProperty(data.getValue()[0])
+            );
+            usernameCol.setPrefWidth(200);
+
+            // Column for Email / Main (second element)
+            TableColumn<String[], String> emailCol = new TableColumn<>("Email");
+            emailCol.setCellValueFactory(data ->
+                    new javafx.beans.property.SimpleStringProperty(data.getValue()[1])
+            );
+            emailCol.setPrefWidth(250);
+
+            // Column for Password (third element, masked)
+            TableColumn<String[], String> passwordCol = new TableColumn<>("Password");
+            passwordCol.setCellValueFactory(data ->
+                    new javafx.beans.property.SimpleStringProperty("********")
+            );
+            passwordCol.setPrefWidth(150);
+
+            table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
+
+            // Add users to the table
+            table.getItems().addAll(users);
+
+            // Make table fill centerPane
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            centerPane.getChildren().setAll(table);
+
+
+
         });
 
         manageMenuBtn.setOnAction(e -> {
-            Label msg = new Label("Manage Menu (Coming soon...)");
-            msg.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-            centerPane.getChildren().setAll(msg);
+//            Label msg = new Label("Manage Menu (Coming soon...)");
+//            msg.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
+//            centerPane.getChildren().setAll(msg);
+            MenuPage menuPage = new MenuPage(primaryStage);
+            primaryStage.setScene(menuPage.getMenuScene());
         });
 
         changePassBtn.setOnAction(e -> com.example.login.ChangeAdminPasswordPage.show(primaryStage));
@@ -547,7 +585,7 @@ public class LoginPage {
                 FileStorage.updateUserPassword(username, np);
                 errorLabel.setStyle("-fx-text-fill: lightgreen;");
                 errorLabel.setText("Password updated successfully!");
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 errorLabel.setStyle("-fx-text-fill: red;");
                 errorLabel.setText("Error updating password.");
                 ex.printStackTrace();
