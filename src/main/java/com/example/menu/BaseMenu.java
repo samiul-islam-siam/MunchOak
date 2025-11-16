@@ -114,7 +114,7 @@ public class BaseMenu {
     // Cart for the current user
     int userId = Session.getCurrentUserId();
 
-    private Cart cart = new Cart(userId, "guest");
+    private Cart cart = new Cart();
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();

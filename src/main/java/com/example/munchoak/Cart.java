@@ -1,40 +1,21 @@
 package com.example.munchoak;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Cart implements Serializable {
     public static int numberOfCarts = 0;
-    private int id;
-    private int userId;
-    private String token;
-    private HashMap<Integer, Integer> buyHistory; // Food_ID -> quantity
-    private String timestamp;
+    private final int id;
+    private final HashMap<Integer, Integer> buyHistory;
 
-    public Cart(int userId, String token) {
+    public Cart() {
         this.id = ++numberOfCarts;
-        this.userId = userId;
-        this.token = token;
         this.buyHistory = new HashMap<>();
-        this.timestamp = Instant.now().toString();
     }
 
     public int getId() {
         return id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
     }
 
     public HashMap<Integer, Integer> getBuyHistory() {
@@ -43,14 +24,6 @@ public class Cart implements Serializable {
 
     public void addToCart(Integer foodId, int count) {
         buyHistory.put(foodId, buyHistory.getOrDefault(foodId, 0) + count);
-    }
-
-    public void removeFromCart(Integer foodId) {
-        if (buyHistory.containsKey(foodId)) {
-            int current = buyHistory.get(foodId);
-            if (current > 1) buyHistory.put(foodId, current - 1);
-            else buyHistory.remove(foodId);
-        }
     }
 
     public void removeFromCartEntirely(Integer foodId) {
