@@ -62,6 +62,10 @@ public class ChatClient {
         this.username = username;
     }
 
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
     private void getIdentityFromSession() {
         this.username = com.example.manager.Session.getCurrentUsername();
         String role = null;
