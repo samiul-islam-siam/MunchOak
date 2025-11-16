@@ -3,21 +3,19 @@ package com.example.network;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * Private chats: USER <-> ADMIN
- * - Users cannot see other users.
- * - Admin can see all users, select one, and reply privately.
- * - Per-user chat histories stored in user's home directory under MunchOakChatHistory/<username>.txt
- */
 public class ChatServer {
     private static final int PORT = 5050;
-    private static final String HISTORY_DIR =
-            //System.getProperty("user.home") + "/MunchOakChatHistory";
-            "src/main/resources/com/example/network/Chats";
+    private static final String HISTORY_DIR = "src/main/resources/com/example/network/Chats";
 
     private static final Map<String, ClientHandler> users = new ConcurrentHashMap<>();
     private static final Set<ClientHandler> admins = ConcurrentHashMap.newKeySet();
@@ -80,7 +78,7 @@ public class ChatServer {
                 }
             }
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("⚠️ Error reading history for " + username + ": " + e.getMessage());
         }
         return lines;

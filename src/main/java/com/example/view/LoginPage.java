@@ -2,7 +2,9 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
-import com.example.munchoak.History;
+import com.example.manager.AdminFileStorage;
+import com.example.manager.FileStorage;
+
 import javafx.stage.Modality;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
@@ -12,7 +14,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Background;
 import javafx.geometry.Insets;
-import com.example.manager.FileStorage;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
@@ -23,7 +24,6 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import com.example.manager.AdminFileStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -362,7 +362,7 @@ public class LoginPage {
         return pane;
     }
 
-    // shopwing register form
+    // showing register form
     private void showRegisterForm() {
         loginPane.setVisible(false);
         registerPane.setVisible(true);
@@ -448,7 +448,7 @@ public class LoginPage {
             btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
         }
 
-        menuBox.getChildren().addAll(viewUsersBtn, countUsersBtn, manageMenuBtn,usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn);
+        menuBox.getChildren().addAll(viewUsersBtn, countUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn);
 
         dashboard.setTop(topBar);
         dashboard.setLeft(menuBox);
@@ -458,18 +458,10 @@ public class LoginPage {
         primaryStage.setScene(scene);
 
 
-
-        // --- Button Functionalities ---
-
+        /* --- Button Functionalities --- */
         usersHistoryBtn.setOnAction(event ->
         {
-            History history = new History(primaryStage);
-            //StackPane centerPane = (StackPane) ((BorderPane) primaryStage.getScene().getRoot()).getCenter();
-            centerPane.getChildren().clear();
-            centerPane.getChildren().add(history.getView());
             System.out.println("History Button Clicked");
-
-            //System.out.println("History Button Clicked");
         });
 
         viewUsersBtn.setOnAction(e -> {
@@ -511,14 +503,9 @@ public class LoginPage {
             // Make table fill centerPane
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             centerPane.getChildren().setAll(table);
-
-
         });
 
         manageMenuBtn.setOnAction(e -> {
-//            Label msg = new Label("Manage Menu (Coming soon...)");
-//            msg.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-//            centerPane.getChildren().setAll(msg);
             MenuPage menuPage = new MenuPage(primaryStage);
             primaryStage.setScene(menuPage.getMenuScene());
         });
@@ -527,7 +514,10 @@ public class LoginPage {
             HomePage homePage = new HomePage(primaryStage);
             homePage.openChatWindow();
         });
-        changePassBtn.setOnAction(e -> com.example.login.ChangeAdminPasswordPage.show(primaryStage));
+
+        changePassBtn.setOnAction(e ->
+                com.example.login.ChangeAdminPasswordPage.show(primaryStage)
+        );
 
         logoutBtn.setOnAction(e -> {
             // Go back to LoginPage

@@ -44,7 +44,7 @@ public class BaseMenu {
     private ObservableList<FoodItems> foodList;
     private VBox foodContainer;
 
-    private TextField nameField, detailsField, priceField, ratingsField;
+    private TextField nameField, detailsField, priceField, calorieField;
     private ComboBox<String> categoryBox;
     private Label imageFilenameLabel;
     private File selectedImageFile = null;
@@ -137,7 +137,7 @@ public class BaseMenu {
         nameField = new TextField();
         detailsField = new TextField();
         priceField = new TextField();
-        ratingsField = new TextField();
+        calorieField = new TextField();
         imageFilenameLabel = new Label("No image selected");
 
         categoryBox = new ComboBox<>();
@@ -155,8 +155,8 @@ public class BaseMenu {
         inputGrid.add(detailsField, 1, 1);
         inputGrid.add(new Label("Price:"), 0, 2);
         inputGrid.add(priceField, 1, 2);
-        inputGrid.add(new Label("Ratings:"), 0, 3);
-        inputGrid.add(ratingsField, 1, 3);
+        inputGrid.add(new Label("Calories:"), 0, 3);
+        inputGrid.add(calorieField, 1, 3);
         inputGrid.add(new Label("Category:"), 0, 4);
         inputGrid.add(categoryBox, 1, 4);
 
@@ -592,8 +592,8 @@ public class BaseMenu {
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
         Label price = new Label("Price: $" + food.getPrice());
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
-        Label rating = new Label("⭐ " + food.getRatings());
-        rating.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
+        Label calorie = new Label("\uD83D\uDD25 " + food.getCalories());
+        calorie.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
 
         if (!(this instanceof guestMenu) && !(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
             addToCartBtn = new Button("Add to Cart");
@@ -635,7 +635,7 @@ public class BaseMenu {
         else buttons = new HBox();
 
         buttons.setAlignment(Pos.CENTER);
-        card.getChildren().addAll(imgView, name, desc, price, rating, buttons);
+        card.getChildren().addAll(imgView, name, desc, price, calorie, buttons);
         return card;
     }
 
@@ -661,17 +661,17 @@ public class BaseMenu {
             return;
         }
 
-        double rating;
-        try {
-            rating = Double.parseDouble(ratingsField.getText().trim());
-            if (rating < 0 || rating > 5) {
-                showAlert("Error", "Ratings must be between 0 and 5.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid ratings.");
-            return;
-        }
+        String calorie= calorieField.getText().trim();
+//        try {
+//            rating = Double.parseDouble(calorieField.getText().trim());
+//            if (rating < 0 || rating > 5) {
+//                showAlert("Error", "Ratings must be between 0 and 5.");
+//                return;
+//            }
+//        } catch (NumberFormatException e) {
+//            showAlert("Error", "Invalid ratings.");
+//            return;
+//        }
 
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
@@ -682,7 +682,7 @@ public class BaseMenu {
         }
 
         FoodItems newFood = new FoodItems(nextId, nameField.getText().trim(), detailsField.getText().trim(),
-                price, rating, imageFilename, categoryBox.getValue());
+                price, calorie, imageFilename, categoryBox.getValue());
 
         try {
             FileStorage.appendMenuItem(newFood);
@@ -708,7 +708,7 @@ public class BaseMenu {
         currentEditingFood.setName(nameField.getText().trim());
         currentEditingFood.setDetails(detailsField.getText().trim());
         currentEditingFood.setPrice(Double.parseDouble(priceField.getText().trim()));
-        currentEditingFood.setRatings(Double.parseDouble(ratingsField.getText().trim()));
+        currentEditingFood.setCalories(calorieField.getText().trim());
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
 
@@ -743,8 +743,8 @@ public class BaseMenu {
         detailsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         priceField.setText(String.valueOf(food.getPrice()));
         priceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        ratingsField.setText(String.valueOf(food.getRatings()));
-        ratingsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        calorieField.setText(String.valueOf(food.getCalories()));
+        calorieField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         imageFilenameLabel.setText(food.getImagePath());
         categoryBox.setValue(food.getCategory());
         categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #798965;");
@@ -762,7 +762,7 @@ public class BaseMenu {
         nameField.clear();
         detailsField.clear();
         priceField.clear();
-        ratingsField.clear();
+        calorieField.clear();
         imageFilenameLabel.setText("No image selected");
         imageFilenameLabel.setStyle("-fx-text-fill:#E53935;");
         categoryBox.setValue(null);

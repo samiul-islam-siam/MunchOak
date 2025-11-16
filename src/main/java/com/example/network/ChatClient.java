@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,15 +181,6 @@ public class ChatClient {
             else handleIncomingAsUser(field1, text);
         } else if (msg.startsWith("SYS|")) chatMessages.add(new ChatMessage(msg.substring(4), false));
     }
-
-//    private void handleIncomingAsAdmin(String field1, String text) {
-//        if (loadingHistory) return; // skip live messages until history finished
-//        String fromUser = field1.trim();
-//        adminConversations.putIfAbsent(fromUser, FXCollections.observableArrayList());
-//        ObservableList<ChatMessage> conv = adminConversations.get(fromUser);
-//        conv.add(new ChatMessage(fromUser + ": " + text, false));
-//        if (Objects.equals(selectedUser, fromUser)) chatMessages.setAll(conv);
-//    }
 
     private void handleIncomingAsAdmin(String field1, String text) {
         String marker = field1 == null ? "" : field1.trim();

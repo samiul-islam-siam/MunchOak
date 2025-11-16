@@ -3,6 +3,7 @@ package com.example.munchoak;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.view.HomePage;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -22,22 +23,20 @@ public class History {
 
     private final Stage primaryStage;
     private TableView<HistoryRecord> historyTable;
-    public ObservableList<HistoryRecord> historyData;
+    private ObservableList<HistoryRecord> historyData;
 
     public History(Stage primaryStage) {
-
         this.primaryStage = primaryStage;
-        this.historyData = FXCollections.observableArrayList();  // <--- FIX
     }
 
-    public VBox getView() {
+    public Scene getScene() {
         historyTable = new TableView<>();
         historyTable.setPlaceholder(new Label("No payment history available."));
         historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         historyTable.setPrefHeight(Region.USE_COMPUTED_SIZE);
         historyTable.setMaxWidth(700); // keep table nicely centered
 
-
+        historyData = FXCollections.observableArrayList();
 
         // --- Table Columns ---
         TableColumn<HistoryRecord, Integer> userIdCol = new TableColumn<>("User ID");
@@ -58,6 +57,7 @@ public class History {
         TableColumn<HistoryRecord, Void> billCol = new TableColumn<>("Bill");
         billCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("View");
+
             {
                 btn.setOnAction(e -> {
                     HistoryRecord record = getTableView().getItems().get(getIndex());
@@ -101,10 +101,10 @@ public class History {
         layout.setAlignment(Pos.TOP_CENTER);
 
 
-        //Scene scene = new Scene(layout, 900, 600);
+        Scene scene = new Scene(layout, 900, 600);
         // Optional CSS file (if you create one)
         // scene.getStylesheets().add(getClass().getResource("/com/example/munchoak/history.css").toExternalForm());
-        return layout;
+        return scene;
     }
 
     private void goBack() {
@@ -117,7 +117,7 @@ public class History {
     }
 
     // ------------------ Data Handling ------------------
-    public void loadHistory() {
+    private void loadHistory() {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
@@ -194,11 +194,28 @@ public class History {
             this.paymentMethod = paymentMethod;
         }
 
-        public int getUserId() { return userId; }
-        public int getPaymentId() { return paymentId; }
-        public String getTimestamp() { return timestamp; }
-        public double getAmount() { return amount; }
-        public String getStatus() { return status; }
-        public String getPaymentMethod() { return paymentMethod; }
+        public int getUserId() {
+            return userId;
+        }
+
+        public int getPaymentId() {
+            return paymentId;
+        }
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getPaymentMethod() {
+            return paymentMethod;
+        }
     }
 }

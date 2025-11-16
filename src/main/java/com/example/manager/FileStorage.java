@@ -23,7 +23,6 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
-    private static final File USER_FILE = new File("src/main/resources/com/example/manager/data/users.dat");
 
     static {
         ensureDataDir();
@@ -108,10 +107,10 @@ public class FileStorage {
                 String name = dis.readUTF();
                 String details = dis.readUTF();
                 double price = dis.readDouble();
-                double ratings = dis.readDouble();
+                String calorie = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-                list.add(new FoodItems(id, name, details, price, ratings, imagePath, category));
+                list.add(new FoodItems(id, name, details, price, calorie, imagePath, category));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -133,7 +132,7 @@ public class FileStorage {
             dos.writeUTF(item.getName());
             dos.writeUTF(item.getDetails());
             dos.writeDouble(item.getPrice());
-            dos.writeDouble(item.getRatings());
+            dos.writeUTF(item.getCalories());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
         }
@@ -147,7 +146,7 @@ public class FileStorage {
                 dos.writeUTF(item.getName());
                 dos.writeUTF(item.getDetails());
                 dos.writeDouble(item.getPrice());
-                dos.writeDouble(item.getRatings());
+                dos.writeUTF(item.getCalories());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
             }

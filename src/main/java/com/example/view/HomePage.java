@@ -4,6 +4,7 @@ import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.History;
 import com.example.network.ChatClient;
+
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -27,12 +28,12 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javafx.util.Duration;
 
 public class HomePage implements HomePageComponent {
     private final StackPane root;
@@ -370,12 +371,12 @@ public class HomePage implements HomePageComponent {
     private void openHistoryPageDirectly() {
         Platform.runLater(() -> {
             History history = new History(primaryStage);
-            //Scene historyScene = history.getScene();
+            Scene historyScene = history.getScene();
             double w = primaryStage.getWidth();
             double h = primaryStage.getHeight();
             boolean fs = primaryStage.isFullScreen();
             boolean max = primaryStage.isMaximized();
-            //primaryStage.setScene(historyScene);
+            primaryStage.setScene(historyScene);
             primaryStage.setWidth(w);
             primaryStage.setHeight(h);
             if (fs) primaryStage.setFullScreen(true);
@@ -416,7 +417,6 @@ public class HomePage implements HomePageComponent {
         Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
 
-        // TODO: Implement History Page, show when logged in
 // History Button Logic here
         historyBtn.setOnAction(e -> {
             e.consume();
@@ -565,7 +565,7 @@ public class HomePage implements HomePageComponent {
         tt.play();
     }
 
-    // FIXED: Robust CSS load with clear/fallback - prevents default style reversion on scene switch
+    // Robust CSS load with clear/fallback - prevents default style reversion on scene switch
     // TODO: Once global CSS is set in Home.java via setUserAgentStylesheet, REMOVE this entire method block
     public Scene getHomeScene() {
         VBox fullPage = getFullPage();
@@ -602,7 +602,7 @@ public class HomePage implements HomePageComponent {
     }
 
     @FXML
-    public void openChatWindow() {
+    void openChatWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage chatStage = new Stage();
