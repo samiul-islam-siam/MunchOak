@@ -1,413 +1,129 @@
-/*
 package com.example.login;
-import com.example.manager.AdminFileStorage;
+
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
+import com.example.manager.FileStorage;
+
+import com.example.view.HomePage;
 import com.example.view.LoginPage;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.util.List;
-
-public class AdminDashboard {
-    public static void show(Stage stage) {
-        Label title = new Label("Welcome to the Admin Dashboard!");
-        title.setStyle("-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;");
-
-        Button viewUsersBtn = new Button("View All Users");
-        Button countUsersBtn = new Button("Count Users");
-        Button manageMenuBtn = new Button("Manage Menu");
-        Button changePassBtn = new Button("Change Admin Password");
-        Button viewHistoryBtn = new Button("View History");
-        Button logoutBtn = new Button("Logout");
-        Button changeIdBtn = new Button("Change Admin ID");
-        changeIdBtn.setStyle("-fx-font-size: 14px; -fx-pref-width: 220px;");
-        changeIdBtn.setOnAction(e -> showChangeAdminID(stage));
-
-
-        // Styling
-      /*  for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn,changeIdBtn, viewHistoryBtn, logoutBtn}) {
-            btn.setStyle("-fx-font-size: 14px; -fx-pref-width: 220px;");
-        }
-*/
-        /*
-        for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn, changeIdBtn, viewHistoryBtn, logoutBtn}) {
-            btn.setStyle("""
-        -fx-font-size: 14px;
-        -fx-pref-width: 220px;
-        -fx-background-color: #ffffff;
-        -fx-text-fill: #001F3F;
-        -fx-background-radius: 8;
-        -fx-font-weight: bold;
-    """);
-        }
-*/
-/*
-        viewUsersBtn.setStyle("-fx-background-color: red;");
-        countUsersBtn.setStyle("-fx-background-color: green;");
-        manageMenuBtn.setStyle("-fx-background-color: blue;");
-        changePassBtn.setStyle("-fx-background-color: yellow;");
-        changeIdBtn.setStyle("-fx-background-color: orange;");
-        viewHistoryBtn.setStyle("-fx-background-color: purple;");
-        logoutBtn.setStyle("-fx-background-color: pink;");
-
-        // --- Button Actions ---
-        viewUsersBtn.setOnAction(e -> {
-            List<String> users = AdminFileStorage.getAllUsers();
-            TextArea area = new TextArea();
-            area.setEditable(false);
-            area.setText(users.isEmpty() ? "No users found." : String.join("\n", users));
-            Button back = new Button("Back");
-            back.setOnAction(ev -> show(stage));
-            VBox layout = new VBox(15, new Label("All Registered Users:"), area, back);
-            layout.setAlignment(Pos.CENTER);
-            layout.setPadding(new Insets(20));
-            stage.setScene(new Scene(layout, 500, 400));
-        });
-
-        countUsersBtn.setOnAction(e -> {
-            int count = AdminFileStorage.countUsers();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("Total Users: " + count);
-            alert.showAndWait();
-        });
-
-        manageMenuBtn.setOnAction(e -> ManageMenuPage.show(stage));
-        changePassBtn.setOnAction(e -> ChangeAdminPasswordPage.show(stage));
-        changeIdBtn.setOnAction(e -> {
-            System.out.println("DEBUG: Change Admin ID button clicked!");
-            showChangeAdminID(stage);
-            //layout.setStyle("-fx-background-color: linear-gradient(to right, #001F3F, #0074D9);");
-
-        });
-
-
-        viewHistoryBtn.setOnAction(e -> {
-            List<String> logs = AdminFileStorage.readLog();
-            TextArea area = new TextArea();
-            area.setEditable(false);
-            area.setText(logs.isEmpty() ? "No history found." : String.join("\n", logs));
-            Button back = new Button("Back");
-            back.setOnAction(ev -> show(stage));
-            VBox layout = new VBox(15, new Label("Admin Action History:"), area, back);
-            layout.setAlignment(Pos.CENTER);
-            layout.setPadding(new Insets(20));
-            stage.setScene(new Scene(layout, 600, 400));
-        });
-
-        logoutBtn.setOnAction(e -> {
-            LoginPage loginPage = new LoginPage(stage);
-            stage.setScene(loginPage.getLoginScene());
-        });
-
-        VBox layout = new VBox(15, title, viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn, changeIdBtn, viewHistoryBtn, logoutBtn);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(40));
-        layout.setStyle("-fx-background-color: linear-gradient(to right, #001F3F, #0074D9);");
-
-        Scene scene = new Scene(layout, 800, 500);
-        stage.setTitle("Admin Dashboard");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-/*
-    private static void showChangeAdminID(Stage stage) {
-        List<String> users = AdminFileStorage.getAllUsers();
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts.length >= 1) userCombo.getItems().add(parts[0]); // username
-        }
-
-        if (users.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("No users found.");
-            alert.showAndWait();
-            return;
-        }
-
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-
-        Label title = new Label("Change User Unique ID");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ComboBox<String> userCombo = new ComboBox<>();
-        userCombo.getItems().addAll(users);
-        userCombo.setPromptText("Select User");
-
-        TextField newIdField = new TextField();
-        newIdField.setPromptText("Enter new Unique ID");
-
-        Label statusLabel = new Label();
-        statusLabel.setStyle("-fx-text-fill: red;");
-
-        Button saveBtn = new Button("Save");
-        Button backBtn = new Button("Back");
-
-        saveBtn.setOnAction(e -> {
-            String selectedUser = userCombo.getValue();
-            String newId = newIdField.getText().trim();
-
-            if (selectedUser == null || newId.isEmpty()) {
-                statusLabel.setText("Please select a user and enter a new ID.");
-                return;
-            }
-
-            try {
-                boolean success = AdminFileStorage.updateAdminUniqueID(selectedUser, newId);
-                if (success) {
-                    statusLabel.setStyle("-fx-text-fill: green;");
-                    statusLabel.setText("Unique ID updated successfully!");
-                } else {
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    statusLabel.setText("Error updating Unique ID.");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                statusLabel.setStyle("-fx-text-fill: red;");
-                statusLabel.setText("Error updating Unique ID.");
-            }
-        });
-
-        backBtn.setOnAction(e -> show(stage));
-
-        root.getChildren().addAll(title, userCombo, newIdField, saveBtn, backBtn, statusLabel);
-        stage.setScene(new Scene(root, 400, 300));
-    }
-*/
-/*
-    private static void showChangeAdminID(Stage stage) {
-        List<String> users = AdminFileStorage.getAllUsers();
-
-        if (users.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("No users found.");
-            alert.showAndWait();
-            return;
-        }
-
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-
-        Label title = new Label("Change User Unique ID");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ComboBox<String> userCombo = new ComboBox<>();
-        userCombo.getItems().addAll(users);
-        userCombo.setPromptText("Select User");
-
-        TextField newIdField = new TextField();
-        newIdField.setPromptText("Enter new Unique ID");
-
-        Label statusLabel = new Label();
-        statusLabel.setStyle("-fx-text-fill: red;");
-
-        Button saveBtn = new Button("Save");
-        Button backBtn = new Button("Back");
-
-        saveBtn.setOnAction(e -> {
-            String selectedUser = userCombo.getValue();
-            String newId = newIdField.getText().trim();
-
-            if (selectedUser == null || newId.isEmpty()) {
-                statusLabel.setText("Please select a user and enter a new ID.");
-                return;
-            }
-
-            try {
-                boolean success = AdminFileStorage.updateAdminUniqueID(selectedUser, newId);
-                if (success) {
-                    statusLabel.setStyle("-fx-text-fill: green;");
-                    statusLabel.setText("Unique ID updated successfully!");
-                } else {
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    statusLabel.setText("Error updating Unique ID.");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                statusLabel.setStyle("-fx-text-fill: red;");
-                statusLabel.setText("Error updating Unique ID.");
-            }
-        });
-
-        backBtn.setOnAction(e -> show(stage));
-
-        root.getChildren().addAll(title, userCombo, newIdField, saveBtn, backBtn, statusLabel);
-        stage.setScene(new Scene(root, 400, 300));
-    }
-
-}
-*/
-package com.example.login;
-
-import com.example.manager.AdminFileStorage;
-import com.example.view.LoginPage;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 import java.util.List;
 
 public class AdminDashboard {
 
-    public static void show(Stage stage) {
-        Label title = new Label("Welcome to the Admin Dashboard!");
-        title.setStyle("-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;");
+    private static Stage primaryStage = new Stage();
 
-        // --- Buttons ---
+    public AdminDashboard(Stage stage) {
+        this.primaryStage = stage;
+    }
+
+    public static void openAdminDashboard() {
+
+        BorderPane dashboard = new BorderPane();
+        dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
+
+        // --- Top Bar ---
+        Label title = new Label("Admin Dashboard");
+        title.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold;");
+        HBox topBar = new HBox(title);
+        topBar.setAlignment(Pos.CENTER);
+        topBar.setPadding(new Insets(20, 0, 20, 0));
+
+        // --- Center Content ---
+        Label infoLabel = new Label("Select an action from the left menu.");
+        infoLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
+        StackPane centerPane = new StackPane(infoLabel);
+
+        // --- Left Menu ---
+        VBox menuBox = new VBox(15);
+        menuBox.setPadding(new Insets(30));
+        menuBox.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-pref-width: 220;");
+        menuBox.setAlignment(Pos.TOP_CENTER);
+
         Button viewUsersBtn = new Button("View All Users");
         Button countUsersBtn = new Button("Count Users");
         Button manageMenuBtn = new Button("Manage Menu");
-        Button changePassBtn = new Button("Change Admin Password");
-        Button changeIdBtn = new Button("Change Admin ID");
-        Button viewHistoryBtn = new Button("View History");
+        Button usersHistoryBtn = new Button("History");
+        Button chatServerBtn = new Button("Chat With users");
+        Button changePassBtn = new Button("Change Password");
         Button logoutBtn = new Button("Logout");
 
-        // --- Styling all buttons consistently ---
-        Button[] buttons = {viewUsersBtn, countUsersBtn, manageMenuBtn, changePassBtn, changeIdBtn, viewHistoryBtn, logoutBtn};
-        for (Button btn : buttons) {
-            btn.setStyle("""
-                -fx-font-size: 14px;
-                -fx-pref-width: 220px;
-                -fx-background-color: #ffffff;
-                -fx-text-fill: #001F3F;
-                -fx-background-radius: 8;
-                -fx-font-weight: bold;
-            """);
+        // --- Button Styling ---
+        for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
+            btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
+            btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
+            btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
         }
 
-        // --- Button Actions ---
+        menuBox.getChildren().addAll(
+                viewUsersBtn, countUsersBtn, manageMenuBtn,
+                usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn
+        );
+
+        dashboard.setTop(topBar);
+        dashboard.setLeft(menuBox);
+        dashboard.setCenter(centerPane);
+
+        Scene scene = new Scene(dashboard, 1000, 700);
+        primaryStage.setScene(scene);
+
+        /* --- Button Actions --- */
+
+        usersHistoryBtn.setOnAction(ev -> {
+            System.out.println("History Button Clicked");
+        });
+
         viewUsersBtn.setOnAction(e -> {
-            List<String> users = AdminFileStorage.getAllUsers();
-            TextArea area = new TextArea();
-            area.setEditable(false);
-            area.setText(users.isEmpty() ? "No users found." : String.join("\n", users));
-            Button back = new Button("Back");
-            back.setOnAction(ev -> show(stage));
-            VBox layout = new VBox(15, new Label("All Registered Users:"), area, back);
-            layout.setAlignment(Pos.CENTER);
-            layout.setPadding(new Insets(20));
-            stage.setScene(new Scene(layout, 500, 400));
+            List<String[]> users = FileStorage.loadUsers();
+            TableView<String[]> table = new TableView<>();
+
+            TableColumn<String[], String> idCol = new TableColumn<>("User ID");
+            idCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[3]));
+            idCol.setPrefWidth(100);
+
+            TableColumn<String[], String> usernameCol = new TableColumn<>("Username");
+            usernameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[0]));
+            usernameCol.setPrefWidth(200);
+
+            TableColumn<String[], String> emailCol = new TableColumn<>("Email");
+            emailCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[1]));
+            emailCol.setPrefWidth(250);
+
+            TableColumn<String[], String> passwordCol = new TableColumn<>("Password");
+            passwordCol.setCellValueFactory(data -> new SimpleStringProperty("********"));
+            passwordCol.setPrefWidth(150);
+
+            table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
+            table.getItems().addAll(users);
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+            centerPane.getChildren().setAll(table);
         });
 
-        countUsersBtn.setOnAction(e -> {
-            int count = AdminFileStorage.countUsers();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("Total Users: " + count);
-            alert.showAndWait();
+        manageMenuBtn.setOnAction(e -> {
+            MenuPage menuPage = new MenuPage(primaryStage);
+            primaryStage.setScene(menuPage.getMenuScene());
         });
 
-        manageMenuBtn.setOnAction(e -> ManageMenuPage.show(stage));
-        changePassBtn.setOnAction(e -> ChangeAdminPasswordPage.show(stage));
-
-        changeIdBtn.setOnAction(e -> showChangeAdminID(stage));
-        changeIdBtn.setStyle("-fx-font-size: 14px; -fx-pref-width: 220px; -fx-background-color: white; -fx-text-fill: #001F3F;");
-
-        viewHistoryBtn.setOnAction(e -> {
-            List<String> logs = AdminFileStorage.readLog();
-            TextArea area = new TextArea();
-            area.setEditable(false);
-            area.setText(logs.isEmpty() ? "No history found." : String.join("\n", logs));
-            Button back = new Button("Back");
-            back.setOnAction(ev -> show(stage));
-            VBox layout = new VBox(15, new Label("Admin Action History:"), area, back);
-            layout.setAlignment(Pos.CENTER);
-            layout.setPadding(new Insets(20));
-            stage.setScene(new Scene(layout, 600, 400));
+        chatServerBtn.setOnAction(event -> {
+            HomePage homePage = new HomePage(primaryStage);
+            homePage.openChatWindow();
         });
+
+        changePassBtn.setOnAction(e ->
+                ChangeAdminPasswordPage.show(primaryStage)
+        );
 
         logoutBtn.setOnAction(e -> {
-            LoginPage loginPage = new LoginPage(stage);
-            stage.setScene(loginPage.getLoginScene());
+            Session.setCurrentUser("guest");
+            primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
         });
-
-        // --- Layout ---
-        VBox layout = new VBox(15, title, viewUsersBtn, countUsersBtn, manageMenuBtn,
-                changePassBtn, changeIdBtn, viewHistoryBtn, logoutBtn);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(40));
-        layout.setStyle("-fx-background-color: linear-gradient(to right, #001F3F, #0074D9);");
-
-        Scene scene = new Scene(layout, 800, 650);
-        stage.setTitle("Admin Dashboard");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    // --- Change Admin ID page ---
-    private static void showChangeAdminID(Stage stage) {
-        List<String> users = AdminFileStorage.getAllUsers();
-
-        if (users.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("No users found.");
-            alert.showAndWait();
-            return;
-        }
-
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-
-        Label title = new Label("Change User Unique ID");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ComboBox<String> userCombo = new ComboBox<>();
-        userCombo.getItems().addAll(users);
-        userCombo.setPromptText("Select User");
-
-        TextField newIdField = new TextField();
-        newIdField.setPromptText("Enter new Unique ID");
-
-        Label statusLabel = new Label();
-        statusLabel.setStyle("-fx-text-fill: red;");
-
-        Button saveBtn = new Button("Save");
-        Button backBtn = new Button("Back");
-
-        saveBtn.setOnAction(e -> {
-            String selectedUser = userCombo.getValue();
-            String newId = newIdField.getText().trim();
-
-            if (selectedUser == null || newId.isEmpty()) {
-                statusLabel.setText("Please select a user and enter a new ID.");
-                return;
-            }
-
-            try {
-                boolean success = AdminFileStorage.updateAdminUniqueID(selectedUser, newId);
-                if (success) {
-                    statusLabel.setStyle("-fx-text-fill: green;");
-                    statusLabel.setText("Unique ID updated successfully!");
-                } else {
-                    statusLabel.setStyle("-fx-text-fill: red;");
-                    statusLabel.setText("Error updating Unique ID.");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                statusLabel.setStyle("-fx-text-fill: red;");
-                statusLabel.setText("Error updating Unique ID.");
-            }
-        });
-
-        backBtn.setOnAction(e -> show(stage));
-
-        root.getChildren().addAll(title, userCombo, newIdField, saveBtn, backBtn, statusLabel);
-        stage.setScene(new Scene(root, 400, 300));
     }
 }

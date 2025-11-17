@@ -61,7 +61,10 @@ public class AboutUsPage {
         });
 
         Button profileBtn = createNavButton("Profile");
-        profileBtn.setOnAction(e -> showComingSoonAlert("Profile"));
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
 
         Button cartBtn = createNavButton("Cart");
         cartBtn.setOnAction(e -> showComingSoonAlert("Cart"));
@@ -339,7 +342,6 @@ public class AboutUsPage {
 
     // Helper to open map links
     private javafx.application.HostServices getHostServices() {
-        return javafx.application.Application.getUserAgentStylesheet() == null ?
-                null : null; // override when called from actual Application
+        return null; // override when called from actual Application
     }
 }

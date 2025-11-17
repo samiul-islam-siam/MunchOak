@@ -1,9 +1,12 @@
+
+
 package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.History;
 import com.example.network.ChatClient;
+
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -28,12 +30,12 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javafx.util.Duration;
 
 public class HomePage implements HomePageComponent {
     private final StackPane root;
@@ -368,6 +370,23 @@ public class HomePage implements HomePageComponent {
         });
     }
 
+    private void openHistoryPageDirectly() {
+        Platform.runLater(() -> {
+            History history = new History(primaryStage);
+            Scene historyScene = history.getScene();
+            double w = primaryStage.getWidth();
+            double h = primaryStage.getHeight();
+            boolean fs = primaryStage.isFullScreen();
+            boolean max = primaryStage.isMaximized();
+            primaryStage.setScene(historyScene);
+            primaryStage.setWidth(w);
+            primaryStage.setHeight(h);
+            if (fs) primaryStage.setFullScreen(true);
+            else if (max) primaryStage.setMaximized(true);
+            primaryStage.centerOnScreen();
+        });
+    }
+
     private void createOverlay() {
         overlay = new Pane();
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
@@ -380,6 +399,27 @@ public class HomePage implements HomePageComponent {
         });
         StackPane.setAlignment(overlay, Pos.TOP_LEFT);
     }
+    private void openProfilePageDirectly() {
+        Platform.runLater(() -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            Scene profileScene = profilePage.getProfileScene();
+
+            double w = primaryStage.getWidth();
+            double h = primaryStage.getHeight();
+            boolean fs = primaryStage.isFullScreen();
+            boolean max = primaryStage.isMaximized();
+
+            primaryStage.setScene(profileScene);
+            primaryStage.setWidth(w);
+            primaryStage.setHeight(h);
+
+            if (fs) primaryStage.setFullScreen(true);
+            else if (max) primaryStage.setMaximized(true);
+
+            primaryStage.centerOnScreen();
+        });
+    }
+
 
     private void createSidePanel() {
         Button closeBtn = new Button("X");
@@ -400,25 +440,31 @@ public class HomePage implements HomePageComponent {
         Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
 
-        // TODO: Implement History Page, show when logged in
 // History Button Logic here
-//        historyBtn.setOnAction(e -> {
-//            content.getChildren().clear();
-//            content.getChildren().add(new History().getView());
-//        });
+        historyBtn.setOnAction(e -> {
+            e.consume();
+            if (scrollPane != null) {
+                scrollPane.setVvalue(0.0);
+            }
+            toggleSidePanel();
+            PauseTransition pause = new PauseTransition(Duration.millis(10));
+            pause.setOnFinished(evt -> openHistoryPageDirectly());
+            pause.play();
+        });
 
-        // TODO: Implement Profile Page and button logic
-// Profile Button Logic here
-//        profileBtn.setOnAction(e -> {
-//            try {
-//                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
-//                Node profileView = loader.load();
-//
-//                content.getChildren().setAll(profileView);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//        });
+
+        profileBtn.setOnAction(e -> {
+
+            e.consume();
+            if (scrollPane != null) {
+                scrollPane.setVvalue(0.0);
+            }
+            toggleSidePanel();
+            PauseTransition pause = new PauseTransition(Duration.millis(10));
+            pause.setOnFinished(evt -> openProfilePageDirectly());
+            pause.play();
+        });
+
 
         reserveBtn.setOnAction(e -> {
             e.consume();
@@ -543,7 +589,7 @@ public class HomePage implements HomePageComponent {
         tt.play();
     }
 
-    // FIXED: Robust CSS load with clear/fallback - prevents default style reversion on scene switch
+    // Robust CSS load with clear/fallback - prevents default style reversion on scene switch
     // TODO: Once global CSS is set in Home.java via setUserAgentStylesheet, REMOVE this entire method block
     public Scene getHomeScene() {
         VBox fullPage = getFullPage();
@@ -580,33 +626,38 @@ public class HomePage implements HomePageComponent {
     }
 
     @FXML
-    private void openChatWindow() {
+    public void openChatWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage chatStage = new Stage();
             chatStage.setScene(new Scene(loader.load()));
 
-            // Get the controller and set username explicitly
+            // Get the controller
             ChatClient controller = loader.getController();
-            String username = Session.getCurrentUsername();
-            if (username == null || username.isEmpty()) {
-                username = "Guest";
-            }
-            controller.setUsername(username);  // <-- pass username here
 
-            // Set stage title with username
+            // Get current session info
+            String username = Session.getCurrentUsername();
+            if (username == null || username.isEmpty()) username = "Guest";
+
+            String role = Session.getCurrentRole();
+            boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
+
+            // Pass username and role to controller
+            controller.setUsername(username);
+            controller.setAdmin(isAdmin);
+
+            // Set stage title
             chatStage.setTitle("Chatting as [" + username + "]");
+
+            // Show window
             chatStage.show();
 
-            chatStage.setOnCloseRequest(e -> {
-                try {
-                    controller.closeConnection();
-                } catch (Exception ignored) {
-                }
-            });
+            // Ensure connection closes when window closes
+            chatStage.setOnCloseRequest(e -> controller.closeConnection());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }

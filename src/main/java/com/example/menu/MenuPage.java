@@ -1,6 +1,10 @@
 package com.example.menu;
 
+import com.example.view.LoginPage;
+import com.example.manager.Session;
 import com.example.view.HomePage;
+
+import javafx.scene.Node;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -16,8 +20,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.List;
 
 public class MenuPage {
     private final Stage primaryStage;
@@ -50,6 +52,28 @@ public class MenuPage {
 
             attachResizeListeners();
         }
+        //BaseMenu baseMenu = new BaseMenu();
+        BaseMenu menu;
+        String username = Session.getCurrentUsername();
+        if ("admin".equalsIgnoreCase(username)) {
+            menu = new AdminMenu();
+            System.out.println("Admin Menu loaded in MenuPage");
+        } else if("guest".equalsIgnoreCase(username))
+        {
+            menu = new guestMenu();
+            System.out.println("Guest Menu loaded in MenuPage");
+        }
+        else {
+            menu = new UserMenu();
+            System.out.println("User Menu loaded in MenuPage");
+        }
+        Node menuView = menu.getView();
+        root.setCenter(menuView);
+
+
+
+// add it to your root layout, e.g., center of BorderPane
+        root.setCenter(menuView);
         return menuScene;
     }
 
@@ -122,7 +146,15 @@ public class MenuPage {
         Button backButton = new Button();
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
-        backButton.setOnAction(e -> returnToHomePerfectly());
+
+        if(Session.getCurrentUsername().equalsIgnoreCase("admin"))
+        {
+            backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
+        }
+        else
+        {
+            backButton.setOnAction(e -> returnToHomePerfectly());
+        }
         backPanel.getChildren().add(backButton);
 
         VBox topSection = new VBox(navBar, backPanel);
@@ -200,13 +232,7 @@ public class MenuPage {
         grid.setVgap(30);
         grid.setAlignment(Pos.CENTER);
 
-        grid.add(createMenuBox("SOUP"), 0, 0);
-        grid.add(createMenuBox("FROM THE SEA"), 1, 0);
-        grid.add(createMenuBox("DRINKS"), 2, 0);
-        grid.add(createMenuBox("SWEETS"), 0, 1);
-        grid.add(createMenuBox("MAIN COURSE"), 1, 1);
-        grid.add(createMenuBox("APPETIZERS"), 2, 1);
-        grid.add(createMenuBox("FAST FOOD"), 1, 2);
+
 
         content.getChildren().add(grid);
 
@@ -226,74 +252,8 @@ public class MenuPage {
         return root;
     }
 
-    // --- Category button setup ---
-    private Button createMenuBox(String text) {
-        Button button = new Button(text);
-        button.getStyleClass().add("menu-button");
-        button.setOnAction(e -> toggleCategory(text));
-        return button;
-    }
 
-    // --- Animated expand/collapse ---
-    private void toggleCategory(String category) {
-        VBox existing = null;
-        for (var node : categoryExtensionsBox.getChildren()) {
-            if (node instanceof VBox box && category.equals(box.getUserData())) {
-                existing = box;
-                break;
-            }
-        }
 
-        if (existing != null) {
-            // collapse animation
-            collapseSection(existing);
-        } else {
-            VBox section = createCategorySection(category);
-            expandSection(section);
-        }
-    }
-
-    private VBox createCategorySection(String category) {
-        VBox section = new VBox(10);
-        section.setUserData(category);
-        section.setAlignment(Pos.CENTER);
-        section.setPadding(new Insets(20));
-        section.setStyle("-fx-background-color: #fff8f8; -fx-border-color: red; -fx-border-width: 2; -fx-border-radius: 10;");
-
-        Label sectionTitle = new Label(category);
-        sectionTitle.setFont(Font.font("Arial", 24));
-        sectionTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
-
-        VBox itemsBox = new VBox(10);
-        itemsBox.setAlignment(Pos.CENTER);
-
-        List<String> foods = switch (category) {
-            case "SOUP" -> List.of("Tomato Soup", "Chicken Soup", "Mushroom Soup");
-            case "FROM THE SEA" -> List.of("Grilled Salmon", "Fish & Chips", "Shrimp Cocktail", "Lobster Thermidor");
-            case "DRINKS" -> List.of("Cola", "Orange Juice", "Mojito", "Lemonade", "Iced Tea");
-            case "SWEETS" -> List.of("Brownie", "Cheesecake", "Chocolate Mousse", "Ice Cream", "Cupcakes");
-            case "MAIN COURSE" -> List.of("Steak", "Pasta", "Pizza", "Grilled Chicken", "Lasagna");
-            case "APPETIZERS" -> List.of("Spring Rolls", "Fries", "Garlic Bread");
-            case "FAST FOOD" -> List.of("Burger", "Hotdog", "Nuggets");
-            default -> List.of();
-        };
-
-        for (String food : foods) {
-            Button itemBtn = new Button(food);
-            itemBtn.setFont(Font.font(16));
-            itemBtn.setStyle(
-                    "-fx-background-color: white; " +
-                            "-fx-border-color: red; -fx-border-width: 1.5; " +
-                            "-fx-background-radius: 6; -fx-padding: 8 16; " +
-                            "-fx-text-fill: black; -fx-cursor: hand;"
-            );
-            itemBtn.setOnAction(ev -> System.out.println("Selected: " + food));
-            itemsBox.getChildren().add(itemBtn);
-        }
-
-        section.getChildren().addAll(sectionTitle, itemsBox);
-        return section;
-    }
 
     private void expandSection(VBox section) {
         section.setOpacity(0);
@@ -336,11 +296,6 @@ public class MenuPage {
         double currentHeight = primaryStage.getHeight();
 
         Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
-//        homeScene.getStylesheets().addAll(
-//                getClass().getResource("resources/com/example/view/styles/style.css").toExternalForm(),
-//                getClass().getResource("resources/com/example/view/menupage.css").toExternalForm()
-//        );
-        // ✅ Reapply global stylesheet here
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             homeScene.getStylesheets().add(css.toExternalForm());

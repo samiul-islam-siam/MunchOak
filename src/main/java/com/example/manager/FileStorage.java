@@ -2,7 +2,7 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import com.example.manager.PasswordUtils;
+
 import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import java.util.Map;
 public class FileStorage {
     private static final File DATA_DIR = new File("src/main/resources/com/example/manager/data");
     private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
-    private static final File MENU_FILE = new File(DATA_DIR, "menu.dat");
     private static final File CATEGORIES_FILE = new File(DATA_DIR, "categories.dat");
     private static final File PAYMENTS_FILE = new File(DATA_DIR, "payments.dat");
     private static final File CARTS_FILE = new File(DATA_DIR, "carts.dat");
@@ -21,47 +20,106 @@ public class FileStorage {
     private static final File PAYMENT_ITEMS_FILE = new File(DATA_DIR, "paymentitems.dat");
     private static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
-    private static final File USER_FILE = new File("src/main/resources/com/example/manager/data/users.dat");
+    private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
+    private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
 
-    static {
+    public static void init() {
+        try {
+            ensureDataDir();
+            loadAttachedMenu();
+            ensureAdminFile();
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    // default
+    public static void setMenuFile(File file) {
+        MENU_FILE = file;
+        saveAttachedMenu(file); // persist the attached menu
+    }
+
+    public static File getMenuFile() {
+        return MENU_FILE;
+    }
+
+    private static void saveAttachedMenu(File menuFile) {
         ensureDataDir();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_POINTER_FILE, false))) {
+            dos.writeUTF(menuFile.getName());
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    private static void loadAttachedMenu() {
+        ensureDataDir();
+        if (!MENU_POINTER_FILE.exists() || MENU_POINTER_FILE.length() == 0) return; // <-- check length
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(MENU_POINTER_FILE))) {
+            String filename = dis.readUTF();
+            File file = new File(DATA_DIR, filename);
+            if (file.exists()) {
+                MENU_FILE = file;
+            }
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
     }
 
     public static void ensureDataDir() {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs();
         try {
             if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
-            if (!MENU_FILE.exists()) MENU_FILE.createNewFile();
-            if (!CATEGORIES_FILE.exists()) CATEGORIES_FILE.createNewFile();
+            if (!CATEGORIES_FILE.exists())
+            {
+                String[] initailizedCategories = {
+                        "Drinks",
+                        "Sweets",
+                        "Spicy Foods",
+                        "Main Course",
+                        "Appetizers"
+                };
+                DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, true));
+                for (String category : initailizedCategories) {
+                    dos.writeUTF(category); // write each category in binary format
+                }
+            }
             if (!PAYMENTS_FILE.exists()) PAYMENTS_FILE.createNewFile();
             if (!CARTS_FILE.exists()) CARTS_FILE.createNewFile();
             if (!CART_ITEMS_FILE.exists()) CART_ITEMS_FILE.createNewFile();
             if (!PAYMENT_ITEMS_FILE.exists()) PAYMENT_ITEMS_FILE.createNewFile();
             if (!ORDERS_FILE.exists()) ORDERS_FILE.createNewFile();
             if (!RESERVATIONS_FILE.exists()) RESERVATIONS_FILE.createNewFile();
+            if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    // ----------------- MENU / FOOD -----------------
+    // ----------------- MENU -----------------
     public static List<FoodItems> loadMenu() {
         ensureDataDir();
         List<FoodItems> list = new ArrayList<>();
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(MENU_FILE))) {
+        File menuFile = getMenuFile();
+        if (!menuFile.exists() || menuFile.length() == 0) {
+
+            return list; // return empty list, UI can show "Empty menu"
+        }
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(getMenuFile()))) {
             while (dis.available() > 0) {
                 int id = dis.readInt();
                 String name = dis.readUTF();
                 String details = dis.readUTF();
                 double price = dis.readDouble();
-                double ratings = dis.readDouble();
+                String cuisine = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-                list.add(new FoodItems(id, name, details, price, ratings, imagePath, category));
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
@@ -74,12 +132,12 @@ public class FileStorage {
 
     public static void appendMenuItem(FoodItems item) throws IOException {
         ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_FILE, true))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), true))) {
             dos.writeInt(item.getId());
             dos.writeUTF(item.getName());
             dos.writeUTF(item.getDetails());
             dos.writeDouble(item.getPrice());
-            dos.writeDouble(item.getRatings());
+            dos.writeUTF(item.getCuisine());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
         }
@@ -87,13 +145,13 @@ public class FileStorage {
 
     public static void rewriteMenu(List<FoodItems> items) throws IOException {
         ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_FILE, false))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), false))) {
             for (FoodItems item : items) {
                 dos.writeInt(item.getId());
                 dos.writeUTF(item.getName());
                 dos.writeUTF(item.getDetails());
                 dos.writeDouble(item.getPrice());
-                dos.writeDouble(item.getRatings());
+                dos.writeUTF(item.getCuisine());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
             }
@@ -110,7 +168,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return cats;
     }
@@ -163,8 +221,6 @@ public class FileStorage {
         return false;
     }
 
-
-
     public static int getUserId(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
@@ -177,10 +233,54 @@ public class FileStorage {
         }
         return -1;
     }
+    public static String getUserEmail(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {  // match by username
+                return user[1];             // email is at index 1
+            }
+        }
+        return null; // or "" if you prefer
+    }
+
+
+    public static String getUserPassword(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {  // match by username
+                return user[2];             // password (salt:hash) is at index 2
+            }
+        }
+        return null; // or "" if you prefer
+    }
 
 
 
 
+
+
+
+
+
+
+
+
+    public static void appendUser(String username, String email, String password) throws IOException {
+        ensureDataDir();
+
+        // Start from 2025001 for registered users
+        int uid = generateNextIdInFile(USERS_FILE, 4);
+        // Generate salt and hash
+        String salt = PasswordUtils.generateSalt();
+        String hash = PasswordUtils.hashPassword(password, salt);
+        String storedPassword = salt + ":" + hash; // store salt and hash together
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
+            dos.writeUTF(username);
+            dos.writeUTF(email);
+            dos.writeUTF(storedPassword);
+            dos.writeInt(uid);
+        }
+    }
 
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
@@ -201,7 +301,7 @@ public class FileStorage {
                 dos.writeUTF("nopass");
                 dos.writeInt(2025000);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
         }
     }
@@ -220,7 +320,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return users;
     }
@@ -295,7 +395,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
@@ -317,7 +417,7 @@ public class FileStorage {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         if (cartId == -1) return items;
@@ -330,7 +430,7 @@ public class FileStorage {
                 if (cid == cartId) items.put(foodId, qty);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         return items;
@@ -354,7 +454,7 @@ public class FileStorage {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
             return false;
         }
     }
@@ -418,7 +518,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return lastId + 1;
     }
@@ -442,158 +542,72 @@ public class FileStorage {
     }
 
 
-    //update users password
-/*
-    public static void updateUserPassword(String username, String newPassword) throws IOException {
-        File tempFile = new File("src/main/resources/com/example/manager/data/temp_users.dat");
-        File userFile = getUserFile(); // your existing users file path
-        try (BufferedReader br = new BufferedReader(new FileReader(userFile));
-             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3 && parts[0].equals(username)) {
-                    parts[2] = newPassword; // update password
-                    bw.write(String.join(",", parts));
-                } else {
-                    bw.write(line);
-                }
-                bw.newLine();
-            }
-        }
-        if (!userFile.delete() || !tempFile.renameTo(userFile)) {
-            throw new IOException("Failed to update user password file.");
-        }
-    }
-*/
-    public static File getUserFile() {
-        return USER_FILE; // or whatever variable holds your user data file
-    }
-
     // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
     private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
-    static {
-        try {
-            ensureAdminFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static void ensureAdminFile() throws IOException {
-        ensureDataDir();
         if (!ADMIN_FILE.exists()) {
-            try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
-                fw.write("admin123"); // default admin password
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(ADMIN_FILE))) {
+                dos.writeUTF("admin123"); // default admin password
             }
         }
     }
 
-    public static boolean verifyAdminPassword(String password) throws IOException {
-        return password.equals(readText(ADMIN_FILE).trim());
-    }
+    // ---------------- USER PASSWORD UTILITIES ----------------
+    public static boolean verifyUserPassword(String username, String password) {
+        ensureDataDir();
+        if (!USERS_FILE.exists()) return false;
 
-    public static void setAdminPassword(String newPassword) throws IOException {
-        try (FileWriter fw = new FileWriter(ADMIN_FILE)) {
-            fw.write(newPassword);
-        }
-    }
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(USERS_FILE))) {
+            while (dis.available() > 0) {
+                String uname = dis.readUTF();
+                String email = dis.readUTF();
+                //String pwd = dis.readUTF();
 
-    // ---------------- ADMIN USER MANAGEMENT ----------------
-    public static List<String[]> readAllUsersSimple() throws IOException {
-        List<String[]> users = new ArrayList<>();
-        for (String[] user : loadUsers()) {
-            users.add(user);
-        }
-        return users;
-    }
+                String saltAndHash = dis.readUTF();
+                dis.readInt(); // userId, ignored here
+                if (uname.equals(username)) {
+                    String[] parts = saltAndHash.split(":");
+                    if (parts.length != 2) return false;
+                    return PasswordUtils.verifyPassword(password, parts[0], parts[1]);
+                }
 
-    public static int getUserCount() {
-        return loadUsers().size();
-    }
-
-    // ---------------- HELPERS ----------------
-    private static String readText(File f) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String line;
-            while ((line = br.readLine()) != null) sb.append(line);
-        }
-        return sb.toString();
-    }
-
-    // Inside FileStorage.java
-    public static List<String> readAllUsers() throws IOException {
-        List<String> users = new ArrayList<>();
-        if (!USERS_FILE.exists()) return users;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                users.add(line); // Or format as "username - email"
             }
-        }
-        return users;
-    }
-    // Example method for adding a user
-    /*
-    public static void appendUser(String username, String email, String password) throws IOException {
-        String salt = PasswordUtils.generateSalt();
-        String hashedPassword = PasswordUtils.hashPassword(password, salt);
-
-        // Store like: username,email,salt:hash
-        String line = username + "," + email + "," + salt + ":" + hashedPassword + "\n";
-        java.nio.file.Files.write(USERS_FILE.toPath(), line.getBytes(), java.nio.file.StandardOpenOption.APPEND, java.nio.file.StandardOpenOption.CREATE);
-    }
-*/
-    public static void appendUser(String username, String email, String password) throws IOException {
-        String salt = PasswordUtils.generateSalt();
-        String hashedPassword = PasswordUtils.hashPassword(password, salt);
-
-        // Store like: username,email,salt:hash
-        String line = username + "," + email + "," + salt + ":" + hashedPassword + "\n";
-        java.nio.file.Files.write(USERS_FILE.toPath(), line.getBytes(), java.nio.file.StandardOpenOption.APPEND, java.nio.file.StandardOpenOption.CREATE);
-    }
-
-    // Example verify method
-   /* public static boolean verifyUserPassword(String username, String password) throws IOException {
-        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts[0].equals(username)) {
-                String[] saltAndHash = parts[2].split(":");
-                return PasswordUtils.verifyPassword(password, saltAndHash[0], saltAndHash[1]);
-            }
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
         }
         return false;
     }
-   */
-    public static boolean verifyUserPassword(String username, String password) throws IOException {
-        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts[0].equals(username)) {
-                String[] saltAndHash = parts[2].split(":");
-                return PasswordUtils.verifyPassword(password, saltAndHash[0], saltAndHash[1]);
-            }
-        }
-        return false;
-    }
-    // Example update password
-    public static void updateUserPassword(String username, String newPassword) throws IOException {
-        List<String> lines = java.nio.file.Files.readAllLines(USERS_FILE.toPath());
-        for (int i = 0; i < lines.size(); i++) {
-            String[] parts = lines.get(i).split(",");
-            if (parts[0].equals(username)) {
+
+    public static void updateUserPassword(String username, String newPassword) {
+        ensureDataDir();
+        List<String[]> users = loadUsers(); // load all users
+        boolean updated = false;
+
+        for (String[] u : users) {
+            if (u[0].equals(username)) {
                 String salt = PasswordUtils.generateSalt();
                 String hash = PasswordUtils.hashPassword(newPassword, salt);
-                lines.set(i, parts[0] + "," + parts[1] + "," + salt + ":" + hash);
+                u[2] = salt + ":" + hash; // replace password field
+
+                updated = true;
                 break;
             }
         }
-        java.nio.file.Files.write(USERS_FILE.toPath(), lines);
-    }
 
+        if (updated) {
+            // rewrite the USERS_FILE
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, false))) {
+                for (String[] u : users) {
+                    dos.writeUTF(u[0]);  // username
+                    dos.writeUTF(u[1]);  // email
+                    dos.writeUTF(u[2]);  // salt:hash
+                    dos.writeInt(Integer.parseInt(u[3])); // userId
+                }
+            } catch (IOException e) {
+                System.err.println("IOException: " + e.getMessage());
+            }
+        }
+    }
 
 }

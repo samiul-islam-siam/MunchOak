@@ -2,6 +2,8 @@ package com.example.munchoak;
 
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
+import com.example.view.HomePage;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -9,6 +11,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -17,14 +21,23 @@ import java.util.List;
 
 public class History {
 
-    private TableView<HistoryRecord> historyTable;
+    private final Stage primaryStage;
     private ObservableList<HistoryRecord> historyData;
 
-    public VBox getView() {
-        historyTable = new TableView<>();
+    public History(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    public Scene getScene() {
+        TableView<HistoryRecord> historyTable = new TableView<>();
+        historyTable.setPlaceholder(new Label("No payment history available."));
+        historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        historyTable.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        historyTable.setMaxWidth(700); // keep table nicely centered
+
         historyData = FXCollections.observableArrayList();
 
-        // Columns
+        // --- Table Columns ---
         TableColumn<HistoryRecord, Integer> userIdCol = new TableColumn<>("User ID");
         userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
 
@@ -61,45 +74,71 @@ public class History {
         historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol);
         historyTable.setItems(historyData);
 
-        // Load data from file storage
+        // Load payment data
         loadHistory();
 
-        VBox layout = new VBox(15, new Label("📜 Payment History"), historyTable);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.CENTER);
+        // --- Back Button ---
+        Button backBtn = new Button("Back");
+        // backBtn.setId("back-btn");
+        backBtn.setStyle("-fx-background-color: #0078d7; -fx-text-fill: white; -fx-font-size: 14px; "
+                + "-fx-padding: 6 15 6 15; -fx-background-radius: 8;");
+        backBtn.setOnAction(e -> goBack());
 
-        return layout;
+        HBox backRow = new HBox(backBtn);
+        backRow.setAlignment(Pos.TOP_LEFT);
+
+        // --- Title Row ---
+        Label title = new Label("📜 Payment History");
+        // title.setId("history-title");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        HBox titleRow = new HBox(title);
+        titleRow.setAlignment(Pos.CENTER);
+
+        // --- Main Layout ---
+        VBox layout = new VBox(15, backRow, titleRow, historyTable);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.TOP_CENTER);
+
+
+        Scene scene = new Scene(layout, 900, 600);
+        // Optional CSS file (if you create one)
+        // scene.getStylesheets().add(getClass().getResource("/com/example/munchoak/history.css").toExternalForm());
+        return scene;
     }
 
+    private void goBack() {
+        try {
+            HomePage homePage = new HomePage(primaryStage);
+            primaryStage.setScene(homePage.getHomeScene());
+        } catch (Exception ex) {
+            System.err.println("Exception: " + ex.getMessage());
+        }
+    }
+
+    // ------------------ Data Handling ------------------
     private void loadHistory() {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
-        boolean isAdmin = false;
-        if(Session.getCurrentUsername().equals("admin")) {// assuming admin has userId = 1
-            isAdmin = true;
-        }
-        for (FileStorage.HistoryRecordSimple s : list) {
+        boolean isAdmin = Session.getCurrentUsername().equals("admin");
 
+        for (FileStorage.HistoryRecordSimple s : list) {
             if (!isAdmin && s.userId != currentUserId) continue;
-            // status defaults to "Success" here (FileStorage doesn't store status)
             historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
         }
     }
 
+    // ------------------ Bill Popup ------------------
     private void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
-        // Create a cart for displaying history
-        Cart cart = new Cart(record.getUserId(), "historyCart");
-
+        Cart cart = new Cart();
         Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
         for (Map.Entry<Integer, Integer> e : items.entrySet()) {
             cart.addToCart(e.getKey(), e.getValue());
         }
 
         Payment payment = new Payment(record.getPaymentId(), record.getAmount());
-        // set private fields using reflection (timestamp and success/status)
         try {
             java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -113,7 +152,7 @@ public class History {
             successField.setAccessible(true);
             successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println("Exception: " + ex.getMessage());
         }
 
         Bill bill = new Bill(cart, payment);
@@ -135,6 +174,7 @@ public class History {
         billStage.show();
     }
 
+    // ------------------ Model ------------------
     public static class HistoryRecord {
         private final int userId;
         private final int paymentId;
@@ -153,11 +193,28 @@ public class History {
             this.paymentMethod = paymentMethod;
         }
 
-        public int getUserId() { return userId; }
-        public int getPaymentId() { return paymentId; }
-        public String getTimestamp() { return timestamp; }
-        public double getAmount() { return amount; }
-        public String getStatus() { return status; }
-        public String getPaymentMethod() { return paymentMethod; }
+        public int getUserId() {
+            return userId;
+        }
+
+        public int getPaymentId() {
+            return paymentId;
+        }
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getPaymentMethod() {
+            return paymentMethod;
+        }
     }
 }

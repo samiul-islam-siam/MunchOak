@@ -1,6 +1,7 @@
 package com.example.view;
 
 import com.example.manager.FileStorage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
@@ -137,6 +138,32 @@ public class ReservationPage {
 
         DatePicker datePicker = new DatePicker();
         datePicker.setEditable(true); // allow manual typing
+        // Custom date format: dd/MM/yyyy
+        java.time.format.DateTimeFormatter dateFormatter =
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        datePicker.setConverter(new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(LocalDate date) {
+                return (date != null) ? dateFormatter.format(date) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                if (string == null || string.trim().isEmpty()) {
+                    return null;
+                }
+                try {
+                    return LocalDate.parse(string, dateFormatter);
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Date Format",
+                            "Please enter the date in dd/MM/yyyy format (e.g. 25/12/2025).");
+                    return null;
+                }
+            }
+        });
+
+        datePicker.setPromptText("dd/MM/yyyy");
         datePicker.setStyle("""
                     -fx-background-color: #FFB266;
                     -fx-text-fill: #001F3F;
@@ -148,7 +175,7 @@ public class ReservationPage {
                     -fx-cursor: hand;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
                 """);
-        datePicker.setPrefWidth(150);
+        datePicker.setPrefWidth(190);
 // TIME SELECTOR
         Label timeLabel = new Label("Time:");
         timeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
