@@ -1,41 +1,35 @@
 package com.example.menu;
 
 import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 import com.example.munchoak.Payment;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.util.Duration;
-
-import java.net.URL;
-import java.util.List;
-
-import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BaseMenu {
 
@@ -82,11 +76,8 @@ public class BaseMenu {
         foodContainer = new VBox();
         foodContainer.setAlignment(Pos.TOP_CENTER);
         foodContainer.setPadding(new Insets(20, 40, 40, 40));
-//        foodContainer.Hgap(30);
-//        foodContainer.setVgap(30);
         foodContainer.setStyle("-fx-background-color: white;");
         foodList = FXCollections.observableArrayList();
-        // --- Cart Buttons Section ---
         cartButtons = new HBox(20);
         cartButtons.setAlignment(Pos.CENTER);
         cartButtons.setPadding(new Insets(20, 0, 40, 0));
@@ -149,16 +140,10 @@ public class BaseMenu {
         inputGrid.add(detailsField, 1, 1);
         inputGrid.add(new Label("Price:"), 0, 2);
         inputGrid.add(priceField, 1, 2);
-        inputGrid.add(new Label("Ratings:"), 0, 3);
+        inputGrid.add(new Label("Cuisine:"), 0, 3);
         inputGrid.add(cuisineField, 1, 3);
         inputGrid.add(new Label("Category:"), 0, 4);
         inputGrid.add(categoryBox, 1, 4);
-
-//        for (Node node : inputGrid.getChildren()) {
-//            if (node instanceof Label lbl) {
-//                lbl.setStyle("-fx-text-fill:#E53935;");
-//            }
-//        }
 
         // Category management buttons
         Button addCatBtn = new Button("Add Category");
@@ -201,14 +186,11 @@ public class BaseMenu {
             }
         });
 
-
         formBox = new VBox(10, inputGrid, addOrUpdateButton);
         formBox.setVisible(false);
         formBox.setManaged(false);
 
         // Inside BaseMenu.java — where you initialize admin buttons
-
-
         // Cart buttons
         viewCartButton = new Button("View Cart");
         viewCartButton.setOnAction(e -> cart.showCart(foodList));
@@ -219,7 +201,6 @@ public class BaseMenu {
         styleMainButton(viewCartButton);
         styleMainButton(checkoutButton);
         cartButtons = new HBox(15, viewCartButton, checkoutButton);
-
 
         HBox adminButtons = null;
         if (this instanceof AdminMenu) {
@@ -248,10 +229,6 @@ public class BaseMenu {
             adminButtons = new HBox(15, showAddFormBtn, buttonMenu, deleteMenuButton);
             adminButtons.setAlignment(Pos.CENTER);
             adminButtons.setPadding(new Insets(10, 0, 10, 0));
-
-            //mainLayout.getChildren().add(adminButtons); // add at top
-            // Add admin buttons **before other sections**
-            //mainLayout.getChildren().add(0, adminButtons);
         }
 
         // --- Assemble final layout ---
@@ -263,7 +240,6 @@ public class BaseMenu {
 
         loadFoodItems();
         return mainLayout;
-
     }
 
     protected void deleteMenuFile() {
@@ -300,7 +276,6 @@ public class BaseMenu {
         categories = FileStorage.loadCategories();
         categoryBox.getItems().addAll(categories);
     }
-
 
     private StackPane createBannerSection() {
         StackPane banner = new StackPane();
@@ -347,7 +322,7 @@ public class BaseMenu {
         return nav;
     }
 
-    protected void chooseMenu() {
+    public void chooseMenu() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Add Menu File");
         fileChooser.getExtensionFilters().addAll(
@@ -769,7 +744,6 @@ public class BaseMenu {
     }
 
     // ================== EDIT ===================
-
     protected void showEditDialog(FoodItems food) {
         Stage dialog = new Stage();
         dialog.setTitle("Edit " + food.getName());

@@ -4,6 +4,7 @@ import javafx.scene.Node;
 
 public class AdminMenu extends BaseMenu {
 
+
     @Override
     public Node getView() {
         Node node = super.getView();

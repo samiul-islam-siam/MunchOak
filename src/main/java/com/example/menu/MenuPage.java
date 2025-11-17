@@ -1,14 +1,12 @@
 package com.example.menu;
 
-import com.example.view.LoginPage;
 import com.example.manager.Session;
 import com.example.view.HomePage;
-
-import javafx.scene.Node;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -34,6 +32,7 @@ public class MenuPage {
     }
 
     public Scene getMenuScene() {
+        //for menu page scene
         if (menuScene == null) {
             double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized()
                     ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH)
@@ -45,6 +44,7 @@ public class MenuPage {
             root = buildRoot();
             menuScene = new Scene(root, initWidth, initHeight);
 
+            //loading css
             menuScene.getStylesheets().addAll(
                     getClass().getResource("/com/example/view/styles/style.css").toExternalForm(),
                     getClass().getResource("/com/example/view/styles/menupage.css").toExternalForm()
@@ -54,16 +54,15 @@ public class MenuPage {
         }
         //BaseMenu baseMenu = new BaseMenu();
         BaseMenu menu;
-        String username = com.example.manager.Session.getCurrentUsername();
+        //checking form session if it is user, guest or admin
+        String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
-        } else if("guest".equalsIgnoreCase(username))
-        {
+        } else if ("guest".equalsIgnoreCase(username)) {
             menu = new guestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
-        }
-        else {
+        } else {
             menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
@@ -71,8 +70,7 @@ public class MenuPage {
         root.setCenter(menuView);
 
 
-
-// add it to your root layout, e.g., center of BorderPane
+        // add it to your root layout, e.g., center of BorderPane
         root.setCenter(menuView);
         return menuScene;
     }
@@ -81,6 +79,7 @@ public class MenuPage {
         BorderPane root = new BorderPane();
 
         // === TOP NAV BAR ===
+        //Actions of top nav bar
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(15, 30, 15, 30));
@@ -102,19 +101,24 @@ public class MenuPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-// --- HOME, ABOUT US, RESERVATION buttons ---
+
+        // --- HOME, ABOUT US, RESERVATION buttons ---
         Button homeButton = new Button("Home");
         homeButton.getStyleClass().add("nav-text-button");
         homeButton.setOnAction(e -> returnToHomePerfectly());
 
         Button aboutButton = new Button("About Us");
         aboutButton.getStyleClass().add("nav-text-button");
-// You can later link this to an AboutUs page
+
+
+        // You can later link this to an AboutUs page
         aboutButton.setOnAction(e -> System.out.println("About Us clicked"));
 
         Button reservationButton = new Button("Reservation");
         reservationButton.getStyleClass().add("nav-text-button");
-// Later, you can open your reservation page here
+
+
+        // Later, you can open your reservation page here
         reservationButton.setOnAction(e -> System.out.println("Reservation clicked"));
         Label profileLabel = new Label("\uD83D\uDC64"); // 👤
         profileLabel.setFont(Font.font("Segoe UI Emoji", 26));
@@ -147,12 +151,10 @@ public class MenuPage {
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
 
-        if(Session.getCurrentUsername().equalsIgnoreCase("admin"))
-        {
+        //For admin access, admin will back to adminDashboard from menu page
+        if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
             backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
-        }
-        else
-        {
+        } else {
             backButton.setOnAction(e -> returnToHomePerfectly());
         }
         backPanel.getChildren().add(backButton);
@@ -180,12 +182,12 @@ public class MenuPage {
         overlayView.setFitWidth(60);
         overlayView.setOpacity(0.75);
 
-// Place overlay *behind* the banner
+        // Place overlay *behind* the banner
         StackPane imageStack = new StackPane(overlayView, bannerView);
         imageStack.setAlignment(Pos.TOP_CENTER);
         StackPane.setMargin(overlayView, new Insets(80, 0, 0, 0));
 
-// === Soft blur & glow pulse ===
+        // === Soft blur & glow pulse ===
         javafx.scene.effect.GaussianBlur blur = new javafx.scene.effect.GaussianBlur(8);
         javafx.scene.effect.ColorAdjust glow = new javafx.scene.effect.ColorAdjust();
         // Combine blur + glow
@@ -196,7 +198,7 @@ public class MenuPage {
         overlayView.setEffect(combinedEffect);
 
 
-// Glow pulse animation
+        // Glow pulse animation
         Timeline glowPulse = new Timeline(
                 new KeyFrame(Duration.seconds(0),
                         new KeyValue(glow.brightnessProperty(), -0.2)),
@@ -207,7 +209,7 @@ public class MenuPage {
         glowPulse.setCycleCount(Animation.INDEFINITE);
         glowPulse.play();
 
-// Zoom animation (breathing motion)
+        // Zoom animation (breathing motion)
         ScaleTransition zoom = new ScaleTransition(Duration.seconds(8.0), overlayView);
         zoom.setFromX(0.6);
         zoom.setFromY(0.4);
@@ -233,7 +235,6 @@ public class MenuPage {
         grid.setAlignment(Pos.CENTER);
 
 
-
         content.getChildren().add(grid);
 
         // === CATEGORY EXTENSION AREA ===
@@ -251,8 +252,6 @@ public class MenuPage {
         root.setCenter(scrollPane);
         return root;
     }
-
-
 
 
     private void expandSection(VBox section) {
