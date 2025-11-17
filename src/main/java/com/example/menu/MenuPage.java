@@ -1,14 +1,12 @@
 package com.example.menu;
 
-import com.example.view.LoginPage;
-import com.example.manager.Session;
+import com.example.manager.*;
 import com.example.view.HomePage;
-
-import javafx.scene.Node;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -57,7 +55,7 @@ public class MenuPage {
         //BaseMenu baseMenu = new BaseMenu();
         BaseMenu menu;
         //checking form session if it is user, guest or admin
-        String username = com.example.manager.Session.getCurrentUsername();
+        String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");

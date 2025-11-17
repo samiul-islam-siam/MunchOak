@@ -1,9 +1,6 @@
 package com.example.view;
 
-import com.example.manager.Session;
 import com.example.login.AdminDashboard;
-import com.example.manager.AdminFileStorage;
-import com.example.manager.FileStorage;
 
 import javafx.stage.Modality;
 import javafx.scene.paint.LinearGradient;
@@ -30,7 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-
+import com.example.menu.*;
+import com.example.manager.*;
 public class LoginPage {
     private final Stage primaryStage;
     private final Random random = new Random();

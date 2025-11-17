@@ -1,9 +1,5 @@
 package com.example.login;
 
-import com.example.manager.Session;
-import com.example.menu.MenuPage;
-import com.example.manager.FileStorage;
-
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,7 +11,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.List;
-
+import com.example.menu.*;
+import com.example.manager.*;
 public class AdminDashboard {
 
     private static Stage primaryStage = new Stage();

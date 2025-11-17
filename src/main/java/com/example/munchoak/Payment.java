@@ -1,7 +1,5 @@
 package com.example.munchoak;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,21 +10,23 @@ import javafx.stage.Stage;
 import java.time.Instant;
 import java.util.Map;
 import java.util.HashMap;
-
+import com.example.menu.*;
+import com.example.manager.*;
 public class Payment {
-    private int id;
-    private double amount;
+    private final int id;
+    private final double amount;
+    private static String paymentMethod;
     private boolean success;
-    private String timestamp;
+    private final String timestamp;
 
     public Payment(int id, double amount) {
         this.id = id;
         this.amount = amount;
-        this.timestamp = Instant.now().toString();
-        this.success = false;
+        this.timestamp = Instant.now().toString();  // Save payment creation timestamp
+        this.success = false;                       // Mark unpaid initially
     }
 
-    // Main payment entry point
+    // Main payment entry point (opens the method selection UI)
     public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
         Stage stage = new Stage();
         stage.setTitle("Select Payment Method");
@@ -37,6 +37,7 @@ public class Payment {
         cardBtn.setPrefWidth(180);
         cashBtn.setPrefWidth(180);
 
+        // Layout asking user to choose payment option
         VBox vbox = new VBox(20, new Label("Choose Payment Method:"), cardBtn, cashBtn);
         vbox.setPadding(new Insets(25));
         vbox.setAlignment(Pos.CENTER);
@@ -44,19 +45,25 @@ public class Payment {
         stage.setScene(new Scene(vbox, 300, 200));
         stage.show();
 
+        // Card payment
         cardBtn.setOnAction(e -> {
             stage.close();
+            paymentMethod = "Card";
             cardPayment(cart, foodMap);
         });
 
+        // Cash on delivery
         cashBtn.setOnAction(e -> {
             stage.close();
+            paymentMethod = "Cash";
             cashOnDelivery(cart, foodMap);
         });
     }
 
     // --- CARD PAYMENT METHOD ---
     private void cardPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
+
+        // UI asking card number + PIN
         Stage paymentStage = new Stage();
         paymentStage.setTitle("Card Payment");
 
@@ -69,7 +76,7 @@ public class Payment {
         pinField.setPromptText("Enter PIN");
 
         Button payButton = new Button("Pay Now");
-        payButton.setDefaultButton(true);
+        payButton.setDefaultButton(true);  // Triggered by Enter key
 
         VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
         vbox.setPadding(new Insets(20));
@@ -79,59 +86,62 @@ public class Payment {
         paymentStage.setScene(scene);
         paymentStage.show();
 
+        // Validate and complete card payment
         payButton.setOnAction(e -> {
             String card = cardField.getText().trim();
             String pin = pinField.getText().trim();
 
-            // simple validation
+            // Basic form validation
             if (card.isEmpty() || pin.isEmpty()) {
                 new Alert(Alert.AlertType.ERROR, "Please fill all fields!").show();
                 return;
             }
             if (card.length() < 8 || pin.length() < 4) {
+                // Very simple mock validation for card + PIN length
                 new Alert(Alert.AlertType.ERROR, "Invalid card (8-digit) or PIN (4-digit)!").show();
                 return;
             }
 
-            // payment success
+            // Payment successful (mock)
             this.success = true;
             paymentStage.close();
 
+            // Generate and display bill
             Bill bill = new Bill(cart, this);
             String receipt = bill.generateReceipt(foodMap);
-
             showBill(receipt);
-            cart.getBuyHistory().clear();
+
+            cart.getBuyHistory().clear(); // Clear cart after payment
         });
     }
 
     // --- CASH ON DELIVERY METHOD ---
     private void cashOnDelivery(Cart cart, Map<Integer, FoodItems> foodMap) {
-        this.success = false; // not paid yet
+        this.success = false; // Payment still pending
 
         Bill bill = new Bill(cart, this);
         String receipt = bill.generateReceipt(foodMap);
 
-        // modify receipt to reflect pending payment
+        // Append pending payment info to bill
         receipt += "\n-----------------------------------\n";
         receipt += "Payment Method: Cash\n";
         receipt += "Status: Pending Payment\n";
         receipt += "-----------------------------------\n";
 
         showBill(receipt);
-        cart.getBuyHistory().clear();
+        cart.getBuyHistory().clear(); // Clear cart but keep unpaid order
     }
 
     // ===================== CHECKOUT HANDLER =====================
     public static void checkout(Cart cart) {
 
-        // Build Food Map
+        // Build map of foodId -> FoodItems
         Map<Integer, FoodItems> foodMap = new HashMap<>();
         for (FoodItems food : FileStorage.loadMenu()) {
             foodMap.put(food.getId(), food);
         }
 
-        // Calculate total
+        // Compute total cart price
         double total = 0;
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             FoodItems food = foodMap.get(entry.getKey());
@@ -140,27 +150,27 @@ public class Payment {
             }
         }
 
-        // Empty cart? Stop immediately
+        // Prevent empty checkout
         if (cart.getBuyHistory().isEmpty()) {
             new Alert(Alert.AlertType.INFORMATION, "Your cart is empty!").show();
             return;
         }
 
         try {
-            int userId = Session.getCurrentUserId();
+            int userId = Session.getCurrentUserId(); // Identify user making purchase
 
-            // Store Payment + Cart in files
+            // Store payment + cart contents into file (persistence)
             int paymentId = FileStorage.createPaymentAndCart(
                     userId,
                     cart,
                     foodMap,
-                    "Card"     // default; user can change later
+                    paymentMethod
             );
 
-            // Create payment object
+            // Create Payment instance for handling UI + method
             Payment payment = new Payment(paymentId, total);
 
-            // Continue to payment method selection
+            // Show payment method selection popup
             payment.processPayment(cart, foodMap);
 
         } catch (Exception e) {
@@ -169,14 +179,13 @@ public class Payment {
         }
     }
 
-
-    // --- Helper to show receipt window ---
+    // --- Helper to display receipt window ---
     private void showBill(String receipt) {
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");
 
         TextArea receiptArea = new TextArea(receipt);
-        receiptArea.setEditable(false);
+        receiptArea.setEditable(false); // Prevent editing bill
         receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
         receiptArea.setPrefSize(500, 400);
 
@@ -203,5 +212,9 @@ public class Payment {
 
     public String getTimestamp() {
         return timestamp;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 }

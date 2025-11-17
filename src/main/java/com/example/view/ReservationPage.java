@@ -1,7 +1,5 @@
 package com.example.view;
 
-import com.example.manager.FileStorage;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +13,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+import com.example.menu.*;
+import com.example.manager.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;

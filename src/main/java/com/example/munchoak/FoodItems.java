@@ -26,17 +26,9 @@ public class FoodItems {
         return id.get();
     }
 
-    public IntegerProperty idProperty() {
-        return id;
-    }
-
     // ----- Name -----
     public String getName() {
         return name.get();
-    }
-
-    public StringProperty nameProperty() {
-        return name;
     }
 
     public void setName(String name) {
@@ -48,10 +40,6 @@ public class FoodItems {
         return details.get();
     }
 
-    public StringProperty detailsProperty() {
-        return details;
-    }
-
     public void setDetails(String details) {
         this.details.set(details);
     }
@@ -59,10 +47,6 @@ public class FoodItems {
     // ----- Price -----
     public double getPrice() {
         return price.get();
-    }
-
-    public DoubleProperty priceProperty() {
-        return price;
     }
 
     public void setPrice(double price) {
@@ -74,10 +58,6 @@ public class FoodItems {
         return cuisine.get();
     }
 
-    public StringProperty cuisineProperty() {
-        return cuisine;
-    }
-
     public void setCuisine(String cuisine) {
         this.cuisine.set(cuisine);
     }
@@ -85,10 +65,6 @@ public class FoodItems {
     // ----- Image Path -----
     public String getImagePath() {
         return imagePath.get();
-    }
-
-    public StringProperty imagePathProperty() {
-        return imagePath;
     }
 
     public void setImagePath(String imagePath) {
@@ -100,13 +76,7 @@ public class FoodItems {
         return category.get();
     }
 
-    public StringProperty categoryProperty() {
-        return category;
-    }
-
     public void setCategory(String category) {
         this.category.set(category);
     }
-
-
 }

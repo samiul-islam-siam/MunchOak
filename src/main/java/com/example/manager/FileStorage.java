@@ -77,7 +77,7 @@ public class FileStorage {
     public static void ensureDataDir() {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs(); //to create directory
         try {
-            if (!USERS_FILE.exists()) USERS_FILE.createNewFile(); //To create category file whent it is not created
+            if (!USERS_FILE.exists()) USERS_FILE.createNewFile(); //To create category file when it is not created
             if (!CATEGORIES_FILE.exists())      // By default, to have some predefined categories
             {
                 String[] initailizedCategories = {
@@ -233,7 +233,7 @@ public class FileStorage {
     }
 
     // ----------------- USERS -----------------
-    //Checking user alraedy exist or not (Used for login)
+    //Checking user already exist or not (Used for login)
     public static boolean userExists(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
@@ -274,7 +274,7 @@ public class FileStorage {
         }
     }
 
-    //'guest' is default user while no login is occured
+    //'guest' is default user while no login is occurred
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
         List<String[]> users = loadUsers();

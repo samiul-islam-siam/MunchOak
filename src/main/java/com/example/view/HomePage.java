@@ -1,10 +1,9 @@
 package com.example.view;
 
-import com.example.manager.Session;
-import com.example.menu.MenuPage;
 import com.example.munchoak.History;
 import com.example.network.ChatClient;
-
+import com.example.menu.*;
+import com.example.manager.*;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
