@@ -2,7 +2,6 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.time.Instant;
@@ -48,7 +47,7 @@ public class FileStorage {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_POINTER_FILE, false))) {
             dos.writeUTF(menuFile.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -62,7 +61,7 @@ public class FileStorage {
                 MENU_FILE = file;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -70,8 +69,20 @@ public class FileStorage {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs();
         try {
             if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
-            //if (!MENU_FILE.exists()) MENU_FILE.createNewFile();
-            if (!CATEGORIES_FILE.exists()) CATEGORIES_FILE.createNewFile();
+            if (!CATEGORIES_FILE.exists())
+            {
+                String[] initailizedCategories = {
+                        "Drinks",
+                        "Sweets",
+                        "Spicy Foods",
+                        "Main Course",
+                        "Appetizers"
+                };
+                DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, true));
+                for (String category : initailizedCategories) {
+                    dos.writeUTF(category); // write each category in binary format
+                }
+            }
             if (!PAYMENTS_FILE.exists()) PAYMENTS_FILE.createNewFile();
             if (!CARTS_FILE.exists()) CARTS_FILE.createNewFile();
             if (!CART_ITEMS_FILE.exists()) CART_ITEMS_FILE.createNewFile();
@@ -81,18 +92,11 @@ public class FileStorage {
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    public static void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.show();
-    }
-
-    // ----------------- MENU / FOOD -----------------
+    // ----------------- MENU -----------------
     public static List<FoodItems> loadMenu() {
         ensureDataDir();
         List<FoodItems> list = new ArrayList<>();
@@ -114,7 +118,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
@@ -163,7 +167,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return cats;
     }
@@ -266,7 +270,7 @@ public class FileStorage {
                 dos.writeUTF("nopass");
                 dos.writeInt(2025000);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
         }
     }
@@ -285,7 +289,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return users;
     }
@@ -360,7 +364,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
@@ -382,7 +386,7 @@ public class FileStorage {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         if (cartId == -1) return items;
@@ -395,7 +399,7 @@ public class FileStorage {
                 if (cid == cartId) items.put(foodId, qty);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         return items;
@@ -419,7 +423,7 @@ public class FileStorage {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
             return false;
         }
     }
@@ -483,7 +487,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return lastId + 1;
     }
@@ -514,7 +518,7 @@ public class FileStorage {
         try {
             ensureAdminFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -523,7 +527,7 @@ public class FileStorage {
             ensureDataDir();
             ensureAdminFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -533,33 +537,6 @@ public class FileStorage {
                 dos.writeUTF("admin123"); // default admin password
             }
         }
-    }
-
-    public static boolean verifyAdminPassword(String password) {
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(ADMIN_FILE))) {
-            String saved = dis.readUTF().trim();
-            return password.equals(saved);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static void setAdminPassword(String newPassword) {
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(ADMIN_FILE, false))) {
-            dos.writeUTF(newPassword);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ---------------- ADMIN USER MANAGEMENT ----------------
-    public static List<String[]> readAllUsersSimple() {
-        return new ArrayList<>(loadUsers());
-    }
-
-    public static int getUserCount() {
-        return loadUsers().size();
     }
 
     // ---------------- USER PASSWORD UTILITIES ----------------
@@ -583,7 +560,7 @@ public class FileStorage {
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return false;
     }
@@ -593,8 +570,7 @@ public class FileStorage {
         List<String[]> users = loadUsers(); // load all users
         boolean updated = false;
 
-        for (int i = 0; i < users.size(); i++) {
-            String[] u = users.get(i);
+        for (String[] u : users) {
             if (u[0].equals(username)) {
                 String salt = PasswordUtils.generateSalt();
                 String hash = PasswordUtils.hashPassword(newPassword, salt);
@@ -615,7 +591,7 @@ public class FileStorage {
                     dos.writeInt(Integer.parseInt(u[3])); // userId
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
         }
     }

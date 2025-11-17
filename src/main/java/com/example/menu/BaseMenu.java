@@ -4,7 +4,6 @@ import com.example.manager.FileStorage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 import com.example.munchoak.Payment;
-import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -23,7 +22,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -59,16 +57,12 @@ public class BaseMenu {
     protected HBox categoryButtons;
     protected VBox formBox;
     protected HBox cartButtons;
-
-    protected VBox cartBox;
-    private HBox navBar;
-
-
     protected Button viewCartButton;
     protected Button checkoutButton;
     protected Button addToCartBtn;
     protected Button buttonMenu;
     protected Button editBtn;
+
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
 
@@ -79,7 +73,7 @@ public class BaseMenu {
         mainLayout.setStyle("-fx-background-color: white;");
 
         // --- Navigation Bar ---
-        navBar = createNavBar();
+        HBox navBar = createNavBar();
 
         // --- Banner Section ---
         StackPane bannerSection = createBannerSection();
@@ -114,7 +108,7 @@ public class BaseMenu {
     // Cart for the current user
     int userId = Session.getCurrentUserId();
 
-    private Cart cart = new Cart();
+    private final Cart cart = new Cart();
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();
@@ -217,11 +211,11 @@ public class BaseMenu {
 
         // Cart buttons
         viewCartButton = new Button("View Cart");
-        viewCartButton.setOnAction(e -> showCart());
+        viewCartButton.setOnAction(e -> cart.showCart(foodList));
 
         checkoutButton = new Button("Checkout");
 
-        checkoutButton.setOnAction(e -> checkout());
+        checkoutButton.setOnAction(e -> Payment.checkout(cart));
         styleMainButton(viewCartButton);
         styleMainButton(checkoutButton);
         cartButtons = new HBox(15, viewCartButton, checkoutButton);
@@ -300,18 +294,7 @@ public class BaseMenu {
         });
     }
 
-
-    private void animateAddToCart(Node node) {
-        FadeTransition fade = new FadeTransition(Duration.millis(300), node);
-        fade.setFromValue(1);
-        fade.setToValue(0.6);
-        fade.setAutoReverse(true);
-        fade.setCycleCount(2);
-        fade.play();
-    }
-
     // ================== CATEGORY MANAGEMENT ===================
-
     protected void loadCategories() {
         categoryBox.getItems().clear();
         categories = FileStorage.loadCategories();
@@ -371,7 +354,6 @@ public class BaseMenu {
                 new FileChooser.ExtensionFilter("Data Files", "*.dat")
         );
 
-
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             try {
@@ -386,7 +368,7 @@ public class BaseMenu {
                 // 2. Load FoodItems from selected file
                 List<FoodItems> importedItems = FileStorage.loadMenu();
 
-                if (importedItems == null || importedItems.isEmpty()) {
+                if (importedItems.isEmpty()) {
                     showAlert("Info", "The selected menu file is empty or invalid.");
                     return;
                 }
@@ -398,10 +380,8 @@ public class BaseMenu {
                 alert.setHeaderText(null);
                 alert.setContentText("Menu items imported successfully!");
                 alert.showAndWait();
-
-
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Failed to import menu file.");
             }
         }
@@ -438,7 +418,7 @@ public class BaseMenu {
         dialog.setHeaderText("Enter new category name:");
         dialog.setContentText("Category:");
         dialog.showAndWait().ifPresent(name -> {
-            if (name == null || name.isBlank()) {
+            if (name.isBlank()) {
                 showAlert("Error", "Invalid category name.");
                 return;
             }
@@ -446,8 +426,8 @@ public class BaseMenu {
                 FileStorage.addCategory(name);
                 loadCategories();
                 categoryBox.setValue(name);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Category already exists or invalid.");
             }
         });
@@ -476,8 +456,8 @@ public class BaseMenu {
                 // reload menu and UI
                 foodList.setAll(FileStorage.loadMenu());
                 loadFoodItems();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Rename failed.");
             }
         });
@@ -501,8 +481,8 @@ public class BaseMenu {
                     categoryBox.setValue(null);
                     foodList.setAll(FileStorage.loadMenu());
                     loadFoodItems();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception e) {
+                    System.err.println("IOException: " + e.getMessage());
                     showAlert("Error", "Delete failed.");
                 }
             }
@@ -690,8 +670,8 @@ public class BaseMenu {
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to add food item.");
         }
     }
@@ -718,8 +698,8 @@ public class BaseMenu {
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to update food item.");
         }
     }
@@ -730,7 +710,7 @@ public class BaseMenu {
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
             loadFoodItems();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to delete item.");
         }
     }
@@ -752,10 +732,9 @@ public class BaseMenu {
         addOrUpdateButton.setText("Update");
 
         // show form
-        ((VBox) addOrUpdateButton.getParent()).setVisible(true);
-        ((VBox) addOrUpdateButton.getParent()).setManaged(true);
+        addOrUpdateButton.getParent().setVisible(true);
+        addOrUpdateButton.getParent().setManaged(true);
         styleMainButton(addOrUpdateButton);
-
     }
 
     protected void clearFields() {
@@ -771,8 +750,8 @@ public class BaseMenu {
         addOrUpdateButton.setText("Add");
 
         // hide form again
-        ((VBox) addOrUpdateButton.getParent()).setVisible(false);
-        ((VBox) addOrUpdateButton.getParent()).setManaged(false);
+        addOrUpdateButton.getParent().setVisible(false);
+        addOrUpdateButton.getParent().setManaged(false);
     }
 
     protected void chooseImage() {
@@ -795,208 +774,8 @@ public class BaseMenu {
                 imageFilenameLabel.setText(file.getName());
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
-        }
-    }
-
-    // =================== CART ====================
-
-    public static class CartItemView {
-        private int id;
-        private String name;
-        private int quantity;
-        private double price;
-        private double total;
-
-        public CartItemView(int id, String name, int quantity, double price) {
-            this.id = id;
-            this.name = name;
-            this.quantity = quantity;
-            this.price = price;
-            this.total = price * quantity;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public double getPrice() {
-            return price;
-        }
-
-        public double getTotal() {
-            return total;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-            this.total = this.price * quantity; // update total dynamically
-        }
-    }
-
-    protected void showCart() {
-        // Map all FoodItems by ID
-        Map<Integer, FoodItems> foodMap = new HashMap<>();
-        for (FoodItems item : foodList) {
-            foodMap.put(item.getId(), item);
-        }
-
-        // Prepare cart data for TableView
-        ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
-        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-            FoodItems food = foodMap.get(entry.getKey());
-            if (food != null) {
-                cartItems.add(new CartItemView(food.getId(), food.getName(), entry.getValue(), food.getPrice()));
-            }
-        }
-
-        TableView<CartItemView> cartTable = new TableView<>(cartItems);
-
-        // Columns
-        TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
-        qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
-        TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        priceCol.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(Double value, boolean empty) {
-                super.updateItem(value, empty);
-                if (empty || value == null) {
-                    setText(null);
-                } else {
-                    setText(String.format("%.2f", value));
-                }
-            }
-        });
-
-        TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
-        totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
-        totalCol.setCellFactory(tc -> new TableCell<>() {
-            @Override
-            protected void updateItem(Double value, boolean empty) {
-                super.updateItem(value, empty);
-                if (empty || value == null) {
-                    setText(null);
-                } else {
-                    setText(String.format("%.2f", value));
-                }
-            }
-        });
-
-        Label totalLabel = new Label("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
-        totalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-
-        TableColumn<CartItemView, Void> actionCol = new TableColumn<>("Action");
-        actionCol.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("Edit");
-            private final Button removeBtn = new Button("Remove");
-            private final HBox box = new HBox(5, editBtn, removeBtn);
-
-            {
-                editBtn.setOnAction(e -> {
-                    CartItemView item = getTableView().getItems().get(getIndex());
-                    TextInputDialog dialog = new TextInputDialog(String.valueOf(item.getQuantity()));
-                    dialog.setTitle("Edit Quantity");
-                    dialog.setHeaderText("Update quantity for " + item.getName());
-                    dialog.setContentText("New quantity:");
-
-                    dialog.showAndWait().ifPresent(value -> {
-                        try {
-                            int newQty = Integer.parseInt(value);
-                            if (newQty <= 0) {
-                                cart.removeFromCartEntirely(item.getId());
-                                cartItems.remove(item);
-                            } else {
-                                cart.getBuyHistory().put(item.getId(), newQty);
-                                item.setQuantity(newQty);
-                                cartTable.refresh();
-                            }
-                            totalLabel.setText("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
-                        } catch (NumberFormatException ex) {
-                            new Alert(Alert.AlertType.ERROR, "Please enter a valid number").show();
-                        }
-                    });
-                });
-
-                removeBtn.setOnAction(e -> {
-                    CartItemView item = getTableView().getItems().get(getIndex());
-                    cart.removeFromCartEntirely(item.getId());
-                    cartItems.remove(item);
-                    totalLabel.setText("Total: $" + String.format("%.2f", cart.getTotalPrice(foodMap)));
-                });
-            }
-
-            @Override
-            protected void updateItem(Void v, boolean empty) {
-                super.updateItem(v, empty);
-                if (empty) setGraphic(null);
-                else setGraphic(box);
-            }
-        });
-
-        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol, actionCol);
-
-        Button closeBtn = new Button("Close");
-        closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
-
-        HBox bottomBar = new HBox(10, totalLabel, closeBtn);
-        bottomBar.setAlignment(Pos.CENTER_RIGHT);
-        bottomBar.setPadding(new Insets(10));
-
-        VBox vbox = new VBox(10, cartTable, bottomBar);
-        vbox.setPadding(new Insets(10));
-
-        Stage stage = new Stage();
-        stage.setTitle("Your Cart");
-        stage.setScene(new Scene(vbox, 600, 400));
-        stage.show();
-    }
-
-    // ================== CHECKOUT ===================
-
-    protected void checkout() {
-        // Step 1: Calculate total
-        double total = 0;
-        Map<Integer, FoodItems> foodMap = new HashMap<>();
-        for (FoodItems food : FileStorage.loadMenu()) {
-            foodMap.put(food.getId(), food);
-        }
-
-        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-            FoodItems food = foodMap.get(entry.getKey());
-            if (food != null) {
-                total += food.getPrice() * entry.getValue();
-            }
-        }
-
-        if (cart.getBuyHistory().isEmpty()) {
-            new Alert(Alert.AlertType.INFORMATION, "Your cart is empty!").show();
-            return;
-        }
-
-        try {
-            int userId = Session.getCurrentUserId();
-
-            int paymentId = FileStorage.createPaymentAndCart(userId, cart, foodMap, "Card");
-            Payment payment = new Payment(paymentId, total);
-            // open payment UI which will show bill and clear cart in Payment.processPayment
-            payment.processPayment(cart, foodMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Checkout failed: " + e.getMessage()).show();
         }
     }
 

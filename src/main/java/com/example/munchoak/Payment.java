@@ -1,5 +1,7 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.HashMap;
 
 public class Payment {
     private int id;
@@ -118,6 +121,54 @@ public class Payment {
         showBill(receipt);
         cart.getBuyHistory().clear();
     }
+
+    // ===================== CHECKOUT HANDLER =====================
+    public static void checkout(Cart cart) {
+
+        // Build Food Map
+        Map<Integer, FoodItems> foodMap = new HashMap<>();
+        for (FoodItems food : FileStorage.loadMenu()) {
+            foodMap.put(food.getId(), food);
+        }
+
+        // Calculate total
+        double total = 0;
+        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+            FoodItems food = foodMap.get(entry.getKey());
+            if (food != null) {
+                total += food.getPrice() * entry.getValue();
+            }
+        }
+
+        // Empty cart? Stop immediately
+        if (cart.getBuyHistory().isEmpty()) {
+            new Alert(Alert.AlertType.INFORMATION, "Your cart is empty!").show();
+            return;
+        }
+
+        try {
+            int userId = Session.getCurrentUserId();
+
+            // Store Payment + Cart in files
+            int paymentId = FileStorage.createPaymentAndCart(
+                    userId,
+                    cart,
+                    foodMap,
+                    "Card"     // default; user can change later
+            );
+
+            // Create payment object
+            Payment payment = new Payment(paymentId, total);
+
+            // Continue to payment method selection
+            payment.processPayment(cart, foodMap);
+
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Checkout failed: " + e.getMessage()).show();
+        }
+    }
+
 
     // --- Helper to show receipt window ---
     private void showBill(String receipt) {

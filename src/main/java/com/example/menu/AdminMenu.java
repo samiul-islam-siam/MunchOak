@@ -1,4 +1,3 @@
-
 package com.example.menu;
 
 import javafx.scene.Node;
@@ -22,11 +21,5 @@ public class AdminMenu extends BaseMenu {
         }
         System.out.println("Admin Menu Loaded");
         return node;
-    }
-
-
-    @Override
-    protected void checkout() {
-        System.out.println("Checkout disabled for admin.");
     }
 }
