@@ -23,14 +23,18 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
+    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
-    static {
-        ensureDataDir();
-    }
 
-    static {
-        ensureDataDir();
-        loadAttachedMenu(); // Load admin-attached menu at startup
+
+    public static void init() {
+        try {
+            ensureDataDir();
+            loadAttachedMenu();
+            ensureAdminFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // default
@@ -132,7 +136,7 @@ public class FileStorage {
             dos.writeUTF(item.getName());
             dos.writeUTF(item.getDetails());
             dos.writeDouble(item.getPrice());
-            dos.writeUTF(item.getCalories());
+            dos.writeUTF(item.getCuisine());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
         }
@@ -146,7 +150,7 @@ public class FileStorage {
                 dos.writeUTF(item.getName());
                 dos.writeUTF(item.getDetails());
                 dos.writeDouble(item.getPrice());
-                dos.writeUTF(item.getCalories());
+                dos.writeUTF(item.getCuisine());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
             }
@@ -373,9 +377,9 @@ public class FileStorage {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(CARTS_FILE))) {
             while (dis.available() > 0) {
                 int cid = dis.readInt();
-                int uid = dis.readInt();
+                dis.readInt();
                 int pid = dis.readInt();
-                String ts = dis.readUTF();
+                dis.readUTF();
                 if (pid == paymentId) {
                     cartId = cid;
                     break;
@@ -508,24 +512,9 @@ public class FileStorage {
 
 
     // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
-    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
-    static {
-        try {
-            ensureAdminFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    static {
-        try {
-            ensureDataDir();
-            ensureAdminFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     private static void ensureAdminFile() throws IOException {
         if (!ADMIN_FILE.exists()) {

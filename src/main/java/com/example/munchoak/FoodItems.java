@@ -7,16 +7,16 @@ public class FoodItems {
     private final StringProperty name;
     private final StringProperty details;
     private final DoubleProperty price;
-    private final StringProperty calories;
+    private final StringProperty cuisine;
     private final StringProperty imagePath;
     private final StringProperty category;
 
-    public FoodItems(int id, String name, String details, double price, String calories, String imagePath, String category) {
+    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
         this.price = new SimpleDoubleProperty(price);
-        this.calories = new SimpleStringProperty(calories);
+        this.cuisine = new SimpleStringProperty(cuisine);
         this.imagePath = new SimpleStringProperty(imagePath);
         this.category = new SimpleStringProperty(category);
     }
@@ -70,16 +70,16 @@ public class FoodItems {
     }
 
     // ----- Ratings -----
-    public String getCalories() {
-        return calories.get();
+    public String getCuisine() {
+        return cuisine.get();
     }
 
-    public StringProperty caloriesProperty() {
-        return calories;
+    public StringProperty cuisineProperty() {
+        return cuisine;
     }
 
-    public void setCalories(String calories) {
-        this.calories.set(calories);
+    public void setCuisine(String cuisine) {
+        this.cuisine.set(cuisine);
     }
 
     // ----- Image Path -----
