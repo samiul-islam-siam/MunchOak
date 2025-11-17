@@ -27,12 +27,15 @@ public class UserMenu extends BaseMenu {
             vbox.getChildren().remove(categoryButtons);  // Remove category management buttons
 
             vbox.getChildren().remove(buttonMenu);
+            //loading menu items
             File menuFile = FileStorage.getMenuFile();
             if (!menuFile.exists() || menuFile.length() == 0) {
+                //If menu is empty then cart and checkout button is disabled
                 javafx.application.Platform.runLater(() -> {
                     viewCartButton.setVisible(false);
                     checkoutButton.setVisible(false);
                     // === Create nice empty state message ===
+                    //User will see messages in menu page when there is no menu loaded
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));
 

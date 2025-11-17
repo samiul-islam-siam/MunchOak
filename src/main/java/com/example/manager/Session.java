@@ -1,9 +1,11 @@
 package com.example.manager;
 
 public class Session {
+    //guest default id
     private static int currentUserId = 2025000;  // Default user (for now)
     private static String currentUsername = "guest";
 
+    //To set and acess current user id and username.
     public static int getCurrentUserId() {
         return currentUserId;
     }
@@ -20,6 +22,7 @@ public class Session {
         currentUsername = name;
     }
 
+    //Uses in chat server
     public static String getCurrentRole() {
         if (currentUsername.equals("admin")) {
             return "ADMIN";

@@ -28,11 +28,16 @@ public class guestMenu extends BaseMenu {
 
             vbox.getChildren().remove(buttonMenu);
 
+            //Cart and checkout button is disable for guest
             if (cartButtons != null) {
                 cartButtons.setVisible(false);
                 cartButtons.setManaged(false);
             }
+
+            //geting menu from files
             File menuFile = FileStorage.getMenuFile();
+
+            //If no menu file is there guest will show some messeges there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
                     viewCartButton.setVisible(false);
@@ -43,11 +48,11 @@ public class guestMenu extends BaseMenu {
 
                     Label title = new Label("Empty Menu Page");
                     title.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
-                    title.setTextFill(Color.web("#444"));
+                    title.setTextFill(Color.web("#f00"));
 
                     Label subtitle = new Label("Please try again later.");
                     subtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 18));
-                    subtitle.setTextFill(Color.web("#666"));
+                    subtitle.setTextFill(Color.web("#f00"));
 
                     VBox messageBox = new VBox(10, emoji, title, subtitle);
                     messageBox.setAlignment(Pos.CENTER);

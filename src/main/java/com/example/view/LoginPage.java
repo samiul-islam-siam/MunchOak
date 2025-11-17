@@ -1,7 +1,7 @@
 package com.example.view;
 
 import com.example.manager.Session;
-import com.example.menu.MenuPage;
+import com.example.login.AdminDashboard;
 import com.example.manager.AdminFileStorage;
 import com.example.manager.FileStorage;
 
@@ -28,6 +28,7 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class LoginPage {
@@ -48,8 +49,8 @@ public class LoginPage {
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
 
-    private Scene loginScene;           // Only one scene ever
-    private BorderPane root;            // Reusable root
+    private Scene loginScene; // Only one scene ever
+    private BorderPane root; // Reusable root
 
     public LoginPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -60,9 +61,14 @@ public class LoginPage {
             // Use current stage size if already in full screen/maximized, else normal
             double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH) : NORMAL_WIDTH;
             double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT) : NORMAL_HEIGHT;
+
             root = buildRoot(); // Build layout once
             loginScene = new Scene(root, initWidth, initHeight);
-            loginScene.getStylesheets().add(getClass().getResource("/com/example/view/styles/style.css").toExternalForm());
+            try {
+                loginScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/example/view/styles/style.css")).toExternalForm());
+            } catch (NullPointerException npe) {
+                System.err.println("Exception: " + npe.getMessage());
+            }
             attachResizeListeners(); // Renamed and fixed to handle full screen too
         }
         return loginScene;
@@ -133,7 +139,7 @@ public class LoginPage {
         return root;
     }
 
-    // --- PANES ---
+    // ------------------ PANES --------------------
     private VBox createLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -145,7 +151,7 @@ public class LoginPage {
         VBox buttonsVBox = new VBox(7);
         buttonsVBox.setAlignment(Pos.CENTER);
 
-//------Button Logics-------------------------------------//
+        //------Button Logics-------------------------------------//
         Button adminBtn = createLoginButton("ADMIN");
         adminBtn.setOnAction(e -> showAdminLoginForm());
 
@@ -181,8 +187,8 @@ public class LoginPage {
 
         Button registerBtn = new Button("Register");
         registerBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;");
-        registerBtn.setOnAction(e -> {
 
+        registerBtn.setOnAction(e -> {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String pwd = passwordField.getText();
@@ -216,7 +222,7 @@ public class LoginPage {
                 showStatus("Registration successful!", false);
 
             } catch (IOException err) {
-                err.printStackTrace();
+                System.err.println("IOException: " + err.getMessage());
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
@@ -286,7 +292,7 @@ public class LoginPage {
                 showStatus("Login successful!", false);
                 returnToHome();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                System.err.println("IOException: " + ex.getMessage());
                 showStatus("Error logging in!", true);
             }
         });
@@ -338,9 +344,10 @@ public class LoginPage {
                 }
                 Session.setCurrentUsername("admin");
                 showStatus("Admin login successful!", false);
-                openAdminDashboard();
+                AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                dashboard.openAdminDashboard();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                System.err.println("IOException: " + ex.getMessage());
                 showStatus("Error verifying password!", true);
             }
         });
@@ -409,129 +416,6 @@ public class LoginPage {
             fadeIn.play();
         });
         fadeOut.play();
-    }
-
-    public void openAdminDashboard() {
-        BorderPane dashboard = new BorderPane();
-        dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
-
-        // --- Top Bar ---
-        Label title = new Label("Admin Dashboard");
-        title.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold;");
-        HBox topBar = new HBox(title);
-        topBar.setAlignment(Pos.CENTER);
-        topBar.setPadding(new Insets(20, 0, 20, 0));
-
-        // --- Center Content Placeholder ---
-        Label infoLabel = new Label("Select an action from the left menu.");
-        infoLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-        StackPane centerPane = new StackPane(infoLabel);
-
-        // --- Left Menu ---
-        VBox menuBox = new VBox(15);
-        menuBox.setPadding(new Insets(30));
-        menuBox.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-pref-width: 220;");
-        menuBox.setAlignment(Pos.TOP_CENTER);
-
-        Button viewUsersBtn = new Button("View All Users");
-        Button countUsersBtn = new Button("Count Users");
-        Button manageMenuBtn = new Button("Manage Menu");
-        Button usersHistoryBtn = new Button("History");
-        Button chatServerBtn = new Button("Chat With users");
-        Button changePassBtn = new Button("Change Password");
-
-        Button logoutBtn = new Button("Logout");
-
-        for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
-            btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
-            btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
-            btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
-        }
-
-        menuBox.getChildren().addAll(viewUsersBtn, countUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn);
-
-        dashboard.setTop(topBar);
-        dashboard.setLeft(menuBox);
-        dashboard.setCenter(centerPane);
-
-        Scene scene = new Scene(dashboard, 1000, 700);
-        primaryStage.setScene(scene);
-
-
-        /* --- Button Functionalities --- */
-        usersHistoryBtn.setOnAction(event ->
-        {
-            System.out.println("History Button Clicked");
-        });
-
-        viewUsersBtn.setOnAction(e -> {
-            List<String[]> users = FileStorage.loadUsers();
-            TableView<String[]> table = new TableView<>();
-            // Column for User ID (last element)
-            TableColumn<String[], String> idCol = new TableColumn<>("User ID");
-            idCol.setCellValueFactory(data ->
-                    new javafx.beans.property.SimpleStringProperty(data.getValue()[3])
-            );
-            idCol.setPrefWidth(100);
-
-            // Column for Username (first element)
-            TableColumn<String[], String> usernameCol = new TableColumn<>("Username");
-            usernameCol.setCellValueFactory(data ->
-                    new javafx.beans.property.SimpleStringProperty(data.getValue()[0])
-            );
-            usernameCol.setPrefWidth(200);
-
-            // Column for Email / Main (second element)
-            TableColumn<String[], String> emailCol = new TableColumn<>("Email");
-            emailCol.setCellValueFactory(data ->
-                    new javafx.beans.property.SimpleStringProperty(data.getValue()[1])
-            );
-            emailCol.setPrefWidth(250);
-
-            // Column for Password (third element, masked)
-            TableColumn<String[], String> passwordCol = new TableColumn<>("Password");
-            passwordCol.setCellValueFactory(data ->
-                    new javafx.beans.property.SimpleStringProperty("********")
-            );
-            passwordCol.setPrefWidth(150);
-
-            table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
-
-            // Add users to the table
-            table.getItems().addAll(users);
-
-            // Make table fill centerPane
-            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-            centerPane.getChildren().setAll(table);
-        });
-
-        manageMenuBtn.setOnAction(e -> {
-            MenuPage menuPage = new MenuPage(primaryStage);
-            primaryStage.setScene(menuPage.getMenuScene());
-        });
-
-        chatServerBtn.setOnAction(event -> {
-            HomePage homePage = new HomePage(primaryStage);
-            homePage.openChatWindow();
-        });
-
-        changePassBtn.setOnAction(e ->
-                com.example.login.ChangeAdminPasswordPage.show(primaryStage)
-        );
-
-        logoutBtn.setOnAction(e -> {
-            // Go back to LoginPage
-            Session.setCurrentUsername("guest");
-            primaryStage.setScene(getLoginScene());
-        });
-    }
-
-    private void openUserDashboard() {
-        Label label = new Label("Welcome, User!");
-        label.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
-        BorderPane pane = new BorderPane(label);
-        pane.setStyle("-fx-background-color: linear-gradient(to right, #56ab2f, #a8e063);");
-        primaryStage.setScene(new Scene(pane, 1000, 700));
     }
 
     private void showUserForgotPasswordPopup(Stage parentStage) {

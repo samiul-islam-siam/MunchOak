@@ -22,7 +22,6 @@ import java.util.List;
 public class History {
 
     private final Stage primaryStage;
-    private TableView<HistoryRecord> historyTable;
     private ObservableList<HistoryRecord> historyData;
 
     public History(Stage primaryStage) {
@@ -30,9 +29,9 @@ public class History {
     }
 
     public Scene getScene() {
-        historyTable = new TableView<>();
+        TableView<HistoryRecord> historyTable = new TableView<>();
         historyTable.setPlaceholder(new Label("No payment history available."));
-        historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         historyTable.setPrefHeight(Region.USE_COMPUTED_SIZE);
         historyTable.setMaxWidth(700); // keep table nicely centered
 
@@ -112,7 +111,7 @@ public class History {
             HomePage homePage = new HomePage(primaryStage);
             primaryStage.setScene(homePage.getHomeScene());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println("Exception: " + ex.getMessage());
         }
     }
 
@@ -133,7 +132,7 @@ public class History {
     private void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
-        Cart cart = new Cart(record.getUserId(), "historyCart");
+        Cart cart = new Cart();
         Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
         for (Map.Entry<Integer, Integer> e : items.entrySet()) {
             cart.addToCart(e.getKey(), e.getValue());
@@ -153,7 +152,7 @@ public class History {
             successField.setAccessible(true);
             successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println("Exception: " + ex.getMessage());
         }
 
         Bill bill = new Bill(cart, payment);

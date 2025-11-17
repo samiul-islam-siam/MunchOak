@@ -602,7 +602,7 @@ public class HomePage implements HomePageComponent {
     }
 
     @FXML
-    void openChatWindow() {
+    public void openChatWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage chatStage = new Stage();

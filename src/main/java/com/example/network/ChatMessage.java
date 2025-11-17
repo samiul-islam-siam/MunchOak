@@ -9,7 +9,6 @@ public class ChatMessage {
         this.isSelf = isSelf;
     }
 
-    // ListView sometimes tries to display "" + object
     @Override
     public String toString() {
         return text;

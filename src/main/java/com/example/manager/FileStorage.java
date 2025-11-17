@@ -2,7 +2,6 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.time.Instant;
@@ -12,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FileStorage {
-    private static final File DATA_DIR = new File("src/main/resources/com/example/manager/data");
+    private static final File DATA_DIR = new File("src/main/resources/com/example/manager/data");      //for directory
+    // Data files stored inside DATA_DIR
     private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
     private static final File CATEGORIES_FILE = new File(DATA_DIR, "categories.dat");
     private static final File PAYMENTS_FILE = new File(DATA_DIR, "payments.dat");
@@ -22,40 +22,44 @@ public class FileStorage {
     private static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
+    // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
-    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
-
-
+    //Ensuring all necessary files in directory and pointer files
     public static void init() {
         try {
             ensureDataDir();
             loadAttachedMenu();
             ensureAdminFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    // default
+    // Updates the current menu file and saves this selection inside the pointer file.
     public static void setMenuFile(File file) {
         MENU_FILE = file;
         saveAttachedMenu(file); // persist the attached menu
     }
 
+    // Returns the currently active menu file
     public static File getMenuFile() {
         return MENU_FILE;
     }
 
+    //Writes the menu filename into the pointer file. This allows switching between multiple menu files.
     private static void saveAttachedMenu(File menuFile) {
         ensureDataDir();
+        //when new files of menu is inserted , current menu file is over-write in pointer file
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(MENU_POINTER_FILE, false))) {
             dos.writeUTF(menuFile.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
+    //Menu pointer file that points multiple files for menu
+    //If pointer is empty, default menu.dat is used
     private static void loadAttachedMenu() {
         ensureDataDir();
         if (!MENU_POINTER_FILE.exists() || MENU_POINTER_FILE.length() == 0) return; // <-- check length
@@ -66,16 +70,29 @@ public class FileStorage {
                 MENU_FILE = file;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
     public static void ensureDataDir() {
-        if (!DATA_DIR.exists()) DATA_DIR.mkdirs();
+        if (!DATA_DIR.exists()) DATA_DIR.mkdirs(); //to create directory
         try {
-            if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
-            //if (!MENU_FILE.exists()) MENU_FILE.createNewFile();
-            if (!CATEGORIES_FILE.exists()) CATEGORIES_FILE.createNewFile();
+            if (!USERS_FILE.exists()) USERS_FILE.createNewFile(); //To create category file whent it is not created
+            if (!CATEGORIES_FILE.exists())      // By default, to have some predefined categories
+            {
+                String[] initailizedCategories = {
+                        "Drinks",
+                        "Sweets",
+                        "Spicy Foods",
+                        "Main Course",
+                        "Appetizers"
+                };
+                DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, true));
+                for (String category : initailizedCategories) {
+                    dos.writeUTF(category); // write each category in binary format
+                }
+            }
+            //When there is no such file , create the corresponding one
             if (!PAYMENTS_FILE.exists()) PAYMENTS_FILE.createNewFile();
             if (!CARTS_FILE.exists()) CARTS_FILE.createNewFile();
             if (!CART_ITEMS_FILE.exists()) CART_ITEMS_FILE.createNewFile();
@@ -85,50 +102,48 @@ public class FileStorage {
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    public static void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.show();
-    }
-
-    // ----------------- MENU / FOOD -----------------
+    // ----------------- MENU -----------------
+    //Loads all menu items from the currently active menu file. Returns an empty list if file missing or empty.
     public static List<FoodItems> loadMenu() {
         ensureDataDir();
-        List<FoodItems> list = new ArrayList<>();
+        List<FoodItems> list = new ArrayList<>();   //To store the data in list
         File menuFile = getMenuFile();
         if (!menuFile.exists() || menuFile.length() == 0) {
 
             return list; // return empty list, UI can show "Empty menu"
         }
+
+        //Reading from current menu file
         try (DataInputStream dis = new DataInputStream(new FileInputStream(getMenuFile()))) {
             while (dis.available() > 0) {
                 int id = dis.readInt();
                 String name = dis.readUTF();
                 String details = dis.readUTF();
                 double price = dis.readDouble();
-                String calorie = dis.readUTF();
+                String cuisine = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-                list.add(new FoodItems(id, name, details, price, calorie, imagePath, category));
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
 
+    //Food map for showing bills
     public static Map<Integer, FoodItems> loadFoodMap() {
         Map<Integer, FoodItems> map = new HashMap<>();
         for (FoodItems f : loadMenu()) map.put(f.getId(), f);
         return map;
     }
 
+    //To append menu items in current menu file
     public static void appendMenuItem(FoodItems item) throws IOException {
         ensureDataDir();
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), true))) {
@@ -142,6 +157,7 @@ public class FileStorage {
         }
     }
 
+    // rewrite full menu file from in-memory list
     public static void rewriteMenu(List<FoodItems> items) throws IOException {
         ensureDataDir();
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(getMenuFile(), false))) {
@@ -158,20 +174,22 @@ public class FileStorage {
     }
 
     // ----------------- CATEGORIES -----------------
+    //Loads all categories from the category file.
     public static List<String> loadCategories() {
         ensureDataDir();
         List<String> cats = new ArrayList<>();
         try (DataInputStream dis = new DataInputStream(new FileInputStream(CATEGORIES_FILE))) {
             while (dis.available() > 0) {
-                cats.add(dis.readUTF());
+                cats.add(dis.readUTF());    //To read the categories
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return cats;
     }
 
+    //Adding new category , appending the file
     public static void addCategory(String name) throws IOException {
         ensureDataDir();
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, true))) {
@@ -179,15 +197,17 @@ public class FileStorage {
         }
     }
 
+    //For renaming category
     public static void replaceCategory(String oldName, String newName) throws IOException {
-        List<String> cats = loadCategories();
+        List<String> cats = loadCategories();       //Reading categories
         for (int i = 0; i < cats.size(); i++)
-            if (cats.get(i).equals(oldName)) cats.set(i, newName);
+            if (cats.get(i).equals(oldName)) cats.set(i, newName);  //Setting new name
 
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, false))) {
             for (String c : cats) dos.writeUTF(c);
         }
 
+        //Updating menu with renamed-category
         List<FoodItems> menu = loadMenu();
         boolean changed = false;
         for (FoodItems f : menu) {
@@ -199,6 +219,7 @@ public class FileStorage {
         if (changed) rewriteMenu(menu);
     }
 
+    //Deleting category and updating menu
     public static void deleteCategory(String name) throws IOException {
         List<String> cats = loadCategories();
         cats.removeIf(s -> s.equals(name));
@@ -212,6 +233,7 @@ public class FileStorage {
     }
 
     // ----------------- USERS -----------------
+    //Checking user alraedy exist or not (Used for login)
     public static boolean userExists(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
@@ -220,6 +242,7 @@ public class FileStorage {
         return false;
     }
 
+    //Accessing user id for a particular user (To track current user)
     public static int getUserId(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
@@ -233,7 +256,7 @@ public class FileStorage {
         return -1;
     }
 
-
+    //While Registration is successful new user information will append in user.dat file
     public static void appendUser(String username, String email, String password) throws IOException {
         ensureDataDir();
 
@@ -251,6 +274,7 @@ public class FileStorage {
         }
     }
 
+    //'guest' is default user while no login is occured
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
         List<String[]> users = loadUsers();
@@ -262,7 +286,7 @@ public class FileStorage {
                 break;
             }
         }
-
+        //guest has particular default data-formate
         if (!guestExists) {
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
                 dos.writeUTF("guest");
@@ -270,15 +294,15 @@ public class FileStorage {
                 dos.writeUTF("nopass");
                 dos.writeInt(2025000);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
         }
     }
 
-
+    //To load all information of users
     public static List<String[]> loadUsers() {
         ensureDataDir();
-        List<String[]> users = new ArrayList<>();
+        List<String[]> users = new ArrayList<>();   //storing in list
         try (DataInputStream dis = new DataInputStream(new FileInputStream(USERS_FILE))) {
             while (dis.available() > 0) {
                 String username = dis.readUTF();
@@ -289,16 +313,21 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return users;
     }
 
     // ----------------- PAYMENT & CARTS -----------------
+    //For payments and carts (useage in checkout)
+    /**
+     * Creates a payment, cart, and payment-items entry.
+     * Returns the generated payment ID.
+     */
     public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method) throws IOException {
         ensureDataDir();
 
-        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);
+        int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);  //First payemnt id starts from 3001
         int cartId = generateNextIdInFile(CARTS_FILE, 1);
         int paymentItemIdStart = generateNextIdInFile(PAYMENT_ITEMS_FILE, 1);
 
@@ -311,6 +340,7 @@ public class FileStorage {
             pw.writeUTF(timestamp);
         }
 
+        // Save cart record
         try (DataOutputStream cw = new DataOutputStream(new FileOutputStream(CARTS_FILE, true))) {
             cw.writeInt(cartId);
             cw.writeInt(userId);
@@ -318,6 +348,7 @@ public class FileStorage {
             cw.writeUTF(timestamp);
         }
 
+        // Save cart items + payment items
         try (DataOutputStream ciw = new DataOutputStream(new FileOutputStream(CART_ITEMS_FILE, true));
              DataOutputStream piw = new DataOutputStream(new FileOutputStream(PAYMENT_ITEMS_FILE, true))) {
 
@@ -337,22 +368,24 @@ public class FileStorage {
             }
         }
 
-        try (DataOutputStream ow = new DataOutputStream(new FileOutputStream(ORDERS_FILE, true))) {
-            for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
-                ow.writeInt(paymentId);
-                ow.writeInt(userId);
-                String itemsStr = e.getKey() + "x" + e.getValue() + ";";
-                ow.writeUTF(itemsStr);
-                ow.writeUTF(timestamp);
-            }
-        }
+//        try (DataOutputStream ow = new DataOutputStream(new FileOutputStream(ORDERS_FILE, true))) {
+//            for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
+//                ow.writeInt(paymentId);
+//                ow.writeInt(userId);
+//                String itemsStr = e.getKey() + "x" + e.getValue() + ";";
+//                ow.writeUTF(itemsStr);
+//                ow.writeUTF(timestamp);
+//            }
+//        }
 
         return paymentId;
     }
 
+
+    //Reading history from payments_file
     public static List<HistoryRecordSimple> loadPaymentHistory() {
         ensureDataDir();
-        List<HistoryRecordSimple> list = new ArrayList<>();
+        List<HistoryRecordSimple> list = new ArrayList<>(); //storing in a list
         try (DataInputStream dis = new DataInputStream(new FileInputStream(PAYMENTS_FILE))) {
             while (dis.available() > 0) {
                 int pid = dis.readInt();
@@ -364,11 +397,16 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return list;
     }
 
+    //Cart_files to show bills
+    /**
+     * Loads cart items used for a specific payment ID.
+     * Returns map: foodId → quantity
+     */
     public static Map<Integer, Integer> getCartItemsForPayment(int paymentId) {
         ensureDataDir();
         Map<Integer, Integer> items = new HashMap<>();
@@ -386,7 +424,7 @@ public class FileStorage {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         if (cartId == -1) return items;
@@ -399,13 +437,14 @@ public class FileStorage {
                 if (cid == cartId) items.put(foodId, qty);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
 
         return items;
     }
 
     // ----------------- RESERVATIONS -----------------
+    //Making new reservations
     public static boolean saveReservation(String name, String phone, int guests, String date, String time, String request) {
         ensureDataDir();
         try {
@@ -423,7 +462,7 @@ public class FileStorage {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
             return false;
         }
     }
@@ -487,7 +526,7 @@ public class FileStorage {
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return lastId + 1;
     }
@@ -512,9 +551,7 @@ public class FileStorage {
 
 
     // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
-
-
-
+    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
     private static void ensureAdminFile() throws IOException {
         if (!ADMIN_FILE.exists()) {
@@ -522,33 +559,6 @@ public class FileStorage {
                 dos.writeUTF("admin123"); // default admin password
             }
         }
-    }
-
-    public static boolean verifyAdminPassword(String password) {
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(ADMIN_FILE))) {
-            String saved = dis.readUTF().trim();
-            return password.equals(saved);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static void setAdminPassword(String newPassword) {
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(ADMIN_FILE, false))) {
-            dos.writeUTF(newPassword);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ---------------- ADMIN USER MANAGEMENT ----------------
-    public static List<String[]> readAllUsersSimple() {
-        return new ArrayList<>(loadUsers());
-    }
-
-    public static int getUserCount() {
-        return loadUsers().size();
     }
 
     // ---------------- USER PASSWORD UTILITIES ----------------
@@ -559,7 +569,7 @@ public class FileStorage {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(USERS_FILE))) {
             while (dis.available() > 0) {
                 String uname = dis.readUTF();
-                String email = dis.readUTF();
+                dis.readUTF();  //email ignored here
                 //String pwd = dis.readUTF();
 
                 String saltAndHash = dis.readUTF();
@@ -572,7 +582,7 @@ public class FileStorage {
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
         return false;
     }
@@ -582,8 +592,7 @@ public class FileStorage {
         List<String[]> users = loadUsers(); // load all users
         boolean updated = false;
 
-        for (int i = 0; i < users.size(); i++) {
-            String[] u = users.get(i);
+        for (String[] u : users) {
             if (u[0].equals(username)) {
                 String salt = PasswordUtils.generateSalt();
                 String hash = PasswordUtils.hashPassword(newPassword, salt);
@@ -604,8 +613,9 @@ public class FileStorage {
                     dos.writeInt(Integer.parseInt(u[3])); // userId
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException: " + e.getMessage());
             }
         }
     }
 }
+
