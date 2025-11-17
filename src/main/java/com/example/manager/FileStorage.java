@@ -23,13 +23,14 @@ public class FileStorage {
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
 
-    static {
-        ensureDataDir();
-    }
-
-    static {
-        ensureDataDir();
-        loadAttachedMenu(); // Load admin-attached menu at startup
+    public static void init() {
+        try {
+            ensureDataDir();
+            loadAttachedMenu();
+            ensureAdminFile();
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
     }
 
     // default
@@ -111,10 +112,10 @@ public class FileStorage {
                 String name = dis.readUTF();
                 String details = dis.readUTF();
                 double price = dis.readDouble();
-                double ratings = dis.readDouble();
+                String cuisine = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-                list.add(new FoodItems(id, name, details, price, ratings, imagePath, category));
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -136,7 +137,7 @@ public class FileStorage {
             dos.writeUTF(item.getName());
             dos.writeUTF(item.getDetails());
             dos.writeDouble(item.getPrice());
-            dos.writeDouble(item.getRatings());
+            dos.writeUTF(item.getCuisine());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
         }
@@ -150,7 +151,7 @@ public class FileStorage {
                 dos.writeUTF(item.getName());
                 dos.writeUTF(item.getDetails());
                 dos.writeDouble(item.getPrice());
-                dos.writeDouble(item.getRatings());
+                dos.writeUTF(item.getCuisine());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
             }
@@ -513,23 +514,6 @@ public class FileStorage {
 
     // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
     private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
-
-    static {
-        try {
-            ensureAdminFile();
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-    }
-
-    static {
-        try {
-            ensureDataDir();
-            ensureAdminFile();
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-    }
 
     private static void ensureAdminFile() throws IOException {
         if (!ADMIN_FILE.exists()) {

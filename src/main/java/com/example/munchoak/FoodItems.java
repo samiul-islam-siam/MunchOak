@@ -7,16 +7,16 @@ public class FoodItems {
     private final StringProperty name;
     private final StringProperty details;
     private final DoubleProperty price;
-    private final DoubleProperty ratings;
+    private final StringProperty cuisine;
     private final StringProperty imagePath;
     private final StringProperty category;
 
-    public FoodItems(int id, String name, String details, double price, double ratings, String imagePath, String category) {
+    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
         this.price = new SimpleDoubleProperty(price);
-        this.ratings = new SimpleDoubleProperty(ratings);
+        this.cuisine = new SimpleStringProperty(cuisine);
         this.imagePath = new SimpleStringProperty(imagePath);
         this.category = new SimpleStringProperty(category);
     }
@@ -26,9 +26,17 @@ public class FoodItems {
         return id.get();
     }
 
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
     // ----- Name -----
     public String getName() {
         return name.get();
+    }
+
+    public StringProperty nameProperty() {
+        return name;
     }
 
     public void setName(String name) {
@@ -40,6 +48,10 @@ public class FoodItems {
         return details.get();
     }
 
+    public StringProperty detailsProperty() {
+        return details;
+    }
+
     public void setDetails(String details) {
         this.details.set(details);
     }
@@ -49,22 +61,34 @@ public class FoodItems {
         return price.get();
     }
 
+    public DoubleProperty priceProperty() {
+        return price;
+    }
+
     public void setPrice(double price) {
         this.price.set(price);
     }
 
     // ----- Ratings -----
-    public double getRatings() {
-        return ratings.get();
+    public String getCuisine() {
+        return cuisine.get();
     }
 
-    public void setRatings(double ratings) {
-        this.ratings.set(ratings);
+    public StringProperty cuisineProperty() {
+        return cuisine;
+    }
+
+    public void setCuisine(String cuisine) {
+        this.cuisine.set(cuisine);
     }
 
     // ----- Image Path -----
     public String getImagePath() {
         return imagePath.get();
+    }
+
+    public StringProperty imagePathProperty() {
+        return imagePath;
     }
 
     public void setImagePath(String imagePath) {
@@ -76,7 +100,13 @@ public class FoodItems {
         return category.get();
     }
 
+    public StringProperty categoryProperty() {
+        return category;
+    }
+
     public void setCategory(String category) {
         this.category.set(category);
     }
+
+
 }
