@@ -12,24 +12,22 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class Home extends Application {
-
     private Stage primaryStage;
-    private Scene mainScene;
 
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-        mainScene = createMainScene(); // load homepage scene
+        Scene mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
         stage.setTitle("Home Page");
 
-        // ✅ Load global stylesheet
+        // Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             mainScene.getStylesheets().add(css.toExternalForm());
-            System.out.println("✅ CSS loaded successfully: " + css);
+            System.out.println("CSS loaded successfully: " + css);
         } else {
-            System.out.println("❌ CSS not found! Check file path.");
+            System.out.println("CSS not found! Check file path.");
         }
         stage.show();
     }

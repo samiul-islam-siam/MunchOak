@@ -18,46 +18,57 @@ import javafx.stage.Stage;
 
 import java.util.Map;
 import java.util.List;
+import java.lang.reflect.Field;
 
 public class History {
 
-    private final Stage primaryStage;
-    private ObservableList<HistoryRecord> historyData;
+    private final Stage primaryStage; // Reference to the main application window
+    private ObservableList<HistoryRecord> historyData; // Observable list for TableView
 
     public History(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
 
+    // Main scene for displaying payment history in a table
     public Scene getScene() {
         TableView<HistoryRecord> historyTable = new TableView<>();
-        historyTable.setPlaceholder(new Label("No payment history available."));
+        historyTable.setPlaceholder(new Label("No payment history available.")); // Shown if no data
         historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         historyTable.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        historyTable.setMaxWidth(700); // keep table nicely centered
+        historyTable.setMaxWidth(700);
 
         historyData = FXCollections.observableArrayList();
 
-        // --- Table Columns ---
+        // ----- Table Columns -----
+
+        // User ID column
         TableColumn<HistoryRecord, Integer> userIdCol = new TableColumn<>("User ID");
         userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
 
+        // Payment ID column
         TableColumn<HistoryRecord, Integer> paymentIdCol = new TableColumn<>("Payment ID");
         paymentIdCol.setCellValueFactory(new PropertyValueFactory<>("paymentId"));
 
+        // Timestamp column
         TableColumn<HistoryRecord, String> dateCol = new TableColumn<>("Date/Time");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
 
+        // Total amount column
         TableColumn<HistoryRecord, Double> totalCol = new TableColumn<>("Total Amount");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
+        // Payment method column (Card/Cash)
         TableColumn<HistoryRecord, String> methodCol = new TableColumn<>("Payment Method");
         methodCol.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
 
+        // View Bill column with a button
         TableColumn<HistoryRecord, Void> billCol = new TableColumn<>("Bill");
         billCol.setCellFactory(col -> new TableCell<>() {
+
             private final Button btn = new Button("View");
 
             {
+                // When clicked, show the bill for that payment ID
                 btn.setOnAction(e -> {
                     HistoryRecord record = getTableView().getItems().get(getIndex());
                     showBill(record);
@@ -67,45 +78,41 @@ public class History {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                setGraphic(empty ? null : btn); // Hide button on empty rows
             }
         });
 
+        // Add columns to table
         historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol);
         historyTable.setItems(historyData);
 
-        // Load payment data
+        // Load data from storage
         loadHistory();
 
-        // --- Back Button ---
+        // ----- Back Button -----
         Button backBtn = new Button("Back");
-        // backBtn.setId("back-btn");
-        backBtn.setStyle("-fx-background-color: #0078d7; -fx-text-fill: white; -fx-font-size: 14px; "
+        backBtn.setStyle("-fx-background-color: #0078d7; -fx-text-fill: white; -fx-font-size: 14px;"
                 + "-fx-padding: 6 15 6 15; -fx-background-radius: 8;");
         backBtn.setOnAction(e -> goBack());
 
         HBox backRow = new HBox(backBtn);
         backRow.setAlignment(Pos.TOP_LEFT);
 
-        // --- Title Row ---
+        // ----- Title -----
         Label title = new Label("📜 Payment History");
-        // title.setId("history-title");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #333;");
         HBox titleRow = new HBox(title);
         titleRow.setAlignment(Pos.CENTER);
 
-        // --- Main Layout ---
+        // ----- Main Layout -----
         VBox layout = new VBox(15, backRow, titleRow, historyTable);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
 
-
-        Scene scene = new Scene(layout, 900, 600);
-        // Optional CSS file (if you create one)
-        // scene.getStylesheets().add(getClass().getResource("/com/example/munchoak/history.css").toExternalForm());
-        return scene;
+        return new Scene(layout, 900, 600);
     }
 
+    // Navigate back to Home Page
     private void goBack() {
         try {
             HomePage homePage = new HomePage(primaryStage);
@@ -115,49 +122,72 @@ public class History {
         }
     }
 
-    // ------------------ Data Handling ------------------
+    // ------------------ Load User/Admin History ------------------
     private void loadHistory() {
         historyData.clear();
+
+        // Load simplified stored records from FileStorage
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
+
         int currentUserId = Session.getCurrentUserId();
         boolean isAdmin = Session.getCurrentUsername().equals("admin");
 
+        // Admin sees all payments; users see only their own
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!isAdmin && s.userId != currentUserId) continue;
-            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
+
+            historyData.add(new HistoryRecord(
+                    s.userId,
+                    s.paymentId,
+                    s.timestamp,
+                    s.amount,
+                    "Success",
+                    s.paymentMethod
+            ));
         }
     }
 
-    // ------------------ Bill Popup ------------------
+    // ------------------ Bill Popup Window ------------------
     private void showBill(HistoryRecord record) {
+
+        // Load food info from storage
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
+        // Rebuild the cart for this specific payment ID
         Cart cart = new Cart();
         Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
         for (Map.Entry<Integer, Integer> e : items.entrySet()) {
             cart.addToCart(e.getKey(), e.getValue());
         }
 
+        // Create payment object using reflection to restore original stored values
         Payment payment = new Payment(record.getPaymentId(), record.getAmount());
+
         try {
-            java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
+            // Restore payment ID
+            Field idField = Payment.class.getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(payment, record.getPaymentId());
 
-            java.lang.reflect.Field timestampField = Payment.class.getDeclaredField("timestamp");
+            // Restore timestamp
+            Field timestampField = Payment.class.getDeclaredField("timestamp");
             timestampField.setAccessible(true);
             timestampField.set(payment, record.getTimestamp());
 
-            java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
+            // Restore success state
+            Field successField = Payment.class.getDeclaredField("success");
             successField.setAccessible(true);
             successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
+
         } catch (Exception ex) {
             System.err.println("Exception: " + ex.getMessage());
         }
 
+        // Generate bill text
         Bill bill = new Bill(cart, payment);
         String receipt = bill.generateReceipt(foodMap);
 
+        // Show bill in separate popup window
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");
 
@@ -174,7 +204,7 @@ public class History {
         billStage.show();
     }
 
-    // ------------------ Model ------------------
+    // ------------------ Table Model for Each Row ------------------
     public static class HistoryRecord {
         private final int userId;
         private final int paymentId;
