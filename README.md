@@ -9,8 +9,6 @@ explore menus and place orders or reserve tables as well as communicate with adm
 Built using **Java**, **JavaFX**, and **TCP socket and thread-based networking**, 
 this project demonstrates both frontend UI design and backend file system management and communication systems.
 
----
-
 ## 🌟 **Features**
 
 ### **User Features**
@@ -33,8 +31,6 @@ this project demonstrates both frontend UI design and backend file system manage
 * Multiple clients can communicate with the admin
 * User to user communication is prohibited
 * Real-time message flow
-
----
 
 ## 📁 **Project Structure**
 
@@ -69,8 +65,6 @@ MunchOak/
 └── README.md
 ```
 
----
-
 ## **Tools**
 
 | Tool                                   | Description                              |
@@ -80,8 +74,6 @@ MunchOak/
 | **CSS**                                | UI framework                             |
 | **IntelliJ IDEA CE v2025.2.2**         | Development environment                  |
 | **Maven**                              | Build automation & dependency management |
-
----
 
 ## ▶️ **How to Run the Application**
 
@@ -97,8 +89,6 @@ src/main/java/com/example/munchoak/Home.java
 ```
 
 5. Run `Home.java` to start the system.
-
----
 
 ### **Connecting to the Chat Server**
 
@@ -119,8 +109,6 @@ src/main/java/com/example/munchoak/Home.java
    ```
    ping 10.33.22.87
    ```
-
----
 
 ## **Contributors**
 
