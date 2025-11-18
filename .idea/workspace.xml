@@ -4,81 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="profile added">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/ChangeAdminPasswordPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/ManageMenuPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/login/ViewUsersPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/AdminFileStorage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/PasswordUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/UserMenu.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/activity.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/admin.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/food.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/chat-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/network/ChatWindow.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/network/chat_history.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fidalgo-logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/location.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/munchoak_interior3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/reservation-bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/right_dish2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/aboutus-style.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/menupage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/styles/reservation-style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/RegisterController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/SignupController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/UserController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/WelcomeController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AboutUs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Dashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/BaseMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Reservation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/admin.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/homepage.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/register.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/signup.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/user.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/login/FXMLs/welcome.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/munchoak/aboutus.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg3.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg4.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/bg4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/cocktails.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/cocktails.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/events1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fourth_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/fourth_ext_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/left_dish.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/left_dish.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/view/images/third_ext_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/view/images/third_ext_bg.png" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="init">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,12 +34,12 @@
     &quot;assignee&quot;: &quot;samiul-islam-siam&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/samiul-islam-siam/MunchOak.git",
-    "accountId": "c37f2613-110f-4720-a24d-eedbda622303"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/samiul-islam-siam/MunchOak.git&quot;,
+    &quot;accountId&quot;: &quot;c37f2613-110f-4720-a24d-eedbda622303&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -146,7 +74,7 @@
     "git-widget-placeholder": "login-and-profile-system",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/shuch/IdeaProjects/MunchOakLogin2",
+    "last_opened_file_path": "C:/Users/shuch/IdeaProjects/MunchOak",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.30804598",
@@ -155,11 +83,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\shuch\IdeaProjects\MunchOak" />
       <recent name="C:\Users\shuch\IdeaProjects\MunchOakLogin2" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\munchoak" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
@@ -425,7 +353,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762398829295</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="init">
+      <option name="closed" value="true" />
+      <created>1763415847563</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1763415847563</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -453,6 +389,7 @@
     <MESSAGE value="update" />
     <MESSAGE value="merging ui" />
     <MESSAGE value="profile added" />
-    <option name="LAST_COMMIT_MESSAGE" value="profile added" />
+    <MESSAGE value="init" />
+    <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
 </project>

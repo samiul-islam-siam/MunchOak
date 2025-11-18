@@ -27,10 +27,12 @@ public class ProfilePage {
         String username = Session.getCurrentUsername();
         String email = Session.getCurrentEmail();
         String password = Session.getCurrentPassword();
+        int userId = Session.getCurrentUserId();
 
         if (username == null) username = "Guest";
         if (email == null) email = "N/A";
-        if (password == null) password = "N/A";
+        //if (password == null) password = "N/A";
+
 
         // --- Title ---
         Label title = new Label("My Profile");
@@ -39,7 +41,8 @@ public class ProfilePage {
         // --- User info labels ---
         Label userLabel = new Label("Username: " + username);
         Label emailLabel = new Label("Email: " + email);
-        Label passLabel = new Label("Password: " + password);
+        //Label passLabel = new Label("Password: " + password);
+        Label passLabel = new Label("Your Id: " + userId);
 
         userLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
         emailLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
