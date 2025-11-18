@@ -1,5 +1,7 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,8 +12,7 @@ import javafx.stage.Stage;
 import java.time.Instant;
 import java.util.Map;
 import java.util.HashMap;
-import com.example.menu.*;
-import com.example.manager.*;
+
 public class Payment {
     private final int id;
     private final double amount;
@@ -22,6 +23,7 @@ public class Payment {
     public Payment(int id, double amount) {
         this.id = id;
         this.amount = amount;
+        paymentMethod = "";
         this.timestamp = Instant.now().toString();  // Save payment creation timestamp
         this.success = false;                       // Mark unpaid initially
     }
@@ -31,92 +33,105 @@ public class Payment {
         Stage stage = new Stage();
         stage.setTitle("Select Payment Method");
 
+        Label title = new Label("Choose Payment Method");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
         Button cardBtn = new Button("Pay with Card");
         Button cashBtn = new Button("Pay Cash");
+        Button backBtn = new Button("Back");
 
-        cardBtn.setPrefWidth(180);
-        cashBtn.setPrefWidth(180);
+        styleButton(cardBtn);
+        styleButton(cashBtn);
+        styleSecondaryButton(backBtn);
 
-        // Layout asking user to choose payment option
-        VBox vbox = new VBox(20, new Label("Choose Payment Method:"), cardBtn, cashBtn);
+        VBox vbox = new VBox(20, title, cardBtn, cashBtn, backBtn);
         vbox.setPadding(new Insets(25));
         vbox.setAlignment(Pos.CENTER);
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #eef2f3, #dfe9f3);");
 
-        stage.setScene(new Scene(vbox, 300, 200));
+        stage.setScene(new Scene(vbox, 340, 260));
         stage.show();
 
-        // Card payment
         cardBtn.setOnAction(e -> {
             stage.close();
-            paymentMethod = "Card";
             cardPayment(cart, foodMap);
         });
 
-        // Cash on delivery
         cashBtn.setOnAction(e -> {
             stage.close();
-            paymentMethod = "Cash";
-            cashOnDelivery(cart, foodMap);
+            cashPayment(cart, foodMap);
         });
+
+        backBtn.setOnAction(e -> stage.close());
     }
+
 
     // --- CARD PAYMENT METHOD ---
     private void cardPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
 
-        // UI asking card number + PIN
         Stage paymentStage = new Stage();
         paymentStage.setTitle("Card Payment");
 
+        Label title = new Label("Enter Card Details");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
         Label cardLabel = new Label("Card Number:");
         TextField cardField = new TextField();
-        cardField.setPromptText("Enter card number");
+        cardField.setPromptText("XXXX XXXX XXXX XXXX");
 
         Label pinLabel = new Label("PIN:");
         PasswordField pinField = new PasswordField();
-        pinField.setPromptText("Enter PIN");
+        pinField.setPromptText("****");
 
         Button payButton = new Button("Pay Now");
-        payButton.setDefaultButton(true);  // Triggered by Enter key
+        Button backButton = new Button("Back");
 
-        VBox vbox = new VBox(10, cardLabel, cardField, pinLabel, pinField, payButton);
-        vbox.setPadding(new Insets(20));
+        styleButton(payButton);
+        styleSecondaryButton(backButton);
+
+        VBox vbox = new VBox(12, title, cardLabel, cardField, pinLabel, pinField, payButton, backButton);
+        vbox.setPadding(new Insets(25));
         vbox.setAlignment(Pos.CENTER);
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);");
 
-        Scene scene = new Scene(vbox, 320, 220);
+        Scene scene = new Scene(vbox, 350, 330);
         paymentStage.setScene(scene);
         paymentStage.show();
 
-        // Validate and complete card payment
         payButton.setOnAction(e -> {
             String card = cardField.getText().trim();
             String pin = pinField.getText().trim();
 
-            // Basic form validation
             if (card.isEmpty() || pin.isEmpty()) {
                 new Alert(Alert.AlertType.ERROR, "Please fill all fields!").show();
                 return;
             }
             if (card.length() < 8 || pin.length() < 4) {
-                // Very simple mock validation for card + PIN length
                 new Alert(Alert.AlertType.ERROR, "Invalid card (8-digit) or PIN (4-digit)!").show();
                 return;
             }
 
-            // Payment successful (mock)
+            paymentMethod = "Card";
             this.success = true;
             paymentStage.close();
 
-            // Generate and display bill
             Bill bill = new Bill(cart, this);
             String receipt = bill.generateReceipt(foodMap);
             showBill(receipt);
 
-            cart.getBuyHistory().clear(); // Clear cart after payment
+            cart.getBuyHistory().clear();
+        });
+
+        backButton.setOnAction(e -> {
+            paymentStage.close();
+            processPayment(cart, foodMap);
         });
     }
 
-    // --- CASH ON DELIVERY METHOD ---
-    private void cashOnDelivery(Cart cart, Map<Integer, FoodItems> foodMap) {
+
+    // --- CASH PAYMENT METHOD ---
+    private void cashPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
+        paymentMethod = "Cash";
         this.success = false; // Payment still pending
 
         Bill bill = new Bill(cart, this);
@@ -164,7 +179,7 @@ public class Payment {
                     userId,
                     cart,
                     foodMap,
-                    paymentMethod
+                    ""
             );
 
             // Create Payment instance for handling UI + method
@@ -196,6 +211,47 @@ public class Payment {
         billStage.setScene(new Scene(box));
         billStage.show();
     }
+
+    private void styleButton(Button btn) {
+        btn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #4facfe, #00f2fe);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-padding: 10 18;" +
+                        "-fx-background-radius: 12;"
+        );
+
+        btn.setOnMouseEntered(e ->
+                btn.setStyle(
+                        "-fx-background-color: linear-gradient(to right, #3399ff, #00e6f6);" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-size: 15px;" +
+                                "-fx-padding: 10 18;" +
+                                "-fx-background-radius: 12;"
+                )
+        );
+
+        btn.setOnMouseExited(e ->
+                btn.setStyle(
+                        "-fx-background-color: linear-gradient(to right, #4facfe, #00f2fe);" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-size: 15px;" +
+                                "-fx-padding: 10 18;" +
+                                "-fx-background-radius: 12;"
+                )
+        );
+    }
+
+    private void styleSecondaryButton(Button btn) {
+        btn.setStyle(
+                "-fx-background-color: #dee2e6;" +
+                        "-fx-text-fill: #333;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-padding: 8 14;" +
+                        "-fx-background-radius: 10;"
+        );
+    }
+
 
     // --- Getters ---
     public int getId() {

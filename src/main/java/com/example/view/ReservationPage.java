@@ -1,7 +1,11 @@
 package com.example.view;
 
+import com.example.manager.FileStorage;
+
+import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,8 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import com.example.menu.*;
-import com.example.manager.*;
+
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -230,13 +233,6 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-//            String fullName = nameField.getText();
-//            String phone = phoneField.getText();
-//            String guests = guestsButton.getText();
-//            String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
-//            String request = requestArea.getText();
-//            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
-//                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
             String name = nameField.getText().trim();
             String phone = phoneField.getText().trim();
             int guests = guestSpinner.getValue();
@@ -360,8 +356,67 @@ public class ReservationPage {
         Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
             HomePage homePage = new HomePage(primaryStage);
-            primaryStage.setScene(homePage.getHomeScene());
+            Scene homeScene = homePage.getHomeScene();
+            primaryStage.setScene(homeScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
+        });
+
+        menuBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            MenuPage menuPage = new MenuPage(primaryStage);
+            Scene menuScene = menuPage.getMenuScene();
+            primaryStage.setScene(menuScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
+        });
+
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
+
+        aboutBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+            aboutPage.showAboutUs();
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
         });
 
         dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn, reviewBtn);
@@ -394,5 +449,24 @@ public class ReservationPage {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public void showReservation() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        Scene scene = getReservationScene();
+        primaryStage.setScene(scene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
     }
 }

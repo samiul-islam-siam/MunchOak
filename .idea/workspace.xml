@@ -6,23 +6,36 @@
   <component name="ChangeListManager">
     <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="fixation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/AdminFileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/AdminFileStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/PasswordUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/PasswordUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/AdminMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/AdminMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/UserMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/UserMenu.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/guestMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/guestMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Cart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Cart.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/admin.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/admin.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/categories.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/categories.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part2.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/network/Chats/siam.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/network/Chats/siam.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +53,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Database" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,12 +64,12 @@
     &quot;assignee&quot;: &quot;samiul-islam-siam&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/samiul-islam-siam/MunchOak.git",
-    "accountId": "e658a277-d71f-446e-85d0-6d46ea0e0d5f"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/samiul-islam-siam/MunchOak.git&quot;,
+    &quot;accountId&quot;: &quot;e658a277-d71f-446e-85d0-6d46ea0e0d5f&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -90,7 +103,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Database",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/User/IdeaProjects/MunchOak/src/main/java/com/example/manager",
@@ -123,17 +136,6 @@
       <recent name="com.example.view" />
       <recent name="com.example.login" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

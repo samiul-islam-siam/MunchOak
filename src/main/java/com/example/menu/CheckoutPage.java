@@ -1,0 +1,548 @@
+package com.example.menu;
+
+import com.example.manager.FileStorage;
+import com.example.munchoak.Cart;
+import com.example.munchoak.FoodItems;
+import com.example.view.HomePage;
+import com.example.view.LoginPage;
+import javafx.animation.ScaleTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.effect.Glow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Duration;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class CheckoutPage {
+    private final Stage primaryStage;
+    private final Cart cart;
+
+    public CheckoutPage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;
+    }
+
+    private Map<Integer, FoodItems> buildFoodMap() {
+        List<FoodItems> loaded = FileStorage.loadMenu();
+        Map<Integer, FoodItems> map = new HashMap<>();
+        for (FoodItems f : loaded) map.put(f.getId(), f);
+        return map;
+    }
+
+    // New method to show feedback dialog after payment
+    private void showFeedbackDialog(Window owner) {
+        Stage feedbackStage = new Stage();
+        feedbackStage.setTitle("Your Feedback");
+        feedbackStage.initModality(Modality.APPLICATION_MODAL);
+        feedbackStage.initOwner(owner);
+        feedbackStage.setResizable(false);
+        feedbackStage.setWidth(400);
+        feedbackStage.setHeight(350);
+
+        VBox feedbackVBox = new VBox(15);
+        feedbackVBox.setPadding(new Insets(20));
+        feedbackVBox.setAlignment(Pos.CENTER);
+        feedbackVBox.setStyle("-fx-background-color: #f9f9f9;");
+
+        Label titleLabel = new Label("How was your experience with MUNCHOAK?");
+        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        Label ratingLabel = new Label("Rate us:");
+        ratingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
+
+        // Star Rating Component
+        HBox starsHBox = new HBox(5);
+        starsHBox.setAlignment(Pos.CENTER);
+        AtomicInteger currentRating = new AtomicInteger(5); // Default rating
+        List<Label> stars = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            Label star = new Label(currentRating.get() >= i ? "★" : "☆");
+            star.setStyle("-fx-font-size: 24px; -fx-cursor: hand; -fx-text-fill: gold;");
+            // Initial glow for filled stars
+            if (currentRating.get() >= i) {
+                Glow glow = new Glow(0.5);
+                star.setEffect(glow);
+            } else {
+                star.setEffect(null);
+            }
+            final int rating = i;
+            // Click event with pulse animation
+            star.setOnMouseClicked(e -> {
+                currentRating.set(rating);
+                updateStars(stars, currentRating.get());
+                // Pulse animation on click
+                ScaleTransition pulse = new ScaleTransition(Duration.millis(150), star);
+                pulse.setToX(1.3);
+                pulse.setToY(1.3);
+                pulse.setAutoReverse(true);
+                pulse.setCycleCount(2);
+                pulse.play();
+            });
+            // Enter event with scale up animation and enhanced glow
+            star.setOnMouseEntered(e -> {
+                updateStars(stars, rating, true);
+                // Scale up animation
+                ScaleTransition scaleUp = new ScaleTransition(Duration.millis(200), star);
+                scaleUp.setToX(1.2);
+                scaleUp.setToY(1.2);
+                scaleUp.play();
+                // Enhance glow on hover
+                Glow hoverGlow = new Glow(0.8);
+                star.setEffect(hoverGlow);
+            });
+            // Exit event with scale down animation and restore glow
+            star.setOnMouseExited(e -> {
+                updateStars(stars, currentRating.get(), false);
+                // Scale down animation
+                ScaleTransition scaleDown = new ScaleTransition(Duration.millis(200), star);
+                scaleDown.setToX(1.0);
+                scaleDown.setToY(1.0);
+                scaleDown.play();
+                // Restore glow based on rating
+                if (currentRating.get() >= rating) {
+                    Glow glow = new Glow(0.5);
+                    star.setEffect(glow);
+                } else {
+                    star.setEffect(null);
+                }
+            });
+            stars.add(star);
+            starsHBox.getChildren().add(star);
+        }
+
+        Label commentLabel = new Label("Optional comments:");
+        commentLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
+
+        TextArea commentArea = new TextArea();
+        commentArea.setPromptText("Tell us what you liked or how we can improve...");
+        commentArea.setPrefHeight(80);
+        commentArea.setWrapText(true);
+        commentArea.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 4;");
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Button submitBtn = new Button("Submit");
+        submitBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;");
+        submitBtn.setOnMouseEntered(e -> submitBtn.setStyle("-fx-background-color: #e55a00; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;"));
+        submitBtn.setOnMouseExited(e -> submitBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;"));
+        submitBtn.setOnAction(e -> {
+            int rating = currentRating.get();
+            String comment = commentArea.getText().trim();
+            // TODO: Save feedback to file/database, e.g., FileStorage.saveFeedback(rating, comment);
+            System.out.println("Feedback submitted: Rating=" + rating + ", Comment=" + comment); // Placeholder for now
+            feedbackStage.close();
+        });
+
+        Button skipBtn = new Button("Skip");
+        skipBtn.setStyle("-fx-background-color: #ddd; -fx-text-fill: #666; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;");
+        skipBtn.setOnMouseEntered(e -> skipBtn.setStyle("-fx-background-color: #ccc; -fx-text-fill: #666; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;"));
+        skipBtn.setOnMouseExited(e -> skipBtn.setStyle("-fx-background-color: #ddd; -fx-text-fill: #666; -fx-background-radius: 5; -fx-font-size: 14px; -fx-padding: 8 16;"));
+        skipBtn.setOnAction(e -> feedbackStage.close());
+
+        buttonBox.getChildren().addAll(skipBtn, submitBtn);
+
+        feedbackVBox.getChildren().addAll(titleLabel, ratingLabel, starsHBox, commentLabel, commentArea, buttonBox);
+
+        Scene feedbackScene = new Scene(feedbackVBox);
+        feedbackStage.setScene(feedbackScene);
+        feedbackStage.showAndWait();
+    }
+
+    // Helper method to update star visuals
+    private void updateStars(List<Label> stars, int rating) {
+        updateStars(stars, rating, false);
+    }
+
+    private void updateStars(List<Label> stars, int rating, boolean isHover) {
+        for (int i = 0; i < 5; i++) {
+            if (i < rating) {
+                stars.get(i).setText("★");
+                stars.get(i).setStyle("-fx-font-size: 24px; -fx-cursor: hand; -fx-text-fill: " + (isHover ? "#FFD700" : "gold") + ";");
+                // Apply glow to filled stars
+                Glow glow = new Glow(isHover ? 0.8 : 0.5);
+                stars.get(i).setEffect(glow);
+            } else {
+                stars.get(i).setText("☆");
+                stars.get(i).setStyle("-fx-font-size: 24px; -fx-cursor: hand; -fx-text-fill: #ddd;");
+                // Remove effect for empty stars
+                stars.get(i).setEffect(null);
+            }
+        }
+    }
+
+    public Scene getScene() {
+        Map<Integer, FoodItems> foodMap = buildFoodMap();
+
+        // PAGE BACKGROUND
+        BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #FFDAB9;"); // Peach yellow background
+
+        // TOP CONTAINER FOR NAVBAR AND BREADCRUMB
+        VBox topContainer = new VBox();
+        topContainer.setSpacing(0);
+
+        // NAVIGATION BAR (same as CartPage)
+        HBox navBar = new HBox();
+        navBar.setPadding(new Insets(10, 20, 10, 20));
+        navBar.setAlignment(Pos.CENTER_LEFT);
+        navBar.setStyle("-fx-background-color: #FF6B00; -fx-background-radius: 0 0 10 10;");
+
+        // LEFT GROUP: LOGO WITH ROUND FRAME AND TITLE
+        HBox leftGroup = new HBox(10);
+        leftGroup.setAlignment(Pos.CENTER_LEFT);
+
+        ImageView logo = new ImageView();
+        logo.setFitWidth(60);
+        logo.setFitHeight(60);
+        logo.setPreserveRatio(true);
+
+        Image logoImg = null;
+        String logoPath = "/images/logo.png"; // Assume logo path
+        try (InputStream is = getClass().getResourceAsStream(logoPath)) {
+            if (is != null) logoImg = new Image(is);
+        } catch (Exception ignored) {
+        }
+
+        if (logoImg != null) {
+            logo.setImage(logoImg);
+        }
+
+        Circle clip = new Circle(30, 30, 30);
+        logo.setClip(clip);
+
+        Label titleLabel = new Label("MUNCHOAK");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        leftGroup.getChildren().addAll(logo, titleLabel);
+
+        // SEARCH BAR IN THE MIDDLE
+        HBox searchContainer = new HBox(10);
+        searchContainer.setAlignment(Pos.CENTER);
+
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search...");
+        searchField.setPrefWidth(250);
+        searchField.setStyle("-fx-background-radius: 20; -fx-padding: 8 12; -fx-background-color: white; -fx-border-radius: 20;");
+
+        Button searchBtn = new Button("🔍");
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
+
+        searchContainer.getChildren().addAll(searchField, searchBtn);
+
+        // SPACERS
+        Region spacer1 = new Region();
+        HBox.setHgrow(spacer1, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
+
+        // BUTTONS HBOX ON THE RIGHT (same as CartPage)
+        HBox buttonsHBox = new HBox(20);
+        buttonsHBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Button homeBtn = new Button("Home");
+        homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        homeBtn.setOnMouseEntered(e -> homeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+
+        Button menuBtn = new Button("Menu");
+        menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
+
+        Button cartBtn = new Button("Cart");
+        cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        cartBtn.setOnMouseEntered(e -> cartBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        cartBtn.setOnMouseExited(e -> cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        cartBtn.setOnAction(e -> primaryStage.setScene(new CartPage(primaryStage, cart).getScene()));
+
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        loginBtn.setOnMouseEntered(e -> loginBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+
+        Button profileBtn = new Button("Profile");
+        profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        profileBtn.setOnMouseExited(e -> profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+
+        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, loginBtn, profileBtn);
+
+        navBar.getChildren().addAll(leftGroup, spacer1, searchContainer, spacer2, buttonsHBox);
+
+        // BREADCRUMB STEPS (updated for payment active)
+        HBox breadcrumb = new HBox(20);
+        breadcrumb.setAlignment(Pos.CENTER);
+        breadcrumb.setPadding(new Insets(10, 20, 10, 20));
+
+        Label cartStep = new Label("Cart");
+        cartStep.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+
+        Label sep1 = new Label(" > ");
+        sep1.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+
+        Label shippingStep = new Label("Shipping");
+        shippingStep.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+
+        Label sep2 = new Label(" > ");
+        sep2.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+
+        Label paymentStep = new Label("Payment");
+        paymentStep.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"); // Active
+
+        breadcrumb.getChildren().addAll(cartStep, sep1, shippingStep, sep2, paymentStep);
+
+        topContainer.getChildren().addAll(navBar, breadcrumb);
+        root.setTop(topContainer);
+
+        // RESPONSIVE LISTENER (same as CartPage, but simplified for checkout)
+        ChangeListener<Number> widthListener = (obs, oldWidth, newWidth) -> {
+            double width = newWidth.doubleValue();
+            if (width < 768) {
+                searchContainer.setVisible(false);
+                searchContainer.setManaged(false);
+                buttonsHBox.setSpacing(5);
+                titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+                leftGroup.setSpacing(5);
+                logo.setFitWidth(40);
+                logo.setFitHeight(40);
+                clip.setRadius(20);
+                logo.setClip(clip);
+                breadcrumb.setSpacing(5);
+                cartStep.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+                sep1.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+                shippingStep.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+                sep2.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+                paymentStep.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333;");
+            } else if (width < 1024) {
+                searchContainer.setVisible(true);
+                searchContainer.setManaged(true);
+                searchField.setPrefWidth(200);
+                buttonsHBox.setSpacing(10);
+                titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+                leftGroup.setSpacing(8);
+                logo.setFitWidth(50);
+                logo.setFitHeight(50);
+                clip.setRadius(25);
+                logo.setClip(clip);
+                breadcrumb.setSpacing(10);
+                cartStep.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
+                sep1.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
+                shippingStep.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
+                sep2.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
+                paymentStep.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+            } else {
+                searchContainer.setVisible(true);
+                searchContainer.setManaged(true);
+                searchField.setPrefWidth(250);
+                buttonsHBox.setSpacing(20);
+                titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+                leftGroup.setSpacing(10);
+                logo.setFitWidth(60);
+                logo.setFitHeight(60);
+                clip.setRadius(30);
+                logo.setClip(clip);
+                breadcrumb.setSpacing(20);
+                cartStep.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+                sep1.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+                shippingStep.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+                sep2.setStyle("-fx-font-size: 16px; -fx-text-fill: #999;");
+                paymentStep.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+            }
+        };
+        primaryStage.widthProperty().addListener(widthListener);
+
+        // MAIN CONTENT HBOX WITH BACKGROUND
+        HBox mainContent = new HBox(20);
+        mainContent.setStyle("-fx-background-color: #FFDAB9;");
+
+        // LEFT SIDE - ORDER SUMMARY (slightly different: no qty controls, just list)
+        VBox leftColumn = new VBox(20);
+        leftColumn.setPadding(new Insets(25, 30, 25, 30));
+        leftColumn.setStyle("-fx-background-color: transparent;");
+
+        Label title = new Label("Order Summary");
+        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        leftColumn.getChildren().add(title);
+
+        VBox orderList = new VBox(18);
+        orderList.setAlignment(Pos.TOP_CENTER);
+
+        double orderSubtotal = 0.0;
+        if (!cart.getBuyHistory().isEmpty()) {
+            for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
+                int foodId = e.getKey();
+                int qty = e.getValue();
+                FoodItems item = foodMap.get(foodId);
+                if (item == null) continue;
+                orderSubtotal += item.getPrice() * qty;
+
+                HBox card = new HBox(20);
+                card.setPadding(new Insets(18));
+                card.setAlignment(Pos.CENTER_LEFT);
+                card.setStyle(
+                        "-fx-background-color: white;" +
+                                "-fx-background-radius: 12;" +
+                                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8,0,0,2);"
+                );
+
+                // IMAGE
+                ImageView iv = new ImageView();
+                iv.setFitWidth(90);
+                iv.setFitHeight(90);
+                iv.setPreserveRatio(true);
+
+                Image img = null;
+                String resourcePath = "/images/" + item.getImagePath();
+                try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+                    if (is != null) img = new Image(is);
+                    else {
+                        String filePath = "file:src/main/resources/com/example/manager/images/" + item.getImagePath();
+                        img = new Image(filePath);
+                    }
+                } catch (Exception ignored) {
+                }
+
+                if (img != null) iv.setImage(img);
+
+                // INFO COLUMN (no qty controls)
+                VBox info = new VBox(6);
+                Label name = new Label(item.getName() + " (x" + qty + ")");
+                name.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
+                Label details = new Label(item.getDetails());
+                details.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
+                details.setMaxWidth(300);
+                details.setWrapText(true);
+                info.getChildren().addAll(name, details);
+
+                // SPACER
+                Region spacer3 = new Region();
+                HBox.setHgrow(spacer3, Priority.ALWAYS);
+
+                // LINE TOTAL
+                Label lineTotal = new Label(String.format("৳ %.2f", item.getPrice() * qty));
+                lineTotal.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+                card.getChildren().addAll(iv, info, spacer3, lineTotal);
+                orderList.getChildren().add(card);
+            }
+        }
+        leftColumn.getChildren().add(orderList);
+
+        // RIGHT COLUMN - PAYMENT FORM
+        VBox rightColumn = new VBox(20);
+        rightColumn.setPadding(new Insets(25));
+        rightColumn.setPrefWidth(350);
+        rightColumn.setStyle("-fx-background-color: transparent;");
+
+        // PAYMENT BOX
+        VBox paymentBox = new VBox(15);
+        paymentBox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;");
+
+        Label paymentTitle = new Label("Payment Details");
+        paymentTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+        // Card Number
+        Label cardLabel = new Label("Card Number");
+        cardLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        TextField cardField = new TextField();
+        cardField.setPromptText("1234 5678 9012 3456");
+        cardField.setStyle("-fx-background-radius: 6; -fx-padding: 10; -fx-background-color: #f5f5f5;");
+
+        // Expiry and CVV
+        HBox expiryCvv = new HBox(10);
+        Label expiryLabel = new Label("Expiry Date");
+        expiryLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        TextField expiryField = new TextField();
+        expiryField.setPromptText("MM/YY");
+        expiryField.setPrefWidth(100);
+        expiryField.setStyle("-fx-background-radius: 6; -fx-padding: 10; -fx-background-color: #f5f5f5;");
+
+        Label cvvLabel = new Label("CVV");
+        cvvLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        TextField cvvField = new TextField();
+        cvvField.setPromptText("123");
+        cvvField.setPrefWidth(80);
+        cvvField.setStyle("-fx-background-radius: 6; -fx-padding: 10; -fx-background-color: #f5f5f5;");
+
+        VBox expiryCvvContainer = new VBox(5, expiryLabel, expiryField);
+        VBox cvvContainer = new VBox(5, cvvLabel, cvvField);
+        expiryCvv.getChildren().addAll(expiryCvvContainer, cvvContainer);
+
+        // Pay Button
+        Button payBtn = new Button("PAY NOW");
+        payBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;");
+        payBtn.setMaxWidth(Double.MAX_VALUE);
+        payBtn.setOnMouseEntered(e -> payBtn.setStyle("-fx-background-color: #e55a00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
+        payBtn.setOnMouseExited(e -> payBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
+
+        payBtn.setOnAction(e -> {
+            if (cardField.getText().isEmpty() || expiryField.getText().isEmpty() || cvvField.getText().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setHeaderText("Incomplete Details");
+                alert.setContentText("Please fill in all payment fields.");
+                alert.showAndWait();
+                return;
+            }
+
+            // Simulate payment success
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("Payment Successful!");
+            alert.setContentText("Your order has been placed. Thank you for shopping with MUNCHOAK!");
+            alert.showAndWait();
+
+            // Show feedback dialog
+            showFeedbackDialog(primaryStage);
+
+            // Clear cart and navigate to success page (TODO: implement SuccessPage)
+            cart.clearCart();
+            primaryStage.setScene(new HomePage(primaryStage).getHomeScene());
+        });
+
+        // Add to payment box
+        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(), payBtn);
+
+        rightColumn.getChildren().add(paymentBox);
+
+        // Add columns to main content
+        HBox.setHgrow(leftColumn, Priority.ALWAYS);
+        mainContent.getChildren().addAll(leftColumn, rightColumn);
+
+        // SCROLLPANE WITH TRANSPARENT BACKGROUND
+        ScrollPane scroll = new ScrollPane(mainContent);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+
+        root.setCenter(scroll);
+
+        Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+
+        // Initial responsive check
+        widthListener.changed(null, null, primaryStage.getWidth());
+
+        return scene;
+    }
+}

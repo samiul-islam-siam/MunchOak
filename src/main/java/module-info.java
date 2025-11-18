@@ -3,6 +3,8 @@ module com.example.munchoak {
     requires javafx.fxml;
     requires javafx.graphics;
 
+
+
     opens com.example.munchoak to javafx.fxml;
     opens com.example.login to javafx.fxml;
 

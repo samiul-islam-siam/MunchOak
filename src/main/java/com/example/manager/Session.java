@@ -1,33 +1,44 @@
+
 package com.example.manager;
 
 public class Session {
-    //guest default id
-    private static int currentUserId = 2025000;  // Default user (for now)
+    private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
+    private static String currentEmail = "people@gmail.com";
+    private static String currentPassword = "ai01*2#";
 
-    //To set and acess current user id and username.
+    // GETTERS
     public static int getCurrentUserId() {
         return currentUserId;
-    }
-
-    public static void setCurrentUserId(String name) {
-        currentUserId = FileStorage.getUserId(name);
     }
 
     public static String getCurrentUsername() {
         return currentUsername;
     }
 
-    public static void setCurrentUsername(String name) {
-        currentUsername = name;
+    public static String getCurrentEmail() {
+        return currentEmail;
     }
 
-    //Uses in chat server
+    public static String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    // Set the currently logged-in user by username
+    public static void setCurrentUser(String username) {
+        currentUsername = username;
+        currentUserId = FileStorage.getUserId(username);
+        currentEmail = FileStorage.getUserEmail(username);
+        currentPassword = FileStorage.getUserPassword(username);
+    }
+
+    // Role based on username
     public static String getCurrentRole() {
-        if (currentUsername.equals("admin")) {
-            return "ADMIN";
-        } else {
-            return "USER";
-        }
+        return "admin".equals(currentUsername) ? "ADMIN" : "USER";
+    }
+
+    // OPTIONAL: Reset to guest
+    public static void resetToGuest() {
+        setCurrentUser("guest");
     }
 }

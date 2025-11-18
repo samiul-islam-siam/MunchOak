@@ -17,13 +17,8 @@ import java.util.Map;
 
 public class Cart implements Serializable {
 
-    // Tracks how many cart instances exist (used to assign unique IDs)
     public static int numberOfCarts = 0;
-
-    // Unique cart ID
     private final int id;
-
-    // Maps <foodId, quantity>
     private final HashMap<Integer, Integer> buyHistory;
 
     public Cart() {
@@ -41,14 +36,13 @@ public class Cart implements Serializable {
 
     // ============================================================
     //                CART ITEM VIEW (INNER CLASS)
-    // Represents an item shown visually inside the cart table
     // ============================================================
     public static class CartItemView {
-        private final int id;           // Food item ID
-        private final String name;      // Display name
-        private int quantity;           // Current quantity
-        private final double price;     // Price per unit
-        private double total;           // Computed price = price * qty
+        private final int id;
+        private final String name;
+        private int quantity;
+        private final double price;
+        private double total;
 
         public CartItemView(int id, String name, int quantity, double price) {
             this.id = id;
@@ -70,7 +64,14 @@ public class Cart implements Serializable {
             return quantity;
         }
 
-        // Update quantity + recompute total
+        public double getPrice() {
+            return price;
+        }
+
+        public double getTotal() {
+            return total;
+        }
+
         public void setQuantity(int quantity) {
             this.quantity = quantity;
             this.total = this.price * quantity;
@@ -78,50 +79,49 @@ public class Cart implements Serializable {
     }
 
     // ============================================================
-    //                CART OPERATIONS (BACKEND)
+    //                CART OPERATIONS
     // ============================================================
-
-    // Add items to cart; increases quantity if exists
     public void addToCart(Integer foodId, int count) {
         buyHistory.put(foodId, buyHistory.getOrDefault(foodId, 0) + count);
     }
 
-    // Update item quantity; remove if qty <= 0
     public void updateQuantity(int foodId, int newQty) {
         if (newQty <= 0) buyHistory.remove(foodId);
         else buyHistory.put(foodId, newQty);
     }
 
-    // Remove item from cart completely
+    public void removeFromCart(Integer foodId) {
+        if (buyHistory.containsKey(foodId)) {
+            int current = buyHistory.get(foodId);
+            if (current > 1) buyHistory.put(foodId, current - 1);
+            else buyHistory.remove(foodId);
+        }
+    }
+
     public void removeFromCartEntirely(Integer foodId) {
         buyHistory.remove(foodId);
     }
 
-    // Compute total cost using foodMap
     public double getTotalPrice(Map<Integer, FoodItems> foodMap) {
         double total = 0.0;
         for (Map.Entry<Integer, Integer> entry : buyHistory.entrySet()) {
             FoodItems item = foodMap.get(entry.getKey());
-            if (item != null) {
-                total += item.getPrice() * entry.getValue();
-            }
+            if (item != null) total += item.getPrice() * entry.getValue();
         }
         return total;
     }
 
     // ============================================================
     //                      SHOW CART UI
-    // Builds and displays a JavaFX cart popup window
     // ============================================================
     public void showCart(ObservableList<FoodItems> foodList) {
-
-        // Build a quick lookup map for food items by ID
+        // Map all FoodItems by ID
         Map<Integer, FoodItems> foodMap = new HashMap<>();
         for (FoodItems item : foodList) {
             foodMap.put(item.getId(), item);
         }
 
-        // Build UI list from backend data
+        // Prepare UI cart list
         ObservableList<CartItemView> cartItems = FXCollections.observableArrayList();
 
         for (Map.Entry<Integer, Integer> entry : buyHistory.entrySet()) {
@@ -133,48 +133,39 @@ public class Cart implements Serializable {
             }
         }
 
-        // Create table
         TableView<CartItemView> cartTable = new TableView<>(cartItems);
 
-        // ---------------- TABLE COLUMNS ----------------
-
-        // Food name
+        // Columns
         TableColumn<CartItemView, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        // Quantity
         TableColumn<CartItemView, Integer> qtyCol = new TableColumn<>("Quantity");
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-        // Price per item
         TableColumn<CartItemView, Double> priceCol = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceCol.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
-                // Format 2 decimal places
                 setText(empty || value == null ? null : String.format("%.2f", value));
             }
         });
 
-        // Total = price * qty
         TableColumn<CartItemView, Double> totalCol = new TableColumn<>("Total");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
         totalCol.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
-                // Format 2 decimal places
                 setText(empty || value == null ? null : String.format("%.2f", value));
             }
         });
 
-        // Label showing current total price of cart
         Label totalLabel = new Label("Total: $" + String.format("%.2f", getTotalPrice(foodMap)));
         totalLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        // ---------------- ACTION COLUMN ----------------
+        // Action Column
         TableColumn<CartItemView, Void> actionCol = new TableColumn<>("Action");
         actionCol.setCellFactory(col -> new TableCell<>() {
 
@@ -183,10 +174,9 @@ public class Cart implements Serializable {
             private final HBox box = new HBox(5, editBtn, removeBtn);
 
             {
-                // Handle Edit button click
+                // Edit button
                 editBtn.setOnAction(e -> {
                     CartItemView item = getTableView().getItems().get(getIndex());
-
                     TextInputDialog dialog = new TextInputDialog(String.valueOf(item.getQuantity()));
                     dialog.setTitle("Edit Quantity");
                     dialog.setHeaderText("Update quantity for " + item.getName());
@@ -198,7 +188,6 @@ public class Cart implements Serializable {
 
                             updateQuantity(item.getId(), newQty);
 
-                            // Remove if zero, refresh otherwise
                             if (newQty <= 0) {
                                 cartItems.remove(item);
                             } else {
@@ -206,26 +195,22 @@ public class Cart implements Serializable {
                                 cartTable.refresh();
                             }
 
-                            // Update total label
                             totalLabel.setText("Total: $" +
                                     String.format("%.2f", getTotalPrice(foodMap)));
 
                         } catch (NumberFormatException ex) {
-                            // Invalid number entered
                             new Alert(Alert.AlertType.ERROR,
                                     "Please enter a valid number").show();
                         }
                     });
                 });
 
-                // Handle Remove button click
+                // Remove button
                 removeBtn.setOnAction(e -> {
                     CartItemView item = getTableView().getItems().get(getIndex());
-
                     removeFromCartEntirely(item.getId());
                     cartItems.remove(item);
 
-                    // Refresh total
                     totalLabel.setText("Total: $" +
                             String.format("%.2f", getTotalPrice(foodMap)));
                 });
@@ -234,13 +219,12 @@ public class Cart implements Serializable {
             @Override
             protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
-                setGraphic(empty ? null : box);  // Show buttons only on valid rows
+                setGraphic(empty ? null : box);
             }
         });
 
         cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol, actionCol);
 
-        // ---------------- BOTTOM BAR ----------------
         Button closeBtn = new Button("Close");
         closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
 
@@ -248,7 +232,6 @@ public class Cart implements Serializable {
         bottomBar.setAlignment(Pos.CENTER_RIGHT);
         bottomBar.setPadding(new Insets(10));
 
-        // ---------------- WINDOW LAYOUT ----------------
         VBox vbox = new VBox(10, cartTable, bottomBar);
         vbox.setPadding(new Insets(10));
 
@@ -256,5 +239,16 @@ public class Cart implements Serializable {
         stage.setTitle("Your Cart");
         stage.setScene(new Scene(vbox, 600, 400));
         stage.show();
+    }
+
+    public int getTotalItems() {
+        int total = 0;
+        for (int qty : buyHistory.values()) {
+            total += qty;
+        }
+        return total;
+    }
+    public void clearCart() {
+        buyHistory.clear();
     }
 }

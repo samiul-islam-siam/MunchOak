@@ -8,15 +8,11 @@ public class AdminFileStorage {
 
     private static final File DATA_DIR = new File("src/main/resources/com/example/manager/data");
     private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
-    //private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
+    private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
 
     public static final String ADMIN_ID = "1"; // unique admin ID
 
-    /*
-     * Static block runs ONE TIME when the class is loaded.
-     * We ensure the data folder and admin file exist.
-     * Checked exceptions (like IOException) must be caught here.
-     */
+    // Static block to initialize files
     static {
         try {
             ensureDataDirAndFiles();
@@ -43,18 +39,15 @@ public class AdminFileStorage {
     public static void setAdminPassword(String newPass) throws IOException {
         String salt = PasswordUtils.generateSalt();
         String hash = PasswordUtils.hashPassword(newPass, salt);
-
-        // Overwrite admin.dat with: 1,salt:hash
         writeText(ADMIN_ID + "," + salt + ":" + hash);
     }
 
+    // TODO: not implemented
+    //    public static int countUsers() {
+    //        return getAllUsers().size();
+    //    }
 
     // ---------- Helpers ----------
-
-    /**
-     * Reads all lines from admin.dat
-     * return List of lines (usually only one line for admin)
-     */
     private static List<String> readLines() {
         List<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(AdminFileStorage.ADMIN_FILE))) {
@@ -72,13 +65,9 @@ public class AdminFileStorage {
         }
     }
 
-    /**
-     * Ensures the folder and admin.dat file exist.
-     * Creates them if missing.
-     */
     private static void ensureDataDirAndFiles() throws IOException {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs();
         if (!ADMIN_FILE.exists()) ADMIN_FILE.createNewFile();
-        //if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
+        if (!USERS_FILE.exists()) USERS_FILE.createNewFile();
     }
 }

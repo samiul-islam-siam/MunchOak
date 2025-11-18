@@ -1,5 +1,6 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
 import com.example.view.HomePage;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -9,7 +10,7 @@ import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
-import com.example.manager.*;
+
 public class Home extends Application {
     private Stage primaryStage;
 
