@@ -116,6 +116,6 @@ src/main/java/com/example/munchoak/Home.java
 | ------------------------- | --------- |
 | **Md. Samiul Islam Siam** | Developer |
 | **Partho Kumar Mondal**   | Developer |
-| **Adiba Jahan**           | Developer |
-| **Suchita Islam Shuvra**  | Developer |
+| **Adeba Jahan**           | Developer |
+| **Shuchita Islam Shuvra**  | Developer |
 
