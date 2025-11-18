@@ -397,6 +397,27 @@ public class HomePage implements HomePageComponent {
         });
         StackPane.setAlignment(overlay, Pos.TOP_LEFT);
     }
+    private void openProfilePageDirectly() {
+        Platform.runLater(() -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            Scene profileScene = profilePage.getProfileScene();
+
+            double w = primaryStage.getWidth();
+            double h = primaryStage.getHeight();
+            boolean fs = primaryStage.isFullScreen();
+            boolean max = primaryStage.isMaximized();
+
+            primaryStage.setScene(profileScene);
+            primaryStage.setWidth(w);
+            primaryStage.setHeight(h);
+
+            if (fs) primaryStage.setFullScreen(true);
+            else if (max) primaryStage.setMaximized(true);
+
+            primaryStage.centerOnScreen();
+        });
+    }
+
 
     private void createSidePanel() {
         Button closeBtn = new Button("X");
@@ -429,18 +450,19 @@ public class HomePage implements HomePageComponent {
             pause.play();
         });
 
-        // TODO: Implement Profile Page and button logic
-// Profile Button Logic here
-//        profileBtn.setOnAction(e -> {
-//            try {
-//                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/login/FXMLs/profile.fxml"));
-//                Node profileView = loader.load();
-//
-//                content.getChildren().setAll(profileView);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//        });
+
+        profileBtn.setOnAction(e -> {
+
+            e.consume();
+            if (scrollPane != null) {
+                scrollPane.setVvalue(0.0);
+            }
+            toggleSidePanel();
+            PauseTransition pause = new PauseTransition(Duration.millis(10));
+            pause.setOnFinished(evt -> openProfilePageDirectly());
+            pause.play();
+        });
+
 
         reserveBtn.setOnAction(e -> {
             e.consume();

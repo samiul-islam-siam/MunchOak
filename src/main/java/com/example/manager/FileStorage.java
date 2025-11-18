@@ -219,7 +219,7 @@ public class FileStorage {
         if (changed) rewriteMenu(menu);
     }
 
-    //Deleting category and updating menu
+    // Deleting category and updating menu
     public static void deleteCategory(String name) throws IOException {
         List<String> cats = loadCategories();
         cats.removeIf(s -> s.equals(name));
@@ -254,6 +254,26 @@ public class FileStorage {
             }
         }
         return -1;
+    }
+
+    public static String getUserEmail(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {  // match by username
+                return user[1];             // email is at index 1
+            }
+        }
+        return null; // or "" if you prefer
+    }
+
+    public static String getUserPassword(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {  // match by username
+                return user[2];             // password (salt:hash) is at index 2
+            }
+        }
+        return null; // or "" if you prefer
     }
 
     //While Registration is successful new user information will append in user.dat file
@@ -319,7 +339,8 @@ public class FileStorage {
     }
 
     // ----------------- PAYMENT & CARTS -----------------
-    //For payments and carts (useage in checkout)
+    // For payments and carts (usage in checkout)
+
     /**
      * Creates a payment, cart, and payment-items entry.
      * Returns the generated payment ID.
@@ -370,7 +391,6 @@ public class FileStorage {
         return paymentId;
     }
 
-
     //Reading history from payments_file
     public static List<HistoryRecordSimple> loadPaymentHistory() {
         ensureDataDir();
@@ -392,6 +412,7 @@ public class FileStorage {
     }
 
     //Cart_files to show bills
+
     /**
      * Loads cart items used for a specific payment ID.
      * Returns map: foodId → quantity

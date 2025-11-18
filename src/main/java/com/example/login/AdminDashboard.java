@@ -122,7 +122,7 @@ public class AdminDashboard {
         );
 
         logoutBtn.setOnAction(e -> {
-            Session.setCurrentUsername("guest");
+            Session.setCurrentUser("guest");
             primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
         });
     }

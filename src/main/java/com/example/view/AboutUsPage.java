@@ -61,7 +61,10 @@ public class AboutUsPage {
         });
 
         Button profileBtn = createNavButton("Profile");
-        profileBtn.setOnAction(e -> showComingSoonAlert("Profile"));
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
 
         Button cartBtn = createNavButton("Cart");
         cartBtn.setOnAction(e -> showComingSoonAlert("Cart"));

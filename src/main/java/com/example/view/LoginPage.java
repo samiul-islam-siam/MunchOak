@@ -1,3 +1,4 @@
+
 package com.example.view;
 
 import com.example.manager.Session;
@@ -24,6 +25,9 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.image.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +49,9 @@ public class LoginPage {
     private PasswordField passwordField;
     private PasswordField confirmField;
     private Label statusLabel;
-
+    private Label registerStatusLabel;
+    private Label registerStrengthLabel;
+    private Label adminStatusLabel;
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
 
@@ -171,6 +177,67 @@ public class LoginPage {
         return pane;
     }
 
+    private StackPane createStyledPasswordFieldWithEye(String prompt, PasswordField[] pfOut, TextField[] tfOut) {
+        double fieldWidth = 280;  // Whatever your fields use
+        double fieldHeight = 45;
+
+        // Create password and visible text fields, match their style
+        PasswordField pwField = createStyledPasswordField(prompt); // Use your existing styled method!
+        TextField textField = new TextField();
+        textField.setPromptText(prompt);
+        textField.setStyle(pwField.getStyle()); // Ensures visual match
+        textField.setVisible(false);
+        textField.setManaged(false);
+
+        pwField.setPrefWidth(fieldWidth);
+        pwField.setPrefHeight(fieldHeight);
+        textField.setPrefWidth(fieldWidth);
+        textField.setPrefHeight(fieldHeight);
+
+        // Keep text in sync
+        pwField.textProperty().bindBidirectional(textField.textProperty());
+
+        // The eye icon label
+        Label eyeIcon = new Label("\uD83D\uDC41");
+        eyeIcon.setStyle(
+                "-fx-font-size: 18px; " +
+                        "-fx-text-fill: #888;" +              // gray eye
+                        "-fx-cursor: hand; " +
+                        "-fx-background-color: transparent; " +
+                        "-fx-label-padding: 0 10 0 0;"
+        );
+        // Overlay: stays within the field bounds
+        StackPane.setAlignment(eyeIcon, Pos.CENTER_RIGHT);
+        StackPane.setMargin(eyeIcon, new Insets(0, 16, 0, 0)); // Adjust right margin to match your field padding
+
+        final boolean[] showing = {false};
+        eyeIcon.setOnMouseClicked(event -> {
+            showing[0] = !showing[0];
+            if (showing[0]) {
+                pwField.setVisible(false);
+                pwField.setManaged(false);
+                textField.setVisible(true);
+                textField.setManaged(true);
+            } else {
+                textField.setVisible(false);
+                textField.setManaged(false);
+                pwField.setVisible(true);
+                pwField.setManaged(true);
+            }
+        });
+
+        // Arrange layers: field below, eye icon on top right inside box
+        StackPane fieldPane = new StackPane(pwField, textField, eyeIcon);
+        fieldPane.setPrefWidth(fieldWidth);
+        fieldPane.setPrefHeight(fieldHeight);
+
+        // Output for logic use:
+        if (pfOut != null && pfOut.length > 0) pfOut[0] = pwField;
+        if (tfOut != null && tfOut.length > 0) tfOut[0] = textField;
+
+        return fieldPane;
+    }
+
     private VBox createRegisterPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -182,8 +249,20 @@ public class LoginPage {
 
         usernameField = createStyledTextField("Username");
         emailField = createStyledTextField("Email");
-        passwordField = createStyledPasswordField("Password");
-        confirmField = createStyledPasswordField("Confirm Password");
+
+        PasswordField[] pf1 = new PasswordField[1], pf2 = new PasswordField[1];
+        TextField[] tf1 = new TextField[1], tf2 = new TextField[1];
+
+        StackPane passwordFieldBox = createStyledPasswordFieldWithEye("Password", pf1, tf1);
+        StackPane confirmFieldBox  = createStyledPasswordFieldWithEye("Confirm Password", pf2, tf2);
+
+        passwordField = pf1[0];
+        confirmField = pf2[0];
+
+        // Password strength label
+        registerStrengthLabel = new Label("Password Strength: ");
+        registerStrengthLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
+        registerStrengthLabel.setMinHeight(20);
 
         Button registerBtn = new Button("Register");
         registerBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;");
@@ -194,16 +273,22 @@ public class LoginPage {
             String pwd = passwordField.getText();
             String conf = confirmField.getText();
 
+            String strength = getPasswordStrength(pwd);
+
+            if (!"Strong".equals(strength)) {
+                showRegisterStatus("Invalid password!", true);
+                return;
+            }
             if (username.isEmpty() || email.isEmpty() || pwd.isEmpty() || conf.isEmpty()) {
-                showStatus("All fields are required!", true);
+                showRegisterStatus("All fields are required!", true);
                 return;
             }
             if (!pwd.equals(conf)) {
-                showStatus("Passwords do not match!", true);
+                showRegisterStatus("Passwords do not match!", true);
                 return;
             }
             if (!email.contains("@") || !email.contains(".")) {
-                showStatus("Invalid email format!", true);
+                showRegisterStatus("Invalid email format!", true);
                 return;
             }
 
@@ -219,7 +304,7 @@ public class LoginPage {
 
                 FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
 
-                showStatus("Registration successful!", false);
+                showRegisterStatus("Registration successful!", false);
 
             } catch (IOException err) {
                 System.err.println("IOException: " + err.getMessage());
@@ -249,14 +334,52 @@ public class LoginPage {
         loginLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
         loginLink.setOnAction(e -> showLoginForm());
 
-        statusLabel = new Label("");
-        statusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
-        statusLabel.setMinHeight(20);
+        registerStatusLabel = new Label("");
+        registerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        registerStatusLabel.setMinHeight(20);
 
-        pane.getChildren().addAll(title, usernameField, emailField, passwordField, confirmField, statusLabel, buttonBox, loginLink);
+        // Listen for changes in password field
+        passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
+            String strength = getPasswordStrength(newVal);
+            updateStrengthLabel(strength);
+        });
+
+        pane.getChildren().addAll(title, usernameField, emailField, passwordFieldBox, confirmFieldBox,registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
         return pane;
     }
 
+    private void updateStrengthLabel(String strength) {
+        // You can color and text per state, using switch statement (Java 17+ switch expression)
+        switch (strength) {
+            case "Invalid" -> {
+                registerStrengthLabel.setText("Password Strength: Invalid");
+                registerStrengthLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
+            }
+            case "Weak" -> {
+                registerStrengthLabel.setText("Password Strength: Weak");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            }
+            case "Normal" -> {
+                registerStrengthLabel.setText("Password Strength: Normal");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            }
+            case "Strong" -> {
+                registerStrengthLabel.setText("Password Strength: Strong");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            }
+        }
+    }
+
+    private void showRegisterStatus(String message, boolean isError) {
+        registerStatusLabel.setText(message);
+        registerStatusLabel.setStyle(isError ? "-fx-text-fill:black; -fx-font-weight: bold;"
+                : "-fx-text-fill: black; -fx-font-weight: bold;");
+
+        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(ev -> registerStatusLabel.setText(""));
+        pause.play();
+
+    }
     private VBox createUserLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -287,8 +410,8 @@ public class LoginPage {
                     showStatus("Incorrect password!", true);
                     return;
                 }
-                Session.setCurrentUsername(usernameField.getText());
-                Session.setCurrentUserId(usernameField.getText());
+                Session.setCurrentUser(usernameField.getText());
+                Session.setCurrentUser(usernameField.getText());
                 showStatus("Login successful!", false);
                 returnToHome();
             } catch (Exception ex) {
@@ -322,7 +445,9 @@ public class LoginPage {
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(30));
         pane.setMaxWidth(300);
-
+        adminStatusLabel = new Label("");
+        adminStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        adminStatusLabel.setMinHeight(20);
         Label title = new Label("Admin Login");
         title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
 
@@ -332,26 +457,24 @@ public class LoginPage {
         Button loginBtn = new Button("Login");
         loginBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 30;");
 
-        // ✅ Login Action
         loginBtn.setOnAction(e -> {
             String idEntered = adminIDField.getText().trim();
             String passEntered = adminPasswordField.getText();
 
             try {
                 if (!AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
-                    showStatus("Incorrect ID or password!", true);
+                    showAdminStatus("Incorrect ID or password!", true); // <<< Use the right method!
                     return;
                 }
-                Session.setCurrentUsername("admin");
-                showStatus("Admin login successful!", false);
+                Session.setCurrentUser("admin");
+                showAdminStatus("Admin login successful!", false);
                 AdminDashboard dashboard = new AdminDashboard(primaryStage);
                 dashboard.openAdminDashboard();
             } catch (IOException ex) {
                 System.err.println("IOException: " + ex.getMessage());
-                showStatus("Error verifying password!", true);
+                showAdminStatus("Error verifying password!", true);
             }
         });
-
         // ✅ Forgot Password Button (for admin only)
         Hyperlink forgotLink = new Hyperlink("Forgot Password?");
         forgotLink.setOnAction(e -> openForgotPasswordWindow(true)); // true = admin mode
@@ -365,8 +488,21 @@ public class LoginPage {
         VBox btnBox = new VBox(10, loginBtn, forgotLink, backBtn);
         btnBox.setAlignment(Pos.CENTER);
 
-        pane.getChildren().addAll(title, adminIDField, adminPasswordField, btnBox);
+        pane.getChildren().addAll(title, adminIDField, adminPasswordField, adminStatusLabel,btnBox);
         return pane;
+    }
+    private void showAdminStatus(String message, boolean isError) {
+        adminStatusLabel.setText(message);
+        adminStatusLabel.setStyle(isError ? "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"
+                : "-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+        FadeTransition fade = new FadeTransition(Duration.millis(3000), adminStatusLabel);
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setOnFinished(e -> {
+            adminStatusLabel.setText("");
+            adminStatusLabel.setOpacity(1.0); // reset for future shows
+        });
+        fade.play();
     }
 
     // showing register form
@@ -540,11 +676,23 @@ public class LoginPage {
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(20));
 
+        // ---- Gradient Background START ----
+        Stop[] stops = new Stop[] {
+                new Stop(0, Color.web("#36D1DC")),
+                new Stop(1, Color.web("#5B86E5"))
+        };
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops
+        );
+        box.setBackground(new Background(
+                new BackgroundFill(gradient, new CornerRadii(16), Insets.EMPTY)
+        ));
+        // ---- Gradient Background END ----
+
         PasswordField newPass = new PasswordField();
         newPass.setPromptText("Enter new password");
 
         Label status = new Label();
-
 
         if (isAdmin) {
             TextField adminIDField = new TextField();
@@ -553,13 +701,13 @@ public class LoginPage {
             Label strengthLabel = new Label("Password Strength: ");
             strengthLabel.setStyle("-fx-font-weight: bold;");
 
-            // ✅ Update strength as user types
             newPass.textProperty().addListener((obs, oldText, newText) -> {
                 strengthLabel.setText("Password Strength: " + getPasswordStrength(newText));
                 switch (getPasswordStrength(newText)) {
                     case "Weak" -> strengthLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
                     case "Normal" -> strengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
                     case "Strong" -> strengthLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                    default -> strengthLabel.setStyle("-fx-text-fill: gray; -fx-font-weight: bold;");
                 }
             });
 
@@ -606,10 +754,22 @@ public class LoginPage {
             );
         }
 
-        popup.setScene(new Scene(box, 350, 250));
-        popup.show();
-    }
+        Scene scene = new Scene(box, 400, 280); // Slightly bigger for nice padding
+        popup.setScene(scene);
 
+        // --- Popup will always close with main window ---
+        popup.initOwner(primaryStage);
+        popup.initModality(Modality.WINDOW_MODAL);
+
+        // This line ensures all popups close when main window closes:
+        primaryStage.setOnCloseRequest(e -> {
+            popup.close();
+            // Optionally exit the application entirely:
+            // Platform.exit();
+        });
+
+        popup.showAndWait();
+    }
     // Helper: ask for username when user resets password
     private String askForUsername() {
         TextInputDialog dialog = new TextInputDialog();

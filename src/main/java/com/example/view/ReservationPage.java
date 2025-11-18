@@ -2,6 +2,7 @@ package com.example.view;
 
 import com.example.manager.FileStorage;
 
+import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
@@ -231,13 +232,6 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-//            String fullName = nameField.getText();
-//            String phone = phoneField.getText();
-//            String guests = guestsButton.getText();
-//            String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
-//            String request = requestArea.getText();
-//            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
-//                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
             String name = nameField.getText().trim();
             String phone = phoneField.getText().trim();
             int guests = guestSpinner.getValue();
@@ -363,6 +357,16 @@ public class ReservationPage {
         homeBtn.setOnAction(e -> {
             HomePage homePage = new HomePage(primaryStage);
             primaryStage.setScene(homePage.getHomeScene());
+        });
+
+        menuBtn.setOnAction(e -> {
+            MenuPage menuPage = new MenuPage(primaryStage);
+            primaryStage.setScene(menuPage.getMenuScene());
+        });
+
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
         });
 
         dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn, reviewBtn);
