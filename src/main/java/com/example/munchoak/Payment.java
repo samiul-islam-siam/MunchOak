@@ -179,14 +179,14 @@ public class Payment {
                     userId,
                     cart,
                     foodMap,
-                    ""
+                    "Card"
             );
 
             // Create Payment instance for handling UI + method
             Payment payment = new Payment(paymentId, total);
 
             // Show payment method selection popup
-            payment.processPayment(cart, foodMap);
+            //payment.processPayment(cart, foodMap);
 
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());

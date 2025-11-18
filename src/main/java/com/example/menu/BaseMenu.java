@@ -52,7 +52,7 @@ public class BaseMenu {
     protected HBox categoryButtons;
     protected VBox formBox;
     protected HBox cartButtons;
-    protected Button viewCartButton;
+    //protected Button viewCartButton;
     protected Button checkoutButton;
     protected Button addToCartBtn;
     protected Button buttonMenu;
@@ -83,12 +83,7 @@ public class BaseMenu {
         cartButtons.setAlignment(Pos.CENTER);
         cartButtons.setPadding(new Insets(20, 0, 40, 0));
 
-//        Button viewCart = new Button("View Cart");
-//        Button checkout = new Button("Checkout");
-//        styleMainButton(viewCart);
-//        styleMainButton(checkout);
 
-        // cartButtons.getChildren().addAll(viewCart, checkout);
 
         // --- Assemble Layout ---
         mainLayout.getChildren().addAll(navBar, bannerSection, foodContainer, cartButtons);
@@ -193,15 +188,15 @@ public class BaseMenu {
 
         // Inside BaseMenu.java — where you initialize admin buttons
         // Cart buttons
-        viewCartButton = new Button("View Cart");
-        viewCartButton.setOnAction(e -> cart.showCart(foodList));
+//        viewCartButton = new Button("View Cart");
+//        viewCartButton.setOnAction(e -> cart.showCart(foodList));
 
-        checkoutButton = new Button("Checkout");
+        //checkoutButton = new Button("Checkout");
 
-        checkoutButton.setOnAction(e -> Payment.checkout(cart));
-        styleMainButton(viewCartButton);
-        styleMainButton(checkoutButton);
-        cartButtons = new HBox(15, viewCartButton, checkoutButton);
+//        checkoutButton.setOnAction(e -> Payment.checkout(cart));
+//        styleMainButton(viewCartButton);
+//        styleMainButton(checkoutButton);
+//        cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
         HBox adminButtons = null;
         if (this instanceof AdminMenu) {
@@ -589,7 +584,7 @@ public class BaseMenu {
         desc.setMaxWidth(200);
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
-        Label price = new Label(String.format("Price: Tk%.2f", food.getPrice()));
+        Label price = new Label(String.format("Price: Tk %.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label cuisine = new Label("⭐ " + food.getCuisine());

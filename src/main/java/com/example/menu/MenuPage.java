@@ -214,9 +214,6 @@ public class MenuPage {
         VBox backPanel = new VBox();
         backPanel.setAlignment(Pos.TOP_LEFT);
         backPanel.setPadding(new Insets(6, 24, 0, 24));
-//        Button backButton = new Button("\u2190");
-//        backButton.setOnAction(e -> returnToHomePerfectly());
-//        backPanel.getChildren().add(backButton);
         Label backLabel = new Label("\u2190");
         backLabel.getStyleClass().add("back-label");
 

@@ -3,6 +3,7 @@ package com.example.menu;
 import com.example.manager.FileStorage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
+import com.example.munchoak.Payment;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import javafx.animation.ScaleTransition;
@@ -510,6 +511,7 @@ public class CheckoutPage {
 
             // Simulate payment success
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Payment.checkout(cart);
             alert.setHeaderText("Payment Successful!");
             alert.setContentText("Your order has been placed. Thank you for shopping with MUNCHOAK!");
             alert.showAndWait();
