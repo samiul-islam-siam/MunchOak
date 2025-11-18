@@ -199,9 +199,13 @@ public class LoginPage {
 
         loginPane = createLoginPane();
         registerPane = createRegisterPane();
+        userLoginPane = createUserLoginPane();
+        adminLoginPane = createAdminLoginPane();
         registerPane.setVisible(false);
+        userLoginPane.setVisible(false);
+        adminLoginPane.setVisible(false);
         registerPane.setOpacity(0);
-        rightContainer.getChildren().addAll(loginPane, registerPane);
+        rightContainer.getChildren().addAll(loginPane, registerPane, userLoginPane, adminLoginPane);
 
         // --- Divider ---
         Pane divider = new Pane();
@@ -891,7 +895,7 @@ public class LoginPage {
         Button btn = new Button(text);
         btn.getStyleClass().add("top-button");
         btn.setPrefWidth(110);
-        btn.setOnAction(e -> System.out.println(text + " clicked"));
+        // btn.setOnAction(e -> System.out.println(text + " clicked"));
         return btn;
     }
 

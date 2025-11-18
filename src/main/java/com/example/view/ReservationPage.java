@@ -395,6 +395,11 @@ public class ReservationPage {
             });
         });
 
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
+
         aboutBtn.setOnAction(e -> {
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
