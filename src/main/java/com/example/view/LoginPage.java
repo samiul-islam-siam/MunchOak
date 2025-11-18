@@ -6,6 +6,7 @@ import com.example.login.AdminDashboard;
 import com.example.manager.AdminFileStorage;
 import com.example.manager.FileStorage;
 
+import javafx.animation.*;
 import javafx.stage.Modality;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.CycleMethod;
@@ -15,8 +16,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Background;
 import javafx.geometry.Insets;
-import javafx.animation.AnimationTimer;
-import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -84,27 +83,114 @@ public class LoginPage {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: linear-gradient(to right, #0f2027, #203a43, #2c5364);");
 
-        // --- Close Button ---
+        // --- Top Bar with Logo, Title, Nav Buttons ---
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10));
-        topBar.setAlignment(Pos.TOP_RIGHT);
-        topBar.setStyle("-fx-background-color: transparent;");
+        topBar.setSpacing(20);
+
+        // Left Section: Logo and Title
+        HBox leftSection = new HBox(10);
+        leftSection.setAlignment(Pos.CENTER_LEFT);
+
+        // Load logo with updated path
+        Image logoImage = new Image(getClass().getResourceAsStream("/com/example/view/images/logo.png"));
+        ImageView logo = new ImageView(logoImage);
+        logo.setFitWidth(40);
+        logo.setFitHeight(40);
+        Circle clip = new Circle(20, 20, 20);
+        logo.setClip(clip);
+        leftSection.getChildren().add(logo);
+
+        Label title = new Label("MUNCHOAK");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        leftSection.getChildren().add(title);
+
+        // Spacer
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Right Section: Nav Buttons and Close
+        HBox navHBox = new HBox(10);
+        Button homeBtn = createNavButton("Home");
+        homeBtn.setOnAction(e -> returnToHome());
+        Button aboutBtn = createNavButton("About Us");
+        aboutBtn.setOnAction(e -> System.out.println("About Us clicked"));
+        Button profileBtn = createNavButton("Profile");
+        profileBtn.setOnAction(e -> System.out.println("Profile clicked"));
+        navHBox.getChildren().addAll(homeBtn, aboutBtn, profileBtn);
 
         Button closeBtn = new Button("X");
         closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-cursor: hand; -fx-font-weight: bold;");
         closeBtn.setOnAction(e -> returnToHome());
-        topBar.getChildren().add(closeBtn);
+
+        HBox rightSection = new HBox(10, navHBox, closeBtn);
+        rightSection.setAlignment(Pos.CENTER_RIGHT);
+
+        topBar.getChildren().addAll(leftSection, spacer, rightSection);
         root.setTop(topBar);
 
         // --- LEFT PANE ---
         VBox leftPane = new VBox();
-        leftPane.setAlignment(Pos.CENTER);
+        leftPane.setAlignment(Pos.TOP_CENTER);
         leftPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #a8e6cf, #dcedc1);");
 
-        Pane doodlePane = new Pane();
-        doodlePane.setMinSize(0, 0);
-        leftPane.getChildren().add(doodlePane);
-        VBox.setVgrow(doodlePane, Priority.ALWAYS);
+        // Messages and image paths
+        String[] messages = {
+                "Ready to vibe? Slide into your account !!",
+                "Hungry? Don’t lie. We can see it in your eyes.",
+                "Fresh flavors, just one login away."
+        };
+        String[] imagePaths = {
+                "/com/example/view/images/left-bg.png",
+                "/com/example/view/images/left-bg2.png",
+                "/com/example/view/images/left-bg3.png"
+        };
+
+        // Add text at the top
+        Label vibeLabel = new Label(messages[0]);
+        vibeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: \"Abril Fatface\", cursive; -fx-font-style: italic; -fx-effect: dropshadow(gaussian, #ffd700, 8, 0.3, 2, 2);");
+        vibeLabel.setPadding(new Insets(20, 0, 10, 0));
+        leftPane.getChildren().add(vibeLabel);
+
+        // Add font animation: gentle pulsing scale (will be restarted on each change)
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(2000), vibeLabel);
+        scaleTransition.setFromX(1.0);
+        scaleTransition.setFromY(1.0);
+        scaleTransition.setToX(1.1);
+        scaleTransition.setToY(1.1);
+        scaleTransition.setCycleCount(ScaleTransition.INDEFINITE);
+        scaleTransition.setAutoReverse(true);
+        scaleTransition.play();
+
+        // Add image to left side
+        Image leftImage = new Image(getClass().getResourceAsStream(imagePaths[0]));
+        ImageView leftImageView = new ImageView(leftImage);
+        leftImageView.setPreserveRatio(true);
+        leftImageView.fitWidthProperty().bind(leftPane.widthProperty().multiply(0.8));
+        leftImageView.fitHeightProperty().bind(leftPane.heightProperty().multiply(0.8));
+        leftPane.getChildren().add(leftImageView);
+
+        // Sequential appearance timeline
+        int[] currentIndex = {0};
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(4), e -> {
+            currentIndex[0] = (currentIndex[0] + 1) % messages.length;
+            // Update text and image
+            vibeLabel.setText(messages[currentIndex[0]]);
+            Image newImage = new Image(getClass().getResourceAsStream(imagePaths[currentIndex[0]]));
+            leftImageView.setImage(newImage);
+            // Zoom in image
+            leftImageView.setScaleX(0.0);
+            leftImageView.setScaleY(0.0);
+            ScaleTransition zoomIn = new ScaleTransition(Duration.millis(800), leftImageView);
+            zoomIn.setToX(1.0);
+            zoomIn.setToY(1.0);
+            zoomIn.play();
+            // Restart scale animation for label
+            scaleTransition.stop();
+            scaleTransition.play();
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
 
         // --- RIGHT PANE ---
         StackPane rightContainer = new StackPane();
@@ -113,13 +199,9 @@ public class LoginPage {
 
         loginPane = createLoginPane();
         registerPane = createRegisterPane();
-        userLoginPane = createUserLoginPane();
-        adminLoginPane = createAdminLoginPane();
         registerPane.setVisible(false);
-        userLoginPane.setVisible(false);
-        adminLoginPane.setVisible(false);
         registerPane.setOpacity(0);
-        rightContainer.getChildren().addAll(loginPane, registerPane, userLoginPane, adminLoginPane);
+        rightContainer.getChildren().addAll(loginPane, registerPane);
 
         // --- Divider ---
         Pane divider = new Pane();
@@ -131,7 +213,6 @@ public class LoginPage {
         mainLayout.getChildren().addAll(leftPane, divider, rightContainer);
         HBox.setHgrow(leftPane, Priority.ALWAYS);
         HBox.setHgrow(rightContainer, Priority.ALWAYS);
-
         mainLayout.widthProperty().addListener((obs, old, newVal) -> {
             if (newVal.doubleValue() > 0) {
                 double total = newVal.doubleValue();
@@ -141,7 +222,6 @@ public class LoginPage {
         });
 
         root.setCenter(mainLayout);
-        setupDoodles(doodlePane, leftPane);
         return root;
     }
 
@@ -916,5 +996,12 @@ public class LoginPage {
                 root.requestLayout();
             }
         });
+    }
+
+    private Button createNavButton(String text) {
+        Button btn = new Button(text);
+        btn.getStyleClass().add("top-button");
+        btn.setPrefWidth(100);
+        return btn;
     }
 }

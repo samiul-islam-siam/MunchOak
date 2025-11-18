@@ -5,6 +5,7 @@ import com.example.manager.FileStorage;
 import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -355,18 +356,62 @@ public class ReservationPage {
         Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
             HomePage homePage = new HomePage(primaryStage);
-            primaryStage.setScene(homePage.getHomeScene());
+            Scene homeScene = homePage.getHomeScene();
+            primaryStage.setScene(homeScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
         });
 
         menuBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
             MenuPage menuPage = new MenuPage(primaryStage);
-            primaryStage.setScene(menuPage.getMenuScene());
+            Scene menuScene = menuPage.getMenuScene();
+            primaryStage.setScene(menuScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
         });
 
-        profileBtn.setOnAction(e -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
-            primaryStage.setScene(profilePage.getProfileScene());
+        aboutBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+            aboutPage.showAboutUs();
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
         });
 
         dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn, reviewBtn);
@@ -399,5 +444,24 @@ public class ReservationPage {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public void showReservation() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        Scene scene = getReservationScene();
+        primaryStage.setScene(scene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
     }
 }

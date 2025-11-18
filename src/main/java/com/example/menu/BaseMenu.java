@@ -5,7 +5,7 @@ import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 import com.example.munchoak.Payment;
-import javafx.animation.PauseTransition;
+import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -82,12 +83,12 @@ public class BaseMenu {
         cartButtons.setAlignment(Pos.CENTER);
         cartButtons.setPadding(new Insets(20, 0, 40, 0));
 
-        Button viewCart = new Button("View Cart");
-        Button checkout = new Button("Checkout");
-        styleMainButton(viewCart);
-        styleMainButton(checkout);
+//        Button viewCart = new Button("View Cart");
+//        Button checkout = new Button("Checkout");
+//        styleMainButton(viewCart);
+//        styleMainButton(checkout);
 
-        cartButtons.getChildren().addAll(viewCart, checkout);
+        // cartButtons.getChildren().addAll(viewCart, checkout);
 
         // --- Assemble Layout ---
         mainLayout.getChildren().addAll(navBar, bannerSection, foodContainer, cartButtons);
@@ -99,7 +100,7 @@ public class BaseMenu {
     // Cart for the current user
     int userId = Session.getCurrentUserId();
 
-    private final Cart cart = new Cart();
+    private Cart cart = new Cart();
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();
@@ -475,96 +476,155 @@ public class BaseMenu {
 
     protected void loadFoodItems() {
         foodContainer.getChildren().clear();
-        Map<String, FlowPane> categoryFlows = new LinkedHashMap<>();
+        Map<String, HBox> categoryRows = new LinkedHashMap<>();
 
         for (FoodItems food : foodList) {
             String category = food.getCategory();
-            if (!categoryFlows.containsKey(category)) {
-                Label categoryLabel = new Label(category);
+
+            // --- Create a new section for each category ---
+            if (!categoryRows.containsKey(category)) {
+                Label categoryLabel = new Label(category.toUpperCase());
                 categoryLabel.setStyle("-fx-font-size: 22px; -fx-text-fill: #E53935; -fx-font-weight: bold;");
                 Separator separator = new Separator();
-                separator.setPrefWidth(500);
+                separator.setPrefWidth(800);
 
-                FlowPane flow = new FlowPane(15, 15);
-                flow.setPadding(new Insets(5));
+                // Horizontal row for food cards
+                HBox foodRow = new HBox(20);
+                foodRow.setPadding(new Insets(10));
+                foodRow.setAlignment(Pos.CENTER_LEFT);
 
-                VBox section = new VBox(10);
-                section.getChildren().addAll(categoryLabel, separator, flow);
-                section.setPadding(new Insets(10, 5, 20, 5));
+                // ScrollPane to hold row
+                ScrollPane scrollPane = new ScrollPane(foodRow);
+                scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                scrollPane.setFitToHeight(true);
+                scrollPane.setPannable(true);
+                scrollPane.setStyle("-fx-background-color: transparent;");
+
+                // --- Left and right arrow buttons ---
+                Button leftArrow = new Button("<");
+                Button rightArrow = new Button(">");
+                styleArrowButton(leftArrow);
+                styleArrowButton(rightArrow);
+
+                leftArrow.setOpacity(0); // Initially hidden
+                rightArrow.setOpacity(0);
+
+                // Arrow click actions — smooth scroll
+                leftArrow.setOnAction(e -> smoothScroll(scrollPane, -0.3));
+                rightArrow.setOnAction(e -> smoothScroll(scrollPane, 0.3));
+
+                // StackPane overlays arrows on top of the scroll area
+                StackPane scrollArea = new StackPane(scrollPane);
+                StackPane.setAlignment(leftArrow, Pos.CENTER_LEFT);
+                StackPane.setAlignment(rightArrow, Pos.CENTER_RIGHT);
+                scrollArea.getChildren().addAll(leftArrow, rightArrow);
+                scrollArea.setPadding(new Insets(0, 40, 0, 40));
+
+                // --- Hover logic: fade arrows in/out ---
+                scrollArea.setOnMouseEntered(e -> fadeArrows(leftArrow, rightArrow, 1.0));
+                scrollArea.setOnMouseExited(e -> fadeArrows(leftArrow, rightArrow, 0.0));
+
+                // Combine all into a category section
+                VBox section = new VBox(10, categoryLabel, separator, scrollArea);
+                section.setPadding(new Insets(15, 10, 30, 10));
 
                 foodContainer.getChildren().add(section);
-                categoryFlows.put(category, flow);
+                categoryRows.put(category, foodRow);
             }
-            categoryFlows.get(category).getChildren().add(createFoodCard(food));
+
+            // Add cards to their category row
+            categoryRows.get(category).getChildren().add(createFoodCard(food));
         }
     }
 
     protected VBox createFoodCard(FoodItems food) {
-        VBox card = new VBox(8);
-        card.setPadding(new Insets(10));
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(12));
         card.setAlignment(Pos.TOP_CENTER);
-        //card.setStyle("-fx-background-color: #fff; -fx-border-color: #e0e0e0; -fx-border-radius: 15; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);");
+        card.setPrefWidth(240);
+
         card.setStyle(
-                "-fx-background-color: #fff;" +
-                        "-fx-border-color: #e0e0e0;" +
-                        "-fx-border-radius: 15;" +
+                "-fx-background-color: white;" +
                         "-fx-background-radius: 15;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 3);"
+                        "-fx-border-radius: 15;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 3);"
         );
 
-        card.setPrefWidth(220);
-
+        // --- IMAGE SETUP ---
         ImageView imgView = new ImageView();
-        imgView.setFitWidth(180);
-        imgView.setFitHeight(120);
+        imgView.setFitWidth(210);
+        imgView.setFitHeight(140);
         imgView.setPreserveRatio(true);
 
-        // Load image
+        // Load image safely
         String imagePath = "/images/" + food.getImagePath();
         Image image = null;
         try (InputStream is = getClass().getResourceAsStream(imagePath)) {
-            if (is != null) image = new Image(is);
-            else {
+            if (is != null) {
+                image = new Image(is);
+            } else {
                 String filePath = "file:src/main/resources/com/example/manager/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
+        // Fallback placeholder
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
                 if (placeholder != null) image = new Image(placeholder);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
         imgView.setImage(image);
 
+        // --- TEXT DETAILS ---
         Label name = new Label(food.getName());
         name.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
         Label desc = new Label(food.getDetails());
         desc.setWrapText(true);
-        desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
-        Label price = new Label("Price: $" + food.getPrice());
+        desc.setMaxWidth(200);
+        desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
+
+        Label price = new Label(String.format("Price: Tk%.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
-        Label cuisine = new Label("\uD83D\uDD25 " + food.getCuisine());
+
+        Label cuisine = new Label("⭐ " + food.getCuisine());
         cuisine.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
 
-        if (!(this instanceof guestMenu) && !(this instanceof AdminMenu)) { // only create Add to Cart if NOT admin
+        // --- BUTTONS ---
+        HBox buttons = new HBox(10);
+        buttons.setAlignment(Pos.CENTER);
+
+        Button addToCartBtn = null;
+        Button editBtn = null;
+
+        // Add to Cart button (only for user)
+        if (!(this instanceof AdminMenu)) {
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
+
             addToCartBtn.setOnAction(e -> {
                 cart.addToCart(food.getId(), 1);
 
+                // Popup notification
                 Stage popup = new Stage();
                 popup.initStyle(StageStyle.UNDECORATED);
                 popup.setAlwaysOnTop(true);
 
                 Label label = new Label(food.getName() + " added to cart!");
-                label.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+                label.setStyle(
+                        "-fx-background-color: #E53935; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-font-weight: bold; " +
+                                "-fx-padding: 10 20 10 20; " +
+                                "-fx-background-radius: 10;"
+                );
 
                 VBox box = new VBox(label);
                 box.setAlignment(Pos.CENTER);
+                box.setStyle("-fx-background-color: transparent;");
 
                 popup.setScene(new Scene(box));
                 popup.show();
@@ -572,25 +632,27 @@ public class BaseMenu {
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> popup.close());
                 delay.play();
-
             });
         }
 
-        editBtn = null;
-        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
+        // Edit button (only for admin)
+        if (!(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));
         }
 
-        HBox buttons;
-        if (addToCartBtn != null && editBtn != null) buttons = new HBox(10, addToCartBtn, editBtn);
-        else if (addToCartBtn != null) buttons = new HBox(10, addToCartBtn);
-        else if (editBtn != null) buttons = new HBox(10, editBtn);
-        else buttons = new HBox();
+        // Combine buttons dynamically
+        if (addToCartBtn != null) buttons.getChildren().add(addToCartBtn);
+        if (editBtn != null) buttons.getChildren().add(editBtn);
 
-        buttons.setAlignment(Pos.CENTER);
-        card.getChildren().addAll(imgView, name, desc, price, cuisine, buttons);
+        // --- ADD EVERYTHING TO CARD ---
+        card.getChildren().addAll(imgView, name, desc, price, cuisine);
+        if (!buttons.getChildren().isEmpty()) card.getChildren().add(buttons);
+
+        // Click event to show detail popup
+        card.setOnMouseClicked(e -> showFoodDetail(food, (VBox) e.getSource()));
+
         return card;
     }
 
@@ -640,6 +702,147 @@ public class BaseMenu {
         }
     }
 
+    protected void showFoodDetail(FoodItems food, VBox card) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        Stage owner = (Stage) card.getScene().getWindow();
+        dialog.initOwner(owner);
+        dialog.setTitle(food.getName());
+        dialog.setWidth(500);
+        dialog.setHeight(600);
+
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(20));
+
+        // Top: Title and Close button
+        HBox top = new HBox();
+        top.setAlignment(Pos.CENTER_LEFT);
+        Label title = new Label(food.getName());
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        Button closeBtn = new Button("X");
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 18px; -fx-cursor: hand;");
+        closeBtn.setOnAction(ev -> dialog.close());
+        HBox.setHgrow(title, Priority.ALWAYS);
+        top.getChildren().addAll(title, closeBtn);
+        root.setTop(top);
+
+        // Center: Image on top, info below (changed from HBox to VBox)
+        VBox center = new VBox(20);
+        center.setAlignment(Pos.TOP_CENTER);
+
+        // Large Image
+        ImageView largeImgView = new ImageView();
+        largeImgView.setFitWidth(200);
+        largeImgView.setFitHeight(200);
+        largeImgView.setPreserveRatio(true);
+
+        // Load image safely (same as card)
+        String imagePath = "/images/" + food.getImagePath();
+        Image image = null;
+        try (InputStream is = getClass().getResourceAsStream(imagePath)) {
+            if (is != null) {
+                image = new Image(is);
+            } else {
+                String filePath = "file:src/main/resources/com/example/manager/images/" + food.getImagePath();
+                image = new Image(filePath);
+            }
+        } catch (Exception ignored) {}
+
+        // Fallback placeholder
+        if (image == null || image.isError()) {
+            try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
+                if (placeholder != null) image = new Image(placeholder);
+            } catch (Exception ignored) {}
+        }
+        largeImgView.setImage(image);
+
+        // Info section (below image, full width)
+        VBox infoVBox = new VBox(15);
+        infoVBox.setPrefWidth(400); // Wider to utilize full dialog width
+
+        Label priceLabel = new Label("Tk " + String.format("%.2f", food.getPrice()));
+        priceLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
+
+        Label descLabel = new Label(food.getDetails());
+        descLabel.setWrapText(true);
+        descLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+
+        Label cuisineLabel = new Label("⭐ " + food.getCuisine());
+        cuisineLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
+
+        // Add On section (simple hardcoded example)
+        VBox addOnSection = new VBox(10);
+        Label addOnTitle = new Label("Add On");
+        addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        HBox addOnItem = new HBox(10);
+        Label addOnName = new Label("Extra Patty");
+        Label addOnPrice = new Label("+Tk 99");
+        Button addOnPlus = new Button("+");
+        addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
+        addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnPlus);
+        addOnSection.getChildren().addAll(addOnTitle, addOnItem);
+        Label optionalLabel = new Label("Select up to 5 (optional)");
+        optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+
+        // Quantity
+        HBox quantityBox = new HBox(10);
+        quantityBox.setAlignment(Pos.CENTER);
+        Button minusBtn = new Button("-");
+        Label qtyLabel = new Label("1");
+        Button plusBtn = new Button("+");
+        minusBtn.setPrefSize(40, 40);
+        plusBtn.setPrefSize(40, 40);
+        minusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
+        plusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
+        qtyLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        quantityBox.getChildren().addAll(minusBtn, qtyLabel, plusBtn);
+
+        final int[] currentQuantity = {1};
+        minusBtn.setOnAction(ev -> {
+            if (currentQuantity[0] > 1) {
+                currentQuantity[0]--;
+                qtyLabel.setText(String.valueOf(currentQuantity[0]));
+            }
+        });
+        plusBtn.setOnAction(ev -> {
+            currentQuantity[0]++;
+            qtyLabel.setText(String.valueOf(currentQuantity[0]));
+        });
+
+        // Add to Cart button
+        Button addToCartDetail = new Button("Add to cart");
+        styleMainButton(addToCartDetail);
+        addToCartDetail.setPrefWidth(Double.MAX_VALUE);
+        addToCartDetail.setOnAction(ev -> {
+            cart.addToCart(food.getId(), currentQuantity[0]);
+            // Popup notification
+            Stage notifyPopup = new Stage();
+            notifyPopup.initStyle(StageStyle.UNDECORATED);
+            notifyPopup.setAlwaysOnTop(true);
+            Label notifyLabel = new Label(food.getName() + " added to cart!");
+            notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+            VBox notifyBox = new VBox(notifyLabel);
+            notifyBox.setAlignment(Pos.CENTER);
+            notifyBox.setStyle("-fx-background-color: transparent;");
+            notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+            notifyPopup.show();
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e2 -> notifyPopup.close());
+            delay.play();
+            dialog.close();
+        });
+
+        infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);
+
+        center.getChildren().addAll(largeImgView, infoVBox);
+        root.setCenter(center);
+
+        root.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
+
+        Scene scene = new Scene(root);
+        dialog.setScene(scene);
+        dialog.show();
+    }
 
     protected void updateFoodItem() {
         if (currentEditingFood == null) return;
@@ -774,4 +977,48 @@ public class BaseMenu {
         dialog.setScene(new Scene(vbox, 300, 200));
         dialog.show();
     }
+    // Style the arrow buttons
+    private void styleArrowButton(Button arrow) {
+        arrow.setPrefSize(40, 40);
+        arrow.setStyle("""
+        -fx-background-color: rgba(0,0,0,0.6);
+        -fx-text-fill: white;
+        -fx-font-size: 20px;
+        -fx-background-radius: 50%;
+        -fx-cursor: hand;
+    """);
+
+        arrow.setOnMouseEntered(e -> arrow.setOpacity(1));
+        arrow.setOnMouseExited(e -> arrow.setOpacity(0.8));
+    }
+
+    // Smoothly scroll the scrollpane
+    private void smoothScroll(ScrollPane scrollPane, double delta) {
+        double newValue = Math.max(0, Math.min(1, scrollPane.getHvalue() + delta));
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(200),
+                        new KeyValue(scrollPane.hvalueProperty(), newValue, Interpolator.EASE_BOTH))
+        );
+        timeline.play();
+    }
+
+    // Fade arrows in/out on hover
+    private void fadeArrows(Button leftArrow, Button rightArrow, double targetOpacity) {
+        Timeline fade = new Timeline(
+                new KeyFrame(Duration.millis(250),
+                        new KeyValue(leftArrow.opacityProperty(), targetOpacity, Interpolator.EASE_BOTH),
+                        new KeyValue(rightArrow.opacityProperty(), targetOpacity, Interpolator.EASE_BOTH))
+        );
+        fade.play();
+    }
+    // near the cart field
+    public Cart getCart() {
+        return this.cart;
+    }
+
+    // New method to allow injecting a shared Cart instance (for navigation persistence)
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
 }

@@ -90,6 +90,14 @@ public class Cart implements Serializable {
         else buyHistory.put(foodId, newQty);
     }
 
+    public void removeFromCart(Integer foodId) {
+        if (buyHistory.containsKey(foodId)) {
+            int current = buyHistory.get(foodId);
+            if (current > 1) buyHistory.put(foodId, current - 1);
+            else buyHistory.remove(foodId);
+        }
+    }
+
     public void removeFromCartEntirely(Integer foodId) {
         buyHistory.remove(foodId);
     }
@@ -231,5 +239,16 @@ public class Cart implements Serializable {
         stage.setTitle("Your Cart");
         stage.setScene(new Scene(vbox, 600, 400));
         stage.show();
+    }
+
+    public int getTotalItems() {
+        int total = 0;
+        for (int qty : buyHistory.values()) {
+            total += qty;
+        }
+        return total;
+    }
+    public void clearCart() {
+        buyHistory.clear();
     }
 }

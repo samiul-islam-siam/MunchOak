@@ -1,8 +1,15 @@
 package com.example.view;
 
+import com.example.manager.Session;
+import com.example.munchoak.Cart;
+import com.example.menu.CartPage;
+import com.example.menu.MenuPage;
+import com.example.view.HomePage;
+import com.example.view.ReservationPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,6 +25,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+// import java.awt.Desktop;
+import java.net.URI;
+
 public class AboutUsPage {
 
     private final Stage primaryStage;
@@ -27,10 +37,24 @@ public class AboutUsPage {
     }
 
     public void showAboutUs() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
         Scene scene = getAboutUsScene();
         primaryStage.setScene(scene);
         primaryStage.setTitle("About Us");
-        primaryStage.show();
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+            primaryStage.show();
+        });
     }
 
     public Scene getAboutUsScene() {
@@ -46,28 +70,19 @@ public class AboutUsPage {
         navTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         Button homeBtn = createNavButton("Home");
-        homeBtn.setOnAction(e -> {
-            HomePage homePage = new HomePage(primaryStage);
-            primaryStage.setScene(homePage.getHomeScene());
-        });
+        homeBtn.setOnAction(e -> navigateToHome());
 
         Button menuBtn = createNavButton("Menu");
-        menuBtn.setOnAction(e -> showComingSoonAlert("Menu"));
+        menuBtn.setOnAction(e -> navigateToMenu());
 
         Button reservationBtn = createNavButton("Reservation");
-        reservationBtn.setOnAction(e -> {
-            ReservationPage reservationPage = new ReservationPage(primaryStage);
-            primaryStage.setScene(reservationPage.getReservationScene());
-        });
+        reservationBtn.setOnAction(e -> navigateToReservation());
 
         Button profileBtn = createNavButton("Profile");
-        profileBtn.setOnAction(e -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
-            primaryStage.setScene(profilePage.getProfileScene());
-        });
+        profileBtn.setOnAction(e -> showComingSoonAlert("Profile"));
 
         Button cartBtn = createNavButton("Cart");
-        cartBtn.setOnAction(e -> showComingSoonAlert("Cart"));
+        cartBtn.setOnAction(e -> navigateToCart());
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -171,7 +186,11 @@ public class AboutUsPage {
         contactDetails.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333;");
         contactDetails.setWrapText(true);
         contactDetails.setOnMouseClicked(e -> {
-            getHostServices().showDocument("https://www.google.com/maps/place/Dhaka,+Bangladesh");
+//            try {
+//                Desktop.getDesktop().browse(new URI("https://www.google.com/maps/place/Dhaka,+Bangladesh"));
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
         });
 
         contactTextBox.getChildren().addAll(contactTitle, contactDetails);
@@ -280,6 +299,93 @@ public class AboutUsPage {
         return new Scene(root, 1000, 1400);
     }
 
+    private void navigateToHome() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        HomePage homePage = new HomePage(primaryStage);
+        Scene homeScene = homePage.getHomeScene();
+        primaryStage.setScene(homeScene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
+    }
+
+    private void navigateToMenu() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        MenuPage menuPage = new MenuPage(primaryStage);
+        Scene menuScene = menuPage.getMenuScene();
+        primaryStage.setScene(menuScene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
+    }
+
+    private void navigateToReservation() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        ReservationPage reservationPage = new ReservationPage(primaryStage);
+        reservationPage.showReservation();
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
+    }
+
+    private void navigateToCart() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        // Use session to get userId for cart, default to 0 if not logged in
+        // Fixed: Removed non-existent Session.getCurrentToken() call; default token to empty string
+        // (If token is needed later, implement getCurrentToken() in Session class)
+        int userId = Session.getCurrentUserId(); // Assume this method exists; default to 0 if not
+        if (userId == 0) userId = 0; // or fetch from session
+        String token = ""; // Default to empty string if not logged in
+
+        Cart cart = new Cart();
+        CartPage cartPage = new CartPage(primaryStage, cart);
+        Scene cartScene = cartPage.getScene();
+        primaryStage.setScene(cartScene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
+    }
+
     private ImageView loadImageView(String path, double width, double height) {
         ImageView imageView;
         var imageUrl = getClass().getResource(path);
@@ -338,10 +444,5 @@ public class AboutUsPage {
         alert.setHeaderText(null);
         alert.setContentText(pageName + " page is coming soon!");
         alert.showAndWait();
-    }
-
-    // Helper to open map links
-    private javafx.application.HostServices getHostServices() {
-        return null; // override when called from actual Application
     }
 }
