@@ -38,8 +38,8 @@ public class guestMenu extends BaseMenu {
             //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
-                    viewCartButton.setVisible(false);
-                    checkoutButton.setVisible(false);
+                    //viewCartButton.setVisible(false);
+                    //checkoutButton.setVisible(false);
 
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));

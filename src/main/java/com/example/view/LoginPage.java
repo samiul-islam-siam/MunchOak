@@ -1,32 +1,30 @@
-
 package com.example.view;
 
-import com.example.manager.Session;
 import com.example.login.AdminDashboard;
 import com.example.manager.AdminFileStorage;
 import com.example.manager.FileStorage;
-
-import javafx.animation.*;
-import javafx.stage.Modality;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.Stop;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Background;
-import javafx.geometry.Insets;
+import com.example.manager.Session;
+import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.image.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,14 +81,14 @@ public class LoginPage {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: linear-gradient(to right, #0f2027, #203a43, #2c5364);");
 
-        // --- Top Bar with Logo, Title, Nav Buttons ---
+        // --- Top Bar with Logo and Title (Centered, No Navigation) ---
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10));
-        topBar.setSpacing(20);
+        topBar.setAlignment(Pos.CENTER);
 
-        // Left Section: Logo and Title
-        HBox leftSection = new HBox(10);
-        leftSection.setAlignment(Pos.CENTER_LEFT);
+        // Logo and Title Section
+        HBox titleSection = new HBox(10);
+        titleSection.setAlignment(Pos.CENTER);
 
         // Load logo with updated path
         Image logoImage = new Image(getClass().getResourceAsStream("/com/example/view/images/logo.png"));
@@ -99,100 +97,16 @@ public class LoginPage {
         logo.setFitHeight(40);
         Circle clip = new Circle(20, 20, 20);
         logo.setClip(clip);
-        leftSection.getChildren().add(logo);
+        titleSection.getChildren().add(logo);
 
         Label title = new Label("MUNCHOAK");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
-        leftSection.getChildren().add(title);
+        titleSection.getChildren().add(title);
 
-        // Spacer
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // Right Section: Nav Buttons and Close
-        HBox navHBox = new HBox(10);
-        Button homeBtn = createNavButton("Home");
-        homeBtn.setOnAction(e -> returnToHome());
-        Button aboutBtn = createNavButton("About Us");
-        aboutBtn.setOnAction(e -> System.out.println("About Us clicked"));
-        Button profileBtn = createNavButton("Profile");
-        profileBtn.setOnAction(e -> System.out.println("Profile clicked"));
-        navHBox.getChildren().addAll(homeBtn, aboutBtn, profileBtn);
-
-        Button closeBtn = new Button("X");
-        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-cursor: hand; -fx-font-weight: bold;");
-        closeBtn.setOnAction(e -> returnToHome());
-
-        HBox rightSection = new HBox(10, navHBox, closeBtn);
-        rightSection.setAlignment(Pos.CENTER_RIGHT);
-
-        topBar.getChildren().addAll(leftSection, spacer, rightSection);
+        topBar.getChildren().add(titleSection);
         root.setTop(topBar);
 
-        // --- LEFT PANE ---
-        VBox leftPane = new VBox();
-        leftPane.setAlignment(Pos.TOP_CENTER);
-        leftPane.setStyle("-fx-background-color: linear-gradient(to bottom right, #a8e6cf, #dcedc1);");
-
-        // Messages and image paths
-        String[] messages = {
-                "Ready to vibe? Slide into your account !!",
-                "Hungry? Don’t lie. We can see it in your eyes.",
-                "Fresh flavors, just one login away."
-        };
-        String[] imagePaths = {
-                "/com/example/view/images/left-bg.png",
-                "/com/example/view/images/left-bg2.png",
-                "/com/example/view/images/left-bg3.png"
-        };
-
-        // Add text at the top
-        Label vibeLabel = new Label(messages[0]);
-        vibeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: \"Abril Fatface\", cursive; -fx-font-style: italic; -fx-effect: dropshadow(gaussian, #ffd700, 8, 0.3, 2, 2);");
-        vibeLabel.setPadding(new Insets(20, 0, 10, 0));
-        leftPane.getChildren().add(vibeLabel);
-
-        // Add font animation: gentle pulsing scale (will be restarted on each change)
-        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(2000), vibeLabel);
-        scaleTransition.setFromX(1.0);
-        scaleTransition.setFromY(1.0);
-        scaleTransition.setToX(1.1);
-        scaleTransition.setToY(1.1);
-        scaleTransition.setCycleCount(ScaleTransition.INDEFINITE);
-        scaleTransition.setAutoReverse(true);
-        scaleTransition.play();
-
-        // Add image to left side
-        Image leftImage = new Image(getClass().getResourceAsStream(imagePaths[0]));
-        ImageView leftImageView = new ImageView(leftImage);
-        leftImageView.setPreserveRatio(true);
-        leftImageView.fitWidthProperty().bind(leftPane.widthProperty().multiply(0.8));
-        leftImageView.fitHeightProperty().bind(leftPane.heightProperty().multiply(0.8));
-        leftPane.getChildren().add(leftImageView);
-
-        // Sequential appearance timeline
-        int[] currentIndex = {0};
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(4), e -> {
-            currentIndex[0] = (currentIndex[0] + 1) % messages.length;
-            // Update text and image
-            vibeLabel.setText(messages[currentIndex[0]]);
-            Image newImage = new Image(getClass().getResourceAsStream(imagePaths[currentIndex[0]]));
-            leftImageView.setImage(newImage);
-            // Zoom in image
-            leftImageView.setScaleX(0.0);
-            leftImageView.setScaleY(0.0);
-            ScaleTransition zoomIn = new ScaleTransition(Duration.millis(800), leftImageView);
-            zoomIn.setToX(1.0);
-            zoomIn.setToY(1.0);
-            zoomIn.play();
-            // Restart scale animation for label
-            scaleTransition.stop();
-            scaleTransition.play();
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-
-        // --- RIGHT PANE ---
+        // --- RIGHT PANE (Full Center) ---
         StackPane rightContainer = new StackPane();
         rightContainer.setAlignment(Pos.CENTER);
         rightContainer.setStyle("-fx-background-color: linear-gradient(to bottom right, #283c86, #45a247);");
@@ -207,25 +121,7 @@ public class LoginPage {
         registerPane.setOpacity(0);
         rightContainer.getChildren().addAll(loginPane, registerPane, userLoginPane, adminLoginPane);
 
-        // --- Divider ---
-        Pane divider = new Pane();
-        divider.setPrefWidth(2);
-        divider.setStyle("-fx-background-color: rgba(255,255,255,0.3);");
-
-        // --- MAIN LAYOUT ---
-        HBox mainLayout = new HBox();
-        mainLayout.getChildren().addAll(leftPane, divider, rightContainer);
-        HBox.setHgrow(leftPane, Priority.ALWAYS);
-        HBox.setHgrow(rightContainer, Priority.ALWAYS);
-        mainLayout.widthProperty().addListener((obs, old, newVal) -> {
-            if (newVal.doubleValue() > 0) {
-                double total = newVal.doubleValue();
-                leftPane.setPrefWidth(total * 0.6);
-                rightContainer.setPrefWidth(total * 0.4);
-            }
-        });
-
-        root.setCenter(mainLayout);
+        root.setCenter(rightContainer);
         return root;
     }
 
@@ -234,6 +130,19 @@ public class LoginPage {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(40));
+
+        // Subtitle at the top
+        Label subtitle = new Label("Fresh flavors, just one login away.");
+        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #FF6B6B; -fx-font-family: 'Comic Sans MS', cursive;");
+        subtitle.setAlignment(Pos.CENTER);
+        subtitle.setOpacity(0.0);
+
+        // Transition effect for subtitle
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), subtitle);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+        fadeIn.setInterpolator(Interpolator.EASE_IN);
+        fadeIn.play();
 
         Label brandTitle = new Label("WELCOME TO MUNCHOAK");
         brandTitle.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);");
@@ -256,8 +165,13 @@ public class LoginPage {
             returnToHome();
         });
 
-        buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn);
-        pane.getChildren().addAll(brandTitle, buttonsVBox);
+        Button backToHomeBtn = createLoginButton("BACK");
+        backToHomeBtn.setOnAction(e -> {
+            returnToHome();
+        });
+
+        buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn, backToHomeBtn);
+        pane.getChildren().addAll(subtitle, brandTitle, buttonsVBox);
         return pane;
     }
 
@@ -399,6 +313,12 @@ public class LoginPage {
                 alert.showAndWait();
             }
 
+            confirmField.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    registerBtn.fire();   // Trigger Register
+                }
+            });
+
             new java.util.Timer().schedule(new java.util.TimerTask() {
                 @Override
                 public void run() {
@@ -459,7 +379,7 @@ public class LoginPage {
         registerStatusLabel.setStyle(isError ? "-fx-text-fill:black; -fx-font-weight: bold;"
                 : "-fx-text-fill: black; -fx-font-weight: bold;");
 
-        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(Duration.seconds(1));
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(ev -> registerStatusLabel.setText(""));
         pause.play();
 
@@ -501,6 +421,12 @@ public class LoginPage {
             } catch (Exception ex) {
                 System.err.println("IOException: " + ex.getMessage());
                 showStatus("Error logging in!", true);
+            }
+        });
+
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                loginBtn.fire();   // Trigger Login
             }
         });
 
@@ -563,6 +489,12 @@ public class LoginPage {
         Hyperlink forgotLink = new Hyperlink("Forgot Password?");
         forgotLink.setOnAction(e -> openForgotPasswordWindow(true)); // true = admin mode
         forgotLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
+
+        adminPasswordField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                loginBtn.fire();   // Trigger Admin Login
+            }
+        });
 
         // ✅ Back Button
         Button backBtn = new Button("Back");
@@ -854,15 +786,6 @@ public class LoginPage {
 
         popup.showAndWait();
     }
-    // Helper: ask for username when user resets password
-    private String askForUsername() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Username Required");
-        dialog.setHeaderText(null);
-        dialog.setContentText("Enter your username:");
-        return dialog.showAndWait().orElse(null);
-    }
-
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
@@ -897,45 +820,6 @@ public class LoginPage {
         btn.setPrefWidth(110);
         // btn.setOnAction(e -> System.out.println(text + " clicked"));
         return btn;
-    }
-
-    private void setupDoodles(Pane doodlePane, VBox leftPane) {
-        List<Circle> doodles = new ArrayList<>();
-        double[] speeds = {0.02, 0.03, 0.025, 0.015, 0.035};
-        double[] targetX = new double[5];
-        double[] targetY = new double[5];
-
-        for (int i = 0; i < 5; i++) {
-            double radius = 3 + random.nextDouble() * 7;
-            Circle doodle = new Circle(radius, Color.rgb(255, 255, 255, 0.6 + random.nextDouble() * 0.4));
-            doodle.setCenterX(100);
-            doodle.setCenterY(100);
-            doodlePane.getChildren().add(doodle);
-            doodles.add(doodle);
-        }
-
-        leftPane.setOnMouseMoved(e -> {
-            double mx = e.getX();
-            double my = e.getY();
-            for (int i = 0; i < 5; i++) {
-                targetX[i] = mx;
-                targetY[i] = my;
-            }
-        });
-
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                for (int i = 0; i < 5; i++) {
-                    Circle d = doodles.get(i);
-                    double dx = targetX[i] - d.getCenterX();
-                    double dy = targetY[i] - d.getCenterY();
-                    d.setCenterX(d.getCenterX() + dx * speeds[i]);
-                    d.setCenterY(d.getCenterY() + dy * speeds[i]);
-                }
-            }
-        };
-        timer.start();
     }
 
     public void returnToHome() {
@@ -1000,12 +884,5 @@ public class LoginPage {
                 root.requestLayout();
             }
         });
-    }
-
-    private Button createNavButton(String text) {
-        Button btn = new Button(text);
-        btn.getStyleClass().add("top-button");
-        btn.setPrefWidth(100);
-        return btn;
     }
 }

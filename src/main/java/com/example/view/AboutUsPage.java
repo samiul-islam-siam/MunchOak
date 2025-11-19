@@ -2,10 +2,8 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
-import com.example.menu.CartPage;
+import com.example.munchoak.CartPage;
 import com.example.menu.MenuPage;
-import com.example.view.HomePage;
-import com.example.view.ReservationPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -26,7 +24,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 // import java.awt.Desktop;
-import java.net.URI;
+
 
 public class AboutUsPage {
 

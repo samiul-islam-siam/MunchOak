@@ -4,7 +4,6 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import com.example.munchoak.Payment;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,11 +51,7 @@ public class BaseMenu {
     protected HBox categoryButtons;
     protected VBox formBox;
     protected HBox cartButtons;
-    protected Button viewCartButton;
-    protected Button checkoutButton;
-    protected Button addToCartBtn;
     protected Button buttonMenu;
-    protected Button editBtn;
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
@@ -83,12 +78,6 @@ public class BaseMenu {
         cartButtons.setAlignment(Pos.CENTER);
         cartButtons.setPadding(new Insets(20, 0, 40, 0));
 
-//        Button viewCart = new Button("View Cart");
-//        Button checkout = new Button("Checkout");
-//        styleMainButton(viewCart);
-//        styleMainButton(checkout);
-
-        // cartButtons.getChildren().addAll(viewCart, checkout);
 
         // --- Assemble Layout ---
         mainLayout.getChildren().addAll(navBar, bannerSection, foodContainer, cartButtons);
@@ -190,18 +179,6 @@ public class BaseMenu {
         formBox = new VBox(10, inputGrid, addOrUpdateButton);
         formBox.setVisible(false);
         formBox.setManaged(false);
-
-        // Inside BaseMenu.java — where you initialize admin buttons
-        // Cart buttons
-        viewCartButton = new Button("View Cart");
-        viewCartButton.setOnAction(e -> cart.showCart(foodList));
-
-        checkoutButton = new Button("Checkout");
-
-        checkoutButton.setOnAction(e -> Payment.checkout(cart));
-        styleMainButton(viewCartButton);
-        styleMainButton(checkoutButton);
-        cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
         HBox adminButtons = null;
         if (this instanceof AdminMenu) {
@@ -473,7 +450,6 @@ public class BaseMenu {
     }
 
     // ================== FOOD ITEMS MANAGEMENT ===================
-
     protected void loadFoodItems() {
         foodContainer.getChildren().clear();
         Map<String, HBox> categoryRows = new LinkedHashMap<>();
@@ -567,13 +543,15 @@ public class BaseMenu {
                 String filePath = "file:src/main/resources/com/example/manager/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Fallback placeholder
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
                 if (placeholder != null) image = new Image(placeholder);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         imgView.setImage(image);
@@ -587,7 +565,7 @@ public class BaseMenu {
         desc.setMaxWidth(200);
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
-        Label price = new Label(String.format("Price: Tk%.2f", food.getPrice()));
+        Label price = new Label(String.format("Price: Tk %.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label cuisine = new Label("⭐ " + food.getCuisine());
@@ -601,7 +579,7 @@ public class BaseMenu {
         Button editBtn = null;
 
         // Add to Cart button (only for user)
-        if (!(this instanceof AdminMenu)) {
+        if (!(this instanceof AdminMenu) && !(this instanceof guestMenu)) {
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
 
@@ -636,7 +614,7 @@ public class BaseMenu {
         }
 
         // Edit button (only for admin)
-        if (!(this instanceof UserMenu)) {
+        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));
@@ -677,7 +655,7 @@ public class BaseMenu {
             showAlert("Error", "Invalid price.");
             return;
         }
-        String cuisine= cuisineField.getText().trim();
+        String cuisine = cuisineField.getText().trim();
 
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
@@ -746,13 +724,15 @@ public class BaseMenu {
                 String filePath = "file:src/main/resources/com/example/manager/images/" + food.getImagePath();
                 image = new Image(filePath);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Fallback placeholder
         if (image == null || image.isError()) {
             try (InputStream placeholder = getClass().getResourceAsStream("/images/placeholder.png")) {
                 if (placeholder != null) image = new Image(placeholder);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         largeImgView.setImage(image);
 
@@ -977,16 +957,17 @@ public class BaseMenu {
         dialog.setScene(new Scene(vbox, 300, 200));
         dialog.show();
     }
+
     // Style the arrow buttons
     private void styleArrowButton(Button arrow) {
         arrow.setPrefSize(40, 40);
         arrow.setStyle("""
-        -fx-background-color: rgba(0,0,0,0.6);
-        -fx-text-fill: white;
-        -fx-font-size: 20px;
-        -fx-background-radius: 50%;
-        -fx-cursor: hand;
-    """);
+                    -fx-background-color: rgba(0,0,0,0.6);
+                    -fx-text-fill: white;
+                    -fx-font-size: 20px;
+                    -fx-background-radius: 50%;
+                    -fx-cursor: hand;
+                """);
 
         arrow.setOnMouseEntered(e -> arrow.setOpacity(1));
         arrow.setOnMouseExited(e -> arrow.setOpacity(0.8));
@@ -1011,6 +992,7 @@ public class BaseMenu {
         );
         fade.play();
     }
+
     // near the cart field
     public Cart getCart() {
         return this.cart;
@@ -1020,5 +1002,4 @@ public class BaseMenu {
     public void setCart(Cart cart) {
         this.cart = cart;
     }
-
 }

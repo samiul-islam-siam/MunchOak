@@ -1,8 +1,7 @@
-package com.example.menu;
+package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.Cart;
-import com.example.munchoak.FoodItems;
+import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import javafx.animation.ScaleTransition;
@@ -59,7 +58,7 @@ public class CheckoutPage {
         feedbackVBox.setAlignment(Pos.CENTER);
         feedbackVBox.setStyle("-fx-background-color: #f9f9f9;");
 
-        Label titleLabel = new Label("How was your experience with MUNCHOAK?");
+        Label titleLabel = new Label("How was your experience with MunchOak?");
         titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
         Label ratingLabel = new Label("Rate us:");
@@ -510,6 +509,7 @@ public class CheckoutPage {
 
             // Simulate payment success
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Payment.checkout(cart);
             alert.setHeaderText("Payment Successful!");
             alert.setContentText("Your order has been placed. Thank you for shopping with MUNCHOAK!");
             alert.showAndWait();

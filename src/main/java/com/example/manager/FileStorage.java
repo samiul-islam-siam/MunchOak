@@ -80,7 +80,7 @@ public class FileStorage {
             if (!USERS_FILE.exists()) USERS_FILE.createNewFile(); //To create category file when it is not created
             if (!CATEGORIES_FILE.exists())      // By default, to have some predefined categories
             {
-                String[] initailizedCategories = {
+                String[] initializedCategories = {
                         "Drinks",
                         "Sweets",
                         "Spicy Foods",
@@ -88,7 +88,7 @@ public class FileStorage {
                         "Appetizers"
                 };
                 DataOutputStream dos = new DataOutputStream(new FileOutputStream(CATEGORIES_FILE, true));
-                for (String category : initailizedCategories) {
+                for (String category : initializedCategories) {
                     dos.writeUTF(category); // write each category in binary format
                 }
             }

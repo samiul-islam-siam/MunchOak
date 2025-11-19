@@ -3,7 +3,6 @@ package com.example.munchoak;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.view.HomePage;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -16,9 +15,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Map;
-import java.util.List;
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 public class History {
 
@@ -118,10 +117,11 @@ public class History {
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
         boolean isAdmin = Session.getCurrentUsername().equals("admin");
+        CartPage cartPage = new CartPage(primaryStage,new Cart());
 
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!isAdmin && s.userId != currentUserId) continue;
-            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
+            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount+cartPage.getTotal(), "Success", s.paymentMethod));
         }
     }
 

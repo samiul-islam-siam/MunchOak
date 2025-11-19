@@ -1,10 +1,10 @@
-package com.example.menu;
+package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.Cart;
-import com.example.munchoak.FoodItems;
+import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
+import com.example.view.ProfilePage;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -26,6 +26,35 @@ import java.util.stream.Collectors;
 public class CartPage {
     private final Stage primaryStage;
     private final Cart cart;
+    private double disCount;
+    private double total;
+    public void setDisCount(double disCount)
+    {
+        this.disCount = disCount;
+    }
+
+    public double getTotal()
+    {
+        return total;
+    }
+
+    public double getDisCount()
+    {
+        return disCount;
+    }
+
+    public double getDeliveryAmount()
+    {
+        return 7.99;
+    }
+    public double getTaxAmount()
+    {
+        return 7.00;
+    }
+    public double getServiceFeeAmount()
+    {
+        return 1.50;
+    }
 
     public CartPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -75,7 +104,7 @@ public class CartPage {
         Circle clip = new Circle(30, 30, 30);
         logo.setClip(clip);
 
-        Label titleLabel = new Label("MUNCHOAK");
+        Label titleLabel = new Label("MunchOak");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         leftGroup.getChildren().addAll(logo, titleLabel);
@@ -111,12 +140,14 @@ public class CartPage {
         homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getScene()));
         homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+
         Button menuBtn = new Button("Menu");
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getScene()));
         menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
+
         Button cartBtn = new Button("Cart");
         cartBtn.setStyle("-fx-background-color: white; -fx-text-fill: #FF6B00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 20; -fx-cursor: hand;");  // Active state
         cartBtn.setOnAction(e -> primaryStage.setScene(getScene()));
@@ -127,11 +158,15 @@ public class CartPage {
         loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getScene()));
         loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+
         Button profileBtn = new Button("Profile");
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         profileBtn.setOnMouseExited(e -> profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // TODO: Add navigation action, e.g., profileBtn.setOnAction(e -> primaryStage.setScene(new ProfilePage(primaryStage).getScene()));
+        profileBtn.setOnAction(e -> {
+            ProfilePage profilePage = new ProfilePage(primaryStage);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
 
         buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, loginBtn, profileBtn);
 
@@ -471,16 +506,16 @@ public class CartPage {
         Label taxLabel = new Label("Tax: ৳7.00");
         taxLabel.setStyle("-fx-text-fill: black;");
 
-        double taxAmount = 7.00;
-        double serviceFeeAmount = 1.50;
-        double deliveryAmount = 7.99;
+        double taxAmount = getTaxAmount();
+        double serviceFeeAmount = getServiceFeeAmount();
+        double deliveryAmount = getDeliveryAmount();
 
         if (!isEmptyCart) {
             discountLabel = new Label("Discount: -৳0.00");
             discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
             deliveryBox = new VBox(6);
-            Label delLabel = new Label("Delivery: ৳7.99");
+            Label delLabel = new Label("Delivery: ৳"+deliveryAmount);
             delLabel.setStyle("-fx-text-fill: black;");
             deliveryBox.getChildren().add(delLabel);
 
@@ -539,9 +574,7 @@ public class CartPage {
             }
             // Add more coupons as needed
             if (valid) {
-                if (discountLabel != null) {
-                    discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
-                }
+                discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
                 couponField.clear();
@@ -567,7 +600,14 @@ public class CartPage {
                 } else if (newValue == tip7) {
                     tip.set(7.00);
                 }
+
+               // this.disCount = discount.get();
+                setDisCount(discount.get());
+
+
+
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
+                this.total = newTotal;
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
             });
         }
@@ -697,16 +737,13 @@ public class CartPage {
     private void updateSuggestionCards(FlowPane pane, double cardWidth, double imgSize, double nameFont, double priceFont, double btnFont, String btnPadding) {
         if (pane == null) return;
         for (javafx.scene.Node node : pane.getChildren()) {
-            if (node instanceof VBox) {
-                VBox card = (VBox) node;
+            if (node instanceof VBox card) {
                 card.setPrefWidth(cardWidth);
                 for (javafx.scene.Node child : card.getChildren()) {
-                    if (child instanceof ImageView) {
-                        ImageView iv = (ImageView) child;
+                    if (child instanceof ImageView iv) {
                         iv.setFitWidth(imgSize);
                         iv.setFitHeight(imgSize);
-                    } else if (child instanceof Label) {
-                        Label lbl = (Label) child;
+                    } else if (child instanceof Label lbl) {
                         String currentStyle = lbl.getStyle();
                         if (currentStyle.contains("-fx-font-size: ")) {
                             // Simple replace for font size (assumes format is consistent)
@@ -717,8 +754,7 @@ public class CartPage {
                             }
                             lbl.setMaxWidth(cardWidth - 20);
                         }
-                    } else if (child instanceof Button) {
-                        Button btn = (Button) child;
+                    } else if (child instanceof Button btn) {
                         String currentStyle = btn.getStyle();
                         String newStyle = currentStyle.replaceAll("-fx-font-size: \\d+(?:\\.\\d+)?px;", "-fx-font-size: " + btnFont + "px;")
                                 .replaceAll("-fx-padding: [^;]+;", "-fx-padding: " + btnPadding + ";");
