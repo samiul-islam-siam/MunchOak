@@ -1,8 +1,7 @@
 package com.example.menu;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.Cart;
-import com.example.munchoak.FoodItems;
+import com.example.munchoak.*;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
@@ -27,6 +26,37 @@ import java.util.stream.Collectors;
 public class CartPage {
     private final Stage primaryStage;
     private final Cart cart;
+    private final double delivaryAmount = 7.99;
+    private final double taxAmount = 7.00;
+    private final double serviceFeeAmount = 1.50;
+    private double disCount;
+    private double total;
+    public void setDisCount(double disCount)
+    {
+        this.disCount = disCount;
+    }
+
+    public double getTotal()
+    {
+        return total;
+    }
+
+    public double getDisCount()
+    {
+        return disCount;
+    }
+    public double getDelivaryAmount()
+    {
+        return delivaryAmount;
+    }
+    public double getTaxAmount()
+    {
+        return taxAmount;
+    }
+    public double getServiceFeeAmount()
+    {
+        return serviceFeeAmount;
+    }
 
     public CartPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -475,16 +505,16 @@ public class CartPage {
         Label taxLabel = new Label("Tax: ৳7.00");
         taxLabel.setStyle("-fx-text-fill: black;");
 
-        double taxAmount = 7.00;
-        double serviceFeeAmount = 1.50;
-        double deliveryAmount = 7.99;
+        double taxAmount = getTaxAmount();
+        double serviceFeeAmount = getServiceFeeAmount();
+        double deliveryAmount = getDelivaryAmount();
 
         if (!isEmptyCart) {
             discountLabel = new Label("Discount: -৳0.00");
             discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
             deliveryBox = new VBox(6);
-            Label delLabel = new Label("Delivery: ৳7.99");
+            Label delLabel = new Label("Delivery: ৳"+deliveryAmount);
             delLabel.setStyle("-fx-text-fill: black;");
             deliveryBox.getChildren().add(delLabel);
 
@@ -571,7 +601,14 @@ public class CartPage {
                 } else if (newValue == tip7) {
                     tip.set(7.00);
                 }
+
+               // this.disCount = discount.get();
+                setDisCount(discount.get());
+
+
+
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
+                this.total = newTotal;
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
             });
         }
