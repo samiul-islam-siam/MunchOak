@@ -1,4 +1,4 @@
-
+/*
 package com.example.manager;
 
 public class Session {
@@ -29,5 +29,95 @@ public class Session {
     // OPTIONAL: Reset to guest
     public static void resetToGuest() {
         setCurrentUser("guest");
+    }
+    public static void logout() {
+        currentUsername = "guest";
+        currentEmail = "";
+        currentPassword = "";
+    }
+
+}
+*/
+/*
+package com.example.manager;
+
+public class Session {
+    private static int currentUserId = 2025000;
+    private static String currentUsername = "guest";
+    private static String currentEmail = "people@gmail.com";
+    private static String currentPassword = "ai01*2#";
+
+    // GETTERS
+    public static int getCurrentUserId() { return currentUserId; }
+    public static String getCurrentUsername() { return currentUsername; }
+    public static String getCurrentEmail() { return currentEmail; }
+    public static String getCurrentPassword() { return currentPassword; }
+
+    // Set the currently logged-in user by username
+    public static void setCurrentUser(String username) {
+        currentUsername = username;
+        currentUserId = FileStorage.getUserId(username);
+        currentEmail = FileStorage.getUserEmail(username);
+        currentPassword = FileStorage.getUserPassword(username);
+    }
+
+    // Dynamic Role Detection
+    public static String getCurrentRole() {
+        if (currentUsername == null) return "GUEST";
+
+        if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
+        if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
+
+        return "USER";
+    }
+
+    // Reset to guest
+    public static void resetToGuest() {
+        setCurrentUser("guest");
+    }
+
+    // logout
+    public static void logout() {
+        currentEmail = null;
+        currentPassword = null;
+        currentUsername = null;
+    }
+}
+*/
+package com.example.manager;
+
+public class Session {
+
+    private static int currentUserId = 2025000;
+    private static String currentUsername = "guest";
+    private static String currentEmail = "guest@gmail.com";
+    private static String currentPassword = "ai01*2#";
+
+    public static int getCurrentUserId() { return currentUserId; }
+    public static String getCurrentUsername() { return currentUsername; }
+    public static String getCurrentEmail() { return currentEmail; }
+    public static String getCurrentPassword() { return currentPassword; }
+
+    public static void setCurrentUser(String username) {
+        currentUsername = username;
+        currentUserId = FileStorage.getUserId(username);
+        currentEmail = FileStorage.getUserEmail(username);
+        currentPassword = FileStorage.getUserPassword(username);
+    }
+
+    public static String getCurrentRole() {
+        if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
+        if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
+        return "USER";
+    }
+
+    public static void resetToGuest() {
+        currentUsername = "guest";
+        currentEmail = "people@gmail.com";
+        currentPassword = "ai01*2#";
+    }
+
+    public static void logout() {
+        resetToGuest();
     }
 }
