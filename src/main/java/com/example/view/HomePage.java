@@ -78,6 +78,8 @@ public class HomePage implements HomePageComponent {
         // --- Style buttons ---
         Button loginBtn = new Button("Log In");
         loginBtn.getStyleClass().addAll("top-button", "login-button");
+        updateLoginButton(loginBtn);
+
 
         Button menuBtn = new Button("MENU");
         menuBtn.getStyleClass().add("top-button");
@@ -399,7 +401,7 @@ public class HomePage implements HomePageComponent {
         });
         StackPane.setAlignment(overlay, Pos.TOP_LEFT);
     }
-    private void openProfilePageDirectly() {
+    public void openProfilePageDirectly() {
         Platform.runLater(() -> {
             ProfilePage profilePage = new ProfilePage(primaryStage);
             Scene profileScene = profilePage.getProfileScene();
@@ -494,8 +496,12 @@ public class HomePage implements HomePageComponent {
             pause.setOnFinished(evt -> openAboutUsPageDirectly());
             pause.play();
         });
+       // Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+       // String username = Session.getCurrentUsername();
+       // boolean isLoggedIn = username != null && !username.equals("guest");
 
         Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+
         authBtn.setPrefWidth(Double.MAX_VALUE);
         authBtn.getStyleClass().add("top-button");
         if (!loggedIn) authBtn.getStyleClass().add("login-button");
@@ -620,7 +626,8 @@ public class HomePage implements HomePageComponent {
         return scene;
     }
 
-    private void openMenu() {
+    private void openMenu()
+    {
         MenuPage menuPage = new MenuPage(primaryStage);
         primaryStage.setScene(menuPage.getMenuScene());
     }
@@ -659,5 +666,29 @@ public class HomePage implements HomePageComponent {
             e.printStackTrace();
         }
     }
+    private void updateLoginButton(Button loginBtn) {
+        boolean loggedIn = Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest") &&
+                Session.getCurrentEmail() != null &&
+                !Session.getCurrentEmail().isEmpty();
+
+        if (loggedIn) {
+            loginBtn.setText("Log Out");
+            loginBtn.getStyleClass().remove("login-button");
+            loginBtn.setOnAction(e -> {
+                Session.logout();
+                Session.setCurrentUser("guest");
+                updateLoginButton(loginBtn);
+            });
+        } else {
+            loginBtn.setText("Log In");
+            if (!loginBtn.getStyleClass().contains("login-button"))
+                loginBtn.getStyleClass().add("login-button");
+
+            loginBtn.setOnAction(e -> openLoginPageDirectly());
+        }
+    }
+
+
 
 }
