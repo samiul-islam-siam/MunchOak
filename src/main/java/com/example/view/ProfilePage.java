@@ -31,9 +31,37 @@ public class ProfilePage {
         String password = Session.getCurrentPassword();
         int userId = Session.getCurrentUserId();
 
-        if (username == null) username = "Guest";
-        if (email == null) email = "N/A";
-        //if (password == null) password = "N/A";
+        if (Session.getCurrentUsername().equals("guest")) {
+            Label title = new Label("You are browsing \n as guest");
+            title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+            Label passLabel = new Label("Default guest Id: " + userId);
+            passLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
+
+            Button backBtn = new Button("⬅ Back to Home");
+            backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-font-size: 16px;");
+            backBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+
+
+            VBox card = new VBox(15, title, passLabel, backBtn);
+            card.setAlignment(Pos.CENTER);
+            card.setPadding(new Insets(30));
+            card.setMaxWidth(400);
+            card.setStyle("-fx-background-color: rgba(255,255,255,0.9); -fx-background-radius: 15;");
+
+            // --- Root gradient background ---
+            StackPane root = new StackPane(card);
+            root.setPadding(new Insets(50));
+            LinearGradient gradient = new LinearGradient(
+                    0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, Color.web("#49bad8")),
+                    new Stop(1, Color.web("#1c71bd"))
+            );
+            root.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
+
+            return new Scene(root, 1000, 700);
+
+        }
 
 
         // --- Title ---
@@ -142,9 +170,18 @@ public class ProfilePage {
         if (password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) score++;
 
         switch (score) {
-            case 4 -> { label.setText("Password Strength: Strong"); label.setTextFill(Color.GREEN); }
-            case 3 -> { label.setText("Password Strength: Normal"); label.setTextFill(Color.ORANGE); }
-            default -> { label.setText("Password Strength: Weak"); label.setTextFill(Color.RED); }
+            case 4 -> {
+                label.setText("Password Strength: Strong");
+                label.setTextFill(Color.GREEN);
+            }
+            case 3 -> {
+                label.setText("Password Strength: Normal");
+                label.setTextFill(Color.ORANGE);
+            }
+            default -> {
+                label.setText("Password Strength: Weak");
+                label.setTextFill(Color.RED);
+            }
         }
     }
 }

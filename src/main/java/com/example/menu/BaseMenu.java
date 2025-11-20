@@ -794,22 +794,39 @@ public class BaseMenu {
         styleMainButton(addToCartDetail);
         addToCartDetail.setPrefWidth(Double.MAX_VALUE);
         addToCartDetail.setOnAction(ev -> {
-            cart.addToCart(food.getId(), currentQuantity[0]);
-            // Popup notification
-            Stage notifyPopup = new Stage();
-            notifyPopup.initStyle(StageStyle.UNDECORATED);
-            notifyPopup.setAlwaysOnTop(true);
-            Label notifyLabel = new Label(food.getName() + " added to cart!");
-            notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
-            VBox notifyBox = new VBox(notifyLabel);
-            notifyBox.setAlignment(Pos.CENTER);
-            notifyBox.setStyle("-fx-background-color: transparent;");
-            notifyPopup.setScene(new Scene(notifyBox, 200, 50));
-            notifyPopup.show();
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e2 -> notifyPopup.close());
-            delay.play();
-            dialog.close();
+            if (Session.getCurrentUsername().equals("guest")) {
+                Stage notifyPopup = new Stage();
+                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.setAlwaysOnTop(true);
+                Label notifyLabel = new Label("Please Login !");
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                VBox notifyBox = new VBox(notifyLabel);
+                notifyBox.setAlignment(Pos.CENTER);
+                notifyBox.setStyle("-fx-background-color: transparent;");
+                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                notifyPopup.show();
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> notifyPopup.close());
+                delay.play();
+                dialog.close();
+            } else {
+                cart.addToCart(food.getId(), currentQuantity[0]);
+                // Popup notification
+                Stage notifyPopup = new Stage();
+                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.setAlwaysOnTop(true);
+                Label notifyLabel = new Label(food.getName() + " added to cart!");
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                VBox notifyBox = new VBox(notifyLabel);
+                notifyBox.setAlignment(Pos.CENTER);
+                notifyBox.setStyle("-fx-background-color: transparent;");
+                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                notifyPopup.show();
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> notifyPopup.close());
+                delay.play();
+                dialog.close();
+            }
         });
 
         infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);

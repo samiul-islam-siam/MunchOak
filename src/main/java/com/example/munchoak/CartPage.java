@@ -1,11 +1,13 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.InputStream;
@@ -28,31 +31,28 @@ public class CartPage {
     private final Cart cart;
     private double disCount;
     private double total;
-    public void setDisCount(double disCount)
-    {
+
+    public void setDisCount(double disCount) {
         this.disCount = disCount;
     }
 
-    public double getTotal()
-    {
+    public double getTotal() {
         return total;
     }
 
-    public double getDisCount()
-    {
+    public double getDisCount() {
         return disCount;
     }
 
-    public double getDeliveryAmount()
-    {
+    public double getDeliveryAmount() {
         return 7.99;
     }
-    public double getTaxAmount()
-    {
+
+    public double getTaxAmount() {
         return 7.00;
     }
-    public double getServiceFeeAmount()
-    {
+
+    public double getServiceFeeAmount() {
         return 1.50;
     }
 
@@ -97,7 +97,8 @@ public class CartPage {
         String logoPath = "/images/logo.png";  // Assume logo path
         try (InputStream is = getClass().getResourceAsStream(logoPath)) {
             if (is != null) logoImg = new Image(is);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         if (logoImg != null) {
             logo.setImage(logoImg);
         }
@@ -249,7 +250,8 @@ public class CartPage {
                         String filePath = "file:src/main/resources/com/example/manager/images/" + item.getImagePath();
                         img = new Image(filePath);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
                 if (img != null) iv.setImage(img);
 
@@ -396,7 +398,8 @@ public class CartPage {
                         String filePath = "file:src/main/resources/com/example/manager/images/" + item.getImagePath();
                         suggestionImg = new Image(filePath);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 if (suggestionImg != null) suggestionIv.setImage(suggestionImg);
 
                 // Name with larger font
@@ -442,8 +445,25 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    cart.addToCart(item.getId(), 1);
-                    primaryStage.setScene(getScene());  // Refresh the scene to update cart
+                    if (Session.getCurrentUsername().equals("guest")) {
+                        Stage notifyPopup = new Stage();
+                        notifyPopup.initStyle(StageStyle.UNDECORATED);
+                        notifyPopup.setAlwaysOnTop(true);
+                        Label notifyLabel = new Label("Please Login !");
+                        notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                        VBox notifyBox = new VBox(notifyLabel);
+                        notifyBox.setAlignment(Pos.CENTER);
+                        notifyBox.setStyle("-fx-background-color: transparent;");
+                        notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                        notifyPopup.show();
+                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                        delay.setOnFinished(e2 -> notifyPopup.close());
+                        delay.play();
+
+                    } else {
+                        cart.addToCart(item.getId(), 1);
+                        primaryStage.setScene(getScene());  // Refresh the scene to update cart
+                    }
                 });
 
                 suggestionCard.getChildren().addAll(suggestionIv, suggestionName, suggestionPrice, addSuggestionBtn);
@@ -515,7 +535,7 @@ public class CartPage {
             discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
             deliveryBox = new VBox(6);
-            Label delLabel = new Label("Delivery: ৳"+deliveryAmount);
+            Label delLabel = new Label("Delivery: ৳" + deliveryAmount);
             delLabel.setStyle("-fx-text-fill: black;");
             deliveryBox.getChildren().add(delLabel);
 
@@ -601,9 +621,8 @@ public class CartPage {
                     tip.set(7.00);
                 }
 
-               // this.disCount = discount.get();
+                // this.disCount = discount.get();
                 setDisCount(discount.get());
-
 
 
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
