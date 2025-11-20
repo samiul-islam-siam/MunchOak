@@ -513,22 +513,4 @@ public class HomePage implements HomePageComponent {
     private void openProfilePageDirectly() {
         Platform.runLater(() -> preserveStageState(new ProfilePage(primaryStage).getProfileScene()));
     }
-
-//    private void updateLoginButton(Button loginBtn) {
-//        if (loggedIn) {
-//            loginBtn.setText("Log Out");
-//            loginBtn.getStyleClass().remove("login-button");
-//            loginBtn.setOnAction(e -> {
-//                Session.logout();
-//                Session.setCurrentUser("guest");
-//                updateLoginButton(loginBtn);
-//            });
-//        } else {
-//            loginBtn.setText("Log In");
-//            if (!loginBtn.getStyleClass().contains("login-button"))
-//                loginBtn.getStyleClass().add("login-button");
-//
-//            loginBtn.setOnAction(e -> openLoginPageDirectly());
-//        }
-//    }
 }
