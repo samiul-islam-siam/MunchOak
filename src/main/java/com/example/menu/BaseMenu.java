@@ -565,7 +565,7 @@ public class BaseMenu {
         desc.setMaxWidth(200);
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
-        Label price = new Label(String.format("Price: Tk %.2f", food.getPrice()));
+        Label price = new Label(String.format("Price: ৳ %.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label cuisine = new Label("⭐ " + food.getCuisine());
