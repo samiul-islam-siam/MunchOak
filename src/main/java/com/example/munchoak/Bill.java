@@ -1,7 +1,6 @@
 package com.example.munchoak;
 
 import com.example.manager.Session;
-import com.example.menu.CartPage;
 import javafx.stage.Stage;
 
 import java.util.Map;
@@ -52,13 +51,13 @@ public class Bill {
         sb.append("--------------------------------------------\n");
 
         // Using cart values (no UI dependency)
-        sb.append(String.format("%-25s %10.2f\n", "Delivery Amount:", cartPage.getDelivaryAmount()));
+        sb.append(String.format("%-25s %10.2f\n", "Delivery Amount:", cartPage.getDeliveryAmount()));
         sb.append(String.format("%-25s %10.2f\n", "Tax Amount:", cartPage.getTaxAmount()));
         sb.append(String.format("%-25s %10.2f\n", "Service Fee:", cartPage.getServiceFeeAmount()));
         sb.append(String.format("%-25s %10.2f\n", "Discount:", cartPage.getDisCount()));
 
         double finalTotal = total +
-                cartPage.getDelivaryAmount() +
+                cartPage.getDeliveryAmount() +
                 cartPage.getTaxAmount() +
                 cartPage.getServiceFeeAmount() -
                 cartPage.getDisCount();

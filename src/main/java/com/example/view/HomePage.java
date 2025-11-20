@@ -4,7 +4,6 @@ import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.History;
 import com.example.network.ChatClient;
-
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,39 +27,38 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.util.Duration;
+import java.util.function.Consumer;
 
 public class HomePage implements HomePageComponent {
     private final StackPane root;
+    private final List<HBox> heroGroups = new ArrayList<>();
     private final List<HomePageComponent> sections;
     private final Stage primaryStage;
     private final double WIDTH = 1000;
     private final double HEIGHT = 700;
 
-    // --- Side Panel Dashboard ---
+    // Side Panel
     private VBox sidePanel;
     private Pane overlay;
     private boolean panelOpen = false;
     private boolean loggedIn = false;
+    private boolean navigatingAway = false;
 
-    // References to background layers
     private BorderPane content;
-
-    // ScrollPane reference for reset
     private ScrollPane scrollPane;
-    private List<HBox> heroGroups = new ArrayList<>();
     private HBox heroSection;
     private int currentIndex = 0;
 
     public HomePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
 
-        // --- HAMBURGER ICON ---
+        // === HAMBURGER ICON ===
         Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
         ImageView hamburgerIcon = new ImageView(hamburgerImg);
         hamburgerIcon.setFitWidth(24);
@@ -73,9 +71,10 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
-        // --- Style buttons ---
+        // === Top Buttons ===
         Button loginBtn = new Button("Log In");
         loginBtn.getStyleClass().addAll("top-button", "login-button");
+        updateLoginButton(loginBtn);
 
         Button menuBtn = new Button("MENU");
         menuBtn.getStyleClass().add("top-button");
@@ -85,26 +84,21 @@ public class HomePage implements HomePageComponent {
         reservationBtn.getStyleClass().add("top-button");
         reservationBtn.setOnAction(e -> openReservationPageDirectly());
 
-        // --- Logo ---
+        // === Logo & Title ===
         Image logoImg = new Image(getClass().getResource("/com/example/view/images/logo.png").toExternalForm());
         ImageView logoView = new ImageView(logoImg);
         logoView.setFitWidth(40);
         logoView.setFitHeight(40);
         logoView.setPreserveRatio(true);
+        logoView.setClip(new Circle(20, 20, 20));
 
-        Circle clip = new Circle(20, 20, 20);
-        logoView.setClip(clip);
-
-        // --- Title ---
         Label title = new Label("MUNCHOAK");
         title.getStyleClass().add("nav-title");
         title.setStyle("-fx-font-family: 'Georgia', serif; -fx-font-weight: bold; -fx-font-size: 24px;");
 
-        // --- Left Nav Part ---
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        // --- Nav Bar ---
         HBox rightButtons = new HBox(10, menuBtn, reservationBtn, loginBtn, menuIconBtn);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
@@ -115,26 +109,21 @@ public class HomePage implements HomePageComponent {
         navBar.setPadding(new Insets(5, 20, 5, 20));
         navBar.setStyle("-fx-background-color: transparent;");
 
-        // --- Content overlay ---
         content = new BorderPane();
         content.setTop(navBar);
         content.setBackground(Background.EMPTY);
 
-        // --- Root StackPane ---
         root = new StackPane();
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        // --- Button Actions ---
         loginBtn.setOnAction(e -> openLoginPageDirectly());
         menuIconBtn.setOnAction(e -> toggleSidePanel());
 
-        // --- Build UI ---
         createOverlay();
         createSidePanel();
         root.getChildren().setAll(content, overlay, sidePanel);
 
-        // --- Initialize Sections ---
         this.sections = Arrays.asList(
                 this,
                 new HomePageThirdExtension(),
@@ -142,26 +131,14 @@ public class HomePage implements HomePageComponent {
                 new HomePageFifthExtension(),
                 new HomePageSixthExtension(primaryStage),
                 new HomePageSeventhExtension(),
-                new HomePageExtension(),
                 new HomePageEighthExtension()
         );
         initialize();
     }
 
-    @Override
-    public Region getRoot() {
-        return root;
-    }
-
-    @Override
-    public double getPrefWidth() {
-        return WIDTH;
-    }
-
-    @Override
-    public double getPrefHeight() {
-        return HEIGHT;
-    }
+    @Override public Region getRoot() { return root; }
+    @Override public double getPrefWidth() { return WIDTH; }
+    @Override public double getPrefHeight() { return HEIGHT; }
 
     @Override
     public void initialize() {
@@ -170,8 +147,7 @@ public class HomePage implements HomePageComponent {
             group.prefWidthProperty().bind(content.widthProperty());
         }
 
-        // Listen for width to be set before performing first transition
-        ChangeListener<Number> widthListener = new ChangeListener<Number>() {
+        ChangeListener<Number> widthListener = new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends Number> obs, Number oldVal, Number newVal) {
                 if (newVal.doubleValue() > 0) {
@@ -199,13 +175,10 @@ public class HomePage implements HomePageComponent {
         HBox nextGroup = heroGroups.get(next);
         HBox current = heroSection;
 
-        // Fade out current
         FadeTransition fadeOut = new FadeTransition(Duration.millis(300), current);
         fadeOut.setToValue(0.0);
         fadeOut.setOnFinished(e -> {
             content.setCenter(nextGroup);
-
-            // Reset translates if any
             ImageView nextImg = (ImageView) nextGroup.getChildren().get(0);
             VBox nextTxt = (VBox) nextGroup.getChildren().get(1);
             nextImg.setTranslateX(0);
@@ -243,38 +216,31 @@ public class HomePage implements HomePageComponent {
         HBox group = new HBox(30);
         group.setMinHeight(600);
         group.setAlignment(Pos.CENTER);
-        group.setOpacity(0.0); // Start invisible for transition
+        group.setOpacity(0.0);
 
-        // Left side: Image
         Image img = new Image(getClass().getResource(imagePath).toExternalForm());
         ImageView iv = new ImageView(img);
         iv.setPreserveRatio(true);
         iv.fitWidthProperty().bind(Bindings.divide(group.widthProperty(), 2));
         iv.fitHeightProperty().bind(group.heightProperty());
-        iv.setTranslateX(20);
 
-        // Right side: Text content
         VBox textBox = new VBox(20);
         textBox.setAlignment(Pos.CENTER_LEFT);
         textBox.setPadding(new Insets(50, 50, 50, 100));
         textBox.prefWidthProperty().bind(Bindings.divide(group.widthProperty(), 2));
 
-        // Title
         Label titleLabel = new Label(title);
         titleLabel.setStyle("-fx-font-size: 48px; -fx-font-weight: bold; -fx-font-family: 'Brush Script MT', cursive; -fx-text-fill: white; -fx-padding: 0 0 10 0;");
 
-        // Paragraph
         Label paraLabel = new Label(para);
         paraLabel.setWrapText(true);
         paraLabel.setStyle("-fx-font-size: 18px; -fx-font-family: 'Georgia', serif; -fx-text-fill: white; -fx-padding: 0 0 20 0;");
 
-        // Book button
         Button bookBtn = new Button("Book your table now!");
         bookBtn.getStyleClass().addAll("top-button", "login-button");
         bookBtn.setOnAction(e -> openReservationPageDirectly());
 
         textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
-
         group.getChildren().addAll(iv, textBox);
         return group;
     }
@@ -295,94 +261,19 @@ public class HomePage implements HomePageComponent {
 
     public VBox getFullPage() {
         VBox fullPage = new VBox();
-        // Set linear gradient background for the full page (horizontal: left to right)
-        Stop[] stops = new Stop[]{
-                new Stop(0, Color.web("#49bad8")),
-                new Stop(1, Color.web("#1c71bd"))
-        };
-        LinearGradient lg = new LinearGradient(
-                0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops
-        );
+        Stop[] stops = new Stop[]{ new Stop(0, Color.web("#49bad8")), new Stop(1, Color.web("#1c71bd")) };
+        LinearGradient lg = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
         fullPage.setBackground(new Background(new BackgroundFill(lg, CornerRadii.EMPTY, Insets.EMPTY)));
         fullPage.setSpacing(0);
+
         for (HomePageComponent section : sections) {
             Region sectionRoot = section.getRoot();
             sectionRoot.prefWidthProperty().bind(primaryStage.widthProperty());
             sectionRoot.prefHeightProperty().bind(primaryStage.heightProperty());
             fullPage.getChildren().add(sectionRoot);
-            if (section != this) {
-                section.initialize();
-            }
+            if (section != this) section.initialize();
         }
         return fullPage;
-    }
-
-    private void openLoginPageDirectly() {
-        Platform.runLater(() -> {
-            LoginPage loginPage = new LoginPage(primaryStage);
-            Scene loginScene = loginPage.getLoginScene();
-            double w = primaryStage.getWidth();
-            double h = primaryStage.getHeight();
-            boolean fs = primaryStage.isFullScreen();
-            boolean max = primaryStage.isMaximized();
-            primaryStage.setScene(loginScene);
-            primaryStage.setWidth(w);
-            primaryStage.setHeight(h);
-            if (fs) primaryStage.setFullScreen(true);
-            else if (max) primaryStage.setMaximized(true);
-            primaryStage.centerOnScreen();
-        });
-    }
-
-    private void openReservationPageDirectly() {
-        Platform.runLater(() -> {
-            ReservationPage reservationPage = new ReservationPage(primaryStage);
-            Scene reservationScene = reservationPage.getReservationScene();
-            double w = primaryStage.getWidth();
-            double h = primaryStage.getHeight();
-            boolean fs = primaryStage.isFullScreen();
-            boolean max = primaryStage.isMaximized();
-            primaryStage.setScene(reservationScene);
-            primaryStage.setWidth(w);
-            primaryStage.setHeight(h);
-            if (fs) primaryStage.setFullScreen(true);
-            else if (max) primaryStage.setMaximized(true);
-            primaryStage.centerOnScreen();
-        });
-    }
-
-    private void openAboutUsPageDirectly() {
-        Platform.runLater(() -> {
-            AboutUsPage aboutUsPage = new AboutUsPage(primaryStage);
-            Scene aboutUsScene = aboutUsPage.getAboutUsScene();
-            double w = primaryStage.getWidth();
-            double h = primaryStage.getHeight();
-            boolean fs = primaryStage.isFullScreen();
-            boolean max = primaryStage.isMaximized();
-            primaryStage.setScene(aboutUsScene);
-            primaryStage.setWidth(w);
-            primaryStage.setHeight(h);
-            if (fs) primaryStage.setFullScreen(true);
-            else if (max) primaryStage.setMaximized(true);
-            primaryStage.centerOnScreen();
-        });
-    }
-
-    private void openHistoryPageDirectly() {
-        Platform.runLater(() -> {
-            History history = new History(primaryStage);
-            Scene historyScene = history.getScene();
-            double w = primaryStage.getWidth();
-            double h = primaryStage.getHeight();
-            boolean fs = primaryStage.isFullScreen();
-            boolean max = primaryStage.isMaximized();
-            primaryStage.setScene(historyScene);
-            primaryStage.setWidth(w);
-            primaryStage.setHeight(h);
-            if (fs) primaryStage.setFullScreen(true);
-            else if (max) primaryStage.setMaximized(true);
-            primaryStage.centerOnScreen();
-        });
     }
 
     private void createOverlay() {
@@ -391,43 +282,22 @@ public class HomePage implements HomePageComponent {
         overlay.setVisible(false);
         overlay.setOnMouseClicked(e -> {
             if (panelOpen) {
+                navigatingAway = false;
                 toggleSidePanel();
                 e.consume();
             }
         });
         StackPane.setAlignment(overlay, Pos.TOP_LEFT);
     }
-    private void openProfilePageDirectly() {
-        Platform.runLater(() -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
-            Scene profileScene = profilePage.getProfileScene();
-
-            double w = primaryStage.getWidth();
-            double h = primaryStage.getHeight();
-            boolean fs = primaryStage.isFullScreen();
-            boolean max = primaryStage.isMaximized();
-
-            primaryStage.setScene(profileScene);
-            primaryStage.setWidth(w);
-            primaryStage.setHeight(h);
-
-            if (fs) primaryStage.setFullScreen(true);
-            else if (max) primaryStage.setMaximized(true);
-
-            primaryStage.centerOnScreen();
-        });
-    }
-
 
     private void createSidePanel() {
+        // FIXED CLOSE BUTTON - Now consumes event properly
         Button closeBtn = new Button("X");
         closeBtn.getStyleClass().addAll("top-button", "login-button");
         closeBtn.setPrefSize(30, 30);
         closeBtn.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
+            e.consume();                    // ← THIS FIXES THE JUMP TO 5TH SCREEN
+            navigatingAway = false;
             toggleSidePanel();
         });
 
@@ -438,81 +308,36 @@ public class HomePage implements HomePageComponent {
         Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
 
-// History Button Logic here
-        historyBtn.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
+        Consumer<Runnable> navigateAndClose = action -> {
+            navigatingAway = true;
             toggleSidePanel();
-            PauseTransition pause = new PauseTransition(Duration.millis(10));
-            pause.setOnFinished(evt -> openHistoryPageDirectly());
+            PauseTransition pause = new PauseTransition(Duration.millis(50));
+            pause.setOnFinished(evt -> action.run());
             pause.play();
-        });
+        };
 
-
-        profileBtn.setOnAction(e -> {
-
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
-            toggleSidePanel();
-            PauseTransition pause = new PauseTransition(Duration.millis(10));
-            pause.setOnFinished(evt -> openProfilePageDirectly());
-            pause.play();
-        });
-
-
-        reserveBtn.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
-            toggleSidePanel();
-            PauseTransition pause = new PauseTransition(Duration.millis(10));
-            pause.setOnFinished(evt -> openReservationPageDirectly());
-            pause.play();
-        });
-
-        // TODO: Chat can be only done when logged in
-        chatBtn.setOnAction(e -> {
-            // if(loggedIn) {
-            openChatWindow();
-            // }
-        });
-
-        aboutBtn.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
-            toggleSidePanel();
-            PauseTransition pause = new PauseTransition(Duration.millis(10));
-            pause.setOnFinished(evt -> openAboutUsPageDirectly());
-            pause.play();
-        });
+        profileBtn.setOnAction(e -> navigateAndClose.accept(this::openProfilePageDirectly));
+        historyBtn.setOnAction(e -> navigateAndClose.accept(this::openHistoryPageDirectly));
+        reserveBtn.setOnAction(e -> navigateAndClose.accept(this::openReservationPageDirectly));
+        aboutBtn.setOnAction(e -> navigateAndClose.accept(this::openAboutUsPageDirectly));
+        chatBtn.setOnAction(e -> openChatWindow());
 
         Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
         authBtn.setPrefWidth(Double.MAX_VALUE);
         authBtn.getStyleClass().add("top-button");
         if (!loggedIn) authBtn.getStyleClass().add("login-button");
+
         authBtn.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
             if (loggedIn) {
                 loggedIn = false;
                 authBtn.setText("Log In");
                 authBtn.getStyleClass().remove("login-button");
+                navigatingAway = true;
+                toggleSidePanel();
                 System.out.println("Logged out");
-                return;
+            } else {
+                navigateAndClose.accept(this::openLoginPageDirectly);
             }
-            toggleSidePanel();
-            PauseTransition pause = new PauseTransition(Duration.millis(10));
-            pause.setOnFinished(evt -> openLoginPageDirectly());
-            pause.play();
         });
 
         VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn, authBtn);
@@ -542,22 +367,12 @@ public class HomePage implements HomePageComponent {
         Button b = new Button(text);
         b.setPrefWidth(Double.MAX_VALUE);
         b.getStyleClass().add("top-button");
-        b.setOnAction(e -> {
-            e.consume();
-            if (scrollPane != null) {
-                scrollPane.setVvalue(0.0);
-            }
-            System.out.println(text + " clicked in dashboard");
-        });
         return b;
     }
 
     private void toggleSidePanel() {
-        if (panelOpen) {
-            slideOut();
-        } else {
-            slideIn();
-        }
+        if (panelOpen) slideOut();
+        else slideIn();
         panelOpen = !panelOpen;
     }
 
@@ -568,27 +383,27 @@ public class HomePage implements HomePageComponent {
         content.setMouseTransparent(true);
         overlay.toFront();
         sidePanel.toFront();
-        TranslateTransition tt = new TranslateTransition(Duration.millis(10), sidePanel);
+
+        TranslateTransition tt = new TranslateTransition(Duration.millis(300), sidePanel);
         tt.setToX(0);
         tt.play();
     }
 
     private void slideOut() {
-        TranslateTransition tt = new TranslateTransition(Duration.millis(10), sidePanel);
+        TranslateTransition tt = new TranslateTransition(Duration.millis(300), sidePanel);
         tt.setToX(280);
         tt.setOnFinished(e -> {
             sidePanel.setVisible(false);
             overlay.setVisible(false);
             content.setMouseTransparent(false);
-            if (scrollPane != null) {
+            if (!navigatingAway && scrollPane != null) {
                 scrollPane.setVvalue(0.0);
             }
+            navigatingAway = false;
         });
         tt.play();
     }
 
-    // Robust CSS load with clear/fallback - prevents default style reversion on scene switch
-    // TODO: Once global CSS is set in Home.java via setUserAgentStylesheet, REMOVE this entire method block
     public Scene getHomeScene() {
         VBox fullPage = getFullPage();
         scrollPane = new ScrollPane(fullPage);
@@ -597,23 +412,19 @@ public class HomePage implements HomePageComponent {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
         scrollPane.setPadding(new Insets(0));
-        // Bind height for dynamic stage resize
         scrollPane.prefHeightProperty().bind(primaryStage.heightProperty());
+
         double stageWidth = primaryStage.getWidth() > 0 ? primaryStage.getWidth() : WIDTH;
         double stageHeight = primaryStage.getHeight() > 0 ? primaryStage.getHeight() : HEIGHT;
         Scene scene = new Scene(scrollPane, stageWidth, stageHeight);
-        // FIXED: Clear any old styles to avoid conflicts, then add CSS with fallback
+
         scene.getStylesheets().clear();
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             scene.getStylesheets().add(css.toExternalForm());
-            System.out.println("✅ CSS loaded for new HomeScene: " + css.toExternalForm());
-            // Check this log on return from login
         } else {
-            System.err.println("❌ CSS not found in HomeScene - buttons will use defaults! Path: /com/example/view/styles/style.css");
-            // Fallback to Modena (built-in default) - buttons get basic styles
+            System.err.println("CSS not found!");
             scene.getStylesheets().add(Application.STYLESHEET_MODENA);
-            System.out.println("🔄 Fallback to Modena stylesheet applied.");
         }
         return scene;
     }
@@ -630,32 +441,76 @@ public class HomePage implements HomePageComponent {
             Stage chatStage = new Stage();
             chatStage.setScene(new Scene(loader.load()));
 
-            // Get the controller
             ChatClient controller = loader.getController();
-
-            // Get current session info
             String username = Session.getCurrentUsername();
             if (username == null || username.isEmpty()) username = "Guest";
-
             String role = Session.getCurrentRole();
             boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
 
-            // Pass username and role to controller
             controller.setUsername(username);
             controller.setAdmin(isAdmin);
-
-            // Set stage title
             chatStage.setTitle("Chatting as [" + username + "]");
-
-            // Show window
             chatStage.show();
-
-            // Ensure connection closes when window closes
             chatStage.setOnCloseRequest(e -> controller.closeConnection());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void preserveStageState(Scene newScene) {
+        double w = primaryStage.getWidth();
+        double h = primaryStage.getHeight();
+        boolean fs = primaryStage.isFullScreen();
+        boolean max = primaryStage.isMaximized();
+
+        primaryStage.setScene(newScene);
+        primaryStage.setWidth(w);
+        primaryStage.setHeight(h);
+        if (fs) primaryStage.setFullScreen(true);
+        else if (max) primaryStage.setMaximized(true);
+        primaryStage.centerOnScreen();
+    }
+
+    private void openLoginPageDirectly() {
+        Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
+    }
+
+    private void openReservationPageDirectly() {
+        Platform.runLater(() -> preserveStageState(new ReservationPage(primaryStage).getReservationScene()));
+    }
+
+    private void openAboutUsPageDirectly() {
+        Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage).getAboutUsScene()));
+    }
+
+    private void openHistoryPageDirectly() {
+        Platform.runLater(() -> preserveStageState(new History(primaryStage).getScene()));
+    }
+
+    private void openProfilePageDirectly() {
+        Platform.runLater(() -> preserveStageState(new ProfilePage(primaryStage).getProfileScene()));
+    }
+
+    private void updateLoginButton(Button loginBtn) {
+        boolean loggedIn = Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest") &&
+                Session.getCurrentEmail() != null &&
+                !Session.getCurrentEmail().isEmpty();
+
+        if (loggedIn) {
+            loginBtn.setText("Log Out");
+            loginBtn.getStyleClass().remove("login-button");
+            loginBtn.setOnAction(e -> {
+                Session.logout();
+                Session.setCurrentUser("guest");
+                updateLoginButton(loginBtn);
+            });
+        } else {
+            loginBtn.setText("Log In");
+            if (!loginBtn.getStyleClass().contains("login-button"))
+                loginBtn.getStyleClass().add("login-button");
+
+            loginBtn.setOnAction(e -> openLoginPageDirectly());
+        }
+    }
 }

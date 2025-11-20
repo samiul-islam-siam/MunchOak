@@ -1,11 +1,13 @@
-package com.example.menu;
+package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.*;
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.InputStream;
@@ -26,9 +29,6 @@ import java.util.stream.Collectors;
 public class CartPage {
     private final Stage primaryStage;
     private final Cart cart;
-    private final double delivaryAmount = 7.99;
-    private final double taxAmount = 7.00;
-    private final double serviceFeeAmount = 1.50;
     private double disCount;
     private double total;
     public void setDisCount(double disCount)
@@ -45,17 +45,18 @@ public class CartPage {
     {
         return disCount;
     }
-    public double getDelivaryAmount()
+
+    public double getDeliveryAmount()
     {
-        return delivaryAmount;
+        return 7.99;
     }
     public double getTaxAmount()
     {
-        return taxAmount;
+        return 7.00;
     }
     public double getServiceFeeAmount()
     {
-        return serviceFeeAmount;
+        return 1.50;
     }
 
     public CartPage(Stage primaryStage, Cart cart) {
@@ -106,7 +107,7 @@ public class CartPage {
         Circle clip = new Circle(30, 30, 30);
         logo.setClip(clip);
 
-        Label titleLabel = new Label("MUNCHOAK");
+        Label titleLabel = new Label("MunchOak");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         leftGroup.getChildren().addAll(logo, titleLabel);
@@ -142,12 +143,14 @@ public class CartPage {
         homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getScene()));
         homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+
         Button menuBtn = new Button("Menu");
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getScene()));
         menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
+
         Button cartBtn = new Button("Cart");
         cartBtn.setStyle("-fx-background-color: white; -fx-text-fill: #FF6B00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 20; -fx-cursor: hand;");  // Active state
         cartBtn.setOnAction(e -> primaryStage.setScene(getScene()));
@@ -158,6 +161,7 @@ public class CartPage {
         loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         // TODO: Add navigation action, e.g., loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getScene()));
         loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+
         Button profileBtn = new Button("Profile");
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
@@ -441,8 +445,28 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    cart.addToCart(item.getId(), 1);
-                    primaryStage.setScene(getScene());  // Refresh the scene to update cart
+                    if(Session.getCurrentUsername().equals("guest"))
+                    {
+                        Stage notifyPopup = new Stage();
+                        notifyPopup.initStyle(StageStyle.UNDECORATED);
+                        notifyPopup.setAlwaysOnTop(true);
+                        Label notifyLabel = new Label("Please Login !");
+                        notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                        VBox notifyBox = new VBox(notifyLabel);
+                        notifyBox.setAlignment(Pos.CENTER);
+                        notifyBox.setStyle("-fx-background-color: transparent;");
+                        notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                        notifyPopup.show();
+                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                        delay.setOnFinished(e2 -> notifyPopup.close());
+                        delay.play();
+
+                    }else
+                    {
+                        cart.addToCart(item.getId(), 1);
+                        primaryStage.setScene(getScene());  // Refresh the scene to update cart
+                    }
+
                 });
 
                 suggestionCard.getChildren().addAll(suggestionIv, suggestionName, suggestionPrice, addSuggestionBtn);
@@ -507,7 +531,7 @@ public class CartPage {
 
         double taxAmount = getTaxAmount();
         double serviceFeeAmount = getServiceFeeAmount();
-        double deliveryAmount = getDelivaryAmount();
+        double deliveryAmount = getDeliveryAmount();
 
         if (!isEmptyCart) {
             discountLabel = new Label("Discount: -৳0.00");
@@ -573,9 +597,7 @@ public class CartPage {
             }
             // Add more coupons as needed
             if (valid) {
-                if (discountLabel != null) {
-                    discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
-                }
+                discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
                 couponField.clear();
@@ -738,16 +760,13 @@ public class CartPage {
     private void updateSuggestionCards(FlowPane pane, double cardWidth, double imgSize, double nameFont, double priceFont, double btnFont, String btnPadding) {
         if (pane == null) return;
         for (javafx.scene.Node node : pane.getChildren()) {
-            if (node instanceof VBox) {
-                VBox card = (VBox) node;
+            if (node instanceof VBox card) {
                 card.setPrefWidth(cardWidth);
                 for (javafx.scene.Node child : card.getChildren()) {
-                    if (child instanceof ImageView) {
-                        ImageView iv = (ImageView) child;
+                    if (child instanceof ImageView iv) {
                         iv.setFitWidth(imgSize);
                         iv.setFitHeight(imgSize);
-                    } else if (child instanceof Label) {
-                        Label lbl = (Label) child;
+                    } else if (child instanceof Label lbl) {
                         String currentStyle = lbl.getStyle();
                         if (currentStyle.contains("-fx-font-size: ")) {
                             // Simple replace for font size (assumes format is consistent)
@@ -758,8 +777,7 @@ public class CartPage {
                             }
                             lbl.setMaxWidth(cardWidth - 20);
                         }
-                    } else if (child instanceof Button) {
-                        Button btn = (Button) child;
+                    } else if (child instanceof Button btn) {
                         String currentStyle = btn.getStyle();
                         String newStyle = currentStyle.replaceAll("-fx-font-size: \\d+(?:\\.\\d+)?px;", "-fx-font-size: " + btnFont + "px;")
                                 .replaceAll("-fx-padding: [^;]+;", "-fx-padding: " + btnPadding + ";");

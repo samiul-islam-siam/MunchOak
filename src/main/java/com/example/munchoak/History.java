@@ -2,9 +2,7 @@ package com.example.munchoak;
 
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
-import com.example.menu.CartPage;
 import com.example.view.HomePage;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -17,9 +15,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Map;
-import java.util.List;
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 public class History {
 

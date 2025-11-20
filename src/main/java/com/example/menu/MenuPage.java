@@ -1,10 +1,10 @@
 package com.example.menu;
 
 import com.example.manager.Session;
-import com.example.menu.BaseMenu;
 import com.example.munchoak.Cart;
-import com.example.view.HomePage;
+import com.example.munchoak.CartPage;
 import com.example.view.AboutUsPage;
+import com.example.view.HomePage;
 import com.example.view.ProfilePage;
 import com.example.view.ReservationPage;
 import javafx.application.Platform;
@@ -13,7 +13,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -70,15 +73,15 @@ public class MenuPage {
 
         // Decide which menu to load (AdminMenu or UserMenu)
         BaseMenu menu;
-        String username = com.example.manager.Session.getCurrentUsername();
+        String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
-            menu = new com.example.menu.AdminMenu();
+            menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
             menu = new guestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
         } else {
-            menu = new com.example.menu.UserMenu();
+            menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
 
@@ -141,7 +144,7 @@ public class MenuPage {
         logoFrame.setPadding(new Insets(0, 8, 0, 0));
 
         // Title
-        Label title = new Label("MUNCHOAK");
+        Label title = new Label("MunchOak");
         title.setFont(Font.font("Segoe UI", 22));
         title.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
 

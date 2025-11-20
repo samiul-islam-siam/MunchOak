@@ -10,8 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Payment {
     private final int id;

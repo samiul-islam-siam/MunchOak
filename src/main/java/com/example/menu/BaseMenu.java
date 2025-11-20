@@ -4,7 +4,6 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import com.example.munchoak.Payment;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,11 +51,7 @@ public class BaseMenu {
     protected HBox categoryButtons;
     protected VBox formBox;
     protected HBox cartButtons;
-    //protected Button viewCartButton;
-    protected Button checkoutButton;
-    protected Button addToCartBtn;
     protected Button buttonMenu;
-    protected Button editBtn;
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
@@ -82,7 +77,6 @@ public class BaseMenu {
         cartButtons = new HBox(20);
         cartButtons.setAlignment(Pos.CENTER);
         cartButtons.setPadding(new Insets(20, 0, 40, 0));
-
 
 
         // --- Assemble Layout ---
@@ -185,18 +179,6 @@ public class BaseMenu {
         formBox = new VBox(10, inputGrid, addOrUpdateButton);
         formBox.setVisible(false);
         formBox.setManaged(false);
-
-        // Inside BaseMenu.java — where you initialize admin buttons
-        // Cart buttons
-//        viewCartButton = new Button("View Cart");
-//        viewCartButton.setOnAction(e -> cart.showCart(foodList));
-
-        //checkoutButton = new Button("Checkout");
-
-//        checkoutButton.setOnAction(e -> Payment.checkout(cart));
-//        styleMainButton(viewCartButton);
-//        styleMainButton(checkoutButton);
-//        cartButtons = new HBox(15, viewCartButton, checkoutButton);
 
         HBox adminButtons = null;
         if (this instanceof AdminMenu) {
@@ -468,7 +450,6 @@ public class BaseMenu {
     }
 
     // ================== FOOD ITEMS MANAGEMENT ===================
-
     protected void loadFoodItems() {
         foodContainer.getChildren().clear();
         Map<String, HBox> categoryRows = new LinkedHashMap<>();
@@ -813,22 +794,43 @@ public class BaseMenu {
         styleMainButton(addToCartDetail);
         addToCartDetail.setPrefWidth(Double.MAX_VALUE);
         addToCartDetail.setOnAction(ev -> {
-            cart.addToCart(food.getId(), currentQuantity[0]);
-            // Popup notification
-            Stage notifyPopup = new Stage();
-            notifyPopup.initStyle(StageStyle.UNDECORATED);
-            notifyPopup.setAlwaysOnTop(true);
-            Label notifyLabel = new Label(food.getName() + " added to cart!");
-            notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
-            VBox notifyBox = new VBox(notifyLabel);
-            notifyBox.setAlignment(Pos.CENTER);
-            notifyBox.setStyle("-fx-background-color: transparent;");
-            notifyPopup.setScene(new Scene(notifyBox, 200, 50));
-            notifyPopup.show();
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e2 -> notifyPopup.close());
-            delay.play();
-            dialog.close();
+
+            if(Session.getCurrentUsername().equals("guest"))
+            {
+                Stage notifyPopup = new Stage();
+                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.setAlwaysOnTop(true);
+                Label notifyLabel = new Label("Please Login !");
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                VBox notifyBox = new VBox(notifyLabel);
+                notifyBox.setAlignment(Pos.CENTER);
+                notifyBox.setStyle("-fx-background-color: transparent;");
+                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                notifyPopup.show();
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> notifyPopup.close());
+                delay.play();
+                dialog.close();
+            }else
+            {
+                cart.addToCart(food.getId(), currentQuantity[0]);
+                // Popup notification
+                Stage notifyPopup = new Stage();
+                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.setAlwaysOnTop(true);
+                Label notifyLabel = new Label(food.getName() + " added to cart!");
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                VBox notifyBox = new VBox(notifyLabel);
+                notifyBox.setAlignment(Pos.CENTER);
+                notifyBox.setStyle("-fx-background-color: transparent;");
+                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                notifyPopup.show();
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> notifyPopup.close());
+                delay.play();
+                dialog.close();
+            }
+
         });
 
         infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);
@@ -1021,5 +1023,4 @@ public class BaseMenu {
     public void setCart(Cart cart) {
         this.cart = cart;
     }
-
 }

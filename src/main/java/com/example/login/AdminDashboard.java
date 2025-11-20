@@ -21,7 +21,7 @@ public class AdminDashboard {
     private static Stage primaryStage = new Stage();
 
     public AdminDashboard(Stage stage) {
-        this.primaryStage = stage;
+        primaryStage = stage;
     }
 
     public static void openAdminDashboard() {
@@ -48,7 +48,6 @@ public class AdminDashboard {
         menuBox.setAlignment(Pos.TOP_CENTER);
 
         Button viewUsersBtn = new Button("View All Users");
-        Button countUsersBtn = new Button("Count Users");
         Button manageMenuBtn = new Button("Manage Menu");
         Button usersHistoryBtn = new Button("History");
         Button chatServerBtn = new Button("Chat With users");
@@ -56,15 +55,14 @@ public class AdminDashboard {
         Button logoutBtn = new Button("Logout");
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, countUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
             btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
             btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
             btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, countUsersBtn, manageMenuBtn,
-                usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn
         );
 
         dashboard.setTop(topBar);
@@ -75,7 +73,6 @@ public class AdminDashboard {
         primaryStage.setScene(scene);
 
         /* --- Button Actions --- */
-
         usersHistoryBtn.setOnAction(ev -> {
             System.out.println("History Button Clicked");
         });
@@ -102,7 +99,7 @@ public class AdminDashboard {
 
             table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
             table.getItems().addAll(users);
-            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
             centerPane.getChildren().setAll(table);
         });

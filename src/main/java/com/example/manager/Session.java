@@ -2,12 +2,12 @@
 package com.example.manager;
 
 public class Session {
+
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
-    private static String currentEmail = "people@gmail.com";
+    private static String currentEmail = "guest@gmail.com";
     private static String currentPassword = "ai01*2#";
 
-    // GETTERS
     public static int getCurrentUserId() {
         return currentUserId;
     }
@@ -24,7 +24,6 @@ public class Session {
         return currentPassword;
     }
 
-    // Set the currently logged-in user by username
     public static void setCurrentUser(String username) {
         currentUsername = username;
         currentUserId = FileStorage.getUserId(username);
@@ -32,13 +31,24 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
     }
 
-    // Role based on username
     public static String getCurrentRole() {
-        return "admin".equals(currentUsername) ? "ADMIN" : "USER";
+        if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
+        if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
+        return "USER";
     }
 
-    // OPTIONAL: Reset to guest
     public static void resetToGuest() {
-        setCurrentUser("guest");
+        currentUsername = "guest";
+        currentEmail = "guest@gmail.com";
+        currentPassword = "ai01*2#";
     }
+
+    public static void logout() {
+        resetToGuest();
+    }
+
+//    public static boolean isUserLoggedIn() {
+//        return !currentUsername.equals("guest");
+//    }
+
 }
