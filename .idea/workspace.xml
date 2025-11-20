@@ -4,50 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="new update">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="menu updated">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part1.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_pointer.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_pointer.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Chocolate-Strawberry-Cake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chocolate-strawberry-cake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Coffee.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/coffee.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Fried-Chicken.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fried-chicken.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/Homemade-Mozzarella-Sticks.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mozzarella-sticks.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/apple pie.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/apple-pie.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/banasmoothie.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/biriyani.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/biryani.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/brownise.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/brownie.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/butter chicken.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/butter-chicken.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chesscake.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/cheesecake.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chili paneer.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chili-paneer.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/clam chowder.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/clam-chowder.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/crab cakes.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/crab-cakes.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/cup cake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/cup-cake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/dal tadka.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/dal-tadka.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fish and chips.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/fish-and-chips.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/grilled chicken.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/grilled-chicken.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/gulab jamun.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/gulab-jamun.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot dog.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot-dog.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot soup.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/hot-soup.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/ice cream.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/ice-cream.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/kebab.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/kabab.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/lobster roll.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/lobster-roll.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mutton biriyani.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/mutton-biryani.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/paneer butter masala.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/paneer-butter-masala.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/potatowages.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/salmon grill.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/salmon-grill.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/sandwich.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shashlik.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/chicken-saslik.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shawrma.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/shwarma.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/spring-role.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/spring-roll.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/stawberry tart.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/strawberry-tart.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/stuffed mushroom.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/stuffed-mushroom.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tandoori wings.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tandoori-wings.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna sandwich.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna-sandwich.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna steak.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/tuna-steak.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/vanila-milkshake.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/vanilla-milkshake.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/veg wrap.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/images/veg-wrap.jpeg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,14 +127,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1759067535159</updated>
-    </task>
-    <task id="LOCAL-00014" summary="update">
-      <option name="closed" value="true" />
-      <created>1759675114572</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1759675114572</updated>
     </task>
     <task id="LOCAL-00015" summary="update">
       <option name="closed" value="true" />
@@ -560,11 +512,18 @@
       <option name="project" value="LOCAL" />
       <updated>1763574897475</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="menu updated">
+      <option name="closed" value="true" />
+      <created>1763607106264</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1763607106264</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Login system update" />
     <MESSAGE value="history page update" />
     <MESSAGE value="Chat service added" />
     <MESSAGE value="Chat service updated" />
@@ -589,6 +548,7 @@
     <MESSAGE value="UI upgrade" />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="new update" />
-    <option name="LAST_COMMIT_MESSAGE" value="new update" />
+    <MESSAGE value="menu updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="menu updated" />
   </component>
 </project>

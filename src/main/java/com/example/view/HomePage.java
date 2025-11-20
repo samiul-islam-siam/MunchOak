@@ -71,10 +71,14 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
+        loggedIn = (Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null &&
+                        !Session.getCurrentEmail().isEmpty());
+
         // === Top Buttons ===
-        Button loginBtn = new Button("Log In");
-        loginBtn.getStyleClass().addAll("top-button", "login-button");
-        updateLoginButton(loginBtn);
+        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+        authBtn.getStyleClass().addAll("top-button", "login-button");
 
         Button menuBtn = new Button("MENU");
         menuBtn.getStyleClass().add("top-button");
@@ -99,7 +103,7 @@ public class HomePage implements HomePageComponent {
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, loginBtn, menuIconBtn);
+        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         BorderPane navBar = new BorderPane();
@@ -117,7 +121,15 @@ public class HomePage implements HomePageComponent {
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        loginBtn.setOnAction(e -> openLoginPageDirectly());
+        authBtn.setOnAction(e ->
+        {
+            if (loggedIn) {
+                Session.logout();
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            } else {
+                openLoginPageDirectly();
+            }
+        });
         menuIconBtn.setOnAction(e -> toggleSidePanel());
 
         createOverlay();
@@ -136,9 +148,20 @@ public class HomePage implements HomePageComponent {
         initialize();
     }
 
-    @Override public Region getRoot() { return root; }
-    @Override public double getPrefWidth() { return WIDTH; }
-    @Override public double getPrefHeight() { return HEIGHT; }
+    @Override
+    public Region getRoot() {
+        return root;
+    }
+
+    @Override
+    public double getPrefWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public double getPrefHeight() {
+        return HEIGHT;
+    }
 
     @Override
     public void initialize() {
@@ -261,7 +284,7 @@ public class HomePage implements HomePageComponent {
 
     public VBox getFullPage() {
         VBox fullPage = new VBox();
-        Stop[] stops = new Stop[]{ new Stop(0, Color.web("#49bad8")), new Stop(1, Color.web("#1c71bd")) };
+        Stop[] stops = new Stop[]{new Stop(0, Color.web("#49bad8")), new Stop(1, Color.web("#1c71bd"))};
         LinearGradient lg = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
         fullPage.setBackground(new Background(new BackgroundFill(lg, CornerRadii.EMPTY, Insets.EMPTY)));
         fullPage.setSpacing(0);
@@ -491,26 +514,21 @@ public class HomePage implements HomePageComponent {
         Platform.runLater(() -> preserveStageState(new ProfilePage(primaryStage).getProfileScene()));
     }
 
-    private void updateLoginButton(Button loginBtn) {
-        boolean loggedIn = Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest") &&
-                Session.getCurrentEmail() != null &&
-                !Session.getCurrentEmail().isEmpty();
-
-        if (loggedIn) {
-            loginBtn.setText("Log Out");
-            loginBtn.getStyleClass().remove("login-button");
-            loginBtn.setOnAction(e -> {
-                Session.logout();
-                Session.setCurrentUser("guest");
-                updateLoginButton(loginBtn);
-            });
-        } else {
-            loginBtn.setText("Log In");
-            if (!loginBtn.getStyleClass().contains("login-button"))
-                loginBtn.getStyleClass().add("login-button");
-
-            loginBtn.setOnAction(e -> openLoginPageDirectly());
-        }
-    }
+//    private void updateLoginButton(Button loginBtn) {
+//        if (loggedIn) {
+//            loginBtn.setText("Log Out");
+//            loginBtn.getStyleClass().remove("login-button");
+//            loginBtn.setOnAction(e -> {
+//                Session.logout();
+//                Session.setCurrentUser("guest");
+//                updateLoginButton(loginBtn);
+//            });
+//        } else {
+//            loginBtn.setText("Log In");
+//            if (!loginBtn.getStyleClass().contains("login-button"))
+//                loginBtn.getStyleClass().add("login-button");
+//
+//            loginBtn.setOnAction(e -> openLoginPageDirectly());
+//        }
+//    }
 }
