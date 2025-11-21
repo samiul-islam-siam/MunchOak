@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="guest browsing fixed">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Chat history problem">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/network/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/network/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/network/ChatServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,14 +125,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1759067535159</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Register page added">
-      <option name="closed" value="true" />
-      <created>1759721276972</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1759721276972</updated>
     </task>
     <task id="LOCAL-00019" summary="Back button created">
       <option name="closed" value="true" />
@@ -522,11 +510,18 @@
       <option name="project" value="LOCAL" />
       <updated>1763616912419</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="Chat history problem">
+      <option name="closed" value="true" />
+      <created>1763696054848</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1763696054848</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Chat service updated" />
     <MESSAGE value="Chat service testing" />
     <MESSAGE value="UI update" />
     <MESSAGE value="new UI" />
@@ -551,6 +546,7 @@
     <MESSAGE value="menu updated" />
     <MESSAGE value="login, logout fixed" />
     <MESSAGE value="guest browsing fixed" />
-    <option name="LAST_COMMIT_MESSAGE" value="guest browsing fixed" />
+    <MESSAGE value="Chat history problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="Chat history problem" />
   </component>
 </project>
