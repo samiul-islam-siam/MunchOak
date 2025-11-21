@@ -31,10 +31,15 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
     }
 
+    public static void setCurrentUsername(String username)
+    {
+        currentUsername = username;
+    }
+
     public static String getCurrentRole() {
         if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
-        if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
-        return "USER";
+        // if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
+        else return "USER";
     }
 
     public static void resetToGuest() {

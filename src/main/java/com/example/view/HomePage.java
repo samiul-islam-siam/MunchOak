@@ -466,7 +466,7 @@ public class HomePage implements HomePageComponent {
 
             ChatClient controller = loader.getController();
             String username = Session.getCurrentUsername();
-            if (username == null || username.isEmpty()) username = "Guest";
+            if (username == null || username.isEmpty()) username = "guest";
             String role = Session.getCurrentRole();
             boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
 
