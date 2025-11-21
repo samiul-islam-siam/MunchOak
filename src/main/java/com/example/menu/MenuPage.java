@@ -1,5 +1,6 @@
 package com.example.menu;
 
+import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
@@ -31,13 +32,15 @@ public class MenuPage {
     private static final double NORMAL_HEIGHT = 700;
     private Scene menuScene;
     private BorderPane root;
-
+    private String searchKeyword = "";
     // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.cart = null;
     }
-
+    public void setSearchKeyword(String keyword) {
+        this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
+    }
     // Overloaded constructor (preserve cart)
     public MenuPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -84,6 +87,7 @@ public class MenuPage {
             menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
+        menu.setSearchKeyword(searchKeyword);
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -103,6 +107,8 @@ public class MenuPage {
                 primaryStage.setScene(cp.getScene());
             });
         }
+
+
 
         return menuScene;
     }
@@ -160,13 +166,37 @@ public class MenuPage {
         searchField.setMaxWidth(320);
         searchField.getStyleClass().add("search-field");
 
-        Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
-        searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
-        searchIcon.setStyle("-fx-text-fill: gray;");
+//        Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
+//        searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
+//        searchIcon.setStyle("-fx-text-fill: gray;");
 
-        StackPane searchPane = new StackPane(searchField, searchIcon);
-        StackPane.setAlignment(searchIcon, Pos.CENTER_RIGHT);
-        StackPane.setMargin(searchIcon, new Insets(0, 10, 0, 0));
+        // KEEP the keyword after refresh
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            searchField.setText(searchKeyword);
+        }
+
+        Button searchBtn = new Button("🔍");
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
+        // TODO: Add search action, e.g., searchBtn.setOnAction(e -> { /* perform search */ });
+        searchBtn.setOnAction(e -> {
+            String keyword = searchField.getText().trim();
+            // Re-open MenuPage with keyword applied
+            MenuPage mp = new MenuPage(primaryStage, cart);
+            mp.setSearchKeyword(keyword);
+            primaryStage.setScene(mp.getMenuScene());
+
+
+        });
+
+
+        searchField.setOnAction(e -> searchBtn.fire());
+
+
+        StackPane searchPane = new StackPane(searchField,searchBtn);
+        StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
         searchPane.setMaxWidth(320);
 
         // --- Right-side nav buttons ---

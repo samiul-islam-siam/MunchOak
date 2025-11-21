@@ -244,6 +244,16 @@ public class CheckoutPage {
         searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
         searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
 
+        searchBtn.setOnAction(e -> {
+            String keyword = searchField.getText().trim();
+            MenuPage menuPage = new MenuPage(primaryStage, cart);
+
+            // Pass search keyword to MenuPage
+            menuPage.setSearchKeyword(keyword);
+
+            primaryStage.setScene(menuPage.getMenuScene());
+        });
+        searchField.setOnAction(e -> searchBtn.fire());
         searchContainer.getChildren().addAll(searchField, searchBtn);
 
         // SPACERS
