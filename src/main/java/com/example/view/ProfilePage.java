@@ -28,14 +28,10 @@ public class ProfilePage {
         // --- Get session info ---
         String username = Session.getCurrentUsername();
         String email = Session.getCurrentEmail();
-        //String password = Session.getCurrentPassword();
+        String password = Session.getCurrentPassword();
         int userId = Session.getCurrentUserId();
 
-//        if (username == null) username = "Guest";
-//        if (email == null) email = "N/A";
-        //if (password == null) password = "N/A";
-        if(Session.getCurrentUsername().equals("guest"))
-        {
+        if (Session.getCurrentUsername().equals("guest")) {
             Label title = new Label("You are browsing \n as guest");
             title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: black;");
 
@@ -66,6 +62,7 @@ public class ProfilePage {
             return new Scene(root, 1000, 700);
 
         }
+
 
         // --- Title ---
         Label title = new Label("My Profile");
@@ -173,9 +170,18 @@ public class ProfilePage {
         if (password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) score++;
 
         switch (score) {
-            case 4 -> { label.setText("Password Strength: Strong"); label.setTextFill(Color.GREEN); }
-            case 3 -> { label.setText("Password Strength: Normal"); label.setTextFill(Color.ORANGE); }
-            default -> { label.setText("Password Strength: Weak"); label.setTextFill(Color.RED); }
+            case 4 -> {
+                label.setText("Password Strength: Strong");
+                label.setTextFill(Color.GREEN);
+            }
+            case 3 -> {
+                label.setText("Password Strength: Normal");
+                label.setTextFill(Color.ORANGE);
+            }
+            default -> {
+                label.setText("Password Strength: Weak");
+                label.setTextFill(Color.RED);
+            }
         }
     }
 }

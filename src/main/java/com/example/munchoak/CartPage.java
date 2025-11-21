@@ -31,31 +31,28 @@ public class CartPage {
     private final Cart cart;
     private double disCount;
     private double total;
-    public void setDisCount(double disCount)
-    {
+
+    public void setDisCount(double disCount) {
         this.disCount = disCount;
     }
 
-    public double getTotal()
-    {
+    public double getTotal() {
         return total;
     }
 
-    public double getDisCount()
-    {
+    public double getDisCount() {
         return disCount;
     }
 
-    public double getDeliveryAmount()
-    {
+    public double getDeliveryAmount() {
         return 7.99;
     }
-    public double getTaxAmount()
-    {
+
+    public double getTaxAmount() {
         return 7.00;
     }
-    public double getServiceFeeAmount()
-    {
+
+    public double getServiceFeeAmount() {
         return 1.50;
     }
 
@@ -100,7 +97,8 @@ public class CartPage {
         String logoPath = "/images/logo.png";  // Assume logo path
         try (InputStream is = getClass().getResourceAsStream(logoPath)) {
             if (is != null) logoImg = new Image(is);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         if (logoImg != null) {
             logo.setImage(logoImg);
         }
@@ -252,7 +250,8 @@ public class CartPage {
                         String filePath = "file:src/main/resources/com/example/manager/images/" + item.getImagePath();
                         img = new Image(filePath);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
                 if (img != null) iv.setImage(img);
 
@@ -399,7 +398,8 @@ public class CartPage {
                         String filePath = "file:src/main/resources/com/example/manager/images/" + item.getImagePath();
                         suggestionImg = new Image(filePath);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 if (suggestionImg != null) suggestionIv.setImage(suggestionImg);
 
                 // Name with larger font
@@ -445,8 +445,7 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    if(Session.getCurrentUsername().equals("guest"))
-                    {
+                    if (Session.getCurrentUsername().equals("guest")) {
                         Stage notifyPopup = new Stage();
                         notifyPopup.initStyle(StageStyle.UNDECORATED);
                         notifyPopup.setAlwaysOnTop(true);
@@ -461,12 +460,10 @@ public class CartPage {
                         delay.setOnFinished(e2 -> notifyPopup.close());
                         delay.play();
 
-                    }else
-                    {
+                    } else {
                         cart.addToCart(item.getId(), 1);
                         primaryStage.setScene(getScene());  // Refresh the scene to update cart
                     }
-
                 });
 
                 suggestionCard.getChildren().addAll(suggestionIv, suggestionName, suggestionPrice, addSuggestionBtn);
@@ -538,7 +535,7 @@ public class CartPage {
             discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
             deliveryBox = new VBox(6);
-            Label delLabel = new Label("Delivery: ৳"+deliveryAmount);
+            Label delLabel = new Label("Delivery: ৳" + deliveryAmount);
             delLabel.setStyle("-fx-text-fill: black;");
             deliveryBox.getChildren().add(delLabel);
 
@@ -624,9 +621,8 @@ public class CartPage {
                     tip.set(7.00);
                 }
 
-               // this.disCount = discount.get();
+                // this.disCount = discount.get();
                 setDisCount(discount.get());
-
 
 
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();

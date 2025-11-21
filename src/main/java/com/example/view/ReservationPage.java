@@ -58,10 +58,6 @@ public class ReservationPage {
         imagePane.setPrefHeight(600);
         imagePane.setMaxWidth(Double.MAX_VALUE);
 
-        if(Session.getCurrentUsername().equals("guest"))
-        {
-
-        }
         // EXTENSION SECTION
         VBox extensionSection = new VBox(20);
         extensionSection.setAlignment(Pos.CENTER);
@@ -240,7 +236,6 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-
             if(Session.getCurrentUsername().equals("guest"))
             {
                 Stage notifyPopup = new Stage();

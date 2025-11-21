@@ -565,7 +565,7 @@ public class BaseMenu {
         desc.setMaxWidth(200);
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
-        Label price = new Label(String.format("Price: Tk %.2f", food.getPrice()));
+        Label price = new Label(String.format("Price: ৳ %.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label cuisine = new Label("⭐ " + food.getCuisine());
@@ -794,9 +794,7 @@ public class BaseMenu {
         styleMainButton(addToCartDetail);
         addToCartDetail.setPrefWidth(Double.MAX_VALUE);
         addToCartDetail.setOnAction(ev -> {
-
-            if(Session.getCurrentUsername().equals("guest"))
-            {
+            if (Session.getCurrentUsername().equals("guest")) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.UNDECORATED);
                 notifyPopup.setAlwaysOnTop(true);
@@ -811,8 +809,7 @@ public class BaseMenu {
                 delay.setOnFinished(e2 -> notifyPopup.close());
                 delay.play();
                 dialog.close();
-            }else
-            {
+            } else {
                 cart.addToCart(food.getId(), currentQuantity[0]);
                 // Popup notification
                 Stage notifyPopup = new Stage();
@@ -830,7 +827,6 @@ public class BaseMenu {
                 delay.play();
                 dialog.close();
             }
-
         });
 
         infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);
