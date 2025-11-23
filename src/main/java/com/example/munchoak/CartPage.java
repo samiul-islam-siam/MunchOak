@@ -4,6 +4,7 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.menu.BaseMenu;
+import com.example.menu.UserMenu;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
@@ -111,6 +112,17 @@ public class CartPage {
 
         leftGroup.getChildren().addAll(logo, titleLabel);
 
+        VBox searchResultsWrapper = new VBox(10);
+        searchResultsWrapper.setPadding(new Insets(20, 0, 10, 0));
+        Label searchResultsTitle = new Label("Search Results");
+        searchResultsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        FlowPane searchResultsPane = new FlowPane();
+        searchResultsPane.setHgap(15);
+        searchResultsPane.setVgap(15);
+        searchResultsPane.setAlignment(Pos.TOP_CENTER);
+
+        searchResultsWrapper.getChildren().addAll(searchResultsTitle, searchResultsPane);
+
         // SEARCH BAR IN THE MIDDLE
         HBox searchContainer = new HBox(10);
         searchContainer.setAlignment(Pos.CENTER);
@@ -133,6 +145,82 @@ public class CartPage {
 
             primaryStage.setScene(menuPage.getMenuScene());
         });
+
+        // Initially hide the search results wrapper
+        searchResultsWrapper.setVisible(false);
+        searchResultsWrapper.setManaged(false);
+        // Live search: triggers on every text change
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            String keyword = newValue.trim().toLowerCase();
+            searchResultsPane.getChildren().clear(); // clear previous results
+
+            if (!keyword.isEmpty()) {
+                searchResultsWrapper.setVisible(true);
+                searchResultsWrapper.setManaged(true);
+                List<FoodItems> results = FileStorage.loadMenu().stream()
+                        .filter(item -> item.getName().toLowerCase().contains(keyword))
+                        .collect(Collectors.toList());
+
+                for (FoodItems item : results) {
+                    VBox card = new VBox(10);
+                    card.setPrefWidth(180);
+                    card.setStyle(
+                            "-fx-background-color: white;" +
+                                    "-fx-background-radius: 12;" +
+                                    "-fx-padding: 12;" +
+                                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8,0,0,2);"
+                    );
+                    card.setAlignment(Pos.CENTER);
+
+                    // IMAGE
+                    ImageView iv = new ImageView();
+                    iv.setFitWidth(100);
+                    iv.setFitHeight(100);
+                    iv.setPreserveRatio(true);
+                    try (InputStream is = getClass().getResourceAsStream("/images/" + item.getImagePath())) {
+                        if (is != null) iv.setImage(new Image(is));
+                        else iv.setImage(new Image("file:src/main/resources/com/example/manager/images/" + item.getImagePath()));
+                    } catch (Exception ignored) {}
+
+                    // NAME
+                    Label name = new Label(item.getName());
+                    name.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: black;");
+                    name.setWrapText(true);
+                    name.setMaxWidth(160);
+                    name.setAlignment(Pos.CENTER);
+
+                    // PRICE
+                    Label price = new Label(String.format("৳ %.2f", item.getPrice()));
+                    price.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+                    price.setAlignment(Pos.CENTER);
+
+                    // ADD BUTTON
+                    Button addBtn = new Button("Add to Cart");
+                    addBtn.setStyle(
+                            "-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                                    "-fx-background-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;"
+                    );
+                    addBtn.setMaxWidth(Double.MAX_VALUE);
+                    addBtn.setOnAction(evt -> {
+                        if (Session.getCurrentUsername().equals("guest")) {
+                            // Show login popup
+                        } else {
+                            cart.addToCart(item.getId(), 1);
+                            primaryStage.setScene(getScene());  // Refresh to update cart
+                        }
+                    });
+
+                    card.getChildren().addAll(iv, name, price, addBtn);
+                    searchResultsPane.getChildren().add(card);
+                }
+            }else {
+                // Hide the wrapper when field is empty
+                searchResultsWrapper.setVisible(false);
+                searchResultsWrapper.setManaged(false);
+            }
+        });
+
+
         searchField.setOnAction(e -> searchBtn.fire());
         searchContainer.getChildren().addAll(searchField, searchBtn);
 
@@ -486,6 +574,7 @@ public class CartPage {
 
         VBox relatedWrapper = new VBox(10, relatedTitle, relatedSection);
         leftColumn.getChildren().add(relatedWrapper);
+        leftColumn.getChildren().add(0, searchResultsWrapper);
 
         // ---- RIGHT COLUMN (ORDER SUMMARY BOX) ----
         VBox rightColumn = new VBox(20);

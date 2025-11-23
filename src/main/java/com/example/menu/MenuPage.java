@@ -33,6 +33,8 @@ public class MenuPage {
     private Scene menuScene;
     private BorderPane root;
     private String searchKeyword = "";
+    private BaseMenu menu; // current menu instance
+
     // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -75,7 +77,7 @@ public class MenuPage {
         }
 
         // Decide which menu to load (AdminMenu or UserMenu)
-        BaseMenu menu;
+        //BaseMenu menu;
         String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
             menu = new AdminMenu();
@@ -187,8 +189,15 @@ public class MenuPage {
             mp.setSearchKeyword(keyword);
             primaryStage.setScene(mp.getMenuScene());
 
-
         });
+        // live search listener
+        searchField.textProperty().addListener((obs, oldText, newText) -> {
+            if (menu != null) {
+                menu.setSearchKeyword(newText.trim().toLowerCase());
+                menu.updateView();
+            }
+        });
+
 
 
         searchField.setOnAction(e -> searchBtn.fire());

@@ -60,8 +60,27 @@ public class BaseMenu {
         this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
     }
 
+    public void updateView() {
+        // reload the full menu
+        List<FoodItems> items = FileStorage.loadMenu();
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            String key = searchKeyword.toLowerCase();
+            items = items.stream()
+                    .filter(i -> i.getName().toLowerCase().contains(key)
+                            || i.getCategory().toLowerCase().contains(key)
+                            || i.getDetails().toLowerCase().contains(key))
+                    .collect(Collectors.toList());
+        }
+
+        foodList.setAll(items);
+        loadFoodItems();
+    }
+
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
+
+
 
     public BaseMenu() {
         mainLayout = new VBox();
