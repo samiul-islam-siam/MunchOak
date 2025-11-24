@@ -264,12 +264,6 @@ public class CheckoutPage {
         searchContainer.getChildren().addAll(searchField, searchBtn);
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
-//            MenuPage menuPage = new MenuPage(primaryStage, cart);
-//
-//            // Pass search keyword to MenuPage
-//            menuPage.setSearchKeyword(keyword);
-//
-//            primaryStage.setScene(menuPage.getMenuScene());
             searchField.textProperty().set(keyword); // triggers listener
         });
 
@@ -285,7 +279,10 @@ public class CheckoutPage {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
                 List<FoodItems> results = FileStorage.loadMenu().stream()
-                        .filter(item -> item.getName().toLowerCase().contains(keyword))
+                        .filter(i -> i.getName().toLowerCase().contains(keyword)
+                                || i.getCategory().toLowerCase().contains(keyword)
+                                || i.getDetails().toLowerCase().contains(keyword)
+                                || i.getCuisine().toLowerCase().contains(keyword))
                         .collect(Collectors.toList());
 
                 if (results.isEmpty()) {

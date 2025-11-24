@@ -69,7 +69,8 @@ public class BaseMenu {
             items = items.stream()
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
-                            || i.getDetails().toLowerCase().contains(key))
+                            || i.getDetails().toLowerCase().contains(key)
+                            || i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
         }
 
@@ -79,7 +80,6 @@ public class BaseMenu {
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
-
 
 
     public BaseMenu() {
@@ -130,7 +130,8 @@ public class BaseMenu {
             items = items.stream()
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
-                            || i.getDetails().toLowerCase().contains(key))
+                            || i.getDetails().toLowerCase().contains(key)
+                            || i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
 
             if (items.isEmpty()) {
@@ -141,7 +142,8 @@ public class BaseMenu {
                     alert.setContentText("No items found for: \"" + searchKeyword + "\"");
                     alert.showAndWait();
 
-                });}
+                });
+            }
         }
         foodList.clear();
         foodList.addAll(items);

@@ -158,7 +158,10 @@ public class CartPage {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
                 List<FoodItems> results = FileStorage.loadMenu().stream()
-                        .filter(item -> item.getName().toLowerCase().contains(keyword))
+                        .filter(i -> i.getName().toLowerCase().contains(keyword)
+                                || i.getCategory().toLowerCase().contains(keyword)
+                                || i.getDetails().toLowerCase().contains(keyword)
+                                || i.getCuisine().toLowerCase().contains(keyword))
                         .collect(Collectors.toList());
 
                 if (results.isEmpty()) {
