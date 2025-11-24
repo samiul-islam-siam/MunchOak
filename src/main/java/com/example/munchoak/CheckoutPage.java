@@ -388,18 +388,34 @@ public class CheckoutPage {
         cartBtn.setOnMouseExited(e -> cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         cartBtn.setOnAction(e -> primaryStage.setScene(new CartPage(primaryStage, cart).getScene()));
 
-        Button loginBtn = new Button("Login");
-        loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
-        loginBtn.setOnMouseEntered(e -> loginBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+        boolean loggedIn = (Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null &&
+                        !Session.getCurrentEmail().isEmpty());
+
+        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+        authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        authBtn.setOnMouseEntered(e ->
+                authBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        authBtn.setOnMouseExited(e ->
+                authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+
+        authBtn.setOnAction(e ->
+        {
+            if (loggedIn) {
+                Session.logout();
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            } else {
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            }
+        });
 
         Button profileBtn = new Button("Profile");
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         profileBtn.setOnMouseExited(e -> profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
 
-        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, loginBtn, profileBtn);
+        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, authBtn, profileBtn);
 
         navBar.getChildren().addAll(leftGroup, spacer1, searchContainer, spacer2, buttonsHBox);
 

@@ -249,10 +249,13 @@ public class CartPage {
 
         Button homeBtn = new Button("Home");
         homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
-        homeBtn.setOnMouseEntered(e -> homeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // TODO: Add navigation action, e.g., homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getScene()));
-        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+        homeBtn.setOnMouseEntered(e ->
+                homeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        homeBtn.setOnMouseExited(e ->
+                homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+
+        homeBtn.setOnAction(e ->
+                primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
 
         Button menuBtn = new Button("Menu");
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -265,12 +268,27 @@ public class CartPage {
         cartBtn.setStyle("-fx-background-color: white; -fx-text-fill: #FF6B00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 20; -fx-cursor: hand;");  // Active state
         cartBtn.setOnAction(e -> primaryStage.setScene(getScene()));
 
-        Button loginBtn = new Button("Login");
-        loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
-        loginBtn.setOnMouseEntered(e -> loginBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // TODO: Add navigation action, e.g., loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getScene()));
-        loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+        boolean loggedIn = (Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null &&
+                        !Session.getCurrentEmail().isEmpty());
+
+        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+        authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        authBtn.setOnMouseEntered(e ->
+                authBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        authBtn.setOnMouseExited(e ->
+                authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+
+        authBtn.setOnAction(e ->
+        {
+            if (loggedIn) {
+                Session.logout();
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            } else {
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            }
+        });
 
         Button profileBtn = new Button("Profile");
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -281,7 +299,7 @@ public class CartPage {
             primaryStage.setScene(profilePage.getProfileScene());
         });
 
-        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, loginBtn, profileBtn);
+        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, authBtn, profileBtn);
 
         navBar.getChildren().addAll(leftGroup, spacer1, searchContainer, spacer2, buttonsHBox);
 
