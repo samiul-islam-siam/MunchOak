@@ -254,6 +254,8 @@ public class CheckoutPage {
         searchField.setPromptText("Search...");
         searchField.setPrefWidth(250);
         searchField.setStyle("-fx-background-radius: 20; -fx-padding: 8 12; -fx-background-color: white; -fx-border-radius: 20;");
+        searchField.setFocusTraversable(false);
+
 
         Button searchBtn = new Button("🔍");
         searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;");
@@ -263,13 +265,14 @@ public class CheckoutPage {
         searchContainer.getChildren().addAll(searchField, searchBtn);
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
-//            MenuPage menuPage = new MenuPage(primaryStage, cart);
-//
-//            // Pass search keyword to MenuPage
-//            menuPage.setSearchKeyword(keyword);
-//
-//            primaryStage.setScene(menuPage.getMenuScene());
+            MenuPage menuPage = new MenuPage(primaryStage, cart);
+
+            // Pass search keyword to MenuPage
+            menuPage.setSearchKeyword(keyword);
+
+            primaryStage.setScene(menuPage.getMenuScene());
             searchField.textProperty().set(keyword); // triggers listener
+            menuPage.menu.updateView();
         });
 
         // Initially hide the search results wrapper
@@ -284,9 +287,19 @@ public class CheckoutPage {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
                 List<FoodItems> results = FileStorage.loadMenu().stream()
-                        .filter(item -> item.getName().toLowerCase().contains(keyword))
+                        .filter(item -> item.getName().toLowerCase().contains(keyword)
+                                || item.getCategory().toLowerCase().contains(keyword) || item.getDetails().toLowerCase().contains(keyword)
+                                || item.getCuisine().toLowerCase().contains(keyword))
                         .collect(Collectors.toList());
 
+                if (results.isEmpty()) {
+                    Label noResult = new Label("No matching food items");
+                    noResult.setStyle("-fx-padding: 10; -fx-text-fill: red; -fx-font-size: 14px;");
+
+                    searchResultsPane.getChildren().add(noResult);
+                    //resultsContainer.getChildren().setAll(noResult);
+                    return;
+                }
                 for (FoodItems item : results) {
                     VBox card = new VBox(10);
                     card.setPrefWidth(180);
@@ -305,8 +318,10 @@ public class CheckoutPage {
                     iv.setPreserveRatio(true);
                     try (InputStream is = getClass().getResourceAsStream("/images/" + item.getImagePath())) {
                         if (is != null) iv.setImage(new Image(is));
-                        else iv.setImage(new Image("file:src/main/resources/com/example/manager/images/" + item.getImagePath()));
-                    } catch (Exception ignored) {}
+                        else
+                            iv.setImage(new Image("file:src/main/resources/com/example/manager/images/" + item.getImagePath()));
+                    } catch (Exception ignored) {
+                    }
 
                     // NAME
                     Label name = new Label(item.getName());
@@ -339,7 +354,7 @@ public class CheckoutPage {
                     card.getChildren().addAll(iv, name, price, addBtn);
                     searchResultsPane.getChildren().add(card);
                 }
-            }else {
+            } else {
                 // Hide the wrapper when field is empty
                 searchResultsWrapper.setVisible(false);
                 searchResultsWrapper.setManaged(false);

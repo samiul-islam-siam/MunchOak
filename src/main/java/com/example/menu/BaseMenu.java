@@ -56,6 +56,7 @@ public class BaseMenu {
     protected Button buttonMenu;
     protected String searchKeyword = "";
 
+
     public void setSearchKeyword(String keyword) {
         this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
     }
@@ -69,12 +70,51 @@ public class BaseMenu {
             items = items.stream()
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
-                            || i.getDetails().toLowerCase().contains(key))
+                            || i.getDetails().toLowerCase().contains(key)
+                            ||i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
         }
-
         foodList.setAll(items);
         loadFoodItems();
+
+        if (items.isEmpty()) {
+//            foodContainer.getChildren().clear();
+//            Label noResult = new Label("No matching food items");
+//            noResult.setStyle(
+//                    "-fx-font-size: 18px;" +
+//                            "-fx-text-fill: #E53935;" +
+//                            "-fx-font-weight: bold;" +
+//                            "-fx-padding: 30;"
+//            );
+//
+//            foodContainer.getChildren().add(noResult);
+            foodContainer.getChildren().clear();
+
+            VBox noResultBox = new VBox(10);
+            noResultBox.setAlignment(Pos.CENTER);
+            noResultBox.setPadding(new Insets(50));
+
+            Label bigEmoji = new Label("🔎");
+            bigEmoji.setStyle("-fx-font-size: 60px;");
+
+            Label title = new Label("No Results Found");
+            title.setStyle(
+                    "-fx-font-size: 24px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: #444;"
+            );
+
+            Label sub = new Label("Try searching with a different keyword.");
+            sub.setStyle(
+                    "-fx-font-size: 14px;" +
+                            "-fx-text-fill: #777;"
+            );
+
+            noResultBox.getChildren().addAll(bigEmoji, title, sub);
+
+            foodContainer.getChildren().add(noResultBox);
+
+        }
     }
 
     // In-memory category list (backed by file)
@@ -124,24 +164,16 @@ public class BaseMenu {
         List<FoodItems> loaded = FileStorage.loadMenu();
         foodList.addAll(loaded);
         List<FoodItems> items = FileStorage.loadMenu();
-// APPLY SEARCH KEYWORD HERE
+
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             String key = searchKeyword.toLowerCase();
             items = items.stream()
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
-                            || i.getDetails().toLowerCase().contains(key))
+                            || i.getDetails().toLowerCase().contains(key)
+                            ||i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
 
-            if (items.isEmpty()) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("No Results");
-                    alert.setHeaderText(null);
-                    alert.setContentText("No items found for: \"" + searchKeyword + "\"");
-                    alert.showAndWait();
-
-                });}
         }
         foodList.clear();
         foodList.addAll(items);

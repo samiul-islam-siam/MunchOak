@@ -1,6 +1,5 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
@@ -30,10 +29,10 @@ public class MenuPage {
     private final Cart cart; // shared cart (nullable)
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
-    private Scene menuScene;
+    public Scene menuScene;
     private BorderPane root;
     private String searchKeyword = "";
-    private BaseMenu menu; // current menu instance
+    public BaseMenu menu; // current menu instance
 
     // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
@@ -90,6 +89,7 @@ public class MenuPage {
             System.out.println("User Menu loaded in MenuPage");
         }
         menu.setSearchKeyword(searchKeyword);
+
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -167,10 +167,11 @@ public class MenuPage {
         searchField.setPromptText("Search...");
         searchField.setMaxWidth(320);
         searchField.getStyleClass().add("search-field");
+        searchField.setFocusTraversable(false);
 
-//        Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
-//        searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
-//        searchIcon.setStyle("-fx-text-fill: gray;");
+        Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
+        searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
+        searchIcon.setStyle("-fx-text-fill: gray;");
 
         // KEEP the keyword after refresh
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
@@ -178,9 +179,9 @@ public class MenuPage {
         }
 
         Button searchBtn = new Button("🔍");
-        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;");
-        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
-        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
         // TODO: Add search action, e.g., searchBtn.setOnAction(e -> { /* perform search */ });
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
@@ -188,6 +189,7 @@ public class MenuPage {
             MenuPage mp = new MenuPage(primaryStage, cart);
             mp.setSearchKeyword(keyword);
             primaryStage.setScene(mp.getMenuScene());
+            mp.menu.updateView();
 
         });
         // live search listener
