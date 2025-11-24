@@ -31,13 +31,17 @@ public class MenuPage {
     private static final double NORMAL_HEIGHT = 700;
     private Scene menuScene;
     private BorderPane root;
+    private String searchKeyword = "";
+    private BaseMenu menu; // current menu instance
 
     // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.cart = null;
     }
-
+    public void setSearchKeyword(String keyword) {
+        this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
+    }
     // Overloaded constructor (preserve cart)
     public MenuPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -72,7 +76,7 @@ public class MenuPage {
         }
 
         // Decide which menu to load (AdminMenu or UserMenu)
-        BaseMenu menu;
+        //BaseMenu menu;
         String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
             menu = new AdminMenu();
@@ -84,6 +88,7 @@ public class MenuPage {
             menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
+        menu.setSearchKeyword(searchKeyword);
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -103,6 +108,8 @@ public class MenuPage {
                 primaryStage.setScene(cp.getScene());
             });
         }
+
+
 
         return menuScene;
     }
@@ -159,14 +166,46 @@ public class MenuPage {
         searchField.setPromptText("Search...");
         searchField.setMaxWidth(320);
         searchField.getStyleClass().add("search-field");
+        searchField.setFocusTraversable(false);
 
         Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
         searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
         searchIcon.setStyle("-fx-text-fill: gray;");
 
-        StackPane searchPane = new StackPane(searchField, searchIcon);
-        StackPane.setAlignment(searchIcon, Pos.CENTER_RIGHT);
-        StackPane.setMargin(searchIcon, new Insets(0, 10, 0, 0));
+        // KEEP the keyword after refresh
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            searchField.setText(searchKeyword);
+        }
+
+        Button searchBtn = new Button("🔍");
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;"));
+
+
+//        searchBtn.setOnAction(e -> {
+//            String keyword = searchField.getText().trim();
+//            // Re-open MenuPage with keyword applied
+//            MenuPage mp = new MenuPage(primaryStage, cart);
+//            mp.setSearchKeyword(keyword);
+//            primaryStage.setScene(mp.getMenuScene());
+//
+//        });
+
+        // live search listener
+        searchField.textProperty().addListener((obs, oldText, newText) -> {
+            if (menu != null) {
+                menu.setSearchKeyword(newText.trim().toLowerCase());
+                menu.updateView();
+            }
+        });
+
+
+//        searchField.setOnAction(e -> searchBtn.fire());
+
+        StackPane searchPane = new StackPane(searchField,searchBtn);
+        StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
         searchPane.setMaxWidth(320);
 
         // --- Right-side nav buttons ---
@@ -187,6 +226,7 @@ public class MenuPage {
         Button profileButton = new Button();
         profileButton.setGraphic(profileLabel);
         profileButton.getStyleClass().add("top-button");
+
         profileButton.setOnAction(e -> {
             ProfilePage profilePage = new ProfilePage(primaryStage);
             primaryStage.setScene(profilePage.getProfileScene());
@@ -205,6 +245,7 @@ public class MenuPage {
                 title,
                 leftSpacer,
                 searchPane,
+                searchBtn,
                 rightSpacer,
                 homeButton,
                 aboutButton,

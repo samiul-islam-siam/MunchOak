@@ -5,6 +5,7 @@ import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BaseMenu {
 
@@ -52,9 +54,33 @@ public class BaseMenu {
     protected VBox formBox;
     protected HBox cartButtons;
     protected Button buttonMenu;
+    protected String searchKeyword = "";
+
+    public void setSearchKeyword(String keyword) {
+        this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
+    }
+
+    public void updateView() {
+        // reload the full menu
+        List<FoodItems> items = FileStorage.loadMenu();
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            String key = searchKeyword.toLowerCase();
+            items = items.stream()
+                    .filter(i -> i.getName().toLowerCase().contains(key)
+                            || i.getCategory().toLowerCase().contains(key)
+                            || i.getDetails().toLowerCase().contains(key))
+                    .collect(Collectors.toList());
+        }
+
+        foodList.setAll(items);
+        loadFoodItems();
+    }
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
+
+
 
     public BaseMenu() {
         mainLayout = new VBox();
@@ -90,12 +116,36 @@ public class BaseMenu {
     int userId = Session.getCurrentUserId();
 
     private Cart cart = new Cart();
+    //public void setSearchKeyword(String kw) {}
 
     public Node getView() {
         foodList = FXCollections.observableArrayList();
         // load menu into foodList from files
         List<FoodItems> loaded = FileStorage.loadMenu();
         foodList.addAll(loaded);
+        List<FoodItems> items = FileStorage.loadMenu();
+// APPLY SEARCH KEYWORD HERE
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            String key = searchKeyword.toLowerCase();
+            items = items.stream()
+                    .filter(i -> i.getName().toLowerCase().contains(key)
+                            || i.getCategory().toLowerCase().contains(key)
+                            || i.getDetails().toLowerCase().contains(key))
+                    .collect(Collectors.toList());
+
+            if (items.isEmpty()) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("No Results");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No items found for: \"" + searchKeyword + "\"");
+                    alert.showAndWait();
+
+                });}
+        }
+        foodList.clear();
+        foodList.addAll(items);
+
 
         // load categories from files
         categories = FileStorage.loadCategories();
