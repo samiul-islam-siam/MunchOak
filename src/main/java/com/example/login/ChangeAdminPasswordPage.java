@@ -1,6 +1,7 @@
 package com.example.login;
 
 import com.example.manager.AdminFileStorage;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -78,7 +79,7 @@ public class ChangeAdminPasswordPage {
             } catch (IOException ex) {
                 status.setText("Error saving password.");
                 status.setTextFill(Color.RED);
-                ex.printStackTrace();
+                System.err.println("IOException: " + ex.getMessage());
             }
         });
 

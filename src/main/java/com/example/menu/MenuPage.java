@@ -1,14 +1,17 @@
 package com.example.menu;
 
-import com.example.view.LoginPage;
 import com.example.manager.Session;
+import com.example.munchoak.Cart;
+import com.example.munchoak.CartPage;
+import com.example.view.AboutUsPage;
 import com.example.view.HomePage;
-
-import javafx.scene.Node;
-import javafx.animation.*;
+import com.example.view.ProfilePage;
+import com.example.view.ReservationPage;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,22 +20,37 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class MenuPage {
     private final Stage primaryStage;
+    private final Cart cart; // shared cart (nullable)
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
     private Scene menuScene;
     private BorderPane root;
-    private VBox categoryExtensionsBox;
+    private String searchKeyword = "";
+    private BaseMenu menu; // current menu instance
 
+    // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.cart = null;
+    }
+    public void setSearchKeyword(String keyword) {
+        this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
+    }
+    // Overloaded constructor (preserve cart)
+    public MenuPage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;
     }
 
+    /**
+     * Returns the menu scene, building it on first call.
+     */
     public Scene getMenuScene() {
         if (menuScene == null) {
             double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized()
@@ -45,101 +63,205 @@ public class MenuPage {
             root = buildRoot();
             menuScene = new Scene(root, initWidth, initHeight);
 
-            menuScene.getStylesheets().addAll(
-                    getClass().getResource("/com/example/view/styles/style.css").toExternalForm(),
-                    getClass().getResource("/com/example/view/styles/menupage.css").toExternalForm()
-            );
+            // optional css — guard against missing resources
+            try {
+                var css1 = getClass().getResource("/com/example/view/styles/style.css");
+                if (css1 != null) menuScene.getStylesheets().add(css1.toExternalForm());
+                var css2 = getClass().getResource("/com/example/view/styles/menupage.css");
+                if (css2 != null) menuScene.getStylesheets().add(css2.toExternalForm());
+            } catch (Exception ignored) {
+            }
 
             attachResizeListeners();
         }
-        //BaseMenu baseMenu = new BaseMenu();
-        BaseMenu menu;
+
+        // Decide which menu to load (AdminMenu or UserMenu)
+        //BaseMenu menu;
         String username = Session.getCurrentUsername();
         if ("admin".equalsIgnoreCase(username)) {
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
-        } else if("guest".equalsIgnoreCase(username))
-        {
+        } else if ("guest".equalsIgnoreCase(username)) {
             menu = new guestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
-        }
-        else {
+        } else {
             menu = new UserMenu();
             System.out.println("User Menu loaded in MenuPage");
         }
+        menu.setSearchKeyword(searchKeyword);
+
+        // Preserve cart if provided
+        if (this.cart != null) {
+            menu.setCart(this.cart);
+        }
+
+        // Place menu view into center
         Node menuView = menu.getView();
         root.setCenter(menuView);
 
+        // Wire cart button (if present)
+        Button cartButton = (Button) root.lookup("#cartButton");
+        if (cartButton != null) {
+            Cart currentCart = menu.getCart();
+            cartButton.setOnAction(e -> {
+                CartPage cp = new CartPage(primaryStage, currentCart);
+                primaryStage.setScene(cp.getScene());
+            });
+        }
 
 
-// add it to your root layout, e.g., center of BorderPane
-        root.setCenter(menuView);
+
         return menuScene;
     }
 
+    /**
+     * Builds the root BorderPane with a top nav bar and a placeholder center.
+     */
     private BorderPane buildRoot() {
-        BorderPane root = new BorderPane();
+        BorderPane pane = new BorderPane();
 
-        // === TOP NAV BAR ===
-        HBox navBar = new HBox(15);
+        // === NAV BAR ===
+        HBox navBar = new HBox(12);
         navBar.setAlignment(Pos.CENTER_LEFT);
-        navBar.setPadding(new Insets(15, 30, 15, 30));
+        navBar.setPadding(new Insets(12, 24, 12, 24));
         navBar.getStyleClass().add("nav-bar");
 
+        // --- Logo (circular) ---
+        Image logoImage = null;
+        try {
+            var url = getClass().getResource("/com/example/view/images/logo.png");
+            if (url != null) logoImage = new Image(url.toExternalForm(), 40, 40, true, true);
+        } catch (Exception ignored) {
+        }
+        ImageView logoView = new ImageView();
+        if (logoImage != null) logoView.setImage(logoImage);
+        logoView.setFitWidth(40);
+        logoView.setFitHeight(40);
+
+        // Clip into a circle
+        Circle clip = new Circle(20, 20, 20);
+        logoView.setClip(clip);
+
+        // small border-style region behind logo for circular frame effect
+        Region logoBorder = new Region();
+        logoBorder.setPrefSize(44, 44);
+        logoBorder.setStyle("-fx-border-radius: 22; -fx-background-radius: 22; -fx-border-color: transparent;");
+
+        StackPane logoFrame = new StackPane(logoBorder, logoView);
+        logoFrame.setPadding(new Insets(0, 8, 0, 0));
+
+        // Title
+        Label title = new Label("MunchOak");
+        title.setFont(Font.font("Segoe UI", 22));
+        title.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
+
+        // Left and right spacers for centering the search field
+        Region leftSpacer = new Region();
+        HBox.setHgrow(leftSpacer, Priority.ALWAYS);
+        Region rightSpacer = new Region();
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+
+        // --- Search field (centered) ---
         TextField searchField = new TextField();
         searchField.setPromptText("Search...");
+        searchField.setMaxWidth(320);
         searchField.getStyleClass().add("search-field");
+        searchField.setFocusTraversable(false);
 
         Label searchIcon = new Label("\uD83D\uDD0D"); // 🔍
-        searchIcon.setFont(Font.font("Segoe UI Emoji", 16));
+        searchIcon.setFont(Font.font("Segoe UI Emoji", 14));
         searchIcon.setStyle("-fx-text-fill: gray;");
 
-        StackPane searchPane = new StackPane(searchField, searchIcon);
-        StackPane.setAlignment(searchIcon, Pos.CENTER_RIGHT);
-        StackPane.setMargin(searchIcon, new Insets(0, 10, 0, 0));
-        searchPane.setMaxWidth(200);
-        // --- SPACER to push navigation buttons to right ---
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // KEEP the keyword after refresh
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            searchField.setText(searchKeyword);
+        }
 
-// --- HOME, ABOUT US, RESERVATION buttons ---
+        Button searchBtn = new Button("🔍");
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;"));
+
+
+//        searchBtn.setOnAction(e -> {
+//            String keyword = searchField.getText().trim();
+//            // Re-open MenuPage with keyword applied
+//            MenuPage mp = new MenuPage(primaryStage, cart);
+//            mp.setSearchKeyword(keyword);
+//            primaryStage.setScene(mp.getMenuScene());
+//
+//        });
+
+        // live search listener
+        searchField.textProperty().addListener((obs, oldText, newText) -> {
+            if (menu != null) {
+                menu.setSearchKeyword(newText.trim().toLowerCase());
+                menu.updateView();
+            }
+        });
+
+
+//        searchField.setOnAction(e -> searchBtn.fire());
+
+        StackPane searchPane = new StackPane(searchField,searchBtn);
+        StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
+        searchPane.setMaxWidth(320);
+
+        // --- Right-side nav buttons ---
         Button homeButton = new Button("Home");
         homeButton.getStyleClass().add("nav-text-button");
         homeButton.setOnAction(e -> returnToHomePerfectly());
 
         Button aboutButton = new Button("About Us");
         aboutButton.getStyleClass().add("nav-text-button");
-// You can later link this to an AboutUs page
-        aboutButton.setOnAction(e -> System.out.println("About Us clicked"));
+        aboutButton.setOnAction(e -> navigateToAboutUs());
 
         Button reservationButton = new Button("Reservation");
         reservationButton.getStyleClass().add("nav-text-button");
-// Later, you can open your reservation page here
-        reservationButton.setOnAction(e -> System.out.println("Reservation clicked"));
+        reservationButton.setOnAction(e -> navigateToReservation());
+
         Label profileLabel = new Label("\uD83D\uDC64"); // 👤
-        profileLabel.setFont(Font.font("Segoe UI Emoji", 26));
+        profileLabel.setFont(Font.font("Segoe UI Emoji", 22));
         Button profileButton = new Button();
         profileButton.setGraphic(profileLabel);
         profileButton.getStyleClass().add("top-button");
 
+        profileButton.setOnAction(e -> {
+
+            Scene currentScene = primaryStage.getScene();
+
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
+            primaryStage.setScene(profilePage.getProfileScene());
+
+        });
+
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
-        cartLabel.setFont(Font.font("Segoe UI Emoji", 26));
+        cartLabel.setFont(Font.font("Segoe UI Emoji", 22));
         Button cartButton = new Button();
+        cartButton.setId("cartButton");
         cartButton.setGraphic(cartLabel);
         cartButton.getStyleClass().add("top-button");
+
+        // Assemble nav bar: logo + title + leftSpacer + centered search + rightSpacer + nav buttons
         navBar.getChildren().addAll(
+                logoFrame,
+                title,
+                leftSpacer,
                 searchPane,
-                spacer,
-                homeButton, aboutButton, reservationButton,
-                profileButton, cartButton
+                searchBtn,
+                rightSpacer,
+                homeButton,
+                aboutButton,
+                reservationButton,
+                profileButton,
+                cartButton
         );
 
-
-        // BACK BUTTON
+        // BACK PANEL beneath (keeps previous behavior)
         VBox backPanel = new VBox();
         backPanel.setAlignment(Pos.TOP_LEFT);
-        backPanel.setPadding(new Insets(10, 30, 0, 30));
-
+        backPanel.setPadding(new Insets(6, 24, 0, 24));
         Label backLabel = new Label("\u2190");
         backLabel.getStyleClass().add("back-label");
 
@@ -147,12 +269,10 @@ public class MenuPage {
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
 
-        if(Session.getCurrentUsername().equalsIgnoreCase("admin"))
-        {
+        //For admin access, admin will back to adminDashboard from menu page
+        if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
             backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
-        }
-        else
-        {
+        } else {
             backButton.setOnAction(e -> returnToHomePerfectly());
         }
         backPanel.getChildren().add(backButton);
@@ -160,125 +280,63 @@ public class MenuPage {
         VBox topSection = new VBox(navBar, backPanel);
         topSection.setAlignment(Pos.TOP_RIGHT);
 
-        // === CENTER CONTENT ===
-        VBox content = new VBox(50);
-        content.setAlignment(Pos.TOP_CENTER);
-        content.setPadding(new Insets(80, 60, 60, 60));
+        // Placeholder center before menu is inserted; it's fine because getMenuScene() replaces center with menu.getView()
+        VBox placeholderCenter = new VBox();
+        placeholderCenter.setPadding(new Insets(40));
+        placeholderCenter.setAlignment(Pos.CENTER);
+        Label placeholderLabel = new Label("Loading menu...");
+        placeholderCenter.getChildren().add(placeholderLabel);
 
-        // === Restored Banner Layering ===
-        // === Atmospheric Behind-Logo Layering ===
-        Image bannerImage = new Image(getClass().getResource("/com/example/view/images/menu_banner.png").toExternalForm());
-        ImageView bannerView = new ImageView(bannerImage);
-        bannerView.setPreserveRatio(true);
-        bannerView.setSmooth(true);
-        bannerView.setFitWidth(300);
+        // put them into root
+        pane.setTop(topSection);
+        pane.setCenter(placeholderCenter);
 
-        Image overlayImage = new Image(getClass().getResource("/com/example/view/images/overlay_logo.png").toExternalForm());
-        ImageView overlayView = new ImageView(overlayImage);
-        overlayView.setPreserveRatio(true);
-        overlayView.setSmooth(true);
-        overlayView.setFitWidth(60);
-        overlayView.setOpacity(0.75);
+        return pane;
+    }
 
-// Place overlay *behind* the banner
-        StackPane imageStack = new StackPane(overlayView, bannerView);
-        imageStack.setAlignment(Pos.TOP_CENTER);
-        StackPane.setMargin(overlayView, new Insets(80, 0, 0, 0));
+    private void navigateToAboutUs() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
 
-// === Soft blur & glow pulse ===
-        javafx.scene.effect.GaussianBlur blur = new javafx.scene.effect.GaussianBlur(8);
-        javafx.scene.effect.ColorAdjust glow = new javafx.scene.effect.ColorAdjust();
-        // Combine blur + glow
-        javafx.scene.effect.Blend combinedEffect = new javafx.scene.effect.Blend();
-        combinedEffect.setMode(javafx.scene.effect.BlendMode.SRC_OVER);
-        combinedEffect.setBottomInput(blur);
-        combinedEffect.setTopInput(glow);
-        overlayView.setEffect(combinedEffect);
+        AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+        Scene aboutScene = aboutPage.getAboutUsScene();
+        primaryStage.setScene(aboutScene);
 
-
-// Glow pulse animation
-        Timeline glowPulse = new Timeline(
-                new KeyFrame(Duration.seconds(0),
-                        new KeyValue(glow.brightnessProperty(), -0.2)),
-                new KeyFrame(Duration.seconds(4),
-                        new KeyValue(glow.brightnessProperty(), 0.3))
-        );
-        glowPulse.setAutoReverse(true);
-        glowPulse.setCycleCount(Animation.INDEFINITE);
-        glowPulse.play();
-
-// Zoom animation (breathing motion)
-        ScaleTransition zoom = new ScaleTransition(Duration.seconds(8.0), overlayView);
-        zoom.setFromX(0.6);
-        zoom.setFromY(0.4);
-        zoom.setToX(8.0);
-        zoom.setToY(6.0);
-        zoom.setCycleCount(ScaleTransition.INDEFINITE);
-        zoom.setAutoReverse(true);
-        imageStack.layoutBoundsProperty().addListener((obs, old, newVal) -> {
-            if (zoom.getStatus() != Animation.Status.RUNNING) zoom.play();
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
         });
-
-        content.getChildren().add(imageStack);
-
-        // === MENU TITLE ===
-        Label title = new Label("OUR SPECIALS MENU");
-        title.getStyleClass().add("menu-title");
-        content.getChildren().add(title);
-
-        // === MENU GRID ===
-        GridPane grid = new GridPane();
-        grid.setHgap(40);
-        grid.setVgap(30);
-        grid.setAlignment(Pos.CENTER);
-
-
-
-        content.getChildren().add(grid);
-
-        // === CATEGORY EXTENSION AREA ===
-        categoryExtensionsBox = new VBox(40);
-        categoryExtensionsBox.setAlignment(Pos.CENTER);
-        categoryExtensionsBox.setPadding(new Insets(50, 0, 0, 0));
-        content.getChildren().add(categoryExtensionsBox);
-
-        ScrollPane scrollPane = new ScrollPane(content);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.getStyleClass().add("scroll-pane");
-
-        root.setTop(topSection);
-        root.setCenter(scrollPane);
-        return root;
     }
 
+    private void navigateToReservation() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
 
+        ReservationPage resPage = new ReservationPage(primaryStage);
+        Scene resScene = resPage.getReservationScene();
+        primaryStage.setScene(resScene);
 
-
-    private void expandSection(VBox section) {
-        section.setOpacity(0);
-        section.setScaleY(0.3);
-        categoryExtensionsBox.getChildren().add(section);
-
-        Timeline fadeIn = new Timeline(
-                new KeyFrame(Duration.millis(350),
-                        new KeyValue(section.opacityProperty(), 1),
-                        new KeyValue(section.scaleYProperty(), 1))
-        );
-        fadeIn.play();
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
     }
 
-    private void collapseSection(VBox section) {
-        Timeline fadeOut = new Timeline(
-                new KeyFrame(Duration.millis(350),
-                        new KeyValue(section.opacityProperty(), 0),
-                        new KeyValue(section.scaleYProperty(), 0.3))
-        );
-        fadeOut.setOnFinished(e -> categoryExtensionsBox.getChildren().remove(section));
-        fadeOut.play();
-    }
-
-    // === Return to Home ===
+    /**
+     * Return to HomePage while preserving fullscreen/maximized state and current window size.
+     */
     private void returnToHomePerfectly() {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
@@ -296,17 +354,15 @@ public class MenuPage {
         double currentHeight = primaryStage.getHeight();
 
         Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
-        var css = getClass().getResource("/com/example/view/styles/style.css");
-        if (css != null) {
-            homeScene.getStylesheets().add(css.toExternalForm());
-            System.out.println("✅ CSS reapplied successfully: " + css);
-        } else {
-            System.out.println("❌ CSS not found! Check file path.");
+        try {
+            var css = getClass().getResource("/com/example/view/styles/style.css");
+            if (css != null) homeScene.getStylesheets().add(css.toExternalForm());
+        } catch (Exception ignored) {
         }
 
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             primaryStage.setScene(homeScene);
-            javafx.application.Platform.runLater(() -> {
+            Platform.runLater(() -> {
                 if (wasFullScreen) primaryStage.setFullScreen(true);
                 else if (wasMaximized) primaryStage.setMaximized(true);
                 else {
@@ -317,6 +373,9 @@ public class MenuPage {
         });
     }
 
+    /**
+     * Basic listener to trigger layout requests when fullscreen/maximize changes.
+     */
     private void attachResizeListeners() {
         ChangeListener<Boolean> resizeListener = (obs, oldVal, newVal) -> {
             if (menuScene != null && root != null) root.requestLayout();

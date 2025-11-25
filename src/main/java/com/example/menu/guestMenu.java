@@ -2,18 +2,16 @@ package com.example.menu;
 
 import com.example.manager.FileStorage;
 import com.example.munchoak.FoodItems;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import java.io.File;
 
+import java.io.File;
 public class guestMenu extends BaseMenu {
 
     @Override
@@ -28,26 +26,32 @@ public class guestMenu extends BaseMenu {
 
             vbox.getChildren().remove(buttonMenu);
 
+            //Cart and checkout button is disable for guest
             if (cartButtons != null) {
                 cartButtons.setVisible(false);
                 cartButtons.setManaged(false);
             }
+
+            //getting menu from files
             File menuFile = FileStorage.getMenuFile();
+
+            //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
-                    viewCartButton.setVisible(false);
-                    checkoutButton.setVisible(false);
+                    //viewCartButton.setVisible(false);
+                    //checkoutButton.setVisible(false);
 
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));
+                    emoji.setStyle("-fx-text-fill: #E53935 !important;");
 
                     Label title = new Label("Empty Menu Page");
                     title.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
-                    title.setTextFill(Color.web("#444"));
+                    title.setStyle("-fx-text-fill: #E53935 !important;");
 
                     Label subtitle = new Label("Please try again later.");
                     subtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 18));
-                    subtitle.setTextFill(Color.web("#666"));
+                    subtitle.setStyle("-fx-text-fill: #E53935 !important;");
 
                     VBox messageBox = new VBox(10, emoji, title, subtitle);
                     messageBox.setAlignment(Pos.CENTER);

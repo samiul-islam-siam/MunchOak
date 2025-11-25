@@ -3,7 +3,6 @@ package com.example.munchoak;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.view.HomePage;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -16,8 +15,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Map;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 public class History {
 
@@ -99,11 +99,7 @@ public class History {
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
 
-
-        Scene scene = new Scene(layout, 900, 600);
-        // Optional CSS file (if you create one)
-        // scene.getStylesheets().add(getClass().getResource("/com/example/munchoak/history.css").toExternalForm());
-        return scene;
+        return new Scene(layout, 900, 600);
     }
 
     private void goBack() {
@@ -121,10 +117,11 @@ public class History {
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
         boolean isAdmin = Session.getCurrentUsername().equals("admin");
+        CartPage cartPage = new CartPage(primaryStage,new Cart());
 
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!isAdmin && s.userId != currentUserId) continue;
-            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod));
+            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount+cartPage.getTotal(), "Success", s.paymentMethod));
         }
     }
 
@@ -140,15 +137,15 @@ public class History {
 
         Payment payment = new Payment(record.getPaymentId(), record.getAmount());
         try {
-            java.lang.reflect.Field idField = Payment.class.getDeclaredField("id");
+            Field idField = Payment.class.getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(payment, record.getPaymentId());
 
-            java.lang.reflect.Field timestampField = Payment.class.getDeclaredField("timestamp");
+            Field timestampField = Payment.class.getDeclaredField("timestamp");
             timestampField.setAccessible(true);
             timestampField.set(payment, record.getTimestamp());
 
-            java.lang.reflect.Field successField = Payment.class.getDeclaredField("success");
+            Field successField = Payment.class.getDeclaredField("success");
             successField.setAccessible(true);
             successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
         } catch (Exception ex) {

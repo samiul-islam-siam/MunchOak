@@ -8,10 +8,21 @@ public class Session {
     private static String currentEmail = "guest@gmail.com";
     private static String currentPassword = "ai01*2#";
 
-    public static int getCurrentUserId() { return currentUserId; }
-    public static String getCurrentUsername() { return currentUsername; }
-    public static String getCurrentEmail() { return currentEmail; }
-    public static String getCurrentPassword() { return currentPassword; }
+    public static int getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public static String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public static String getCurrentEmail() {
+        return currentEmail;
+    }
+
+    public static String getCurrentPassword() {
+        return currentPassword;
+    }
 
     public static void setCurrentUser(String username) {
         currentUsername = username;
@@ -20,15 +31,20 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
     }
 
+    public static void setCurrentUsername(String username)
+    {
+        currentUsername = username;
+    }
+
     public static String getCurrentRole() {
         if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
-        if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
-        return "USER";
+        // if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
+        else return "USER";
     }
 
     public static void resetToGuest() {
         currentUsername = "guest";
-        currentEmail = "people@gmail.com";
+        currentEmail = "guest@gmail.com";
         currentPassword = "ai01*2#";
     }
 

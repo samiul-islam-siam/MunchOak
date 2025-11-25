@@ -3,25 +3,23 @@ package com.example.network;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * Private chats: USER <-> ADMIN
+ * - Users cannot see other users.
+ * - Admin can see all users, select one, and reply privately.
+ * - Per-user chat histories stored in user's home directory under MunchOakChatHistory/<username>.txt
+ */
 public class ChatServer {
     private static final int PORT = 5050;
-    private static final String HISTORY_DIR = "src/main/resources/com/example/network/Chats";
+    private static final String HISTORY_DIR ="src/main/resources/com/example/network/Chats";
 
     private static final Map<String, ClientHandler> users = new ConcurrentHashMap<>();
     private static final Set<ClientHandler> admins = ConcurrentHashMap.newKeySet();
 
-    /*-------------------- main method --------------------*/
-    // Thread per client method
     public static void main(String[] args) {
         ensureHistoryDir();
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -32,12 +30,10 @@ public class ChatServer {
                 new Thread(ch, "ClientHandler-" + socket.getRemoteSocketAddress()).start();
             }
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    /*-------------------- History Utils --------------------*/
-    // History directory
     private static void ensureHistoryDir() {
         File dir = new File(HISTORY_DIR);
         if (!dir.exists() && !dir.mkdirs()) {
@@ -45,55 +41,45 @@ public class ChatServer {
         }
     }
 
-    // Separate file for each user
     private static File historyFileFor(String username) {
         return new File(HISTORY_DIR, username + ".dat");
     }
 
     private static void appendHistory(String username, String role, String text) {
-        File appendFile = historyFileFor(username);
-        // dos = Data Output Stream
-        try (DataOutputStream dos = new DataOutputStream(
-                new BufferedOutputStream(new FileOutputStream(appendFile, true)))) {
-
-            dos.writeUTF(role); // "USER" or "ADMIN"
-            dos.writeUTF(text); // content
-            dos.writeLong(System.currentTimeMillis()); // timestamp
+        File f = historyFileFor(username);
+        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f, true)))) {
+            dos.writeUTF(role);
+            dos.writeUTF(text);
         } catch (IOException e) {
-            System.err.println("Error saving history for " + username + ": " + e.getMessage());
+            System.err.println("⚠️ Error saving history for " + username + ": " + e.getMessage());
         }
     }
 
+
     private static List<String> readHistory(String username) {
-        File readFile = historyFileFor(username);
-        if (!readFile.exists()) return Collections.emptyList();
+        File f = historyFileFor(username);
+        if (!f.exists()) return Collections.emptyList();
 
         List<String> lines = new ArrayList<>();
-        // dis = Data Input Stream
-        try (DataInputStream dis = new DataInputStream(
-                new BufferedInputStream(new FileInputStream(readFile)))) {
 
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
             while (true) {
-                try {
-                    String role = dis.readUTF();
-                    String text = dis.readUTF();
-
-                    lines.add(role + "|" + text); // message: ROLE|TEXT
-                } catch (EOFException eof) {
-                    break;
-                }
+                String role = dis.readUTF();
+                String text = dis.readUTF();
+                lines.add(role + "|" + text);
             }
-
+        } catch (EOFException eof) {
+            // Reached end of file — normal
         } catch (IOException e) {
-            System.err.println("Error reading history for " + username + ": " + e.getMessage());
+            System.err.println("⚠️ Error reading history for " + username + ": " + e.getMessage());
         }
+
         return lines;
     }
 
-    // A comma-separated list of all current online users
+
     private static void notifyAdminsUserList() {
-        String list = users.keySet().stream().sorted().collect(Collectors.joining(","));
-        // Sends the list to every admin
+        String list = String.join(",", users.keySet().stream().sorted().collect(Collectors.toList()));
         for (ClientHandler admin : admins) {
             admin.send("USER_LIST|" + list);
         }
@@ -118,8 +104,7 @@ public class ChatServer {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                /*-------------------- Authentication --------------------*/
-                // First message: AUTH|username|role
+                // AUTH|username|role
                 String auth = in.readLine();
                 if (auth == null || !auth.startsWith("AUTH|")) {
                     send("AUTH_ERR|Missing AUTH");
@@ -141,7 +126,7 @@ public class ChatServer {
                 if (!isAdmin) {
                     ClientHandler existing = users.putIfAbsent(username, this);
                     if (existing != null) {
-                        send("AUTH_ERR|Username already in use"); // username must be unique
+                        send("AUTH_ERR|Username already in use");
                         close();
                         return;
                     }
@@ -157,13 +142,13 @@ public class ChatServer {
                     for (String line : readHistory(username)) {
                         String[] p = line.split("\\|", 2);
                         if (p.length == 2) {
-                            send("INCOMING|" + p[0] + "|" + p[1]); // INCOMING|ROLE|message
+                            send("INCOMING|" + p[0] + "|" + p[1]);
                         }
                     }
                 }
 
                 if (isAdmin) {
-                    notifyAdminsUserList(); // updated current online user list
+                    notifyAdminsUserList();
                 } else {
                     for (ClientHandler admin : admins) {
                         admin.send("SYS|🟢 " + username + " joined");
@@ -171,61 +156,39 @@ public class ChatServer {
                     notifyAdminsUserList();
                 }
 
-                /*-------------------- Message Handling --------------------*/
                 String line;
                 while ((line = in.readLine()) != null) {
                     if (line.equalsIgnoreCase("BYE")) break;
 
                     if (line.startsWith("MSG|")) {
-                        handleUserMessageToAdmin(line.substring(4)); // User to Admin
+                        handleUserMessageToAdmin(line.substring(4));
                     } else if (line.startsWith("MSGTO|")) {
-                        if (!isAdmin) {
-                            send("SYS|Only admin can send MSGTO");
-                            continue;
-                        }
+                        if (!isAdmin) { send("SYS|Only admin can send MSGTO"); continue; }
                         String[] p = line.split("\\|", 3);
-                        if (p.length < 3) {
-                            send("SYS|Bad MSGTO format");
-                            continue;
-                        }
-                        handleAdminMessageToUser(p[1].trim(), p[2]); // Admin to User
+                        if (p.length < 3) { send("SYS|Bad MSGTO format"); continue; }
+                        handleAdminMessageToUser(p[1].trim(), p[2]);
                     } else if (line.startsWith("GETHIST|")) {
-                        if (!isAdmin) {
-                            send("SYS|Only admin can request history");
-                            continue;
-                        }
+                        if (!isAdmin) { send("SYS|Only admin can request history"); continue; }
                         String[] p = line.split("\\|", 2);
-                        if (p.length < 2) {
-                            send("SYS|Bad GETHIST format");
-                            continue;
-                        }
-                        sendHistoryToAdmin(p[1].trim()); // When admin request history
+                        if (p.length < 2) { send("SYS|Bad GETHIST format"); continue; }
+                        sendHistoryToAdmin(p[1].trim());
                     } else {
                         send("SYS|Unknown command");
                     }
                 }
-            } catch (IOException ignored) {
-            } finally {
-                close();
-            }
+            } catch (IOException ignored) {}
+            finally { close(); }
         }
 
-        /*-------------------- Message Handling Utils --------------------*/
         private void handleUserMessageToAdmin(String text) {
             appendHistory(username, "USER", text);
-            if (admins.isEmpty()) {
-                send("SYS|No admin online");
-            } else {
-                admins.forEach(admin -> admin.send("INCOMING|" + username + "|" + text));
-            }
+            if (admins.isEmpty()) send("SYS|No admin online");
+            else admins.forEach(admin -> admin.send("INCOMING|" + username + "|" + text));
         }
 
         private void handleAdminMessageToUser(String targetUser, String text) {
             ClientHandler target = users.get(targetUser);
-            if (target == null) {
-                send("SYS|User not online: " + targetUser);
-                return;
-            }
+            if (target == null) { send("SYS|User not online: " + targetUser); return; }
             appendHistory(targetUser, "ADMIN", text);
             target.send("INCOMING|ADMIN|" + text);
         }
@@ -241,11 +204,8 @@ public class ChatServer {
             send("HIST_END|" + targetUser);
         }
 
-        private void send(String msg) {
-            if (out != null) out.println(msg);
-        }
+        private void send(String msg) { if (out != null) out.println(msg); }
 
-        /*-------------------- close method --------------------*/
         private void close() {
             try {
                 if (!isAdmin && username != null) {
@@ -257,8 +217,7 @@ public class ChatServer {
                 if (socket != null && !socket.isClosed()) socket.close();
                 if (in != null) in.close();
                 if (out != null) out.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 }

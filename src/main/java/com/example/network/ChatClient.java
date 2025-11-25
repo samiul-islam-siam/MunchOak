@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class ChatClient {
     private ListView<String> userListView;
 
     private final ObservableList<ChatMessage> chatMessages = FXCollections.observableArrayList();
-    private final Map<String, ObservableList<ChatMessage>> adminConversations = new HashMap<>(); // per user conversation history
+    private final Map<String, ObservableList<ChatMessage>> adminConversations = new HashMap<>();
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -44,9 +43,8 @@ public class ChatClient {
 
     private String username;
     private boolean isAdmin;
-
-    private String selectedUser = null; // which user admin is chatting with
-    private boolean loadingHistory = false; // prevent duplication
+    private String selectedUser = null;
+    private boolean loadingHistory = false;
 
     @FXML
     public void initialize() {
@@ -68,25 +66,23 @@ public class ChatClient {
 
     private void getIdentityFromSession() {
         this.username = com.example.manager.Session.getCurrentUsername();
+        if (username == null || username.isEmpty()) username = "Guest";
         String role = null;
         try {
             role = com.example.manager.Session.getCurrentRole();
         } catch (Exception ignored) {
         }
-        this.isAdmin = (role != null) ? role.equalsIgnoreCase("ADMIN") : username.equalsIgnoreCase("admin");
-        // (role != null) for NullPointerException
+        this.isAdmin = role != null ? role.equalsIgnoreCase("ADMIN") : username.equalsIgnoreCase("admin");
     }
 
     private void setupUIEvents() {
         sendButton.setOnAction(e -> sendMessage());
-        // Send message by clicking Enter key
         messageField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) sendMessage();
         });
-
         closeButton.setOnAction(e -> {
             try {
-                if (writer != null) writer.println("BYE"); // to server
+                if (writer != null) writer.println("BYE");
             } catch (Exception ignored) {
             }
             closeConnection();
@@ -100,14 +96,14 @@ public class ChatClient {
         userListView.setVisible(isAdmin);
         userListView.setManaged(isAdmin);
 
-        if (!isAdmin) return; // only admin can see userListView
+        if (!isAdmin) return;
 
         userListView.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldV, newV) -> {
                     selectedUser = newV;
                     if (newV == null) return;
 
-                    // Clear previous conversations before loading new
+                    // Clear previous conversation before loading new
                     adminConversations.putIfAbsent(newV, FXCollections.observableArrayList());
                     chatMessages.setAll(adminConversations.get(newV));
 
@@ -122,6 +118,7 @@ public class ChatClient {
                         writer.println("GETHIST|" + newV);
                     }
                 });
+
     }
 
     private void connectToServer() {
@@ -129,11 +126,9 @@ public class ChatClient {
             socket = new Socket("localhost", 5050);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
-
-            // First Message: AUTH|username|ROLE
             writer.println("AUTH|" + username + "|" + (isAdmin ? "ADMIN" : "USER"));
 
-            Thread listener = new Thread(this::listenLoop); // Starts in the background
+            Thread listener = new Thread(this::listenLoop);
             listener.setDaemon(true);
             listener.start();
         } catch (IOException e) {
@@ -146,20 +141,18 @@ public class ChatClient {
             String msg;
             while ((msg = reader.readLine()) != null) {
                 final String line = msg;
-                Platform.runLater(() -> handleServerMessage(line)); // as JavaFX UI cannot update from non-UI threads
+                Platform.runLater(() -> handleServerMessage(line));
             }
         } catch (IOException e) {
             Platform.runLater(() -> chatMessages.add(new ChatMessage("Disconnected from server.", false)));
         }
     }
 
-    //-------------------- Server message handler --------------------//
     private void handleServerMessage(String msg) {
         if (msg == null || msg.isEmpty()) return;
 
-        if (msg.startsWith("AUTH_OK")) {
-            chatMessages.add(new ChatMessage("Connected", false));
-        } else if (msg.startsWith("USER_LIST|") && isAdmin) { // user list for admin
+        if (msg.startsWith("AUTH_OK")) chatMessages.add(new ChatMessage("Connected", false));
+        else if (msg.startsWith("USER_LIST|") && isAdmin) {
             String[] users = msg.substring(10).split(",");
             ObservableList<String> list = FXCollections.observableArrayList();
             for (String u : users) {
@@ -169,7 +162,7 @@ public class ChatClient {
                 }
             }
             userListView.setItems(list);
-        } else if (msg.startsWith("HIST|") && isAdmin) { // HIST|user|ROLE|message
+        } else if (msg.startsWith("HIST|") && isAdmin) {
             String[] parts = msg.split("\\|", 4);
             if (parts.length == 4 && selectedUser != null && selectedUser.equals(parts[1])) {
                 boolean isSelf = "ADMIN".equalsIgnoreCase(parts[2]);
@@ -178,24 +171,16 @@ public class ChatClient {
             }
         } else if (msg.startsWith("HIST_END|") && isAdmin) {
             loadingHistory = false;
-        } else if (msg.startsWith("INCOMING|")) { // INCOMING|username|TEXT
+        } else if (msg.startsWith("INCOMING|")) {
             String[] p = msg.split("\\|", 3);
             if (p.length < 3) return;
 
-            // Handle messages based on role
             String field1 = p[1], text = p[2];
-            if (isAdmin) {
-                handleIncomingAsAdmin(field1, text);
-            } else {
-                handleIncomingAsUser(field1, text);
-            }
-        } else if (msg.startsWith("SYS|")) { // System messages
-            chatMessages.add(new ChatMessage(msg.substring(4), false));
-        }
+            if (isAdmin) handleIncomingAsAdmin(field1, text);
+            else handleIncomingAsUser(field1, text);
+        } else if (msg.startsWith("SYS|")) chatMessages.add(new ChatMessage(msg.substring(4), false));
     }
 
-    //-------------------- Admin message handler --------------------//
-    // field1 = username, text = message
     private void handleIncomingAsAdmin(String field1, String text) {
         String marker = field1 == null ? "" : field1.trim();
 
@@ -225,29 +210,28 @@ public class ChatClient {
         }
 
         // --- CASE 3: live message from a user ---
+        String fromUser = marker;
+
         // Ensure conversation list exists
-        adminConversations.putIfAbsent(marker, FXCollections.observableArrayList());
-        ObservableList<ChatMessage> conv = adminConversations.get(marker);
+        adminConversations.putIfAbsent(fromUser, FXCollections.observableArrayList());
+        ObservableList<ChatMessage> conv = adminConversations.get(fromUser);
 
         // Add live message
-        conv.add(new ChatMessage(marker + ": " + text, false));
+        conv.add(new ChatMessage(fromUser + ": " + text, false));
 
         // Update visible chat if currently selected
-        if (Objects.equals(selectedUser, marker)) {
+        if (Objects.equals(selectedUser, fromUser)) {
             chatMessages.setAll(conv);
         }
     }
 
-    //-------------------- User message handler --------------------//
+
     private void handleIncomingAsUser(String field1, String text) {
         String marker = field1 == null ? "" : field1.trim();
-        if (marker.equalsIgnoreCase("USER") || marker.equalsIgnoreCase(username)) {
+        if (marker.equalsIgnoreCase("USER") || marker.equalsIgnoreCase(username))
             chatMessages.add(new ChatMessage(text, true));
-        } else if (marker.equalsIgnoreCase("ADMIN")) {
-            chatMessages.add(new ChatMessage("Admin: " + text, false));
-        } else {
-            chatMessages.add(new ChatMessage(marker + ": " + text, false));
-        }
+        else if (marker.equalsIgnoreCase("ADMIN")) chatMessages.add(new ChatMessage("Admin: " + text, false));
+        else chatMessages.add(new ChatMessage(marker + ": " + text, false));
     }
 
     private void sendMessage() {
@@ -271,9 +255,6 @@ public class ChatClient {
         messageField.clear();
     }
 
-    //-------------------- UI handler --------------------//
-    // Right aligned green bubble → self
-    // Left aligned white bubble → others
     private void setupChatBubbleRenderer() {
         chatListView.setCellFactory(list -> new ListCell<ChatMessage>() {
             private final HBox box = new HBox();

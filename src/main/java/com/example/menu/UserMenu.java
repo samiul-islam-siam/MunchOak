@@ -2,16 +2,15 @@ package com.example.menu;
 
 import com.example.manager.FileStorage;
 import com.example.munchoak.FoodItems;
-
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+
 import java.io.File;
 
 public class UserMenu extends BaseMenu {
@@ -27,22 +26,31 @@ public class UserMenu extends BaseMenu {
             vbox.getChildren().remove(categoryButtons);  // Remove category management buttons
 
             vbox.getChildren().remove(buttonMenu);
+            //loading menu items
+
+            if (cartButtons != null) {
+                cartButtons.setVisible(false);
+                cartButtons.setManaged(false);
+            }
             File menuFile = FileStorage.getMenuFile();
             if (!menuFile.exists() || menuFile.length() == 0) {
+                //If menu is empty then cart and checkout button is disabled
                 javafx.application.Platform.runLater(() -> {
-                    viewCartButton.setVisible(false);
-                    checkoutButton.setVisible(false);
+                    //viewCartButton.setVisible(false);
+                   // checkoutButton.setVisible(false);
                     // === Create nice empty state message ===
+                    //User will see messages in menu page when there is no menu loaded
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));
+                    emoji.setStyle("-fx-text-fill: #E53935 !important;");
 
                     Label title = new Label("Empty Menu Page");
                     title.setFont(Font.font("Poppins", FontWeight.BOLD, 28));
-                    title.setTextFill(Color.web("#444"));
+                    title.setStyle("-fx-text-fill: #E53935 !important;");
 
                     Label subtitle = new Label("Please try again later.");
                     subtitle.setFont(Font.font("Poppins", FontWeight.NORMAL, 18));
-                    subtitle.setTextFill(Color.web("#666"));
+                    subtitle.setStyle("-fx-text-fill: #E53935 !important;");
 
                     VBox messageBox = new VBox(10, emoji, title, subtitle);
                     messageBox.setAlignment(Pos.CENTER);

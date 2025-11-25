@@ -2,8 +2,12 @@ package com.example.view;
 
 import com.example.manager.FileStorage;
 
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -231,42 +236,54 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-//            String fullName = nameField.getText();
-//            String phone = phoneField.getText();
-//            String guests = guestsButton.getText();
-//            String date = datePicker.getValue() != null ? datePicker.getValue().toString() : "N/A";
-//            String request = requestArea.getText();
-//            showAlert("Reservation confirmed!\nFull Name: " + fullName + "\nPhone: " + phone +
-//                    "\nGuests: " + guests + "\nDate: " + date + "\nRequests: " + request);
-            String name = nameField.getText().trim();
-            String phone = phoneField.getText().trim();
-            int guests = guestSpinner.getValue();
-            LocalDate date = datePicker.getValue();
-            String time = timeBox.getValue();
+            if(Session.getCurrentUsername().equals("guest"))
+            {
+                Stage notifyPopup = new Stage();
+                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.setAlwaysOnTop(true);
+                Label notifyLabel = new Label("Please Login To Reserve Your table !");
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                VBox notifyBox = new VBox(notifyLabel);
+                notifyBox.setAlignment(Pos.CENTER);
+                notifyBox.setStyle("-fx-background-color: transparent;");
+                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                notifyPopup.show();
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e2 -> notifyPopup.close());
+                delay.play();
+            }else
+            {
+                String name = nameField.getText().trim();
+                String phone = phoneField.getText().trim();
+                int guests = guestSpinner.getValue();
+                LocalDate date = datePicker.getValue();
+                String time = timeBox.getValue();
 
-            if (name.isEmpty() || phone.isEmpty() || date == null || time == null) {
-                showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
-                return;
-            }
-
-            String summary = "Reservation Summary:\n\n" +
-                    "Name: " + name + "\n" +
-                    "Phone: " + phone + "\n" +
-                    "Guests: " + guests + "\n" +
-                    "Date: " + date + "\n" +
-                    "Time: " + time + "\n" +
-                    "Requests: " + requestArea.getText();
-
-            Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
-                if (saved) {
-                    showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
-                            "Your table has been successfully reserved!\nWe look forward to serving you.");
-                    clearFields(nameField, phoneField, requestArea, datePicker, timeBox, guestSpinner);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
+                if (name.isEmpty() || phone.isEmpty() || date == null || time == null) {
+                    showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
+                    return;
                 }
+
+                String summary = "Reservation Summary:\n\n" +
+                        "Name: " + name + "\n" +
+                        "Phone: " + phone + "\n" +
+                        "Guests: " + guests + "\n" +
+                        "Date: " + date + "\n" +
+                        "Time: " + time + "\n" +
+                        "Requests: " + requestArea.getText();
+
+                Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
+                    if (saved) {
+                        showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
+                                "Your table has been successfully reserved!\nWe look forward to serving you.");
+                        clearFields(nameField, phoneField, requestArea, datePicker, timeBox, guestSpinner);
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
+                    }
+                }
+
             }
 
         });
@@ -361,8 +378,70 @@ public class ReservationPage {
         Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
             HomePage homePage = new HomePage(primaryStage);
-            primaryStage.setScene(homePage.getHomeScene());
+            Scene homeScene = homePage.getHomeScene();
+            primaryStage.setScene(homeScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
+        });
+
+        menuBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            MenuPage menuPage = new MenuPage(primaryStage);
+            Scene menuScene = menuPage.getMenuScene();
+            primaryStage.setScene(menuScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
+        });
+
+        profileBtn.setOnAction(e -> {
+            Scene currentScene = primaryStage.getScene();
+
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
+            primaryStage.setScene(profilePage.getProfileScene());
+
+        });
+
+        aboutBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+            aboutPage.showAboutUs();
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
         });
 
         dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn, reviewBtn);
@@ -395,5 +474,24 @@ public class ReservationPage {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public void showReservation() {
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+
+        Scene scene = getReservationScene();
+        primaryStage.setScene(scene);
+
+        Platform.runLater(() -> {
+            if (wasFullScreen) primaryStage.setFullScreen(true);
+            else if (wasMaximized) primaryStage.setMaximized(true);
+            else {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+            }
+        });
     }
 }
