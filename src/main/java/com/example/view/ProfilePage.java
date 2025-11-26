@@ -20,9 +20,14 @@ public class ProfilePage {
 
     private final Stage primaryStage;
 
-    public ProfilePage(Stage stage) {
+
+    private final Scene previousScene;
+
+    public ProfilePage(Stage stage, Scene previousScene) {
         this.primaryStage = stage;
+        this.previousScene = previousScene;
     }
+
 
     public Scene getProfileScene() {
         // --- Get session info ---
@@ -38,9 +43,9 @@ public class ProfilePage {
             Label passLabel = new Label("Default guest Id: " + userId);
             passLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
 
-            Button backBtn = new Button("⬅ Back to Home");
+            Button backBtn = new Button("⬅ Back");
             backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-font-size: 16px;");
-            backBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+            backBtn.setOnAction(e -> primaryStage.setScene(previousScene));
 
 
             VBox card = new VBox(15, title, passLabel, backBtn);
@@ -129,9 +134,10 @@ public class ProfilePage {
         });
 
         // --- Back button ---
-        Button backBtn = new Button("⬅ Back to Home");
+        Button backBtn = new Button("⬅ Back");
         backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-font-size: 16px;");
-        backBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+
+        backBtn.setOnAction(e -> primaryStage.setScene(previousScene));
 
         // --- Card layout ---
         VBox card = new VBox(15, title, userLabel, emailLabel, passLabel,

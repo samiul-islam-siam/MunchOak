@@ -90,7 +90,6 @@ public class MenuPage {
         }
         menu.setSearchKeyword(searchKeyword);
 
-
         // Preserve cart if provided
         if (this.cart != null) {
             menu.setCart(this.cart);
@@ -179,10 +178,11 @@ public class MenuPage {
         }
 
         Button searchBtn = new Button("🔍");
-        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;");
-        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
-        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
-        // TODO: Add search action, e.g., searchBtn.setOnAction(e -> { /* perform search */ });
+        searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;");
+        searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-font-size: 16px; -fx-cursor: hand;"));
+        searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;"));
+
+
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
             // Re-open MenuPage with keyword applied
@@ -192,6 +192,7 @@ public class MenuPage {
             mp.menu.updateView();
 
         });
+
         // live search listener
         searchField.textProperty().addListener((obs, oldText, newText) -> {
             if (menu != null) {
@@ -201,9 +202,7 @@ public class MenuPage {
         });
 
 
-
-        searchField.setOnAction(e -> searchBtn.fire());
-
+//        searchField.setOnAction(e -> searchBtn.fire());
 
         StackPane searchPane = new StackPane(searchField,searchBtn);
         StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
@@ -228,9 +227,14 @@ public class MenuPage {
         Button profileButton = new Button();
         profileButton.setGraphic(profileLabel);
         profileButton.getStyleClass().add("top-button");
+
         profileButton.setOnAction(e -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
+
+            Scene currentScene = primaryStage.getScene();
+
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
             primaryStage.setScene(profilePage.getProfileScene());
+
         });
 
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
@@ -246,6 +250,7 @@ public class MenuPage {
                 title,
                 leftSpacer,
                 searchPane,
+                searchBtn,
                 rightSpacer,
                 homeButton,
                 aboutButton,

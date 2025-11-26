@@ -10,8 +10,10 @@ public class FoodItems {
     private final StringProperty cuisine;
     private final StringProperty imagePath;
     private final StringProperty category;
+    private final IntegerProperty quantity;
 
-    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category) {
+
+    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category, int quantity) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
@@ -19,6 +21,7 @@ public class FoodItems {
         this.cuisine = new SimpleStringProperty(cuisine);
         this.imagePath = new SimpleStringProperty(imagePath);
         this.category = new SimpleStringProperty(category);
+        this.quantity = new SimpleIntegerProperty(quantity);
     }
 
     // ----- ID -----
@@ -79,4 +82,6 @@ public class FoodItems {
     public void setCategory(String category) {
         this.category.set(category);
     }
+    public int getQuantity() { return quantity.get(); }
+    public void setQuantity(int q) { this.quantity.set(q); }
 }

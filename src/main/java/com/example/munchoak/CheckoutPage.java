@@ -256,13 +256,13 @@ public class CheckoutPage {
         searchField.setStyle("-fx-background-radius: 20; -fx-padding: 8 12; -fx-background-color: white; -fx-border-radius: 20;");
         searchField.setFocusTraversable(false);
 
-
         Button searchBtn = new Button("🔍");
         searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;");
         searchBtn.setOnMouseEntered(e -> searchBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
         searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
 
         searchContainer.getChildren().addAll(searchField, searchBtn);
+
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
             MenuPage menuPage = new MenuPage(primaryStage, cart);
@@ -287,9 +287,10 @@ public class CheckoutPage {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
                 List<FoodItems> results = FileStorage.loadMenu().stream()
-                        .filter(item -> item.getName().toLowerCase().contains(keyword)
-                                || item.getCategory().toLowerCase().contains(keyword) || item.getDetails().toLowerCase().contains(keyword)
-                                || item.getCuisine().toLowerCase().contains(keyword))
+                        .filter(i -> i.getName().toLowerCase().contains(keyword)
+                                || i.getCategory().toLowerCase().contains(keyword)
+                                || i.getDetails().toLowerCase().contains(keyword)
+                                || i.getCuisine().toLowerCase().contains(keyword))
                         .collect(Collectors.toList());
 
                 if (results.isEmpty()) {
@@ -300,6 +301,7 @@ public class CheckoutPage {
                     //resultsContainer.getChildren().setAll(noResult);
                     return;
                 }
+
                 for (FoodItems item : results) {
                     VBox card = new VBox(10);
                     card.setPrefWidth(180);
@@ -394,18 +396,34 @@ public class CheckoutPage {
         cartBtn.setOnMouseExited(e -> cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         cartBtn.setOnAction(e -> primaryStage.setScene(new CartPage(primaryStage, cart).getScene()));
 
-        Button loginBtn = new Button("Login");
-        loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
-        loginBtn.setOnMouseEntered(e -> loginBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        loginBtn.setOnMouseExited(e -> loginBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        loginBtn.setOnAction(e -> primaryStage.setScene(new LoginPage(primaryStage).getLoginScene()));
+        boolean loggedIn = (Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null &&
+                        !Session.getCurrentEmail().isEmpty());
+
+        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+        authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
+        authBtn.setOnMouseEntered(e ->
+                authBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        authBtn.setOnMouseExited(e ->
+                authBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+
+        authBtn.setOnAction(e ->
+        {
+            if (loggedIn) {
+                Session.logout();
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            } else {
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            }
+        });
 
         Button profileBtn = new Button("Profile");
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         profileBtn.setOnMouseExited(e -> profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
 
-        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, loginBtn, profileBtn);
+        buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, authBtn, profileBtn);
 
         navBar.getChildren().addAll(leftGroup, spacer1, searchContainer, spacer2, buttonsHBox);
 

@@ -418,8 +418,11 @@ public class ReservationPage {
         });
 
         profileBtn.setOnAction(e -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
+            Scene currentScene = primaryStage.getScene();
+
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
             primaryStage.setScene(profilePage.getProfileScene());
+
         });
 
         aboutBtn.setOnAction(e -> {

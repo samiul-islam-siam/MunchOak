@@ -511,6 +511,9 @@ public class HomePage implements HomePageComponent {
     }
 
     private void openProfilePageDirectly() {
-        Platform.runLater(() -> preserveStageState(new ProfilePage(primaryStage).getProfileScene()));
+        Scene currentScene = primaryStage.getScene();
+        Platform.runLater(() -> preserveStageState(
+                new ProfilePage(primaryStage, currentScene).getProfileScene()
+        ));
     }
 }

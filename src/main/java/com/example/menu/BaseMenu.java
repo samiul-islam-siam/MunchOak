@@ -38,7 +38,7 @@ public class BaseMenu {
     private ObservableList<FoodItems> foodList;
     private VBox foodContainer;
 
-    private TextField nameField, detailsField, priceField, cuisineField;
+    private TextField nameField, detailsField, priceField, cuisineField, quantityField;
     private ComboBox<String> categoryBox;
     private Label imageFilenameLabel;
     private File selectedImageFile = null;
@@ -56,7 +56,6 @@ public class BaseMenu {
     protected Button buttonMenu;
     protected String searchKeyword = "";
 
-
     public void setSearchKeyword(String keyword) {
         this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
     }
@@ -71,23 +70,14 @@ public class BaseMenu {
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
                             || i.getDetails().toLowerCase().contains(key)
-                            ||i.getCuisine().toLowerCase().contains(key))
+                            || i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
         }
+
         foodList.setAll(items);
         loadFoodItems();
 
         if (items.isEmpty()) {
-//            foodContainer.getChildren().clear();
-//            Label noResult = new Label("No matching food items");
-//            noResult.setStyle(
-//                    "-fx-font-size: 18px;" +
-//                            "-fx-text-fill: #E53935;" +
-//                            "-fx-font-weight: bold;" +
-//                            "-fx-padding: 30;"
-//            );
-//
-//            foodContainer.getChildren().add(noResult);
             foodContainer.getChildren().clear();
 
             VBox noResultBox = new VBox(10);
@@ -119,7 +109,6 @@ public class BaseMenu {
 
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
-
 
 
     public BaseMenu() {
@@ -165,15 +154,15 @@ public class BaseMenu {
         foodList.addAll(loaded);
         List<FoodItems> items = FileStorage.loadMenu();
 
+        // APPLY SEARCH KEYWORD HERE
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             String key = searchKeyword.toLowerCase();
             items = items.stream()
                     .filter(i -> i.getName().toLowerCase().contains(key)
                             || i.getCategory().toLowerCase().contains(key)
                             || i.getDetails().toLowerCase().contains(key)
-                            ||i.getCuisine().toLowerCase().contains(key))
+                            || i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
-
         }
         foodList.clear();
         foodList.addAll(items);
@@ -195,6 +184,7 @@ public class BaseMenu {
         detailsField = new TextField();
         priceField = new TextField();
         cuisineField = new TextField();
+        quantityField = new TextField();
         imageFilenameLabel = new Label("No image selected");
 
         categoryBox = new ComboBox<>();
@@ -216,13 +206,15 @@ public class BaseMenu {
         inputGrid.add(cuisineField, 1, 3);
         inputGrid.add(new Label("Category:"), 0, 4);
         inputGrid.add(categoryBox, 1, 4);
+        inputGrid.add(new Label("Quantity:"), 0, 5);
+        inputGrid.add(quantityField, 1, 5);
 
         // Category management buttons
         Button addCatBtn = new Button("Add Category");
         Button renameCatBtn = new Button("Rename Category");
         Button deleteCatBtn = new Button("Delete Category");
-        categoryButtons = new HBox(10, addCatBtn, renameCatBtn, deleteCatBtn);
-        inputGrid.add(categoryButtons, 1, 5);
+        categoryButtons = new HBox(20, addCatBtn, renameCatBtn, deleteCatBtn);
+        inputGrid.add(categoryButtons, 1, 6);
         categoryButtons.setSpacing(12);
         categoryButtons.setPadding(new Insets(10, 0, 10, 0));
 
@@ -239,8 +231,8 @@ public class BaseMenu {
         browseBtn.setOnAction(e -> chooseImage());
         HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
         imageBox.setAlignment(Pos.CENTER_LEFT);
-        inputGrid.add(new Label("Image:"), 0, 6);
-        inputGrid.add(imageBox, 1, 6);
+        inputGrid.add(new Label("Image:"), 0, 7);
+        inputGrid.add(imageBox, 1, 7);
 
         for (Node node : inputGrid.getChildren()) {
             if (node instanceof Label lbl) {
@@ -650,6 +642,9 @@ public class BaseMenu {
         Label price = new Label(String.format("Price: ৳ %.2f", food.getPrice()));
         price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
+        Label quantity = new Label("Quantity: " + food.getQuantity());
+        quantity.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
+
         Label cuisine = new Label("⭐ " + food.getCuisine());
         cuisine.setStyle("-fx-font-size: 13px; -fx-text-fill: #FFA000;");
 
@@ -707,7 +702,7 @@ public class BaseMenu {
         if (editBtn != null) buttons.getChildren().add(editBtn);
 
         // --- ADD EVERYTHING TO CARD ---
-        card.getChildren().addAll(imgView, name, desc, price, cuisine);
+        card.getChildren().addAll(imgView, name, desc, price, quantity, cuisine);
         if (!buttons.getChildren().isEmpty()) card.getChildren().add(buttons);
 
         // Click event to show detail popup
@@ -738,7 +733,7 @@ public class BaseMenu {
             return;
         }
         String cuisine = cuisineField.getText().trim();
-
+        int quantity = Integer.parseInt(quantityField.getText().trim());
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
         // compute next id from existing items to avoid ID collisions
@@ -748,7 +743,7 @@ public class BaseMenu {
         }
 
         FoodItems newFood = new FoodItems(nextId, nameField.getText().trim(), detailsField.getText().trim(),
-                price, cuisine, imageFilename, categoryBox.getValue());
+                price, cuisine, imageFilename, categoryBox.getValue(), quantity);
 
         try {
             FileStorage.appendMenuItem(newFood);
@@ -832,6 +827,8 @@ public class BaseMenu {
         Label cuisineLabel = new Label("⭐ " + food.getCuisine());
         cuisineLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
 
+        Label quantityLabel = new Label("Quantity:"+ food.getQuantity());
+        quantityLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
         // Add On section (simple hardcoded example)
         VBox addOnSection = new VBox(10);
         Label addOnTitle = new Label("Add On");
@@ -935,8 +932,10 @@ public class BaseMenu {
         currentEditingFood.setDetails(detailsField.getText().trim());
         currentEditingFood.setPrice(Double.parseDouble(priceField.getText().trim()));
         currentEditingFood.setCuisine(cuisineField.getText().trim());
+        currentEditingFood.setQuantity(Integer.parseInt(quantityField.getText()));
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
+
 
         try {
             // rewrite full menu file from in-memory list
@@ -971,6 +970,8 @@ public class BaseMenu {
         priceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         cuisineField.setText(String.valueOf(food.getCuisine()));
         cuisineField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        quantityField.setText(String.valueOf(food.getQuantity()));
+        quantityField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         imageFilenameLabel.setText(food.getImagePath());
         categoryBox.setValue(food.getCategory());
         categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #798965;");
@@ -988,6 +989,7 @@ public class BaseMenu {
         detailsField.clear();
         priceField.clear();
         cuisineField.clear();
+        quantityField.clear();
         imageFilenameLabel.setText("No image selected");
         imageFilenameLabel.setStyle("-fx-text-fill:#E53935;");
         categoryBox.setValue(null);
