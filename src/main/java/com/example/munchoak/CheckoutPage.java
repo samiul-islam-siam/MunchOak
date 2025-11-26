@@ -262,9 +262,17 @@ public class CheckoutPage {
         searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"));
 
         searchContainer.getChildren().addAll(searchField, searchBtn);
+
         searchBtn.setOnAction(e -> {
             String keyword = searchField.getText().trim();
+            MenuPage menuPage = new MenuPage(primaryStage, cart);
+
+            // Pass search keyword to MenuPage
+            menuPage.setSearchKeyword(keyword);
+
+            primaryStage.setScene(menuPage.getMenuScene());
             searchField.textProperty().set(keyword); // triggers listener
+            menuPage.menu.updateView();
         });
 
         // Initially hide the search results wrapper

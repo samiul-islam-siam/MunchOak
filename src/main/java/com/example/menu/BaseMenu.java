@@ -76,6 +76,35 @@ public class BaseMenu {
 
         foodList.setAll(items);
         loadFoodItems();
+
+        if (items.isEmpty()) {
+            foodContainer.getChildren().clear();
+
+            VBox noResultBox = new VBox(10);
+            noResultBox.setAlignment(Pos.CENTER);
+            noResultBox.setPadding(new Insets(50));
+
+            Label bigEmoji = new Label("🔎");
+            bigEmoji.setStyle("-fx-font-size: 60px;");
+
+            Label title = new Label("No Results Found");
+            title.setStyle(
+                    "-fx-font-size: 24px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: #444;"
+            );
+
+            Label sub = new Label("Try searching with a different keyword.");
+            sub.setStyle(
+                    "-fx-font-size: 14px;" +
+                            "-fx-text-fill: #777;"
+            );
+
+            noResultBox.getChildren().addAll(bigEmoji, title, sub);
+
+            foodContainer.getChildren().add(noResultBox);
+
+        }
     }
 
     // In-memory category list (backed by file)
@@ -124,7 +153,8 @@ public class BaseMenu {
         List<FoodItems> loaded = FileStorage.loadMenu();
         foodList.addAll(loaded);
         List<FoodItems> items = FileStorage.loadMenu();
-// APPLY SEARCH KEYWORD HERE
+
+        // APPLY SEARCH KEYWORD HERE
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             String key = searchKeyword.toLowerCase();
             items = items.stream()
@@ -133,17 +163,6 @@ public class BaseMenu {
                             || i.getDetails().toLowerCase().contains(key)
                             || i.getCuisine().toLowerCase().contains(key))
                     .collect(Collectors.toList());
-
-            if (items.isEmpty()) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("No Results");
-                    alert.setHeaderText(null);
-                    alert.setContentText("No items found for: \"" + searchKeyword + "\"");
-                    alert.showAndWait();
-
-                });
-            }
         }
         foodList.clear();
         foodList.addAll(items);

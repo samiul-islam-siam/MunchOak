@@ -29,10 +29,10 @@ public class MenuPage {
     private final Cart cart; // shared cart (nullable)
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
-    private Scene menuScene;
+    public Scene menuScene;
     private BorderPane root;
     private String searchKeyword = "";
-    private BaseMenu menu; // current menu instance
+    public BaseMenu menu; // current menu instance
 
     // Default constructor (no external cart)
     public MenuPage(Stage primaryStage) {
@@ -183,14 +183,15 @@ public class MenuPage {
         searchBtn.setOnMouseExited(e -> searchBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: maroon; -fx-font-size: 16px; -fx-cursor: hand;"));
 
 
-//        searchBtn.setOnAction(e -> {
-//            String keyword = searchField.getText().trim();
-//            // Re-open MenuPage with keyword applied
-//            MenuPage mp = new MenuPage(primaryStage, cart);
-//            mp.setSearchKeyword(keyword);
-//            primaryStage.setScene(mp.getMenuScene());
-//
-//        });
+        searchBtn.setOnAction(e -> {
+            String keyword = searchField.getText().trim();
+            // Re-open MenuPage with keyword applied
+            MenuPage mp = new MenuPage(primaryStage, cart);
+            mp.setSearchKeyword(keyword);
+            primaryStage.setScene(mp.getMenuScene());
+            mp.menu.updateView();
+
+        });
 
         // live search listener
         searchField.textProperty().addListener((obs, oldText, newText) -> {

@@ -144,6 +144,7 @@ public class CartPage {
             menuPage.setSearchKeyword(keyword);
 
             primaryStage.setScene(menuPage.getMenuScene());
+            menuPage.menu.updateView();
         });
 
         // Initially hide the search results wrapper
@@ -217,6 +218,19 @@ public class CartPage {
                     addBtn.setOnAction(evt -> {
                         if (Session.getCurrentUsername().equals("guest")) {
                             // Show login popup
+                            Stage notifyPopup = new Stage();
+                            notifyPopup.initStyle(StageStyle.UNDECORATED);
+                            notifyPopup.setAlwaysOnTop(true);
+                            Label notifyLabel = new Label("Please Login !");
+                            notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                            VBox notifyBox = new VBox(notifyLabel);
+                            notifyBox.setAlignment(Pos.CENTER);
+                            notifyBox.setStyle("-fx-background-color: transparent;");
+                            notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                            notifyPopup.show();
+                            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                            delay.setOnFinished(e2 -> notifyPopup.close());
+                            delay.play();
                         } else {
                             cart.addToCart(item.getId(), 1);
                             primaryStage.setScene(getScene());  // Refresh to update cart
