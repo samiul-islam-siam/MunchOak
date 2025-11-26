@@ -661,6 +661,24 @@ public class BaseMenu {
             styleMainButton(addToCartBtn);
 
             addToCartBtn.setOnAction(e -> {
+
+
+                if (food.getQuantity() <= 0) {
+                    showAlert("Stock Empty", "This item is out of stock.");
+                    return;
+                }
+
+                food.setQuantity(food.getQuantity() - 1);
+                //List<FoodItems> updated = FileStorage.loadMenu();
+                // save updated list to file
+                List<FoodItems> current = new ArrayList<>(foodList);
+                try {
+                    FileStorage.rewriteMenu(current);
+
+                } catch (Exception i) {
+                    System.err.println("IOException: " + i.getMessage());
+                    //showAlert("Error", "Failed to delete item.");
+                }
                 cart.addToCart(food.getId(), 1);
 
                 // Popup notification
@@ -687,6 +705,7 @@ public class BaseMenu {
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> popup.close());
                 delay.play();
+                updateView();
             });
         }
 
