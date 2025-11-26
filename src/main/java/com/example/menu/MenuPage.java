@@ -229,8 +229,12 @@ public class MenuPage {
         profileButton.getStyleClass().add("top-button");
 
         profileButton.setOnAction(e -> {
-            ProfilePage profilePage = new ProfilePage(primaryStage);
+
+            Scene currentScene = primaryStage.getScene();
+
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
             primaryStage.setScene(profilePage.getProfileScene());
+
         });
 
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
