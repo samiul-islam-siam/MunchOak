@@ -315,6 +315,8 @@ public class BaseMenu {
                     foodList.clear();
                     loadFoodItems();
                     showAlert("Menu Deleted", "The menu file has been deleted successfully.");
+                    // Broadcast to all clients
+                    Session.getMenuClient().sendMenuUpdate();
                 } else {
                     showAlert("Error", "Failed to delete the menu file.");
                 }
@@ -402,6 +404,9 @@ public class BaseMenu {
                 foodList.setAll(importedItems);
                 loadFoodItems();
 
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText(null);
@@ -453,6 +458,8 @@ public class BaseMenu {
                 FileStorage.addCategory(name);
                 loadCategories();
                 categoryBox.setValue(name);
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Category already exists or invalid.");
@@ -483,6 +490,8 @@ public class BaseMenu {
                 // reload menu and UI
                 foodList.setAll(FileStorage.loadMenu());
                 loadFoodItems();
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Rename failed.");
@@ -508,6 +517,8 @@ public class BaseMenu {
                     categoryBox.setValue(null);
                     foodList.setAll(FileStorage.loadMenu());
                     loadFoodItems();
+                    // Broadcast to all clients
+                    Session.getMenuClient().sendMenuUpdate();
                 } catch (Exception e) {
                     System.err.println("IOException: " + e.getMessage());
                     showAlert("Error", "Delete failed.");
@@ -666,17 +677,6 @@ public class BaseMenu {
                     return;
                 }
 
-                //  food.setQuantity(food.getQuantity() - 1);
-                //List<FoodItems> updated = FileStorage.loadMenu();
-                // save updated list to file
-//                List<FoodItems> current = new ArrayList<>(foodList);
-//                try {
-//                    FileStorage.rewriteMenu(current);
-//
-//                } catch (Exception i) {
-//                    System.err.println("IOException: " + i.getMessage());
-//                    //showAlert("Error", "Failed to delete item.");
-//                }
                 cart.addToCart(food.getId(), 1);
 
                 // Popup notification
@@ -778,6 +778,8 @@ public class BaseMenu {
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to add food item.");
@@ -925,15 +927,6 @@ public class BaseMenu {
                 food.setQuantity(food.getQuantity() - 1);
                 //List<FoodItems> updated = FileStorage.loadMenu();
                 // save updated list to file
-//                List<FoodItems> current = new ArrayList<>(foodList);
-//                try {
-//                    FileStorage.rewriteMenu(current);
-//
-//                } catch (Exception i) {
-//                    System.err.println("IOException: " + i.getMessage());
-//                    //showAlert("Error", "Failed to delete item.");
-//                }
-                //cart.addToCart(food.getId(), 1);
                 cart.addToCart(food.getId(), currentQuantity[0]);
                 // Popup notification
                 Stage notifyPopup = new Stage();
@@ -1015,6 +1008,8 @@ public class BaseMenu {
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to update food item.");
@@ -1026,6 +1021,8 @@ public class BaseMenu {
         try {
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
             loadFoodItems();
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to delete item.");
@@ -1092,6 +1089,8 @@ public class BaseMenu {
 
                 selectedImageFile = file;
                 imageFilenameLabel.setText(file.getName());
+
+                Session.getMenuClient().sendImageUpdate(destFile);
 
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
