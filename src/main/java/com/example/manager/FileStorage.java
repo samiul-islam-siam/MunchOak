@@ -128,7 +128,8 @@ public class FileStorage {
                 String cuisine = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category));
+                int quantity = dis.readInt();   // NEW LINE
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -155,6 +156,7 @@ public class FileStorage {
             dos.writeUTF(item.getCuisine());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
+            dos.writeInt(item.getQuantity());   // NEW
         }
     }
 
@@ -170,6 +172,7 @@ public class FileStorage {
                 dos.writeUTF(item.getCuisine());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
+                dos.writeInt(item.getQuantity());   // NEW
             }
         }
     }

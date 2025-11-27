@@ -716,6 +716,38 @@ public class CheckoutPage {
             }
 
             try {
+                // Load current menu
+                List<FoodItems> menuList = FileStorage.loadMenu();
+                Map<Integer, FoodItems> menuMap = menuList.stream()
+                        .collect(Collectors.toMap(FoodItems::getId, f -> f));
+
+                // Check stock availability
+                for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+                    int foodId = entry.getKey();
+                    int qtyRequested = entry.getValue();
+                    FoodItems menuItem = menuMap.get(foodId);
+
+                    if (menuItem == null || menuItem.getQuantity() < qtyRequested) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setHeaderText("Insufficient Stock");
+                        alert.setContentText("Sorry, " + (menuItem != null ? menuItem.getName() : "an item")
+                                + " is out of stock or doesn't have enough quantity.");
+                        alert.showAndWait();
+                        return; // Stop payment
+                    }
+                }
+
+                // Deduct quantities
+                for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+                    int foodId = entry.getKey();
+                    int qtyRequested = entry.getValue();
+                    FoodItems menuItem = menuMap.get(foodId);
+                    menuItem.setQuantity(menuItem.getQuantity() - qtyRequested);
+                }
+
+                // Update menu file
+                FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
+
                 // FIXED: Save the payment and discount/tip
                 Payment.checkout(cart);
                 int paymentId = Payment.getLastPaymentId();
