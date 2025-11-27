@@ -12,9 +12,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 public class HomePageThirdExtension implements HomePageComponent {
     private final StackPane extensionRoot;
@@ -27,35 +24,25 @@ public class HomePageThirdExtension implements HomePageComponent {
         extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
         // Set exact gradient background color: linear 90 degrees (#5de0e6 to #004aad)
-        extensionRoot.setStyle("-fx-background-color: linear-gradient(to right, #5de0e6, #004aad);");
+        extensionRoot.setStyle("-fx-background-color: black;");
 
         // --- Text Container (Left Side) ---
         textContainer = new VBox(10);
         textContainer.setAlignment(Pos.CENTER_LEFT);
         textContainer.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> extensionRoot.getWidth() * 0.55, extensionRoot.widthProperty()));
         textContainer.setMinHeight(HEIGHT_RATIO * getPrefHeight() * 0.9); // Ensure container takes sufficient height
-        // Title parts (staggered lines) with "The Seasons" font, increased sizes, explicit black color
+        // Title parts (staggered lines) with CSS styling
         Label title1 = new Label("ONLY THE");
-        title1.setFont(Font.font("The Seasons", FontWeight.BOLD, 32));
-        title1.setTextFill(Color.BLACK);
-        title1.setStyle("-fx-text-fill: black;");
+        title1.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
         Label title2 = new Label("FINEST");
-        title2.setFont(Font.font("The Seasons", FontWeight.BOLD, 36));
-        title2.setTextFill(Color.BLACK);
-        title2.setStyle("-fx-text-fill: black;");
+        title2.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: white;");
         Label title3 = new Label("FOOD &");
-        title3.setFont(Font.font("The Seasons", FontWeight.BOLD, 32));
-        title3.setTextFill(Color.BLACK);
-        title3.setStyle("-fx-text-fill: black;");
+        title3.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
         Label title4 = new Label("GREAT");
-        title4.setFont(Font.font("The Seasons", FontWeight.BOLD, 36));
-        title4.setTextFill(Color.BLACK);
-        title4.setStyle("-fx-text-fill: black;");
+        title4.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: white;");
         Label title5 = new Label("SERVICE");
-        title5.setFont(Font.font("The Seasons", FontWeight.BOLD, 32));
-        title5.setTextFill(Color.BLACK);
-        title5.setStyle("-fx-text-fill: black;");
-        // Paragraph with "The Seasons" font, increased size, explicit black color, full wrap
+        title5.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
+        // Paragraph with CSS styling, full wrap
         Label paragraph = new Label("""
                 Experience the harmony of taste and hospitality.
                 From fresh ingredients to flawless presentation,
@@ -64,9 +51,7 @@ public class HomePageThirdExtension implements HomePageComponent {
                 elegance, and perfection in every visit.
                 Here, every meal is more than food — it’s a moment
                 to remember.""");
-        paragraph.setFont(Font.font("The Seasons", 18));
-        paragraph.setTextFill(Color.BLACK);
-        paragraph.setStyle("-fx-text-fill: black;");
+        paragraph.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: white;");
         paragraph.setWrapText(true);
         paragraph.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> textContainer.getWidth() * 0.9, textContainer.widthProperty()));
         paragraph.setPrefHeight(Region.USE_COMPUTED_SIZE); // Allow natural height

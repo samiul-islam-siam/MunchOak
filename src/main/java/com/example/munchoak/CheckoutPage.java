@@ -32,10 +32,15 @@ import java.util.stream.Collectors;
 public class CheckoutPage {
     private final Stage primaryStage;
     private final Cart cart;
+    private final double discount; // FIXED: Added field for passed discount
+    private final double tip; // FIXED: Added field for passed tip
 
-    public CheckoutPage(Stage primaryStage, Cart cart) {
+    // FIXED: Updated constructor to accept discount and tip
+    public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip) {
         this.primaryStage = primaryStage;
         this.cart = cart;
+        this.discount = discount;
+        this.tip = tip;
     }
 
     private Map<Integer, FoodItems> buildFoodMap() {
@@ -187,8 +192,36 @@ public class CheckoutPage {
         }
     }
 
+    // Helper to show bill receipt
+    private void showBill(String receipt) {
+        Stage billStage = new Stage();
+        billStage.setTitle("Bill Receipt");
+        billStage.initModality(Modality.APPLICATION_MODAL);
+        billStage.initOwner(primaryStage);
+
+        TextArea receiptArea = new TextArea(receipt);
+        receiptArea.setEditable(false);
+        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
+        receiptArea.setPrefSize(500, 400);
+
+        VBox billBox = new VBox(15, receiptArea);
+        billBox.setPadding(new Insets(20));
+        billBox.setAlignment(Pos.CENTER);
+
+        billStage.setScene(new Scene(billBox));
+        billStage.showAndWait();
+    }
+
     public Scene getScene() {
         Map<Integer, FoodItems> foodMap = buildFoodMap();
+
+        // FIXED: Calculate totals here to match Cart (using passed discount/tip)
+        double subtotal = cart.getTotalPrice(foodMap);
+        boolean isEmptyCart = cart.getBuyHistory().isEmpty();
+        double taxAmount = 7.00; // Fixed from Cart
+        double serviceFeeAmount = 1.50; // Fixed from Cart
+        double deliveryAmount = 7.99; // Fixed from Cart
+        double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
 
         // PAGE BACKGROUND
         BorderPane root = new BorderPane();
@@ -388,7 +421,8 @@ public class CheckoutPage {
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
+        // FIXED: Pass cart to HomePage to preserve state during navigation
+        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene()));
 
         Button cartBtn = new Button("Cart");
         cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -588,11 +622,45 @@ public class CheckoutPage {
         leftColumn.getChildren().add(0, searchResultsWrapper);
 
 
-        // RIGHT COLUMN - PAYMENT FORM
+        // RIGHT COLUMN - PAYMENT FORM WITH TOTAL SUMMARY
         VBox rightColumn = new VBox(20);
         rightColumn.setPadding(new Insets(25));
         rightColumn.setPrefWidth(350);
         rightColumn.setStyle("-fx-background-color: transparent;");
+
+        // FIXED: Added Order Summary Box (mirrors Cart's summary for total visibility)
+        if (!isEmptyCart) {
+            VBox summaryBox = new VBox(15);
+            summaryBox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-margin: 0 0 20 0;");
+
+            Label yourOrder = new Label("Your Order Summary");
+            yourOrder.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+            Label subtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", subtotal));
+            subtotalLabel.setStyle("-fx-text-fill: black;");
+
+            Label discountLabel = new Label("Discount: -৳" + String.format("%.2f", discount));
+            discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
+
+            Label deliveryLabel = new Label("Delivery: ৳" + String.format("%.2f", deliveryAmount));
+            deliveryLabel.setStyle("-fx-text-fill: black;");
+
+            Label tipLabel = new Label("Tip: ৳" + String.format("%.2f", tip));
+            tipLabel.setStyle("-fx-text-fill: black;");
+
+            Label serviceFeeLabel = new Label("Service Fee: ৳" + String.format("%.2f", serviceFeeAmount));
+            serviceFeeLabel.setStyle("-fx-text-fill: black;");
+
+            Label taxLabel = new Label("Tax: ৳" + String.format("%.2f", taxAmount));
+            taxLabel.setStyle("-fx-text-fill: black;");
+
+            Separator separator = new Separator();
+            Label totalLabel = new Label("Total Payable: ৳" + String.format("%.2f", totalPayable));
+            totalLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+            summaryBox.getChildren().addAll(yourOrder, subtotalLabel, discountLabel, deliveryLabel, tipLabel, serviceFeeLabel, taxLabel, separator, totalLabel);
+            rightColumn.getChildren().add(summaryBox);
+        }
 
         // PAYMENT BOX
         VBox paymentBox = new VBox(15);
@@ -631,8 +699,8 @@ public class CheckoutPage {
         VBox cvvContainer = new VBox(5, cvvLabel, cvvField);
         expiryCvv.getChildren().addAll(expiryCvvContainer, cvvContainer);
 
-        // Pay Button
-        Button payBtn = new Button("PAY NOW");
+        // FIXED: Updated pay button to reference totalPayable in alert
+        Button payBtn = new Button("PAY NOW (৳" + String.format("%.2f", totalPayable) + ")");
         payBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;");
         payBtn.setMaxWidth(Double.MAX_VALUE);
         payBtn.setOnMouseEntered(e -> payBtn.setStyle("-fx-background-color: #e55a00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
@@ -647,19 +715,29 @@ public class CheckoutPage {
                 return;
             }
 
-            // Simulate payment success
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            Payment.checkout(cart);
-            alert.setHeaderText("Payment Successful!");
-            alert.setContentText("Your order has been placed. Thank you for shopping with MUNCHOAK!");
-            alert.showAndWait();
+            try {
+                // FIXED: Save the payment and discount/tip
+                Payment.checkout(cart);
+                int paymentId = Payment.getLastPaymentId();
+                FileStorage.savePaymentDiscountTip(paymentId, discount, tip);
 
-            // Show feedback dialog
-            showFeedbackDialog(primaryStage);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("Payment Successful!");
+                alert.setContentText("Your order has been placed for ৳" + String.format("%.2f", totalPayable) + ". Thank you for shopping with MUNCHOAK! You can view your receipt in Payment History.");
+                alert.showAndWait();
 
-            // Clear cart and navigate to success page (TODO: implement SuccessPage)
-            cart.clearCart();
-            primaryStage.setScene(new HomePage(primaryStage).getHomeScene());
+                // Show feedback dialog
+                showFeedbackDialog(primaryStage);
+
+                // Clear cart and navigate to home
+                cart.clearCart();
+                primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene());
+            } catch (Exception ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Payment Failed");
+                alert.setContentText("An error occurred: " + ex.getMessage());
+                alert.showAndWait();
+            }
         });
 
         // Add to payment box

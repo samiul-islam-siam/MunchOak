@@ -133,7 +133,7 @@ public class LoginPage {
 
         // Subtitle at the top
         Label subtitle = new Label("Fresh flavors, just one login away.");
-        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #FF6B6B; -fx-font-family: 'Comic Sans MS', cursive;");
+        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Comic Sans MS', cursive;");
         subtitle.setAlignment(Pos.CENTER);
         subtitle.setOpacity(0.0);
 

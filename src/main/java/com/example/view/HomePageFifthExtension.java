@@ -9,11 +9,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 public class HomePageFifthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
@@ -38,21 +33,14 @@ public class HomePageFifthExtension implements HomePageComponent {
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
         // --- RADIAL GRADIENT BACKGROUND ---
-        RadialGradient gradient = new RadialGradient(
-                0, 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#5de0e6")),
-                new Stop(1.0, Color.web("#004aad"))
-        );
-        extensionRoot.setBackground(new Background(new BackgroundFill(
-                gradient, CornerRadii.EMPTY, Insets.EMPTY
-        )));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- IMAGES ---
         Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish.png").toExternalForm());
         Image rightImg = new Image(getClass().getResource("/com/example/view/images/right_dish.png").toExternalForm());
 
-        leftImageView = createFramedImage(leftImg);
-        rightImageView = createFramedImage(rightImg);
+        leftImageView = createImageView(leftImg);
+        rightImageView = createImageView(rightImg);
 
         // --- MENU ---
         middleMenu = createMenuSection();
@@ -67,20 +55,19 @@ public class HomePageFifthExtension implements HomePageComponent {
         initialize();
     }
 
-    // --- Create framed image ---
-    private ImageView createFramedImage(Image image) {
+    // --- Create image view with modern styling, no frame ---
+    private ImageView createImageView(Image image) {
         ImageView iv = new ImageView(image);
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
 
-        StackPane frame = new StackPane(iv);
-        frame.setStyle("-fx-background-color: white; -fx-border-color: white; -fx-border-width: 6; -fx-border-radius: 12; -fx-background-radius: 12;");
-
+        // Softer, more modern drop shadow
         DropShadow shadow = new DropShadow();
-        shadow.setColor(Color.rgb(0, 0, 0, 0.4));
-        shadow.setRadius(18);
-        shadow.setOffsetY(10);
-        frame.setEffect(shadow);
+        shadow.setColor(Color.rgb(0, 0, 0, 0.15)); // Lighter shadow color
+        shadow.setRadius(25); // Softer blur
+        shadow.setOffsetY(8); // Reduced offset for subtlety
+        shadow.setSpread(0.1); // Slight spread for modern elevation effect
+        iv.setEffect(shadow);
 
         return iv;
     }
@@ -91,8 +78,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         menuBox.setAlignment(Pos.CENTER);
 
         Label seaTitle = new Label("From the Sea");
-        seaTitle.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
-        seaTitle.setTextFill(Color.WHITE);
+        seaTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
 
         VBox seaItems = new VBox(2);
         seaItems.setAlignment(Pos.CENTER_LEFT);
@@ -105,8 +91,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         );
 
         Label mainTitle = new Label("Main Course");
-        mainTitle.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
-        mainTitle.setTextFill(Color.WHITE);
+        mainTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
 
         VBox mainItems = new VBox(2);
         mainItems.setAlignment(Pos.CENTER_LEFT);
@@ -124,12 +109,10 @@ public class HomePageFifthExtension implements HomePageComponent {
 
     private HBox createMenuItem(String name, String price) {
         Label nameLabel = new Label(name);
-        nameLabel.setFont(Font.font("Arial", 16));
-        nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: white;");
 
         Label priceLabel = new Label(price);
-        priceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        priceLabel.setTextFill(Color.web("#ffdd00"));
+        priceLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #ffdd00;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -155,13 +138,14 @@ public class HomePageFifthExtension implements HomePageComponent {
             imageWidth = imageHeight / ASPECT_RATIO;
         }
 
+        // --- IMAGE SIZES ---
         leftImageView.setFitWidth(imageWidth);
         leftImageView.setFitHeight(imageHeight);
         rightImageView.setFitWidth(imageWidth);
         rightImageView.setFitHeight(imageHeight);
 
         // --- IMAGE POSITION (closer to edges) ---
-        double edgePadding = width * EDGE_PADDING_PERCENT; // 3%
+        double edgePadding = width * EDGE_PADDING_PERCENT; // 5%
         leftImageView.setLayoutX(edgePadding);
         leftImageView.setLayoutY((height - imageHeight) / 2);
 

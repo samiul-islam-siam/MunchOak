@@ -268,8 +268,9 @@ public class CartPage {
         homeBtn.setOnMouseExited(e ->
                 homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
 
+        // FIXED: Pass cart to HomePage to maintain cart state across navigation
         homeBtn.setOnAction(e ->
-                primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+                primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene()));
 
         Button menuBtn = new Button("Menu");
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -595,14 +596,14 @@ public class CartPage {
                 addSuggestionBtn.setOnAction(evt -> {
                     if (Session.getCurrentUsername().equals("guest")) {
                         Stage notifyPopup = new Stage();
-                        notifyPopup.initStyle(StageStyle.UNDECORATED);
+                        notifyPopup.initStyle(StageStyle.TRANSPARENT);
                         notifyPopup.setAlwaysOnTop(true);
                         Label notifyLabel = new Label("Please Login !");
                         notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
                         VBox notifyBox = new VBox(notifyLabel);
                         notifyBox.setAlignment(Pos.CENTER);
                         notifyBox.setStyle("-fx-background-color: transparent;");
-                        notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                        notifyPopup.setScene(new Scene(notifyBox, 200, 50, javafx.scene.paint.Color.TRANSPARENT));
                         notifyPopup.show();
                         PauseTransition delay = new PauseTransition(Duration.seconds(2));
                         delay.setOnFinished(e2 -> notifyPopup.close());
@@ -665,7 +666,7 @@ public class CartPage {
         VBox deliveryBox = null;
         Label tipLabel = null;
         HBox tipRow = null;
-        ToggleGroup tipGroup = null;
+        ToggleGroup tipGroup;
         RadioButton tip2;
         RadioButton tip4;
         RadioButton tip7;
@@ -704,6 +705,7 @@ public class CartPage {
 
             tipRow = new HBox(12, tip2, tip4, tip7);
         } else {
+            tipGroup = null;
             tip7 = null;
             tip4 = null;
             tip2 = null;
@@ -718,9 +720,17 @@ public class CartPage {
         Button checkoutBtn = new Button("PROCEED TO CHECKOUT");
         checkoutBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 15px; -fx-padding: 10;");
         checkoutBtn.setMaxWidth(Double.MAX_VALUE);
-        // TODO: Add checkout action, e.g., checkoutBtn.setOnAction(e -> primaryStage.setScene(new ShippingPage(primaryStage, cart).getScene()));
-        checkoutBtn.setOnAction(e -> primaryStage.setScene(new CheckoutPage(primaryStage, cart).getScene()));
-        // Coupon validation logic
+        // FIXED: Pass current discount and tip to CheckoutPage for matching totals
+        checkoutBtn.setOnAction(e -> {
+            double currentTip = 0.0;
+            if (!isEmptyCart && tipGroup != null && tipGroup.getSelectedToggle() != null) {
+                if (tipGroup.getSelectedToggle() == tip2) currentTip = 2.0;
+                else if (tipGroup.getSelectedToggle() == tip4) currentTip = 4.0;
+                else if (tipGroup.getSelectedToggle() == tip7) currentTip = 7.0;
+            }
+            primaryStage.setScene(new CheckoutPage(primaryStage, cart, discount.get(), currentTip).getScene());
+        });
+        // Coupon validation logic (FIXED: Added setDisCount and this.total update after successful apply)
         applyBtn.setOnAction(e -> {
             if (isEmptyCart) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -746,6 +756,9 @@ public class CartPage {
                 discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
                 double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
+                // FIXED: Update class fields to pass correct discount to CheckoutPage
+                setDisCount(discount.get());
+                this.total = newTotal;
                 couponField.clear();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText(null);

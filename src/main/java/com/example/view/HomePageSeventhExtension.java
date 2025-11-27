@@ -7,10 +7,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
 
 public class HomePageSeventhExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
@@ -21,25 +17,12 @@ public class HomePageSeventhExtension implements HomePageComponent {
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
 
         // --- 90° LINEAR GRADIENT BACKGROUND ---
-        LinearGradient gradient = new LinearGradient(
-                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#5de0e6")),
-                new Stop(1.0, Color.web("#004aad"))
-        );
-        extensionRoot.setBackground(new Background(new BackgroundFill(
-                gradient, CornerRadii.EMPTY, Insets.EMPTY
-        )));
-
-        // --- Fonts ---
-        Font titleFont = Font.font("The Seasons", 36);
-        Font subtitleFont = Font.font("The Seasons", 18);
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- Headline ---
         Label headline = new Label("UPCOMING EVENTS");
-        headline.setFont(titleFont);
         headline.setStyle("""
-                -fx-text-fill: white;
-                -fx-font-weight: bold;
+                -fx-font-family: 'The Seasons'; -fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;
                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
                 """);
         headline.setAlignment(Pos.CENTER);
@@ -57,7 +40,6 @@ public class HomePageSeventhExtension implements HomePageComponent {
                 "ILLISH UTTSOB",
                 "02 NOV, Sunday",
                 "Reservations 12.30 - 2 PM",
-                subtitleFont,
                 307, 255
         );
         section1.setBorder(new Border(new BorderStroke(
@@ -69,7 +51,6 @@ public class HomePageSeventhExtension implements HomePageComponent {
                 "FOOD FORWARDERS",
                 "20 NOV, Thursday",
                 "Join Us : 4 - 8 PM",
-                subtitleFont,
                 263, 200
         );
         section2.setBorder(new Border(new BorderStroke(
@@ -81,7 +62,6 @@ public class HomePageSeventhExtension implements HomePageComponent {
                 "CHRISTMAS EVE",
                 "25 DEC, Thursday",
                 "Reservations 11 AM - 1 PM",
-                subtitleFont,
                 307, 255
         );
 
@@ -105,7 +85,7 @@ public class HomePageSeventhExtension implements HomePageComponent {
         initialize();
     }
 
-    private VBox createImageSection(String imagePath, String eventTitle, String eventDate, String eventDetails, Font font, double width, double height) {
+    private VBox createImageSection(String imagePath, String eventTitle, String eventDate, String eventDetails, double width, double height) {
         VBox section = new VBox(11);
         section.setAlignment(Pos.TOP_CENTER);
         section.setPadding(new Insets(15));
@@ -126,16 +106,13 @@ public class HomePageSeventhExtension implements HomePageComponent {
 
         // --- Event text below image ---
         Label titleLabel = new Label(eventTitle);
-        titleLabel.setFont(Font.font("The Seasons", 22));
-        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         Label dateLabel = new Label(eventDate);
-        dateLabel.setFont(font);
-        dateLabel.setStyle("-fx-text-fill: #ffd700;");
+        dateLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: #ffd700;");
 
         Label detailsLabel = new Label(eventDetails);
-        detailsLabel.setFont(font);
-        detailsLabel.setStyle("-fx-text-fill: white;");
+        detailsLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: white;");
 
         VBox textBox = new VBox(3, titleLabel, dateLabel, detailsLabel);
         textBox.setAlignment(Pos.CENTER);

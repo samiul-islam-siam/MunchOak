@@ -867,14 +867,16 @@ public class BaseMenu {
         addToCartDetail.setOnAction(ev -> {
             if (Session.getCurrentUsername().equals("guest")) {
                 Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
                 Label notifyLabel = new Label("Please Login !");
                 notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
                 VBox notifyBox = new VBox(notifyLabel);
                 notifyBox.setAlignment(Pos.CENTER);
                 notifyBox.setStyle("-fx-background-color: transparent;");
-                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                Scene popupScene = new Scene(notifyBox, 200, 50);
+                popupScene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+                notifyPopup.setScene(popupScene);
                 notifyPopup.show();
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> notifyPopup.close());

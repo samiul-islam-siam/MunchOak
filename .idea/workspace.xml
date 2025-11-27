@@ -4,13 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="searching enhanced">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="back logic correction">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,37 +78,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.ChatServer.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Dashboard.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Home.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Launcher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainHome.executor&quot;: &quot;Run&quot;,
-    &quot;Application.RestaurantDashboard.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/munchoak&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.30804598&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.ChatServer.executor": "Run",
+    "Application.Dashboard.executor": "Run",
+    "Application.Home.executor": "Run",
+    "Application.Launcher.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Application.MainHome.executor": "Run",
+    "Application.RestaurantDashboard.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/view",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.30804598",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager\data" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager\images" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\login\FXMLs" />
@@ -130,14 +144,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1759067535159</updated>
-    </task>
-    <task id="LOCAL-00024" summary="new version">
-      <option name="closed" value="true" />
-      <created>1762348400480</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1762348400480</updated>
     </task>
     <task id="LOCAL-00025" summary="README update">
       <option name="closed" value="true" />
@@ -523,11 +529,18 @@
       <option name="project" value="LOCAL" />
       <updated>1764126782787</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="back logic correction">
+      <option name="closed" value="true" />
+      <created>1764127682137</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1764127682137</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fresh" />
     <MESSAGE value="several changes" />
     <MESSAGE value="updated chat server" />
     <MESSAGE value="updated menu page" />
@@ -552,6 +565,7 @@
     <MESSAGE value="Searching added" />
     <MESSAGE value="login logout in cart page fixed" />
     <MESSAGE value="searching enhanced" />
-    <option name="LAST_COMMIT_MESSAGE" value="searching enhanced" />
+    <MESSAGE value="back logic correction" />
+    <option name="LAST_COMMIT_MESSAGE" value="back logic correction" />
   </component>
 </project>

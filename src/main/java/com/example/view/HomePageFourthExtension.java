@@ -11,11 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 public class HomePageFourthExtension implements HomePageComponent {
     private final AnchorPane extensionRoot;
@@ -35,14 +30,7 @@ public class HomePageFourthExtension implements HomePageComponent {
         extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
         // Set linear gradient background (horizontal: left to right)
-        Stop[] stops = new Stop[] {
-                new Stop(0, Color.web("#49bad8")),
-                new Stop(1, Color.web("#1c71bd"))
-        };
-        LinearGradient lg = new LinearGradient(
-                0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops
-        );
-        extensionRoot.setBackground(new Background(new BackgroundFill(lg, CornerRadii.EMPTY, Insets.EMPTY)));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- Single Image: Rectangular frame at left center ---
         Image mainImage = new Image(getClass().getResource("/com/example/view/images/cocktails.png").toExternalForm());
@@ -74,11 +62,9 @@ public class HomePageFourthExtension implements HomePageComponent {
                 Because true elegance is generous.
                 """;
         textLabel = new Label(previewText);
-        textLabel.setFont(Font.font("Segoe UI", 16));
-        textLabel.setTextFill(Color.WHITE);
+        textLabel.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16px; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.2, 0, 1);");
         textLabel.setWrapText(true);
         textLabel.setAlignment(Pos.TOP_LEFT); // Ensure text aligns left within the label for readability
-        textLabel.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.2, 0, 1);");
 
         // --- Scrollable container - FIXED: No scrollbars, transparent ---
         scrollPane = new ScrollPane(textLabel);
@@ -102,20 +88,17 @@ public class HomePageFourthExtension implements HomePageComponent {
         String[] letters = {"C", "U", "I", "S", "I", "N", "E"};
         for (String letter : letters) {
             Label letterLabel = new Label(letter);
-            letterLabel.setFont(Font.font("The Seasons", FontWeight.BOLD, 56)); // Larger font size
-            letterLabel.setTextFill(Color.WHITE);
-            letterLabel.setOpacity(0.7); // Semi-transparent
+            letterLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 56px; -fx-text-fill: white; -fx-opacity: 0.7;");
             cuisineBox.getChildren().add(letterLabel);
         }
 
         // Our History & Goal - larger font
         Label historyLabel = new Label("Our History & Goal");
-        historyLabel.setFont(Font.font("The Seasons", FontWeight.BOLD, 32)); // Larger font size
-        historyLabel.setTextFill(Color.WHITE);
+        historyLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
 
         // --- Read More button (onAction set later) ---
         readMoreBtn = new Button("Read More ⬇");
-        readMoreBtn.getStyleClass().add("top-button"); // Use the same style as login buttons
+        readMoreBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 1; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 16;");
 
         // --- Container for headers + scroll + button ---
         textContainer = new VBox(25, cuisineBox, historyLabel, scrollPane, readMoreBtn); // Increased spacing for distance
