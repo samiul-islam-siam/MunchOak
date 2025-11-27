@@ -46,6 +46,7 @@ public class BaseMenu {
     private FoodItems currentEditingFood = null;
     protected Button deleteMenuButton;
 
+
     // ===== make UI sections accessible to subclasses =====
     protected VBox mainLayout;
     protected Button showAddFormBtn;
@@ -147,7 +148,7 @@ public class BaseMenu {
     //public void setSearchKeyword(String kw) {}
 
     public Node getView() {
-        foodList = FXCollections.observableArrayList();
+        //foodList = FXCollections.observableArrayList();
         // load menu into foodList from files
         List<FoodItems> loaded = FileStorage.loadMenu();
         foodList.addAll(loaded);

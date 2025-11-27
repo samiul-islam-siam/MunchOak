@@ -5,15 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="back logic correction">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/menu_part2.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +36,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Database" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -67,30 +72,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.ChatServer.executor": "Run",
-    "Application.Dashboard.executor": "Run",
-    "Application.Home.executor": "Run",
-    "Application.Launcher.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.MainHome.executor": "Run",
-    "Application.RestaurantDashboard.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "Database",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/USER/IdeaProjects/MunchOakCopy/src/main/java/com/example/munchoak",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.30804598",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ChatServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Dashboard.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Home.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Launcher.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainHome.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MenuServer.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RestaurantDashboard.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/MunchOakCopy/src/main/java/com/example/munchoak&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.30804598&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\MunchOakCopy\src\main\java\com\example\munchoak" />

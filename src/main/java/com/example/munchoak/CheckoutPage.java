@@ -716,19 +716,7 @@ public class CheckoutPage {
             }
 
             try {
-                // FIXED: Save the payment and discount/tip
-//                food.setQuantity(food.getQuantity() - 1);
-//                //List<FoodItems> updated = FileStorage.loadMenu();
-//                // save updated list to file
-//                List<FoodItems> current = new ArrayList<>(foodList);
-//                try {
-//                    FileStorage.rewriteMenu(current);
-//
-//                } catch (Exception i) {
-//                    System.err.println("IOException: " + i.getMessage());
-//                    //showAlert("Error", "Failed to delete item.");
-//                }
-                // Load current menu
+
                 List<FoodItems> menuList = FileStorage.loadMenu();
                 Map<Integer, FoodItems> menuMap = menuList.stream()
                         .collect(Collectors.toMap(FoodItems::getId, f -> f));

@@ -66,4 +66,8 @@ public class Session {
     public static void logout() {
         resetToGuest();
     }
+    public static void setMenuClient(MenuClient client) {
+        menuClient = client;
+    }
+
 }
