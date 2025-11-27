@@ -1,12 +1,27 @@
 
 package com.example.manager;
 
+import com.example.menu.MenuClient;
+
 public class Session {
 
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
     private static String currentEmail = "guest@gmail.com";
     private static String currentPassword = "ai01*2#";
+
+    // ===== NEW: Global menu socket client =====
+    private static MenuClient menuClient;
+
+    public static void initializeSocket() {
+        if (menuClient == null) {
+            menuClient = new MenuClient(); // connect to server
+        }
+    }
+
+    public static MenuClient getMenuClient() {
+        return menuClient;
+    }
 
     public static int getCurrentUserId() {
         return currentUserId;

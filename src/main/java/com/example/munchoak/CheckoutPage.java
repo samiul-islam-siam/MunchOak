@@ -760,6 +760,10 @@ public class CheckoutPage {
                 // Update menu file
                 FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
 
+/*------------------------------SERVER PART----------------------------------------*/
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
+
                 Payment.checkout(cart);
                 int paymentId = Payment.getLastPaymentId();
                 FileStorage.savePaymentDiscountTip(paymentId, discount, tip);

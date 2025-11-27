@@ -1,7 +1,7 @@
 package com.example.munchoak;
 
+import com.example.manager.FileStorage;
 import com.example.manager.Session;
-import javafx.stage.Stage;
 
 import java.util.Map;
 
@@ -53,20 +53,20 @@ public class Bill {
         double delivery = 7.99;
         double tax = 7.00;
         double service = 1.50;
-        double discount = payment.getDiscount();
-        double tip = payment.getTip();
+        double discount = FileStorage.getPaymentDiscount(payment.getId());
+        double tip = FileStorage.getPaymentTip(payment.getId());
 
         // Match the order in the screenshot: Delivery, Tax, Service Fee, then add Tip, then Discount
-        sb.append(String.format("%-25s %10.2f\n", "Delivery Amount:", delivery));
-        sb.append(String.format("%-25s %10.2f\n", "Tax Amount:", tax));
-        sb.append(String.format("%-25s %10.2f\n", "Service Fee:", service));
-        sb.append(String.format("%-25s %10.2f\n", "Tip:", tip));
-        sb.append(String.format("%-25s %10.2f\n", "Discount:", -discount));
+        sb.append(String.format("%-26s %10.2f\n", "Delivery Amount:", delivery));
+        sb.append(String.format("%-26s %10.2f\n", "Tax Amount:", tax));
+        sb.append(String.format("%-26s %10.2f\n", "Service Fee:", service));
+        sb.append(String.format("%-26s %10.2f\n", "Tip:", tip));
+        sb.append(String.format("%-26s %10.2f\n", "Discount:", -discount));
 
         double finalTotal = subtotal + delivery + tax + service + tip - discount;
 
         sb.append("--------------------------------------------\n");
-        sb.append(String.format("%-20s %15.2f\n", "TOTAL:", finalTotal));
+        sb.append(String.format("%-21s %15.2f\n", "TOTAL:", finalTotal));
         sb.append("============================================\n");
         sb.append("         Thank you for dining with us!       \n");
         sb.append("============================================\n");
