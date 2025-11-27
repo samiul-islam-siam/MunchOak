@@ -16,16 +16,25 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 public class History {
 
     private final Stage primaryStage;
+    private final Cart cart;  // ADDED: To support reordering into current cart
     private ObservableList<HistoryRecord> historyData;
 
+    // UPDATED: Overloaded constructor for backward compatibility (creates new Cart if not provided)
     public History(Stage primaryStage) {
+        this(primaryStage, new Cart());
+    }
+
+    // Primary constructor
+    public History(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
+        this.cart = cart;
     }
 
     public Scene getScene() {
@@ -71,7 +80,32 @@ public class History {
             }
         });
 
-        historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol);
+        // ADDED: Reorder Column
+        TableColumn<HistoryRecord, Void> reorderCol = new TableColumn<>("Reorder");
+        reorderCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("Reorder");
+
+            {
+                btn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 4 8;");
+                btn.setOnAction(e -> {
+                    HistoryRecord record = getTableView().getItems().get(getIndex());
+                    Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
+                    for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+                        cart.addToCart(entry.getKey(), entry.getValue());
+                    }
+                    // Navigate to Cart page to view updated cart
+                    primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btn);
+            }
+        });
+
+        historyTable.getColumns().addAll(userIdCol, paymentIdCol, dateCol, totalCol, methodCol, billCol, reorderCol);
         historyTable.setItems(historyData);
 
         // Load payment data
@@ -117,11 +151,19 @@ public class History {
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
         boolean isAdmin = Session.getCurrentUsername().equals("admin");
-        CartPage cartPage = new CartPage(primaryStage,new Cart());
+
+        double delivery = 7.99;
+        double tax = 7.00;
+        double service = 1.50;
 
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!isAdmin && s.userId != currentUserId) continue;
-            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, s.amount+cartPage.getTotal(), "Success", s.paymentMethod));
+            // FIXED: Load actual discount and tip for this payment to match Cart/Checkout totals
+            double discountVal = FileStorage.getPaymentDiscount(s.paymentId);  // Assume FileStorage method loads saved discount for paymentId
+            double tipVal = FileStorage.getPaymentTip(s.paymentId);  // Assume FileStorage method loads saved tip for paymentId
+            double subtotal = s.amount;  // Assuming s.amount is the subtotal saved in storage
+            double fullAmount = subtotal - discountVal + delivery + tipVal + service + tax;
+            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, fullAmount, "Success", s.paymentMethod));
         }
     }
 
@@ -129,31 +171,25 @@ public class History {
     private void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
-        Cart cart = new Cart();
+        Cart tempCart = new Cart();
         Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
         for (Map.Entry<Integer, Integer> e : items.entrySet()) {
-            cart.addToCart(e.getKey(), e.getValue());
+            tempCart.addToCart(e.getKey(), e.getValue());
         }
 
-        Payment payment = new Payment(record.getPaymentId(), record.getAmount());
-        try {
-            Field idField = Payment.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(payment, record.getPaymentId());
+        // FIXED: Load actual discount and tip to match totals in bill/receipt
+        double discountVal = FileStorage.getPaymentDiscount(record.getPaymentId);
+        double tipVal = FileStorage.getPaymentTip(record.getPaymentId);
+        double subtotal = tempCart.getTotalPrice(foodMap);  // Recalculate subtotal from items for accuracy
+        // FIXED: Create Payment with subtotal, then set discount/tip via setters for Bill to use in receipt breakdown
+        Payment payment = new Payment(record.getPaymentId(), subtotal, record.getTimestamp());
+        payment.setDiscount(discountVal);
+        payment.setTip(tipVal);
+        payment.setSuccess(record.getStatus().equalsIgnoreCase("Success"));
+        payment.setPaymentMethod(record.getPaymentMethod());
 
-            Field timestampField = Payment.class.getDeclaredField("timestamp");
-            timestampField.setAccessible(true);
-            timestampField.set(payment, record.getTimestamp());
-
-            Field successField = Payment.class.getDeclaredField("success");
-            successField.setAccessible(true);
-            successField.set(payment, record.getStatus().equalsIgnoreCase("Success"));
-        } catch (Exception ex) {
-            System.err.println("Exception: " + ex.getMessage());
-        }
-
-        Bill bill = new Bill(cart, payment);
-        String receipt = bill.generateReceipt(foodMap);
+        Bill bill = new Bill(tempCart, payment);
+        String receipt = bill.generateReceipt(foodMap);  // Assume this now uses payment.getDiscount(), payment.getTip() for correct total in receipt
 
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");
@@ -179,6 +215,7 @@ public class History {
         private final double amount;
         private final String status;
         private final String paymentMethod;
+        public int getPaymentId;
 
         public HistoryRecord(int userId, int paymentId, String timestamp,
                              double amount, String status, String paymentMethod) {

@@ -5,7 +5,6 @@ import com.example.manager.Session;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 import javafx.animation.*;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -661,8 +660,6 @@ public class BaseMenu {
             styleMainButton(addToCartBtn);
 
             addToCartBtn.setOnAction(e -> {
-
-
                 if (food.getQuantity() <= 0) {
                     showAlert("Stock Empty", "This item is out of stock.");
                     return;
@@ -671,14 +668,14 @@ public class BaseMenu {
                 food.setQuantity(food.getQuantity() - 1);
                 //List<FoodItems> updated = FileStorage.loadMenu();
                 // save updated list to file
-                List<FoodItems> current = new ArrayList<>(foodList);
-                try {
-                    FileStorage.rewriteMenu(current);
-
-                } catch (Exception i) {
-                    System.err.println("IOException: " + i.getMessage());
-                    //showAlert("Error", "Failed to delete item.");
-                }
+//                List<FoodItems> current = new ArrayList<>(foodList);
+//                try {
+//                    FileStorage.rewriteMenu(current);
+//
+//                } catch (Exception i) {
+//                    System.err.println("IOException: " + i.getMessage());
+//                    //showAlert("Error", "Failed to delete item.");
+//                }
                 cart.addToCart(food.getId(), 1);
 
                 // Popup notification
@@ -908,6 +905,24 @@ public class BaseMenu {
                 delay.play();
                 dialog.close();
             } else {
+
+                if (food.getQuantity() <= 0) {
+                    showAlert("Stock Empty", "This item is out of stock.");
+                    return;
+                }
+
+                food.setQuantity(food.getQuantity() - 1);
+                //List<FoodItems> updated = FileStorage.loadMenu();
+                // save updated list to file
+//                List<FoodItems> current = new ArrayList<>(foodList);
+//                try {
+//                    FileStorage.rewriteMenu(current);
+//
+//                } catch (Exception i) {
+//                    System.err.println("IOException: " + i.getMessage());
+//                    //showAlert("Error", "Failed to delete item.");
+//                }
+                //cart.addToCart(food.getId(), 1);
                 cart.addToCart(food.getId(), currentQuantity[0]);
                 // Popup notification
                 Stage notifyPopup = new Stage();
@@ -924,6 +939,7 @@ public class BaseMenu {
                 delay.setOnFinished(e2 -> notifyPopup.close());
                 delay.play();
                 dialog.close();
+                updateView();
             }
         });
 

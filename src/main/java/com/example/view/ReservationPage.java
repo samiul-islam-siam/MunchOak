@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -57,6 +58,30 @@ public class ReservationPage {
         }
         imagePane.setPrefHeight(600);
         imagePane.setMaxWidth(Double.MAX_VALUE);
+
+        // Semi-transparent spherical downward indicator button
+        Button downIndicator = new Button("↓");
+        downIndicator.setStyle("""
+                -fx-background-color: rgba(255, 255, 255, 0.3);
+                -fx-font-size: 24px;
+                -fx-text-fill: white;
+                -fx-background-radius: 50;
+                -fx-min-width: 60;
+                -fx-min-height: 60;
+                -fx-max-width: 60;
+                -fx-max-height: 60;
+                -fx-cursor: hand;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 2);
+                """);
+        // Clip to circle for perfect sphere
+        downIndicator.setShape(new Circle(30));
+        downIndicator.setOnAction(e -> {
+            // Scroll to bottom
+            ScrollPane scrollPane = (ScrollPane) root.getCenter();
+            scrollPane.setVvalue(1.0);
+        });
+        StackPane.setAlignment(downIndicator, Pos.CENTER);
+        imagePane.getChildren().add(downIndicator);
 
         // EXTENSION SECTION
         VBox extensionSection = new VBox(20);
@@ -224,8 +249,8 @@ public class ReservationPage {
         requestArea.setPrefWidth(400);
         requestArea.setWrapText(true);
         requestArea.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #ccc;
+                    -fx-background-color: transparent;
+                    -fx-border-color: transparent;
                     -fx-border-radius: 0;
                     -fx-background-radius: 0;
                     -fx-font-size: 16px;
@@ -239,20 +264,22 @@ public class ReservationPage {
             if(Session.getCurrentUsername().equals("guest"))
             {
                 Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
                 Label notifyLabel = new Label("Please Login To Reserve Your table !");
-                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                notifyLabel.setWrapText(true); // Enable text wrapping for longer messages
+                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 15 25 15 25; -fx-background-radius: 10;");
                 VBox notifyBox = new VBox(notifyLabel);
                 notifyBox.setAlignment(Pos.CENTER);
                 notifyBox.setStyle("-fx-background-color: transparent;");
-                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                Scene popupScene = new Scene(notifyBox, 320, 80);
+                popupScene.setFill(Color.TRANSPARENT);
+                notifyPopup.setScene(popupScene);
                 notifyPopup.show();
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> notifyPopup.close());
                 delay.play();
-            }else
-            {
+            } else {
                 String name = nameField.getText().trim();
                 String phone = phoneField.getText().trim();
                 int guests = guestSpinner.getValue();
@@ -444,7 +471,7 @@ public class ReservationPage {
             });
         });
 
-        dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn, reviewBtn);
+        dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn);
         return dashboard;
     }
 

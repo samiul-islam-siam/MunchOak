@@ -22,6 +22,7 @@ public class FileStorage {
     private static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
+    private static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
     // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
 
@@ -92,7 +93,7 @@ public class FileStorage {
                     dos.writeUTF(category); // write each category in binary format
                 }
             }
-            //When there is no such file , create the corresponding one
+            // When there is no such file , create the corresponding one
             if (!PAYMENTS_FILE.exists()) PAYMENTS_FILE.createNewFile();
             if (!CARTS_FILE.exists()) CARTS_FILE.createNewFile();
             if (!CART_ITEMS_FILE.exists()) CART_ITEMS_FILE.createNewFile();
@@ -100,7 +101,7 @@ public class FileStorage {
             if (!ORDERS_FILE.exists()) ORDERS_FILE.createNewFile();
             if (!RESERVATIONS_FILE.exists()) RESERVATIONS_FILE.createNewFile();
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
-
+            if (!PAYMENT_DISCOUNTS_FILE.exists()) PAYMENT_DISCOUNTS_FILE.createNewFile();
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
@@ -174,7 +175,7 @@ public class FileStorage {
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
 
-                dos.writeInt(item.getQuantity());
+                dos.writeInt(item.getQuantity());   // NEW
             }
         }
     }
@@ -395,6 +396,69 @@ public class FileStorage {
             }
         }
         return paymentId;
+    }
+
+    /**
+     * Saves discount and tip for a specific payment ID.
+     * Appends to payment_discounts.dat file.
+     */
+    public static void savePaymentDiscountTip(int paymentId, double discount, double tip) throws IOException {
+        ensureDataDir();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(PAYMENT_DISCOUNTS_FILE, true))) {
+            dos.writeInt(paymentId);
+            dos.writeDouble(discount);
+            dos.writeDouble(tip);
+        }
+    }
+
+    /**
+     * Retrieves the discount for a specific payment ID.
+     * Returns 0.0 if not found.
+     */
+    public static double getPaymentDiscount(int paymentId) {
+        ensureDataDir();
+        if (!PAYMENT_DISCOUNTS_FILE.exists() || PAYMENT_DISCOUNTS_FILE.length() == 0) return 0.0;
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(PAYMENT_DISCOUNTS_FILE))) {
+            while (dis.available() > 0) {
+                int pid = dis.readInt();
+                double disc = dis.readDouble();
+                dis.readDouble(); // skip tip
+                if (pid == paymentId) return disc;
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
+    /**
+     * Retrieves the tip for a specific payment ID.
+     * Returns 0.0 if not found.
+     */
+    public static double getPaymentTip(int paymentId) {
+        ensureDataDir();
+        if (!PAYMENT_DISCOUNTS_FILE.exists() || PAYMENT_DISCOUNTS_FILE.length() == 0) return 0.0;
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(PAYMENT_DISCOUNTS_FILE))) {
+            while (dis.available() > 0) {
+                int pid = dis.readInt();
+                dis.readDouble(); // skip discount
+                double tip = dis.readDouble();
+                if (pid == paymentId) return tip;
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return 0.0;
+    }
+
+    /**
+     * Gets the last generated payment ID.
+     * Returns 3000 if no payments exist.
+     */
+    public static int getLastPaymentId() {
+        return generateNextIdInFile(PAYMENTS_FILE, 3001) - 1;
     }
 
     //Reading history from payments_file
