@@ -665,7 +665,7 @@ public class BaseMenu {
                     return;
                 }
 
-                food.setQuantity(food.getQuantity() - 1);
+                //  food.setQuantity(food.getQuantity() - 1);
                 //List<FoodItems> updated = FileStorage.loadMenu();
                 // save updated list to file
 //                List<FoodItems> current = new ArrayList<>(foodList);
@@ -702,7 +702,7 @@ public class BaseMenu {
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> popup.close());
                 delay.play();
-                updateView();
+
             });
         }
 
@@ -749,7 +749,17 @@ public class BaseMenu {
             return;
         }
         String cuisine = cuisineField.getText().trim();
-        int quantity = Integer.parseInt(quantityField.getText().trim());
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityField.getText().trim());
+            if (quantity < 0) {
+                showAlert("Error", "Quantity cannot be negative.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid Quantity.");
+            return;
+        }
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
         // compute next id from existing items to avoid ID collisions
@@ -965,9 +975,35 @@ public class BaseMenu {
 
         currentEditingFood.setName(nameField.getText().trim());
         currentEditingFood.setDetails(detailsField.getText().trim());
-        currentEditingFood.setPrice(Double.parseDouble(priceField.getText().trim()));
+
+
+        double price;
+        try {
+            price = Double.parseDouble(priceField.getText().trim());
+            if (price < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+            currentEditingFood.setPrice(price);
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
         currentEditingFood.setCuisine(cuisineField.getText().trim());
-        currentEditingFood.setQuantity(Integer.parseInt(quantityField.getText()));
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityField.getText().trim());
+
+            if (quantity < 0) {
+                showAlert("Error", "Quantity cannot be negative.");
+                return;
+            }
+            currentEditingFood.setQuantity(quantity);
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid Quantity.");
+            return;
+        }
+
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
 
