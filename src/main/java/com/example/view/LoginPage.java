@@ -476,7 +476,16 @@ public class LoginPage {
                     showAdminStatus("Incorrect ID or password!", true); // <<< Use the right method!
                     return;
                 }
-                Session.setCurrentUser("admin");
+                //   Session.setCurrentUser("admin");
+                if (AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                    Session.setAdminUser(); // <-- sets isAdmin = true
+                    showAdminStatus("Admin login successful!", false);
+                    AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                    dashboard.openAdminDashboard();
+                } else {
+                    showAdminStatus("Incorrect ID or password!", true);
+                }
+
                 showAdminStatus("Admin login successful!", false);
                 AdminDashboard dashboard = new AdminDashboard(primaryStage);
                 dashboard.openAdminDashboard();

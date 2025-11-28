@@ -42,11 +42,6 @@ public class AdminFileStorage {
         writeText(ADMIN_ID + "," + salt + ":" + hash);
     }
 
-    // TODO: not implemented
-    //    public static int countUsers() {
-    //        return getAllUsers().size();
-    //    }
-
     // ---------- Helpers ----------
     private static List<String> readLines() {
         List<String> lines = new ArrayList<>();
@@ -57,6 +52,19 @@ public class AdminFileStorage {
             System.err.println("IOException: " + e.getMessage());
         }
         return lines;
+    }
+
+    // AdminFileStorage.java
+    public static String getAdminPassword() throws IOException {
+        List<String> lines = readLines();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(ADMIN_ID)) {
+                String[] saltAndHash = parts[1].split(":");
+                return saltAndHash[1]; // return hash only (if needed)
+            }
+        }
+        return null;
     }
 
     private static void writeText(String text) throws IOException {

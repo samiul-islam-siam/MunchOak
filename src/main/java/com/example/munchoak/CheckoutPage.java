@@ -716,7 +716,7 @@ public class CheckoutPage {
             }
 
             try {
-                // Load current menu
+
                 List<FoodItems> menuList = FileStorage.loadMenu();
                 Map<Integer, FoodItems> menuMap = menuList.stream()
                         .collect(Collectors.toMap(FoodItems::getId, f -> f));
@@ -748,7 +748,10 @@ public class CheckoutPage {
                 // Update menu file
                 FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
 
-                // FIXED: Save the payment and discount/tip
+/*------------------------------SERVER PART----------------------------------------*/
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
+
                 Payment.checkout(cart);
                 int paymentId = Payment.getLastPaymentId();
                 FileStorage.savePaymentDiscountTip(paymentId, discount, tip);

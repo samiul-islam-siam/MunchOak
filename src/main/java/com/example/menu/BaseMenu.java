@@ -60,6 +60,12 @@ public class BaseMenu {
     }
 
     public void updateView() {
+        // Remove guest empty message if it exists
+        Node emptyMsg = mainLayout.lookup("#empty-message");
+        if (emptyMsg != null) {
+            ((Pane) emptyMsg.getParent()).getChildren().remove(emptyMsg);
+        }
+
         // reload the full menu
         List<FoodItems> items = FileStorage.loadMenu();
 
@@ -147,8 +153,6 @@ public class BaseMenu {
     //public void setSearchKeyword(String kw) {}
 
     public Node getView() {
-        foodList = FXCollections.observableArrayList();
-        // load menu into foodList from files
         List<FoodItems> loaded = FileStorage.loadMenu();
         foodList.addAll(loaded);
         List<FoodItems> items = FileStorage.loadMenu();
@@ -277,7 +281,7 @@ public class BaseMenu {
             styleMainButton(deleteMenuButton);
             deleteMenuButton.setOnAction(e -> deleteMenuFile());
 
-            adminButtons = new HBox(15, showAddFormBtn, buttonMenu, deleteMenuButton);
+            adminButtons = new HBox(15, showAddFormBtn, buttonMenu);
             adminButtons.setAlignment(Pos.CENTER);
             adminButtons.setPadding(new Insets(10, 0, 10, 0));
         }
@@ -314,6 +318,8 @@ public class BaseMenu {
                     foodList.clear();
                     loadFoodItems();
                     showAlert("Menu Deleted", "The menu file has been deleted successfully.");
+                    // Broadcast to all clients
+                    Session.getMenuClient().sendMenuUpdate();
                 } else {
                     showAlert("Error", "Failed to delete the menu file.");
                 }
@@ -401,6 +407,9 @@ public class BaseMenu {
                 foodList.setAll(importedItems);
                 loadFoodItems();
 
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText(null);
@@ -452,6 +461,8 @@ public class BaseMenu {
                 FileStorage.addCategory(name);
                 loadCategories();
                 categoryBox.setValue(name);
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Category already exists or invalid.");
@@ -482,6 +493,8 @@ public class BaseMenu {
                 // reload menu and UI
                 foodList.setAll(FileStorage.loadMenu());
                 loadFoodItems();
+                // Broadcast to all clients
+                Session.getMenuClient().sendMenuUpdate();
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
                 showAlert("Error", "Rename failed.");
@@ -507,6 +520,8 @@ public class BaseMenu {
                     categoryBox.setValue(null);
                     foodList.setAll(FileStorage.loadMenu());
                     loadFoodItems();
+                    // Broadcast to all clients
+                    Session.getMenuClient().sendMenuUpdate();
                 } catch (Exception e) {
                     System.err.println("IOException: " + e.getMessage());
                     showAlert("Error", "Delete failed.");
@@ -665,17 +680,6 @@ public class BaseMenu {
                     return;
                 }
 
-                //  food.setQuantity(food.getQuantity() - 1);
-                //List<FoodItems> updated = FileStorage.loadMenu();
-                // save updated list to file
-//                List<FoodItems> current = new ArrayList<>(foodList);
-//                try {
-//                    FileStorage.rewriteMenu(current);
-//
-//                } catch (Exception i) {
-//                    System.err.println("IOException: " + i.getMessage());
-//                    //showAlert("Error", "Failed to delete item.");
-//                }
                 cart.addToCart(food.getId(), 1);
 
                 // Popup notification
@@ -777,6 +781,8 @@ public class BaseMenu {
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
             clearFields();
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to add food item.");
@@ -924,15 +930,6 @@ public class BaseMenu {
                 food.setQuantity(food.getQuantity() - 1);
                 //List<FoodItems> updated = FileStorage.loadMenu();
                 // save updated list to file
-//                List<FoodItems> current = new ArrayList<>(foodList);
-//                try {
-//                    FileStorage.rewriteMenu(current);
-//
-//                } catch (Exception i) {
-//                    System.err.println("IOException: " + i.getMessage());
-//                    //showAlert("Error", "Failed to delete item.");
-//                }
-                //cart.addToCart(food.getId(), 1);
                 cart.addToCart(food.getId(), currentQuantity[0]);
                 // Popup notification
                 Stage notifyPopup = new Stage();
@@ -969,14 +966,13 @@ public class BaseMenu {
         if (currentEditingFood == null) return;
 
         String imageFilename = currentEditingFood.getImagePath();
+        System.out.println(imageFilename);
         if (selectedImageFile != null) {
             imageFilename = selectedImageFile.getName();
+            System.out.println(imageFilename);
         }
-
         currentEditingFood.setName(nameField.getText().trim());
         currentEditingFood.setDetails(detailsField.getText().trim());
-
-
         double price;
         try {
             price = Double.parseDouble(priceField.getText().trim());
@@ -1007,12 +1003,36 @@ public class BaseMenu {
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
 
+        // ---- FIX: Update list item instance ----
+        for (FoodItems f : foodList) {
+            if (f.getId() == currentEditingFood.getId()) {
+                f.setName(currentEditingFood.getName());
+                f.setDetails(currentEditingFood.getDetails());
+                f.setPrice(currentEditingFood.getPrice());
+                f.setCuisine(currentEditingFood.getCuisine());
+                f.setQuantity(currentEditingFood.getQuantity());
+                f.setCategory(currentEditingFood.getCategory());
+                f.setImagePath(currentEditingFood.getImagePath());
+                break;
+            }
+        }
 
         try {
             // rewrite full menu file from in-memory list
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
+            System.out.println("Image UP");
+
+
+            // 2. send the image ONLY if changed
+            if (selectedImageFile != null) {
+                Session.getMenuClient().sendImageUpdate(selectedImageFile);
+            }
+
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
+
             clearFields();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
@@ -1025,6 +1045,8 @@ public class BaseMenu {
         try {
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
             loadFoodItems();
+            // Broadcast to all clients
+            Session.getMenuClient().sendMenuUpdate();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to delete item.");
@@ -1090,7 +1112,10 @@ public class BaseMenu {
                 Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                 selectedImageFile = file;
-                imageFilenameLabel.setText(file.getName());
+                imageFilenameLabel.setText(selectedImageFile.getName());
+
+                Session.getMenuClient().sendImageUpdate(destFile);
+                //Session.getMenuClient().sendMenuUpdate();
 
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());

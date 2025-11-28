@@ -121,11 +121,11 @@ public class HomePageSixthExtension implements HomePageComponent {
         VBox appItems = new VBox(2);
         appItems.setAlignment(Pos.CENTER_LEFT);
         appItems.getChildren().addAll(
-                createMenuItem("Samosa", "$2"),
-                createMenuItem("Fries", "$2.5"),
-                createMenuItem("Spring Rolls", "$2.8"),
-                createMenuItem("Garlic Bread", "$2.2"),
-                createMenuItem("Onion Rings", "$2.5")
+                createMenuItem("Samosa", "৳20"),
+                createMenuItem("Fries", "৳25"),
+                createMenuItem("Spring Rolls", "৳40"),
+                createMenuItem("Garlic Bread", "৳220"),
+                createMenuItem("Onion Rings", "৳120")
         );
 
         Label soupTitle = new Label("Soup");
@@ -134,10 +134,10 @@ public class HomePageSixthExtension implements HomePageComponent {
         VBox soupItems = new VBox(2);
         soupItems.setAlignment(Pos.CENTER_LEFT);
         soupItems.getChildren().addAll(
-                createMenuItem("Mushroom Soup", "$5"),
-                createMenuItem("Hot Soup", "$3.5"),
-                createMenuItem("Clam Chowder", "$6.5"),
-                createMenuItem("Miso Soup", "$3")
+                createMenuItem("Mushroom Soup", "৳499"),
+                createMenuItem("Hot Soup", "৳350"),
+                createMenuItem("Clam Chowder", "৳650"),
+                createMenuItem("Miso Soup", "৳300")
         );
 
         menuBox.getChildren().addAll(appTitle, appItems, soupTitle, soupItems);

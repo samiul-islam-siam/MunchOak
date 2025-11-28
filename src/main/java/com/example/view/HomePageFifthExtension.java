@@ -83,11 +83,11 @@ public class HomePageFifthExtension implements HomePageComponent {
         VBox seaItems = new VBox(2);
         seaItems.setAlignment(Pos.CENTER_LEFT);
         seaItems.getChildren().addAll(
-                createMenuItem("Crab Cakes", "$8.5"),
-                createMenuItem("Fish & Chips", "$7"),
-                createMenuItem("Salmon Grill", "$10.5"),
-                createMenuItem("Tuna Steak", "$11"),
-                createMenuItem("plateau de fruits de mer", "$11")
+                createMenuItem("Crab Cakes", "৳805"),
+                createMenuItem("Fish & Chips", "৳279"),
+                createMenuItem("Salmon Grill", "৳1000"),
+                createMenuItem("Tuna Steak", "৳1100"),
+                createMenuItem("plateau de fruits de mer", "৳119")
         );
 
         Label mainTitle = new Label("Main Course");
@@ -96,11 +96,11 @@ public class HomePageFifthExtension implements HomePageComponent {
         VBox mainItems = new VBox(2);
         mainItems.setAlignment(Pos.CENTER_LEFT);
         mainItems.getChildren().addAll(
-                createMenuItem("Chicken Curry", "$5"),
-                createMenuItem("Chicken Biriyani", "$6"),
-                createMenuItem("Mutton Biriyani", "$8.5"),
-                createMenuItem("Lasagna", "$8"),
-                createMenuItem("Alfredo Pasta", "$7.5")
+                createMenuItem("Chicken Curry", "৳250"),
+                createMenuItem("Chicken Biryani", "৳360"),
+                createMenuItem("Mutton Biryani", "৳850"),
+                createMenuItem("Lasagna", "৳800"),
+                createMenuItem("Alfredo Pasta", "৳750")
         );
 
         menuBox.getChildren().addAll(seaTitle, seaItems, mainTitle, mainItems);

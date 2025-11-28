@@ -76,9 +76,8 @@ public class MenuPage {
         }
 
         // Decide which menu to load (AdminMenu or UserMenu)
-        //BaseMenu menu;
         String username = Session.getCurrentUsername();
-        if ("admin".equalsIgnoreCase(username)) {
+        if (Session.isAdmin()){ // "admin".equalsIgnoreCase(username)
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
@@ -89,6 +88,36 @@ public class MenuPage {
             System.out.println("User Menu loaded in MenuPage");
         }
         menu.setSearchKeyword(searchKeyword);
+
+        // ----------------- NEW: create / register MenuClient and attach menu -----------------
+        try {
+            // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
+            MenuClient client = Session.getMenuClient();
+            if (client == null) {
+                // no client yet -> create, attach menu and store in Session
+                client = new MenuClient(menu);
+                Session.setMenuClient(client); // your Session should expose this; expected by other code
+            } else {
+                // client exists (maybe created earlier) -> just update the menu reference so UI refresh works
+                client.setMenu(menu);
+            }
+        } catch (NoSuchMethodError | NoClassDefFoundError ex) {
+            // If Session.setMenuClient doesn't exist in your Session class, fallback to creating a local client:
+            // (should rarely happen because your payment code used Session.getMenuClient())
+            try {
+                MenuClient client = new MenuClient(menu);
+                // don't crash; we couldn't register into Session, but local client will still listen and call menu.updateView()
+            } catch (Exception inner) {
+                inner.printStackTrace();
+            }
+        } catch (Exception e) {
+            // safe fallback: create client and attach menu
+            try {
+                MenuClient tmp = new MenuClient(menu);
+                // won't be in Session, but will still listen/refresh this menu instance
+            } catch (Exception ignored) {}
+        }
+        // ------------------------------------------------------------------------------------
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -108,8 +137,6 @@ public class MenuPage {
                 primaryStage.setScene(cp.getScene());
             });
         }
-
-
 
         return menuScene;
     }
@@ -201,9 +228,6 @@ public class MenuPage {
             }
         });
 
-
-//        searchField.setOnAction(e -> searchBtn.fire());
-
         StackPane searchPane = new StackPane(searchField,searchBtn);
         StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
         StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
@@ -270,12 +294,19 @@ public class MenuPage {
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
 
-        //For admin access, admin will back to adminDashboard from menu page
-        if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
+        // For admin access, admin will back to adminDashboard from menu page
+
+//        if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
+//            backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
+//        } else {
+//            backButton.setOnAction(e -> returnToHomePerfectly());
+//        }
+        if (Session.isAdmin()) {
             backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
         } else {
             backButton.setOnAction(e -> returnToHomePerfectly());
         }
+
         backPanel.getChildren().add(backButton);
 
         VBox topSection = new VBox(navBar, backPanel);

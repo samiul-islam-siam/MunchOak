@@ -150,14 +150,14 @@ public class History {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
-        boolean isAdmin = Session.getCurrentUsername().equals("admin");
+        // boolean isAdmin = Session.getCurrentUsername().equals("admin");
 
         double delivery = 7.99;
         double tax = 7.00;
         double service = 1.50;
 
         for (FileStorage.HistoryRecordSimple s : list) {
-            if (!isAdmin && s.userId != currentUserId) continue;
+            if (!Session.isAdmin() && s.userId != currentUserId) continue;
             // FIXED: Load actual discount and tip for this payment to match Cart/Checkout totals
             double discountVal = FileStorage.getPaymentDiscount(s.paymentId);  // Assume FileStorage method loads saved discount for paymentId
             double tipVal = FileStorage.getPaymentTip(s.paymentId);  // Assume FileStorage method loads saved tip for paymentId

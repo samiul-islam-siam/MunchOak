@@ -49,20 +49,19 @@ public class AdminDashboard {
 
         Button viewUsersBtn = new Button("View All Users");
         Button manageMenuBtn = new Button("Manage Menu");
-        Button usersHistoryBtn = new Button("History");
         Button chatServerBtn = new Button("Chat With users");
         Button changePassBtn = new Button("Change Password");
         Button logoutBtn = new Button("Logout");
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, logoutBtn}) {
             btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
             btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
             btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, logoutBtn
         );
 
         dashboard.setTop(topBar);
@@ -72,10 +71,7 @@ public class AdminDashboard {
         Scene scene = new Scene(dashboard, 1000, 700);
         primaryStage.setScene(scene);
 
-        /* --- Button Actions --- */
-        usersHistoryBtn.setOnAction(ev -> {
-            System.out.println("History Button Clicked");
-        });
+        /* ------ Button Actions ------ */
 
         viewUsersBtn.setOnAction(e -> {
             List<String[]> users = FileStorage.loadUsers();
