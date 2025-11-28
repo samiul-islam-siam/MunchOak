@@ -11,17 +11,32 @@ import java.util.List;
 import static java.nio.file.Files.write;
 
 public class MenuServer {
+
     private static final int PORT = 8080;
     private static final List<Socket> clients = new ArrayList<>();
 
+    private static byte[] latestMenu = null;
+    private static String latestMenuName = "menu.dat";
+
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started on " + PORT);
+            System.out.println("Menu Server started.");
 
             while (true) {
                 Socket client = serverSocket.accept();
                 clients.add(client);
-                System.out.println("Client connected");
+                System.out.println("Client connected.");
+
+                // send latest menu to late joiners
+                if (latestMenu != null) {
+                    try {
+                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                        out.writeUTF("UPDATE_MENU");
+                        out.writeUTF(latestMenuName);
+                        out.writeInt(latestMenu.length);
+                        out.write(latestMenu);
+                    } catch (Exception ignored) {}
+                }
 
                 new Thread(() -> handleClient(client)).start();
             }
@@ -38,47 +53,49 @@ public class MenuServer {
             while (true) {
                 String cmd = in.readUTF();
 
-                if (cmd.equals("UPDATE_MENU")) {
+                if ("UPDATE_MENU".equals(cmd)) {
+                    String filename = in.readUTF();
                     int size = in.readInt();
+
                     byte[] data = new byte[size];
                     in.readFully(data);
 
-                    broadcastMenu(data, client);
+                    // save for late clients
+                    latestMenuName = filename;
+                    latestMenu = data;
+
+                    broadcastMenu(filename, data, client);
                 }
 
-                if (cmd.equals("UPDATE_IMAGE")) {
-
+                if ("UPDATE_IMAGE".equals(cmd)) {
                     String filename = in.readUTF();
                     int size = in.readInt();
-                    byte[] imageBytes = new byte[size];
-                    in.readFully(imageBytes);
 
-                    // store in server resources directory
-                    File imagesDir = new File("src/main/resources/com/example/manager/images/");
-                    if (!imagesDir.exists()) imagesDir.mkdirs();
+                    byte[] img = new byte[size];
+                    in.readFully(img);
 
-                    File target = new File(imagesDir, filename);
-                    write(target.toPath(), imageBytes);
+                    File imgDir = new File("src/main/resources/com/example/manager/images/");
+                    if (!imgDir.exists()) imgDir.mkdirs();
 
-                    // broadcast to all connected clients
-                    broadcastImage(filename, imageBytes);
+                    write(new File(imgDir, filename).toPath(), img);
+
+                    broadcastImage(filename, img);
                 }
-
             }
 
         } catch (Exception ignored) {
-        } finally {
             clients.remove(client);
         }
     }
 
-    private static void broadcastMenu(byte[] data, Socket exclude) {
-        for (Socket client : clients) {
-            if (client == exclude) continue;
+    private static void broadcastMenu(String filename, byte[] data, Socket exclude) {
+        for (Socket c : clients) {
+            if (c == exclude) continue;
 
             try {
-                DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                DataOutputStream out = new DataOutputStream(c.getOutputStream());
                 out.writeUTF("UPDATE_MENU");
+                out.writeUTF(filename);
                 out.writeInt(data.length);
                 out.write(data);
                 out.flush();
@@ -87,19 +104,15 @@ public class MenuServer {
     }
 
     private static void broadcastImage(String filename, byte[] data) {
-        for (Socket client : clients) {
+        for (Socket c : clients) {
             try {
-                DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                DataOutputStream out = new DataOutputStream(c.getOutputStream());
                 out.writeUTF("UPDATE_IMAGE");
                 out.writeUTF(filename);
                 out.writeInt(data.length);
                 out.write(data);
                 out.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception ignored) {}
         }
     }
-
 }
-

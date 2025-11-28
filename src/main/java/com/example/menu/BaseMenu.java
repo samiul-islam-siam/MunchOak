@@ -61,6 +61,12 @@ public class BaseMenu {
     }
 
     public void updateView() {
+        // Remove guest empty message if it exists
+        Node emptyMsg = mainLayout.lookup("#empty-message");
+        if (emptyMsg != null) {
+            ((Pane) emptyMsg.getParent()).getChildren().remove(emptyMsg);
+        }
+
         // reload the full menu
         List<FoodItems> items = FileStorage.loadMenu();
 
@@ -278,7 +284,7 @@ public class BaseMenu {
             styleMainButton(deleteMenuButton);
             deleteMenuButton.setOnAction(e -> deleteMenuFile());
 
-            adminButtons = new HBox(15, showAddFormBtn, buttonMenu, deleteMenuButton);
+            adminButtons = new HBox(15, showAddFormBtn, buttonMenu);
             adminButtons.setAlignment(Pos.CENTER);
             adminButtons.setPadding(new Insets(10, 0, 10, 0));
         }

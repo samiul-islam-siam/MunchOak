@@ -57,6 +57,7 @@ public class UserMenu extends BaseMenu {
                     messageBox.setPadding(new Insets(80));
 
                     StackPane wrapper = new StackPane(messageBox);
+                    wrapper.setId("empty-message");
                     wrapper.setAlignment(Pos.CENTER);
                     wrapper.setStyle("-fx-background-color: linear-gradient(to bottom, #ffffff, #f9f9f9);");
 

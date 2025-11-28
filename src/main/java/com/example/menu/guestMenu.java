@@ -1,6 +1,7 @@
 package com.example.menu;
 
 import com.example.manager.FileStorage;
+import com.example.manager.Session;
 import com.example.munchoak.FoodItems;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,7 +35,7 @@ public class guestMenu extends BaseMenu {
 
             //getting menu from files
             File menuFile = FileStorage.getMenuFile();
-
+            //Session.getMenuClient().sendMenuUpdate();
             //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
@@ -58,6 +59,7 @@ public class guestMenu extends BaseMenu {
                     messageBox.setPadding(new Insets(80));
 
                     StackPane wrapper = new StackPane(messageBox);
+                    wrapper.setId("empty-message");
                     wrapper.setAlignment(Pos.CENTER);
                     wrapper.setStyle("-fx-background-color: linear-gradient(to bottom, #ffffff, #f9f9f9);");
 
