@@ -58,6 +58,18 @@ public class AdminFileStorage {
         }
         return lines;
     }
+    // AdminFileStorage.java
+    public static String getAdminPassword() throws IOException {
+        List<String> lines = readLines();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(ADMIN_ID)) {
+                String[] saltAndHash = parts[1].split(":");
+                return saltAndHash[1]; // return hash only (if needed)
+            }
+        }
+        return null;
+    }
 
     private static void writeText(String text) throws IOException {
         try (FileWriter fw = new FileWriter(AdminFileStorage.ADMIN_FILE)) {

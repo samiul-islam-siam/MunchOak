@@ -2,6 +2,8 @@ package com.example.view;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.Cart;
+import com.example.munchoak.CartPage;
 import com.example.munchoak.History;
 import com.example.network.ChatClient;
 import javafx.animation.*;
@@ -40,6 +42,7 @@ public class HomePage implements HomePageComponent {
     private final List<HBox> heroGroups = new ArrayList<>();
     private final List<HomePageComponent> sections;
     private final Stage primaryStage;
+    private final Cart cart;  // ADDED: Cart field for state persistence
     private final double WIDTH = 1000;
     private final double HEIGHT = 700;
 
@@ -55,8 +58,10 @@ public class HomePage implements HomePageComponent {
     private HBox heroSection;
     private int currentIndex = 0;
 
+    // UPDATED: Existing constructor now initializes cart
     public HomePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.cart = new Cart();  // Initialize with empty cart
 
         // === HAMBURGER ICON ===
         Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
@@ -79,13 +84,114 @@ public class HomePage implements HomePageComponent {
         // === Top Buttons ===
         Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
         authBtn.getStyleClass().addAll("top-button", "login-button");
+        authBtn.setStyle("-fx-text-fill: white;");
 
         Button menuBtn = new Button("MENU");
         menuBtn.getStyleClass().add("top-button");
+        menuBtn.setStyle("-fx-text-fill: white;");
         menuBtn.setOnAction(e -> openMenu());
 
         Button reservationBtn = new Button("Reservation");
         reservationBtn.getStyleClass().add("top-button");
+        reservationBtn.setStyle("-fx-text-fill: white;");
+        reservationBtn.setOnAction(e -> openReservationPageDirectly());
+
+        // === Logo & Title ===
+        Image logoImg = new Image(getClass().getResource("/com/example/view/images/logo.png").toExternalForm());
+        ImageView logoView = new ImageView(logoImg);
+        logoView.setFitWidth(40);
+        logoView.setFitHeight(40);
+        logoView.setPreserveRatio(true);
+        logoView.setClip(new Circle(20, 20, 20));
+
+        Label title = new Label("MUNCHOAK");
+        title.getStyleClass().add("nav-title");
+        title.setStyle("-fx-font-family: 'Georgia', serif; -fx-font-weight: bold; -fx-font-size: 24px;");
+
+        HBox leftPart = new HBox(10, logoView, title);
+        leftPart.setAlignment(Pos.CENTER_LEFT);
+
+        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        rightButtons.setAlignment(Pos.CENTER_RIGHT);
+
+        BorderPane navBar = new BorderPane();
+        navBar.setLeft(leftPart);
+        navBar.setRight(rightButtons);
+        navBar.getStyleClass().add("home-nav");
+        navBar.setPadding(new Insets(5, 20, 5, 20));
+        navBar.setStyle("-fx-background-color: transparent;");
+
+        content = new BorderPane();
+        content.setTop(navBar);
+        content.setBackground(Background.EMPTY);
+
+        root = new StackPane();
+        root.prefWidthProperty().bind(primaryStage.widthProperty());
+        root.prefHeightProperty().bind(primaryStage.heightProperty());
+
+        authBtn.setOnAction(e ->
+        {
+            if (loggedIn) {
+                Session.logout();
+                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            } else {
+                openLoginPageDirectly();
+            }
+        });
+        menuIconBtn.setOnAction(e -> toggleSidePanel());
+
+        createOverlay();
+        createSidePanel();
+        root.getChildren().setAll(content, overlay, sidePanel);
+
+        this.sections = Arrays.asList(
+                this,
+                new HomePageThirdExtension(),
+                new HomePageFourthExtension(),
+                new HomePageFifthExtension(),
+                new HomePageSixthExtension(primaryStage),
+                new HomePageSeventhExtension(),
+                new HomePageEighthExtension()
+        );
+        initialize();
+    }
+
+    // ADDED: Overloaded constructor to accept and preserve Cart state
+    public HomePage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;  // Use passed cart to preserve state
+
+        // === HAMBURGER ICON ===
+        Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
+        ImageView hamburgerIcon = new ImageView(hamburgerImg);
+        hamburgerIcon.setFitWidth(24);
+        hamburgerIcon.setFitHeight(24);
+        hamburgerIcon.setPreserveRatio(true);
+
+        Button menuIconBtn = new Button();
+        menuIconBtn.setGraphic(hamburgerIcon);
+        menuIconBtn.setPrefSize(40, 40);
+        menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
+        menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+
+        loggedIn = (Session.getCurrentUsername() != null &&
+                !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null &&
+                        !Session.getCurrentEmail().isEmpty());
+
+        // === Top Buttons ===
+        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
+        authBtn.getStyleClass().addAll("top-button", "login-button");
+        authBtn.setStyle("-fx-text-fill: white;");
+
+        Button menuBtn = new Button("MENU");
+        menuBtn.getStyleClass().add("top-button");
+        menuBtn.setStyle("-fx-text-fill: white;");
+        menuBtn.setOnAction(e -> openMenu());
+
+        Button reservationBtn = new Button("Reservation");
+        reservationBtn.getStyleClass().add("top-button");
+        reservationBtn.setStyle("-fx-text-fill: white;");
         reservationBtn.setOnAction(e -> openReservationPageDirectly());
 
         // === Logo & Title ===
@@ -261,6 +367,7 @@ public class HomePage implements HomePageComponent {
 
         Button bookBtn = new Button("Book your table now!");
         bookBtn.getStyleClass().addAll("top-button", "login-button");
+        bookBtn.setStyle("-fx-text-fill: black;");
         bookBtn.setOnAction(e -> openReservationPageDirectly());
 
         textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
@@ -284,9 +391,7 @@ public class HomePage implements HomePageComponent {
 
     public VBox getFullPage() {
         VBox fullPage = new VBox();
-        Stop[] stops = new Stop[]{new Stop(0, Color.web("#49bad8")), new Stop(1, Color.web("#1c71bd"))};
-        LinearGradient lg = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
-        fullPage.setBackground(new Background(new BackgroundFill(lg, CornerRadii.EMPTY, Insets.EMPTY)));
+        fullPage.setStyle("-fx-background-color: black;");
         fullPage.setSpacing(0);
 
         for (HomePageComponent section : sections) {
@@ -326,7 +431,7 @@ public class HomePage implements HomePageComponent {
 
         Button profileBtn = createSideButton("Profile");
         Button historyBtn = createSideButton("History");
-        Button cartBtn = createSideButton("Cart");
+        Button cartBtn = createSideButton("Cart");  // UPDATED: Add onAction for Cart navigation with this.cart
         Button reserveBtn = createSideButton("Reservation");
         Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
@@ -340,7 +445,8 @@ public class HomePage implements HomePageComponent {
         };
 
         profileBtn.setOnAction(e -> navigateAndClose.accept(this::openProfilePageDirectly));
-        historyBtn.setOnAction(e -> navigateAndClose.accept(this::openHistoryPageDirectly));
+        historyBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new History(primaryStage, this.cart).getScene())));  // UPDATED: Pass this.cart to History
+        cartBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new CartPage(primaryStage, this.cart).getScene())));  // ADDED: Cart navigation with this.cart
         reserveBtn.setOnAction(e -> navigateAndClose.accept(this::openReservationPageDirectly));
         aboutBtn.setOnAction(e -> navigateAndClose.accept(this::openAboutUsPageDirectly));
         chatBtn.setOnAction(e -> openChatWindow());
@@ -452,8 +558,9 @@ public class HomePage implements HomePageComponent {
         return scene;
     }
 
+    // UPDATED: openMenu now passes this.cart to MenuPage
     private void openMenu() {
-        MenuPage menuPage = new MenuPage(primaryStage);
+        MenuPage menuPage = new MenuPage(primaryStage, this.cart);
         primaryStage.setScene(menuPage.getMenuScene());
     }
 
@@ -466,7 +573,7 @@ public class HomePage implements HomePageComponent {
 
             ChatClient controller = loader.getController();
             String username = Session.getCurrentUsername();
-            if (username == null || username.isEmpty()) username = "guest";
+            if (username == null || username.isEmpty()) username = "Guest";
             String role = Session.getCurrentRole();
             boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
 
@@ -506,16 +613,15 @@ public class HomePage implements HomePageComponent {
         Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage).getAboutUsScene()));
     }
 
+    // UPDATED: openHistoryPageDirectly now passes this.cart to History
     private void openHistoryPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new History(primaryStage).getScene()));
+        Platform.runLater(() -> preserveStageState(new History(primaryStage, this.cart).getScene()));
     }
 
-
-   private void openProfilePageDirectly() {
-       Scene currentScene = primaryStage.getScene();
-       Platform.runLater(() -> preserveStageState(
-               new ProfilePage(primaryStage, currentScene).getProfileScene()
-       ));
-   }
-
+    private void openProfilePageDirectly() {
+        Scene currentScene = primaryStage.getScene();
+        Platform.runLater(() -> preserveStageState(
+                new ProfilePage(primaryStage, currentScene).getProfileScene()
+        ));
+    }
 }

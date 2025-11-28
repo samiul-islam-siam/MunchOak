@@ -133,7 +133,7 @@ public class LoginPage {
 
         // Subtitle at the top
         Label subtitle = new Label("Fresh flavors, just one login away.");
-        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #FF6B6B; -fx-font-family: 'Comic Sans MS', cursive;");
+        subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Comic Sans MS', cursive;");
         subtitle.setAlignment(Pos.CENTER);
         subtitle.setOpacity(0.0);
 
@@ -476,7 +476,16 @@ public class LoginPage {
                     showAdminStatus("Incorrect ID or password!", true); // <<< Use the right method!
                     return;
                 }
-                Session.setCurrentUser("admin");
+             //   Session.setCurrentUser("admin");
+                if (AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                    Session.setAdminUser(); // <-- sets isAdmin = true
+                    showAdminStatus("Admin login successful!", false);
+                    AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                    dashboard.openAdminDashboard();
+                } else {
+                    showAdminStatus("Incorrect ID or password!", true);
+                }
+
                 showAdminStatus("Admin login successful!", false);
                 AdminDashboard dashboard = new AdminDashboard(primaryStage);
                 dashboard.openAdminDashboard();

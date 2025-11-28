@@ -77,16 +77,12 @@ public class AboutUsPage {
         reservationBtn.setOnAction(e -> navigateToReservation());
 
         Button profileBtn = createNavButton("Profile");
+
         profileBtn.setOnAction(e -> {
-
-
             Scene currentScene = primaryStage.getScene();
 
             ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
             primaryStage.setScene(profilePage.getProfileScene());
-
-
-
         });
 
         Button cartBtn = createNavButton("Cart");

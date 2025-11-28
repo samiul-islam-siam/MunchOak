@@ -15,17 +15,25 @@ import java.util.Map;
 
 public class Payment {
     private final int id;
-    private final double amount;
-    private static String paymentMethod;
+    private final double amount;  // This is the subtotal
+    private String paymentMethod;
     private boolean success;
     private final String timestamp;
+    private double discount = 0.0;
+    private double tip = 0.0;
 
     public Payment(int id, double amount) {
+        this(id, amount, Instant.now().toString());
+    }
+
+    public Payment(int id, double amount, String timestamp) {
         this.id = id;
         this.amount = amount;
-        paymentMethod = "";
-        this.timestamp = Instant.now().toString();  // Save payment creation timestamp
-        this.success = false;                       // Mark unpaid initially
+        this.paymentMethod = "";
+        this.timestamp = timestamp;
+        this.success = false;
+        this.discount = 0.0;
+        this.tip = 0.0;
     }
 
     // Main payment entry point (opens the method selection UI)
@@ -156,12 +164,12 @@ public class Payment {
             foodMap.put(food.getId(), food);
         }
 
-        // Compute total cart price
-        double total = 0;
+        // Compute subtotal (cart price)
+        double subtotal = 0;
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             FoodItems food = foodMap.get(entry.getKey());
             if (food != null) {
-                total += food.getPrice() * entry.getValue();
+                subtotal += food.getPrice() * entry.getValue();
             }
         }
 
@@ -174,24 +182,30 @@ public class Payment {
         try {
             int userId = Session.getCurrentUserId(); // Identify user making purchase
 
-            // Store payment + cart contents into file (persistence)
+            // Store payment + cart contents into file (persistence) - saves subtotal as amount
             int paymentId = FileStorage.createPaymentAndCart(
                     userId,
                     cart,
                     foodMap,
-                    "Card"
+                    "Card"  // Default; can be overridden later
             );
 
-            // Create Payment instance for handling UI + method
-            Payment payment = new Payment(paymentId, total);
+            // FIXED: The caller (e.g., CheckoutPage) should save discount/tip separately via FileStorage.savePaymentDiscountTip(paymentId, discount, tip)
 
-            // Show payment method selection popup
-            //payment.processPayment(cart, foodMap);
+            // Create Payment instance for handling UI + method (subtotal only)
+            Payment payment = new Payment(paymentId, subtotal);
+
+            // Show payment method selection popup (uncomment if needed)
+            // payment.processPayment(cart, foodMap);
 
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             new Alert(Alert.AlertType.ERROR, "Checkout failed: " + e.getMessage()).show();
         }
+    }
+
+    public static int getLastPaymentId() {
+        return FileStorage.getLastPaymentId();
     }
 
     // --- Helper to display receipt window ---
@@ -253,13 +267,38 @@ public class Payment {
     }
 
 
+    // --- Setters (for use in CheckoutPage and History) ---
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public void setTip(double tip) {
+        this.tip = tip;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     // --- Getters ---
     public int getId() {
         return id;
     }
 
     public double getAmount() {
-        return amount;
+        return amount;  // Returns subtotal
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public double getTip() {
+        return tip;
     }
 
     public boolean isSuccess() {
