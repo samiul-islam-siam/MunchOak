@@ -80,11 +80,11 @@ public class MenuClient {
                         try {
                             if (menu != null) {
                                 menu.updateView();
-                                return;
+                                //return;
                             }
-                            if (foodList != null) {
-                                foodList.setAll(FileStorage.loadMenu());
-                            }
+//                            if (foodList != null) {
+//                                foodList.setAll(FileStorage.loadMenu());
+//                            }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -106,10 +106,10 @@ public class MenuClient {
                     write(target.toPath(), data);
 
                     Platform.runLater(() -> {
-                        if (menu != null) {
-                            menu.updateView();
-                        }
+                        if (menu != null) menu.updateView();
+                        if (foodList != null) foodList.setAll(FileStorage.loadMenu());
                     });
+
                 }
             }
 

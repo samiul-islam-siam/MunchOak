@@ -6,7 +6,9 @@ import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.nio.file.Files.write;
 
@@ -17,6 +19,8 @@ public class MenuServer {
 
     private static byte[] latestMenu = null;
     private static String latestMenuName = "menu.dat";
+    private static final Map<String, byte[]> latestImages = new HashMap<>();
+
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -35,6 +39,17 @@ public class MenuServer {
                         out.writeUTF(latestMenuName);
                         out.writeInt(latestMenu.length);
                         out.write(latestMenu);
+                    } catch (Exception ignored) {}
+                }
+
+                // send all previously stored images
+                for (var entry : latestImages.entrySet()) {
+                    try {
+                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                        out.writeUTF("UPDATE_IMAGE");
+                        out.writeUTF(entry.getKey());
+                        out.writeInt(entry.getValue().length);
+                        out.write(entry.getValue());
                     } catch (Exception ignored) {}
                 }
 
@@ -64,6 +79,11 @@ public class MenuServer {
                     latestMenuName = filename;
                     latestMenu = data;
 
+                    // 🔥 WRITE new menu file to disk
+                    File menuDir = new File("src/main/resources/com/example/manager/data/");
+                    if (!menuDir.exists()) menuDir.mkdirs();
+                    write(new File(menuDir, filename).toPath(), data);
+
                     broadcastMenu(filename, data, client);
                 }
 
@@ -78,6 +98,9 @@ public class MenuServer {
                     if (!imgDir.exists()) imgDir.mkdirs();
 
                     write(new File(imgDir, filename).toPath(), img);
+
+                    // store for late clients
+                    latestImages.put(filename, img);
 
                     broadcastImage(filename, img);
                 }

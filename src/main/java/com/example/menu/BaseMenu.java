@@ -46,7 +46,6 @@ public class BaseMenu {
     private FoodItems currentEditingFood = null;
     protected Button deleteMenuButton;
 
-
     // ===== make UI sections accessible to subclasses =====
     protected VBox mainLayout;
     protected Button showAddFormBtn;
@@ -969,14 +968,13 @@ public class BaseMenu {
         if (currentEditingFood == null) return;
 
         String imageFilename = currentEditingFood.getImagePath();
+        System.out.println(imageFilename);
         if (selectedImageFile != null) {
             imageFilename = selectedImageFile.getName();
+            System.out.println(imageFilename);
         }
-
         currentEditingFood.setName(nameField.getText().trim());
         currentEditingFood.setDetails(detailsField.getText().trim());
-
-
         double price;
         try {
             price = Double.parseDouble(priceField.getText().trim());
@@ -1007,15 +1005,37 @@ public class BaseMenu {
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
 
+        // ---- FIX: Update list item instance ----
+        for (FoodItems f : foodList) {
+            if (f.getId() == currentEditingFood.getId()) {
+                f.setName(currentEditingFood.getName());
+                f.setDetails(currentEditingFood.getDetails());
+                f.setPrice(currentEditingFood.getPrice());
+                f.setCuisine(currentEditingFood.getCuisine());
+                f.setQuantity(currentEditingFood.getQuantity());
+                f.setCategory(currentEditingFood.getCategory());
+                f.setImagePath(currentEditingFood.getImagePath());
+                break;
+            }
+        }
 
         try {
             // rewrite full menu file from in-memory list
             FileStorage.rewriteMenu(new ArrayList<>(foodList));
             foodList.setAll(FileStorage.loadMenu());
             loadFoodItems();
-            clearFields();
+            System.out.println("Image UP");
+
+
+            // 2. send the image ONLY if changed
+            if (selectedImageFile != null) {
+                Session.getMenuClient().sendImageUpdate(selectedImageFile);
+            }
+
             // Broadcast to all clients
             Session.getMenuClient().sendMenuUpdate();
+
+            clearFields();
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to update food item.");
@@ -1094,9 +1114,10 @@ public class BaseMenu {
                 Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                 selectedImageFile = file;
-                imageFilenameLabel.setText(file.getName());
+                imageFilenameLabel.setText(selectedImageFile.getName());
 
                 Session.getMenuClient().sendImageUpdate(destFile);
+                //Session.getMenuClient().sendMenuUpdate();
 
             } catch (Exception e) {
                 System.err.println("IOException: " + e.getMessage());
