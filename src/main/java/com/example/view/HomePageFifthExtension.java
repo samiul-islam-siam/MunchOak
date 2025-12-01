@@ -33,7 +33,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
         // --- RADIAL GRADIENT BACKGROUND ---
-        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- IMAGES ---
         Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish.png").toExternalForm());
@@ -78,7 +78,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         menuBox.setAlignment(Pos.CENTER);
 
         Label seaTitle = new Label("From the Sea");
-        seaTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        seaTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox seaItems = new VBox(2);
         seaItems.setAlignment(Pos.CENTER_LEFT);
@@ -91,7 +91,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         );
 
         Label mainTitle = new Label("Main Course");
-        mainTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        mainTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox mainItems = new VBox(2);
         mainItems.setAlignment(Pos.CENTER_LEFT);
@@ -109,7 +109,7 @@ public class HomePageFifthExtension implements HomePageComponent {
 
     private HBox createMenuItem(String name, String price) {
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: white;");
+        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: black;");
 
         Label priceLabel = new Label(price);
         priceLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #ffdd00;");

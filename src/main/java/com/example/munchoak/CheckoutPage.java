@@ -5,6 +5,7 @@ import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
+import com.example.view.ProfilePage;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -415,14 +416,14 @@ public class CheckoutPage {
         homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         homeBtn.setOnMouseEntered(e -> homeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage).getHomeScene()));
+        // FIXED: Pass cart to HomePage to preserve state during navigation
+        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene()));
 
         Button menuBtn = new Button("Menu");
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // FIXED: Pass cart to HomePage to preserve state during navigation
-        homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene()));
+        menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
 
         Button cartBtn = new Button("Cart");
         cartBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -456,6 +457,11 @@ public class CheckoutPage {
         profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         profileBtn.setOnMouseEntered(e -> profileBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         profileBtn.setOnMouseExited(e -> profileBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
+        profileBtn.setOnAction(e -> {
+            Scene currentScene = primaryStage.getScene();
+            ProfilePage profilePage = new ProfilePage(primaryStage, currentScene);
+            primaryStage.setScene(profilePage.getProfileScene());
+        });
 
         buttonsHBox.getChildren().addAll(homeBtn, menuBtn, cartBtn, authBtn, profileBtn);
 
@@ -748,7 +754,7 @@ public class CheckoutPage {
                 // Update menu file
                 FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
 
-/*------------------------------SERVER PART----------------------------------------*/
+                /*------------------------------SERVER PART----------------------------------------*/
                 // Broadcast to all clients
                 Session.getMenuClient().sendMenuUpdate();
 

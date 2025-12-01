@@ -17,12 +17,12 @@ public class HomePageSeventhExtension implements HomePageComponent {
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
 
         // --- 90° LINEAR GRADIENT BACKGROUND ---
-        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- Headline ---
         Label headline = new Label("UPCOMING EVENTS");
         headline.setStyle("""
-                -fx-font-family: 'The Seasons'; -fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;
+                -fx-font-family: 'The Seasons'; -fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: black;
                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
                 """);
         headline.setAlignment(Pos.CENTER);
@@ -106,13 +106,13 @@ public class HomePageSeventhExtension implements HomePageComponent {
 
         // --- Event text below image ---
         Label titleLabel = new Label(eventTitle);
-        titleLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         Label dateLabel = new Label(eventDate);
         dateLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: #ffd700;");
 
         Label detailsLabel = new Label(eventDetails);
-        detailsLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: white;");
+        detailsLabel.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox textBox = new VBox(3, titleLabel, dateLabel, detailsLabel);
         textBox.setAlignment(Pos.CENTER);

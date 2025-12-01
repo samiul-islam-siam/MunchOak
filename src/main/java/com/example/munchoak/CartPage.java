@@ -207,6 +207,7 @@ public class CartPage {
                     Label price = new Label(String.format("৳ %.2f", item.getPrice()));
                     price.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
                     price.setAlignment(Pos.CENTER);
+                    price.setMinWidth(70);
 
                     // ADD BUTTON
                     Button addBtn = new Button("Add to Cart");
@@ -413,10 +414,17 @@ public class CartPage {
                 details.setMaxWidth(300);
                 details.setWrapText(true);
 
+                // Right-aligned price row to prevent truncation
+                HBox priceRow = new HBox(10);
+                Region priceSpacer = new Region();
+                HBox.setHgrow(priceSpacer, Priority.ALWAYS);
                 Label priceEach = new Label(String.format("৳ %.2f", item.getPrice()));
                 priceEach.setStyle("-fx-font-size: 15px; -fx-text-fill: #333;");
+                priceEach.setMinWidth(70);
+                priceEach.setAlignment(Pos.CENTER_RIGHT);
+                priceRow.getChildren().addAll(priceSpacer, priceEach);
 
-                info.getChildren().addAll(name, details, priceEach);
+                info.getChildren().addAll(name, details, priceRow);
 
                 // SPACER
                 Region spacer3 = new Region();
@@ -454,11 +462,17 @@ public class CartPage {
                 VBox sideControls = new VBox(6, qtyBox, remove);
                 sideControls.setAlignment(Pos.CENTER_RIGHT);
 
-                // LINE TOTAL
+                // Right-aligned line total row to prevent truncation
+                HBox totalRow = new HBox(10);
+                Region totalSpacer = new Region();
+                HBox.setHgrow(totalSpacer, Priority.ALWAYS);
                 Label lineTotal = new Label(String.format("৳ %.2f", item.getPrice() * qty));
                 lineTotal.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
+                lineTotal.setMinWidth(70);
+                lineTotal.setAlignment(Pos.CENTER_RIGHT);
+                totalRow.getChildren().addAll(totalSpacer, lineTotal);
 
-                card.getChildren().addAll(iv, info, spacer3, sideControls, lineTotal);
+                card.getChildren().addAll(iv, info, spacer3, sideControls, totalRow);
 
                 // ANIMATION
                 FadeTransition ft = new FadeTransition(Duration.millis(230), card);
@@ -558,10 +572,11 @@ public class CartPage {
                 suggestionName.setMaxWidth(160);
                 suggestionName.setAlignment(Pos.CENTER);
 
-                // Price
+                // Price with min width to prevent truncation
                 Label suggestionPrice = new Label(String.format("৳ %.2f", item.getPrice()));
                 suggestionPrice.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");  // Larger
                 suggestionPrice.setAlignment(Pos.CENTER);
+                suggestionPrice.setMinWidth(70);
 
                 // Add button, larger and matching style
                 Button addSuggestionBtn = new Button("Add to Cart");

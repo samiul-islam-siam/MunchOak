@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -424,7 +425,7 @@ public class BaseMenu {
 
     private void styleMainButton(Button button) {
         button.setStyle(
-                "-fx-background-color: #E53935;" +
+                "-fx-background-color: #FF6B00;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-size: 14px;" +
                         "-fx-font-weight: bold;" +
@@ -432,14 +433,14 @@ public class BaseMenu {
                         "-fx-cursor: hand;"
         );
         button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: #C62828;" +
+                "-fx-background-color: #E65C00;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-size: 14px;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 12;"
         ));
         button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: #E53935;" +
+                "-fx-background-color: #FF6B00;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-size: 14px;" +
                         "-fx-font-weight: bold;" +
@@ -654,7 +655,7 @@ public class BaseMenu {
         desc.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
         Label price = new Label(String.format("Price: ৳ %.2f", food.getPrice()));
-        price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
+        price.setStyle("-fx-font-size: 14px; -fx-font-weight:  bold; -fx-text-fill: #E53935;");
 
         Label quantity = new Label("Quantity: " + food.getQuantity());
         quantity.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
@@ -684,7 +685,7 @@ public class BaseMenu {
 
                 // Popup notification
                 Stage popup = new Stage();
-                popup.initStyle(StageStyle.UNDECORATED);
+                popup.initStyle(StageStyle.TRANSPARENT);
                 popup.setAlwaysOnTop(true);
 
                 Label label = new Label(food.getName() + " added to cart!");
@@ -700,7 +701,9 @@ public class BaseMenu {
                 box.setAlignment(Pos.CENTER);
                 box.setStyle("-fx-background-color: transparent;");
 
-                popup.setScene(new Scene(box));
+                Scene popupScene = new Scene(box);
+                popupScene.setFill(Color.TRANSPARENT);
+                popup.setScene(popupScene);
                 popup.show();
 
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
@@ -796,7 +799,7 @@ public class BaseMenu {
         dialog.initOwner(owner);
         dialog.setTitle(food.getName());
         dialog.setWidth(500);
-        dialog.setHeight(600);
+        dialog.setHeight(700); // Increased height to accommodate scrolling content
 
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
@@ -813,9 +816,16 @@ public class BaseMenu {
         top.getChildren().addAll(title, closeBtn);
         root.setTop(top);
 
-        // Center: Image on top, info below (changed from HBox to VBox)
+        // Center: Scrollable content to prevent overflow and ensure button visibility via scroll
         VBox center = new VBox(20);
         center.setAlignment(Pos.TOP_CENTER);
+
+        // Wrap center in ScrollPane for scrollable content if it exceeds dialog height
+        ScrollPane scrollPane = new ScrollPane(center);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setStyle("-fx-background-color: transparent;");
 
         // Large Image
         ImageView largeImgView = new ImageView();
@@ -845,11 +855,10 @@ public class BaseMenu {
         }
         largeImgView.setImage(image);
 
-        // Info section (below image, full width)
-        VBox infoVBox = new VBox(15);
-        infoVBox.setPrefWidth(400); // Wider to utilize full dialog width
-
-        Label priceLabel = new Label("Tk " + String.format("%.2f", food.getPrice()));
+        // Base price
+        final double basePrice = food.getPrice();
+        double[] currentTotalPriceHolder = {basePrice};  // Use array for mutability in lambdas
+        Label priceLabel = new Label("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
         priceLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label descLabel = new Label(food.getDetails());
@@ -859,19 +868,79 @@ public class BaseMenu {
         Label cuisineLabel = new Label("⭐ " + food.getCuisine());
         cuisineLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
 
-        Label quantityLabel = new Label("Quantity:"+ food.getQuantity());
+        Label quantityLabel = new Label("Quantity: " + food.getQuantity());
         quantityLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
-        // Add On section (simple hardcoded example)
+
+        // Add On section with multiple options
         VBox addOnSection = new VBox(10);
         Label addOnTitle = new Label("Add On");
         addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        HBox addOnItem = new HBox(10);
-        Label addOnName = new Label("Extra Patty");
-        Label addOnPrice = new Label("+Tk 99");
-        Button addOnPlus = new Button("+");
-        addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 5;");
-        addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnPlus);
-        addOnSection.getChildren().addAll(addOnTitle, addOnItem);
+        addOnSection.getChildren().add(addOnTitle);
+
+        // Define add-ons
+        Map<String, Double> addOns = Map.of(
+                "Extra Patty", 99.0,
+                "Cheese", 50.0,
+                "Bacon", 80.0,
+                "Fries", 40.0
+        );
+
+        // Counters for each add-on
+        Map<String, int[]> counters = new LinkedHashMap<>();
+        Map<String, Label> qtyLabels = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Double> entry : addOns.entrySet()) {
+            String name = entry.getKey();
+            double price = entry.getValue();
+
+            HBox addOnItem = new HBox(8);
+            Label addOnName = new Label(name);
+            addOnName.setPrefWidth(80);
+            Label addOnPrice = new Label("+" + String.format("Tk %.0f", price));
+            Button addOnMinus = new Button("-");
+            addOnMinus.setPrefSize(25, 25);
+            addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+            Label extraQtyLabel = new Label(" x0");
+            extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+            Button addOnPlus = new Button("+");
+            addOnPlus.setPrefSize(25, 25);
+            addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+
+            int[] count = {0};
+            counters.put(name, count);
+            qtyLabels.put(name, extraQtyLabel);
+
+            addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
+
+            // Plus action
+            addOnPlus.setOnAction(e -> {
+                int totalSelected = 0;
+                for (int[] c : counters.values()) {
+                    totalSelected += c[0];
+                }
+                if (totalSelected < 5) {
+                    count[0]++;
+                    extraQtyLabel.setText(" x" + count[0]);
+                    // Update price (using array)
+                    currentTotalPriceHolder[0] += price;
+                    priceLabel.setText("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
+                }
+            });
+
+            // Minus action
+            addOnMinus.setOnAction(e -> {
+                if (count[0] > 0) {
+                    count[0]--;
+                    extraQtyLabel.setText(" x" + count[0]);
+                    // Update price (using array)
+                    currentTotalPriceHolder[0] -= price;
+                    priceLabel.setText("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
+                }
+            });
+
+            addOnSection.getChildren().add(addOnItem);
+        }
+
         Label optionalLabel = new Label("Select up to 5 (optional)");
         optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
 
@@ -907,14 +976,16 @@ public class BaseMenu {
         addToCartDetail.setOnAction(ev -> {
             if (Session.getCurrentUsername().equals("guest")) {
                 Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
                 Label notifyLabel = new Label("Please Login !");
                 notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
                 VBox notifyBox = new VBox(notifyLabel);
                 notifyBox.setAlignment(Pos.CENTER);
                 notifyBox.setStyle("-fx-background-color: transparent;");
-                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                Scene notifyScene = new Scene(notifyBox, 200, 50);
+                notifyScene.setFill(Color.TRANSPARENT);
+                notifyPopup.setScene(notifyScene);
                 notifyPopup.show();
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> notifyPopup.close());
@@ -927,20 +998,29 @@ public class BaseMenu {
                     return;
                 }
 
-                food.setQuantity(food.getQuantity() - 1);
-                //List<FoodItems> updated = FileStorage.loadMenu();
-                // save updated list to file
-                cart.addToCart(food.getId(), currentQuantity[0]);
+                // Deduct actual selected quantity (not hardcoded -1)
+                int selectedQty = currentQuantity[0];
+                food.setQuantity(food.getQuantity() - selectedQty);
+
+                // TODO: Save updated food list to file, e.g.:
+                // List<FoodItems> updatedMenu = FileStorage.loadMenu();
+                // for (FoodItems f : updatedMenu) { if (f.getId() == food.getId()) { f.setQuantity(food.getQuantity()); break; } }
+                // FileStorage.rewriteMenu(updatedMenu);
+
+                cart.addToCart(food.getId(), selectedQty);  // Note: This ignores add-ons; extend Cart if needed
+
                 // Popup notification
                 Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.UNDECORATED);
+                notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
                 Label notifyLabel = new Label(food.getName() + " added to cart!");
                 notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
                 VBox notifyBox = new VBox(notifyLabel);
                 notifyBox.setAlignment(Pos.CENTER);
                 notifyBox.setStyle("-fx-background-color: transparent;");
-                notifyPopup.setScene(new Scene(notifyBox, 200, 50));
+                Scene notifyScene = new Scene(notifyBox, 200, 50);
+                notifyScene.setFill(Color.TRANSPARENT);
+                notifyPopup.setScene(notifyScene);
                 notifyPopup.show();
                 PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e2 -> notifyPopup.close());
@@ -950,10 +1030,13 @@ public class BaseMenu {
             }
         });
 
+        // Info VBox
+        VBox infoVBox = new VBox(15);
+        infoVBox.setPrefWidth(400);
         infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);
 
         center.getChildren().addAll(largeImgView, infoVBox);
-        root.setCenter(center);
+        root.setCenter(scrollPane);
 
         root.setStyle("-fx-background-color: white; -fx-background-radius: 10;");
 

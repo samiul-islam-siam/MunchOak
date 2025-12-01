@@ -152,6 +152,7 @@ public class MenuPage {
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(12, 24, 12, 24));
         navBar.getStyleClass().add("nav-bar");
+        navBar.setStyle("-fx-background-color: #FF6B00;");
 
         // --- Logo (circular) ---
         Image logoImage = null;
@@ -234,23 +235,40 @@ public class MenuPage {
         searchPane.setMaxWidth(320);
 
         // --- Right-side nav buttons ---
+        Label homeIcon = new Label("\uD83C\uDFE0"); // 🏠
+        homeIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        homeIcon.setStyle("-fx-text-fill: white;");
         Button homeButton = new Button("Home");
-        homeButton.getStyleClass().add("nav-text-button");
+        homeButton.setGraphic(homeIcon);
+        homeButton.getStyleClass().add("top-button");
+        homeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         homeButton.setOnAction(e -> returnToHomePerfectly());
 
+        Label aboutIcon = new Label("\u2139"); // ℹ
+        aboutIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        aboutIcon.setStyle("-fx-text-fill: white;");
         Button aboutButton = new Button("About Us");
-        aboutButton.getStyleClass().add("nav-text-button");
+        aboutButton.setGraphic(aboutIcon);
+        aboutButton.getStyleClass().add("top-button");
+        aboutButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         aboutButton.setOnAction(e -> navigateToAboutUs());
 
+        Label reservationIcon = new Label("\uD83D\uDDC5"); // 📅
+        reservationIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        reservationIcon.setStyle("-fx-text-fill: white;");
         Button reservationButton = new Button("Reservation");
-        reservationButton.getStyleClass().add("nav-text-button");
+        reservationButton.setGraphic(reservationIcon);
+        reservationButton.getStyleClass().add("top-button");
+        reservationButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         reservationButton.setOnAction(e -> navigateToReservation());
 
         Label profileLabel = new Label("\uD83D\uDC64"); // 👤
         profileLabel.setFont(Font.font("Segoe UI Emoji", 22));
+        profileLabel.setStyle("-fx-text-fill: white;");
         Button profileButton = new Button();
         profileButton.setGraphic(profileLabel);
         profileButton.getStyleClass().add("top-button");
+        profileButton.setStyle("-fx-background-color: transparent;");
 
         profileButton.setOnAction(e -> {
 
@@ -263,10 +281,16 @@ public class MenuPage {
 
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
         cartLabel.setFont(Font.font("Segoe UI Emoji", 22));
+        cartLabel.setStyle("-fx-text-fill: white;");
         Button cartButton = new Button();
         cartButton.setId("cartButton");
         cartButton.setGraphic(cartLabel);
         cartButton.getStyleClass().add("top-button");
+        cartButton.setStyle("-fx-background-color: transparent;");
+
+        // Wrap right buttons in HBox for spacing
+        HBox rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
+        rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         // Assemble nav bar: logo + title + leftSpacer + centered search + rightSpacer + nav buttons
         navBar.getChildren().addAll(
@@ -274,13 +298,8 @@ public class MenuPage {
                 title,
                 leftSpacer,
                 searchPane,
-                searchBtn,
                 rightSpacer,
-                homeButton,
-                aboutButton,
-                reservationButton,
-                profileButton,
-                cartButton
+                rightButtons
         );
 
         // BACK PANEL beneath (keeps previous behavior)

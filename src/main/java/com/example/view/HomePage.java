@@ -23,10 +23,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -119,7 +115,7 @@ public class HomePage implements HomePageComponent {
         navBar.setRight(rightButtons);
         navBar.getStyleClass().add("home-nav");
         navBar.setPadding(new Insets(5, 20, 5, 20));
-        navBar.setStyle("-fx-background-color: transparent;");
+        navBar.setStyle("-fx-background-color: #b30000;");
 
         content = new BorderPane();
         content.setTop(navBar);
@@ -217,7 +213,7 @@ public class HomePage implements HomePageComponent {
         navBar.setRight(rightButtons);
         navBar.getStyleClass().add("home-nav");
         navBar.setPadding(new Insets(5, 20, 5, 20));
-        navBar.setStyle("-fx-background-color: transparent;");
+        navBar.setStyle("-fx-background-color: #b30000;");
 
         content = new BorderPane();
         content.setTop(navBar);
@@ -359,15 +355,15 @@ public class HomePage implements HomePageComponent {
         textBox.prefWidthProperty().bind(Bindings.divide(group.widthProperty(), 2));
 
         Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-size: 48px; -fx-font-weight: bold; -fx-font-family: 'Brush Script MT', cursive; -fx-text-fill: white; -fx-padding: 0 0 10 0;");
+        titleLabel.setStyle("-fx-font-size: 48px; -fx-font-weight: bold; -fx-font-family: 'Brush Script MT', cursive; -fx-text-fill: black; -fx-padding: 0 0 10 0;");
 
         Label paraLabel = new Label(para);
         paraLabel.setWrapText(true);
-        paraLabel.setStyle("-fx-font-size: 18px; -fx-font-family: 'Georgia', serif; -fx-text-fill: white; -fx-padding: 0 0 20 0;");
+        paraLabel.setStyle("-fx-font-size: 18px; -fx-font-family: 'Georgia', serif; -fx-text-fill: black; -fx-padding: 0 0 20 0;");
 
         Button bookBtn = new Button("Book your table now!");
         bookBtn.getStyleClass().addAll("top-button", "login-button");
-        bookBtn.setStyle("-fx-text-fill: black;");
+        bookBtn.setStyle("-fx-text-fill: black;-fx-border-color: black;");
         bookBtn.setOnAction(e -> openReservationPageDirectly());
 
         textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
@@ -391,7 +387,7 @@ public class HomePage implements HomePageComponent {
 
     public VBox getFullPage() {
         VBox fullPage = new VBox();
-        fullPage.setStyle("-fx-background-color: black;");
+        fullPage.setStyle("-fx-background-color: lightyellow;");
         fullPage.setSpacing(0);
 
         for (HomePageComponent section : sections) {
@@ -539,7 +535,7 @@ public class HomePage implements HomePageComponent {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.setStyle("-fx-background-color: lightyellow;");
         scrollPane.setPadding(new Insets(0));
         scrollPane.prefHeightProperty().bind(primaryStage.heightProperty());
 
