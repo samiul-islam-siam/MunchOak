@@ -36,8 +36,6 @@ public class UserMenu extends BaseMenu {
             if (!menuFile.exists() || menuFile.length() == 0) {
                 //If menu is empty then cart and checkout button is disabled
                 javafx.application.Platform.runLater(() -> {
-                    //viewCartButton.setVisible(false);
-                   // checkoutButton.setVisible(false);
                     // === Create nice empty state message ===
                     //User will see messages in menu page when there is no menu loaded
                     Label emoji = new Label("🍽");

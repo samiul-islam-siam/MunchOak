@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.net.Socket;
 
-
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.write;
 
@@ -80,18 +79,12 @@ public class MenuClient {
                         try {
                             if (menu != null) {
                                 menu.updateView();
-                                //return;
                             }
-//                            if (foodList != null) {
-//                                foodList.setAll(FileStorage.loadMenu());
-//                            }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     });
-                }
-
-                else if ("UPDATE_IMAGE".equals(cmd)) {
+                } else if ("UPDATE_IMAGE".equals(cmd)) {
 
                     String filename = in.readUTF();
                     int size = in.readInt();
@@ -110,7 +103,25 @@ public class MenuClient {
                         if (foodList != null) foodList.setAll(FileStorage.loadMenu());
                     });
 
+                } else if ("UPDATE_USERFILE".equals(cmd)) {
+                    String filename = in.readUTF();
+                    int size = in.readInt();
+
+                    byte[] data = new byte[size];
+                    in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    if (!dir.exists()) dir.mkdirs();
+
+                    File target = new File(dir, filename);
+                    write(target.toPath(), data);
+
+                    System.out.println("User file updated from server.");
+
+                    // (optional) reload FileStorage users list
+                    // FileStorage.setUserFile(target);
                 }
+
             }
 
         } catch (Exception e) {
@@ -151,4 +162,17 @@ public class MenuClient {
             e.printStackTrace();
         }
     }
+
+    public void sendRegister(String username, String email, String password) {
+        try {
+            out.writeUTF("REGISTER_USER");   // Command
+            out.writeUTF(username);
+            out.writeUTF(email);
+            out.writeUTF(password);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -24,7 +24,7 @@ public class HomePageThirdExtension implements HomePageComponent {
         extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
         extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
         // Set exact gradient background color: linear 90 degrees (#5de0e6 to #004aad)
-        extensionRoot.setStyle("-fx-background-color: black;");
+        extensionRoot.setStyle("-fx-background-color: lightyellow;");
 
         // --- Text Container (Left Side) ---
         textContainer = new VBox(10);
@@ -33,15 +33,15 @@ public class HomePageThirdExtension implements HomePageComponent {
         textContainer.setMinHeight(HEIGHT_RATIO * getPrefHeight() * 0.9); // Ensure container takes sufficient height
         // Title parts (staggered lines) with CSS styling
         Label title1 = new Label("ONLY THE");
-        title1.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
+        title1.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: black;");
         Label title2 = new Label("FINEST");
-        title2.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: white;");
+        title2.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: black;");
         Label title3 = new Label("FOOD &");
-        title3.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
+        title3.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: black;");
         Label title4 = new Label("GREAT");
-        title4.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: white;");
+        title4.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: black;");
         Label title5 = new Label("SERVICE");
-        title5.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: white;");
+        title5.setStyle("-fx-font-family: 'The Seasons'; -fx-font-weight: bold; -fx-font-size: 32px; -fx-text-fill: black;");
         // Paragraph with CSS styling, full wrap
         Label paragraph = new Label("""
                 Experience the harmony of taste and hospitality.
@@ -51,7 +51,7 @@ public class HomePageThirdExtension implements HomePageComponent {
                 elegance, and perfection in every visit.
                 Here, every meal is more than food — it’s a moment
                 to remember.""");
-        paragraph.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: white;");
+        paragraph.setStyle("-fx-font-family: 'The Seasons'; -fx-font-size: 18px; -fx-text-fill: black;");
         paragraph.setWrapText(true);
         paragraph.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> textContainer.getWidth() * 0.9, textContainer.widthProperty()));
         paragraph.setPrefHeight(Region.USE_COMPUTED_SIZE); // Allow natural height

@@ -1,15 +1,20 @@
 package com.example.menu;
 
+import com.example.manager.FileStorage;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.write;
 
 public class MenuServer {
@@ -20,11 +25,12 @@ public class MenuServer {
     private static byte[] latestMenu = null;
     private static String latestMenuName = "menu.dat";
     private static final Map<String, byte[]> latestImages = new HashMap<>();
+    private static byte[] latestUserFile = null;
 
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Menu Server started.");
+            System.out.println("Menu Server started on port " + PORT);
 
             while (true) {
                 Socket client = serverSocket.accept();
@@ -52,6 +58,19 @@ public class MenuServer {
                         out.write(entry.getValue());
                     } catch (Exception ignored) {}
                 }
+
+                // send latest user file to late joiners
+                if (latestUserFile != null) {
+                    try {
+                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                        out.writeUTF("UPDATE_USERFILE");
+                        out.writeUTF("users.dat");
+                        out.writeInt(latestUserFile.length);
+                        out.write(latestUserFile);
+                        out.flush();
+                    } catch (Exception ignored) {}
+                }
+
 
                 new Thread(() -> handleClient(client)).start();
             }
@@ -104,6 +123,35 @@ public class MenuServer {
 
                     broadcastImage(filename, img);
                 }
+
+                if ("REGISTER_USER".equals(cmd)) {
+                    String username = in.readUTF();
+                    String email = in.readUTF();
+                    String pwd = in.readUTF();
+
+                    // Write into server's user file
+                    File userFile = new File("src/main/resources/com/example/manager/data/users.dat");
+                    if (!userFile.exists()) userFile.createNewFile();
+
+                    FileStorage.appendUser(username, email, pwd);
+
+                    // Read whole file so it can be broadcast to all clients
+                    byte[] fullUserData = readAllBytes(userFile.toPath());
+
+                    // Store the latest version for late joiners
+                    latestUserFile = fullUserData;
+
+                    // Broadcast to all clients
+                    broadcastUserFile("users.dat", fullUserData);
+
+                    // Also respond to this client if you want confirmation
+                    DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                    out.writeUTF("REGISTER_RESPONSE");
+                    out.writeBoolean(true);
+                    out.writeUTF("Registration successful.");
+                    out.flush();
+                }
+
             }
 
         } catch (Exception ignored) {
@@ -131,6 +179,19 @@ public class MenuServer {
             try {
                 DataOutputStream out = new DataOutputStream(c.getOutputStream());
                 out.writeUTF("UPDATE_IMAGE");
+                out.writeUTF(filename);
+                out.writeInt(data.length);
+                out.write(data);
+                out.flush();
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private static void broadcastUserFile(String filename, byte[] data) {
+        for (Socket c : clients) {
+            try {
+                DataOutputStream out = new DataOutputStream(c.getOutputStream());
+                out.writeUTF("UPDATE_USERFILE");
                 out.writeUTF(filename);
                 out.writeInt(data.length);
                 out.write(data);

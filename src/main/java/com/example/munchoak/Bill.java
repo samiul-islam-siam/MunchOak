@@ -2,6 +2,7 @@ package com.example.munchoak;
 
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
+import javafx.stage.Stage;
 
 import java.util.Map;
 

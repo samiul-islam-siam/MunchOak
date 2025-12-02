@@ -1,7 +1,6 @@
 package com.example.menu;
 
 import com.example.manager.FileStorage;
-import com.example.manager.Session;
 import com.example.munchoak.FoodItems;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,12 +34,10 @@ public class guestMenu extends BaseMenu {
 
             //getting menu from files
             File menuFile = FileStorage.getMenuFile();
-            //Session.getMenuClient().sendMenuUpdate();
+
             //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
-                    //viewCartButton.setVisible(false);
-                    //checkoutButton.setVisible(false);
 
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));

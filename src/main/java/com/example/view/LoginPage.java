@@ -4,6 +4,8 @@ import com.example.login.AdminDashboard;
 import com.example.manager.AdminFileStorage;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
+import com.example.menu.BaseMenu;
+import com.example.menu.MenuClient;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -54,6 +56,7 @@ public class LoginPage {
 
     private Scene loginScene; // Only one scene ever
     private BorderPane root; // Reusable root
+    public BaseMenu menu; // current menu instance
 
     public LoginPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -73,6 +76,35 @@ public class LoginPage {
                 System.err.println("Exception: " + npe.getMessage());
             }
             attachResizeListeners(); // Renamed and fixed to handle full screen too
+
+            // ----------------- NEW: create / register MenuClient and attach menu -----------------
+            try {
+                // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
+                MenuClient client = Session.getMenuClient();
+                if (client == null) {
+                    // no client yet -> create, attach menu and store in Session
+                    client = new MenuClient(menu);
+                    Session.setMenuClient(client); // your Session should expose this; expected by other code
+                } else {
+                    // client exists (maybe created earlier) -> just update the menu reference so UI refresh works
+                    client.setMenu(menu);
+                }
+            } catch (NoSuchMethodError | NoClassDefFoundError ex) {
+                // If Session.setMenuClient doesn't exist in your Session class, fallback to creating a local client:
+                // (should rarely happen because your payment code used Session.getMenuClient())
+                try {
+                    MenuClient client = new MenuClient(menu);
+                    // don't crash; we couldn't register into Session, but local client will still listen and call menu.updateView()
+                } catch (Exception inner) {
+                    inner.printStackTrace();
+                }
+            } catch (Exception e) {
+                // safe fallback: create client and attach menu
+                try {
+                    MenuClient tmp = new MenuClient(menu);
+                    // won't be in Session, but will still listen/refresh this menu instance
+                } catch (Exception ignored) {}
+            }
         }
         return loginScene;
     }
@@ -300,11 +332,14 @@ public class LoginPage {
                     return;
                 }
 
-                FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
+                // FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
+                Session.getMenuClient().sendRegister(username, email, pwd);
 
-                showRegisterStatus("Registration successful!", false);
+                showRegisterStatus("Registering...", false);
 
-            } catch (IOException err) {
+                // showRegisterStatus("Registration successful!", false);
+
+            } catch (Exception err) {
                 System.err.println("IOException: " + err.getMessage());
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
@@ -476,7 +511,16 @@ public class LoginPage {
                     showAdminStatus("Incorrect ID or password!", true); // <<< Use the right method!
                     return;
                 }
-                Session.setCurrentUser("admin");
+                //   Session.setCurrentUser("admin");
+                if (AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                    Session.setAdminUser(); // <-- sets isAdmin = true
+                    showAdminStatus("Admin login successful!", false);
+                    AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                    dashboard.openAdminDashboard();
+                } else {
+                    showAdminStatus("Incorrect ID or password!", true);
+                }
+
                 showAdminStatus("Admin login successful!", false);
                 AdminDashboard dashboard = new AdminDashboard(primaryStage);
                 dashboard.openAdminDashboard();

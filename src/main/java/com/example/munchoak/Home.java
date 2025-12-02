@@ -1,15 +1,14 @@
 package com.example.munchoak;
 
 import com.example.manager.FileStorage;
-import com.example.manager.Session;
 import com.example.view.HomePage;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class Home extends Application {
@@ -21,8 +20,6 @@ public class Home extends Application {
         Scene mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
         stage.setTitle("Home Page");
-
-        Session.initializeSocket();   // Connect to broadcast server once
 
         // Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");

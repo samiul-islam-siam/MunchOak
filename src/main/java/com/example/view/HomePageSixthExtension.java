@@ -39,7 +39,7 @@ public class HomePageSixthExtension implements HomePageComponent {
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
         // --- RADIAL GRADIENT BACKGROUND (UPSIDE DOWN: DARK CENTER, LIGHT EDGES) ---
-        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- LEFT & RIGHT IMAGES ---
         Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish2.png").toExternalForm());
@@ -52,7 +52,7 @@ public class HomePageSixthExtension implements HomePageComponent {
 
         // --- ENTER MENU BUTTON ---
         enterMenuBtn = new Button("ENTER MENU");
-        originalStyle = "-fx-background-color: transparent; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.6), 20, 0, 0, 0);";
+        originalStyle = "-fx-background-color: transparent; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 2; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.6), 20, 0, 0, 0);";
         enterMenuBtn.setStyle(originalStyle);
 
         // Add hover effects
@@ -116,28 +116,28 @@ public class HomePageSixthExtension implements HomePageComponent {
         menuBox.setAlignment(Pos.TOP_LEFT);
 
         Label appTitle = new Label("Appetizers");
-        appTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        appTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox appItems = new VBox(2);
         appItems.setAlignment(Pos.CENTER_LEFT);
         appItems.getChildren().addAll(
-                createMenuItem("Samosa", "$2"),
-                createMenuItem("Fries", "$2.5"),
-                createMenuItem("Spring Rolls", "$2.8"),
-                createMenuItem("Garlic Bread", "$2.2"),
-                createMenuItem("Onion Rings", "$2.5")
+                createMenuItem("Samosa", "৳20"),
+                createMenuItem("Fries", "৳25"),
+                createMenuItem("Spring Rolls", "৳40"),
+                createMenuItem("Garlic Bread", "৳220"),
+                createMenuItem("Onion Rings", "৳120")
         );
 
         Label soupTitle = new Label("Soup");
-        soupTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        soupTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox soupItems = new VBox(2);
         soupItems.setAlignment(Pos.CENTER_LEFT);
         soupItems.getChildren().addAll(
-                createMenuItem("Mushroom Soup", "$5"),
-                createMenuItem("Hot Soup", "$3.5"),
-                createMenuItem("Clam Chowder", "$6.5"),
-                createMenuItem("Miso Soup", "$3")
+                createMenuItem("Mushroom Soup", "৳499"),
+                createMenuItem("Hot Soup", "৳350"),
+                createMenuItem("Clam Chowder", "৳650"),
+                createMenuItem("Miso Soup", "৳300")
         );
 
         menuBox.getChildren().addAll(appTitle, appItems, soupTitle, soupItems);
@@ -147,7 +147,7 @@ public class HomePageSixthExtension implements HomePageComponent {
     // --- Create menu item ---
     private HBox createMenuItem(String name, String price) {
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: white;");
+        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: black;");
 
         Label priceLabel = new Label(price);
         priceLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #ffdd00;");

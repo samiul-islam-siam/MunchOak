@@ -128,7 +128,6 @@ public class FileStorage {
                 String cuisine = dis.readUTF();
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
-
                 int quantity = dis.readInt();   // NEW LINE
                 list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity));
             }
@@ -157,7 +156,6 @@ public class FileStorage {
             dos.writeUTF(item.getCuisine());
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
-
             dos.writeInt(item.getQuantity());   // NEW
         }
     }
@@ -174,7 +172,6 @@ public class FileStorage {
                 dos.writeUTF(item.getCuisine());
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
-
                 dos.writeInt(item.getQuantity());   // NEW
             }
         }
