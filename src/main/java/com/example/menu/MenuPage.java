@@ -131,12 +131,29 @@ public class MenuPage {
         // Wire cart button (if present)
         Button cartButton = (Button) root.lookup("#cartButton");
         if (cartButton != null) {
+            menu.setCartButton(cartButton);
             Cart currentCart = menu.getCart();
+
+            // Restore badge count after returning to menu page
+            Label cartCountLabel = (Label) root.lookup("#cartCountLabel");
+
+            if (cartCountLabel != null && currentCart != null) {
+                int count = currentCart.getTotalItems(); // or getItemCount()
+
+                if (count > 0) {
+                    cartCountLabel.setText(String.valueOf(count));
+                    cartCountLabel.setVisible(true);
+                } else {
+                    cartCountLabel.setVisible(false);
+                }
+            }
             cartButton.setOnAction(e -> {
                 CartPage cp = new CartPage(primaryStage, currentCart);
                 primaryStage.setScene(cp.getScene());
             });
         }
+
+
 
         return menuScene;
     }
@@ -282,9 +299,32 @@ public class MenuPage {
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
         cartLabel.setFont(Font.font("Segoe UI Emoji", 22));
         cartLabel.setStyle("-fx-text-fill: white;");
+        Label cartCountLabel = new Label("0");
+        cartCountLabel.setId("cartCountLabel");
+        cartCountLabel.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-text-fill: black;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-min-width: 14px;" +
+                        "-fx-min-height: 14px;" +
+                        "-fx-max-width: 14px;" +
+                        "-fx-max-height: 14px;" +
+                        "-fx-alignment: center;" +
+                        "-fx-background-radius: 20;"
+        );
+        cartCountLabel.setVisible(false);
+
+// STACK cart icon + badge
+        StackPane cartPane = new StackPane(cartLabel, cartCountLabel);
+        StackPane.setAlignment(cartCountLabel, Pos.TOP_RIGHT);
+        // Move badge farther up-right
+        cartCountLabel.setTranslateX(10);   // push more right
+        cartCountLabel.setTranslateY(-10);  // push more up
+        StackPane.setMargin(cartCountLabel, new Insets(-4, -4, 0, 0));
+
         Button cartButton = new Button();
         cartButton.setId("cartButton");
-        cartButton.setGraphic(cartLabel);
+        cartButton.setGraphic(cartPane);
         cartButton.getStyleClass().add("top-button");
         cartButton.setStyle("-fx-background-color: transparent;");
 
@@ -313,13 +353,6 @@ public class MenuPage {
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
 
-        // For admin access, admin will back to adminDashboard from menu page
-
-//        if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
-//            backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
-//        } else {
-//            backButton.setOnAction(e -> returnToHomePerfectly());
-//        }
         if (Session.isAdmin()) {
             backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
         } else {

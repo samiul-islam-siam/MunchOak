@@ -1,5 +1,5 @@
 package com.example.menu;
-
+import com.example.menu.MenuPage;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
@@ -55,6 +55,11 @@ public class BaseMenu {
     protected HBox cartButtons;
     protected Button buttonMenu;
     protected String searchKeyword = "";
+    protected Button cartButton;
+
+    public void setCartButton(Button cartButton) {
+        this.cartButton = cartButton;
+    }
 
     public void setSearchKeyword(String keyword) {
         this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
@@ -682,6 +687,7 @@ public class BaseMenu {
                 }
 
                 cart.addToCart(food.getId(), 1);
+                updateCartIcon();
 
                 // Popup notification
                 Stage popup = new Stage();
@@ -789,6 +795,20 @@ public class BaseMenu {
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
             showAlert("Error", "Failed to add food item.");
+        }
+    }
+
+
+    protected void updateCartIcon() {
+        int count = cart.getTotalItems();   // You already have this function
+
+        Label cartCountLabel = (Label) ((StackPane) cartButton.getGraphic()).getChildren().get(1);
+
+        if (count > 0) {
+            cartCountLabel.setText(String.valueOf(count));
+            cartCountLabel.setVisible(true);
+        } else {
+            cartCountLabel.setVisible(false);
         }
     }
 
@@ -1008,7 +1028,7 @@ public class BaseMenu {
                 // FileStorage.rewriteMenu(updatedMenu);
 
                 cart.addToCart(food.getId(), selectedQty);  // Note: This ignores add-ons; extend Cart if needed
-
+                updateCartIcon();
                 // Popup notification
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
@@ -1044,6 +1064,7 @@ public class BaseMenu {
         dialog.setScene(scene);
         dialog.show();
     }
+
 
     protected void updateFoodItem() {
         if (currentEditingFood == null) return;
