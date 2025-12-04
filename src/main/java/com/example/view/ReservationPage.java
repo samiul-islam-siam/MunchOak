@@ -1,9 +1,9 @@
 package com.example.view;
 
 import com.example.manager.FileStorage;
-
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.Cart;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -28,9 +28,14 @@ import java.util.Optional;
 
 public class ReservationPage {
     private final Stage primaryStage;
-
+    private final Cart cart;  // ADDED: Cart field for state persistence
+    public ReservationPage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;
+    }
     public ReservationPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.cart = new Cart();
     }
 
     public Scene getReservationScene() {
@@ -410,7 +415,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            HomePage homePage = new HomePage(primaryStage);
+            HomePage homePage = new HomePage(primaryStage,cart);
             Scene homeScene = homePage.getHomeScene();
             primaryStage.setScene(homeScene);
 
@@ -430,7 +435,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            MenuPage menuPage = new MenuPage(primaryStage);
+            MenuPage menuPage = new MenuPage(primaryStage,cart);
             Scene menuScene = menuPage.getMenuScene();
             primaryStage.setScene(menuScene);
 
@@ -458,7 +463,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage,cart);
             aboutPage.showAboutUs();
 
             Platform.runLater(() -> {

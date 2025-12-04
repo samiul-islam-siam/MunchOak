@@ -15,8 +15,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Field;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -138,7 +136,7 @@ public class History {
 
     private void goBack() {
         try {
-            HomePage homePage = new HomePage(primaryStage);
+            HomePage homePage = new HomePage(primaryStage,cart);
             primaryStage.setScene(homePage.getHomeScene());
         } catch (Exception ex) {
             System.err.println("Exception: " + ex.getMessage());

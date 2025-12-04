@@ -1,9 +1,9 @@
 package com.example.view;
 
 import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
-import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -29,9 +29,15 @@ import javafx.util.Duration;
 public class AboutUsPage {
 
     private final Stage primaryStage;
+    private final Cart cart;  // ADDED: Cart field for state persistence
+    public AboutUsPage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;
+    }
 
     public AboutUsPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.cart = new Cart();
     }
 
     public void showAboutUs() {
@@ -309,7 +315,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        HomePage homePage = new HomePage(primaryStage);
+        HomePage homePage = new HomePage(primaryStage,cart);
         Scene homeScene = homePage.getHomeScene();
         primaryStage.setScene(homeScene);
 
@@ -329,7 +335,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        MenuPage menuPage = new MenuPage(primaryStage);
+        MenuPage menuPage = new MenuPage(primaryStage,cart);
         Scene menuScene = menuPage.getMenuScene();
         primaryStage.setScene(menuScene);
 
@@ -349,7 +355,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        ReservationPage reservationPage = new ReservationPage(primaryStage);
+        ReservationPage reservationPage = new ReservationPage(primaryStage,cart);
         reservationPage.showReservation();
 
         Platform.runLater(() -> {
@@ -375,7 +381,7 @@ public class AboutUsPage {
         if (userId == 0) userId = 0; // or fetch from session
         String token = ""; // Default to empty string if not logged in
 
-        Cart cart = new Cart();
+        //Cart cart = new Cart();
         CartPage cartPage = new CartPage(primaryStage, cart);
         Scene cartScene = cartPage.getScene();
         primaryStage.setScene(cartScene);

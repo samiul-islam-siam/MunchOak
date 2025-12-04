@@ -393,7 +393,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+        AboutUsPage aboutPage = new AboutUsPage(primaryStage,cart);
         Scene aboutScene = aboutPage.getAboutUsScene();
         primaryStage.setScene(aboutScene);
 
@@ -413,7 +413,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        ReservationPage resPage = new ReservationPage(primaryStage);
+        ReservationPage resPage = new ReservationPage(primaryStage,cart);
         Scene resScene = resPage.getReservationScene();
         primaryStage.setScene(resScene);
 
@@ -434,7 +434,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        HomePage homePage = new HomePage(primaryStage);
+        HomePage homePage = new HomePage(primaryStage,cart);
         VBox fullPage = homePage.getFullPage();
 
         ScrollPane scrollPane = new ScrollPane(fullPage);
