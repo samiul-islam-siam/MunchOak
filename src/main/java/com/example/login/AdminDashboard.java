@@ -1,4 +1,6 @@
 package com.example.login;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
 
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
@@ -23,59 +25,114 @@ public class AdminDashboard {
     public AdminDashboard(Stage stage) {
         primaryStage = stage;
     }
+    private static HBox topBar;
 
     public static void openAdminDashboard() {
 
         BorderPane dashboard = new BorderPane();
-        dashboard.setStyle("-fx-background-color: linear-gradient(to right, #000428, #004e92);");
 
-        // --- Top Bar ---
+        dashboard.setStyle("-fx-background-color: lightyellow;");
+
+
+
+
+
+
+        VBox centerContent = new VBox(20);
+        centerContent.setAlignment(Pos.CENTER);
+
         Label title = new Label("Admin Dashboard");
-        title.setStyle("-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold;");
-        HBox topBar = new HBox(title);
-        topBar.setAlignment(Pos.CENTER);
-        topBar.setPadding(new Insets(20, 0, 20, 0));
+        title.setStyle("-fx-font-size: 36px; -fx-text-fill: black; -fx-font-family: 'Arial Black'; -fx-font-weight: bold;");
+        HBox titleBox = new HBox(title);
+        titleBox.setAlignment(Pos.CENTER);
+        titleBox.setPadding(new Insets(10, 0, 0, 0)); // Top spacing
 
-        // --- Center Content ---
         Label infoLabel = new Label("Select an action from the left menu.");
-        infoLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-        StackPane centerPane = new StackPane(infoLabel);
+        infoLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Georgia';");
+
+        VBox infoBox = new VBox(infoLabel);
+        infoBox.setAlignment(Pos.CENTER); // Vertically center the instruction
+
+        BorderPane centerPane = new BorderPane();
+        centerPane.setTop(titleBox);
+        centerPane.setCenter(infoBox);
+        centerPane.setStyle("-fx-background-color: transparent;");
+
+
 
         // --- Left Menu ---
         VBox menuBox = new VBox(15);
         menuBox.setPadding(new Insets(30));
-        menuBox.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-pref-width: 220;");
-        menuBox.setAlignment(Pos.TOP_CENTER);
+
+        menuBox.setStyle("-fx-background-color: transparent;");
+
+        menuBox.setAlignment(Pos.CENTER);
 
         Button viewUsersBtn = new Button("View All Users");
         Button manageMenuBtn = new Button("Manage Menu");
-        Button usersHistoryBtn = new Button("History");
         Button chatServerBtn = new Button("Chat With users");
         Button changePassBtn = new Button("Change Password");
         Button logoutBtn = new Button("Logout");
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn}) {
-            btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;");
-            btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #63B3ED; -fx-text-fill: black; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
-            btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #1E90FF; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-pref-width: 180; -fx-padding: 10 0; -fx-background-radius: 25;"));
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, logoutBtn}) {
+
+            btn.setStyle(
+                    "-fx-background-color: #b30000;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 18px;" +
+                            "-fx-font-weight: bolder;" +
+                            "-fx-pref-width: 200;" +
+                            "-fx-padding: 12 0;" +
+                            "-fx-background-radius: 25;"
+            );
+
+            btn.setOnMouseEntered(e -> {
+                btn.setStyle(
+                        "-fx-background-color: #ff4d4d;" +
+                                "-fx-text-fill: black;" +
+                                "-fx-font-size: 18px;" +          // keep same size
+                                "-fx-font-weight: bolder;" +      // keep same boldness
+                                "-fx-pref-width: 200;" +
+                                "-fx-padding: 12 0;" +
+                                "-fx-background-radius: 25;"
+                );
+                btn.setEffect(new DropShadow(10, Color.DARKRED));
+            });
+
+            btn.setOnMouseExited(e -> {
+                btn.setStyle(
+                        "-fx-background-color: #b30000;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-size: 18px;" +
+                                "-fx-font-weight: bolder;" +
+                                "-fx-pref-width: 200;" +
+                                "-fx-padding: 12 0;" +
+                                "-fx-background-radius: 25;"
+                );
+                btn.setEffect(null);
+            });
+
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, usersHistoryBtn, chatServerBtn, changePassBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, logoutBtn
         );
 
-        dashboard.setTop(topBar);
-        dashboard.setLeft(menuBox);
+
+        VBox leftPanel = new VBox(menuBox);
+        leftPanel.setAlignment(Pos.CENTER);
+        leftPanel.setPadding(new Insets(0));
+        leftPanel.setStyle("-fx-background-color: #b30000;");
+        leftPanel.setPrefWidth(250); // Optional: controls left panel width
+        dashboard.setLeft(leftPanel);
+
         dashboard.setCenter(centerPane);
 
         Scene scene = new Scene(dashboard, 1000, 700);
         primaryStage.setScene(scene);
-
-        /* --- Button Actions --- */
-        usersHistoryBtn.setOnAction(ev -> {
-            System.out.println("History Button Clicked");
-        });
+        primaryStage.show();
+        /* ------ Button Actions ------ */
 
         viewUsersBtn.setOnAction(e -> {
             List<String[]> users = FileStorage.loadUsers();
@@ -101,7 +158,8 @@ public class AdminDashboard {
             table.getItems().addAll(users);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-            centerPane.getChildren().setAll(table);
+            //centerPane.getChildren().setAll(table);
+            centerPane.setCenter(table);
         });
 
         manageMenuBtn.setOnAction(e -> {

@@ -1,67 +1,32 @@
-/*
 package com.example.manager;
 
-public class Session {
-
-    private static int currentUserId = 2025000;
-    private static String currentUsername = "guest";
-    private static String currentEmail = "guest@gmail.com";
-    private static String currentPassword = "ai01*2#";
-
-    public static int getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public static String getCurrentUsername() {
-        return currentUsername;
-    }
-
-    public static String getCurrentEmail() {
-        return currentEmail;
-    }
-
-    public static String getCurrentPassword() {
-        return currentPassword;
-    }
-
-    public static void setCurrentUser(String username) {
-        currentUsername = username;
-        currentUserId = FileStorage.getUserId(username);
-        currentEmail = FileStorage.getUserEmail(username);
-        currentPassword = FileStorage.getUserPassword(username);
-    }
-
-    public static void setCurrentUsername(String username)
-    {
-        currentUsername = username;
-    }
-
-    public static String getCurrentRole() {
-        if ("admin".equalsIgnoreCase(currentUsername)) return "ADMIN";
-        // if ("guest".equalsIgnoreCase(currentUsername)) return "GUEST";
-        else return "USER";
-    }
-
-    public static void resetToGuest() {
-        currentUsername = "guest";
-        currentEmail = "guest@gmail.com";
-        currentPassword = "ai01*2#";
-    }
-
-    public static void logout() {
-        resetToGuest();
-    }
-}
-*/
-package com.example.manager;
+import com.example.menu.MenuClient;
 import java.io.IOException;
+
 public class Session {
 
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
     private static String currentEmail = "guest@gmail.com";
     private static String currentPassword = "ai01*2#";
-    private static boolean isAdmin = false; // new flag
+    private static boolean isAdmin = false; // new flag for admin control
+
+    // ===== NEW: Global menu socket client =====
+    private static MenuClient menuClient;
+
+    public static void initializeSocket() {
+        if (menuClient == null) {
+            menuClient = new MenuClient(); // connect to server
+        }
+    }
+
+    public static void setMenuClient(MenuClient client) {
+        menuClient = client;
+    }
+
+    public static MenuClient getMenuClient() {
+        return menuClient;
+    }
 
     public static int getCurrentUserId() {
         return currentUserId;
@@ -103,6 +68,10 @@ public class Session {
         isAdmin = true; // set admin flag
     }
 
+    public static void setCurrentUsername(String username) {
+        currentUsername = username;
+    }
+
     public static void resetToGuest() {
         currentUsername = "guest";
         currentEmail = "guest@gmail.com";
@@ -113,4 +82,5 @@ public class Session {
     public static void logout() {
         resetToGuest();
     }
+
 }

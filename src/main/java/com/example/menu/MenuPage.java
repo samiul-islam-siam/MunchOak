@@ -76,9 +76,8 @@ public class MenuPage {
         }
 
         // Decide which menu to load (AdminMenu or UserMenu)
-        //BaseMenu menu;
         String username = Session.getCurrentUsername();
-        if (Session.isAdmin()){//"admin".equalsIgnoreCase(username)) {
+        if (Session.isAdmin()){ // "admin".equalsIgnoreCase(username)
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
@@ -89,6 +88,36 @@ public class MenuPage {
             System.out.println("User Menu loaded in MenuPage");
         }
         menu.setSearchKeyword(searchKeyword);
+
+        // ----------------- NEW: create / register MenuClient and attach menu -----------------
+        try {
+            // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
+            MenuClient client = Session.getMenuClient();
+            if (client == null) {
+                // no client yet -> create, attach menu and store in Session
+                client = new MenuClient(menu);
+                Session.setMenuClient(client); // your Session should expose this; expected by other code
+            } else {
+                // client exists (maybe created earlier) -> just update the menu reference so UI refresh works
+                client.setMenu(menu);
+            }
+        } catch (NoSuchMethodError | NoClassDefFoundError ex) {
+            // If Session.setMenuClient doesn't exist in your Session class, fallback to creating a local client:
+            // (should rarely happen because your payment code used Session.getMenuClient())
+            try {
+                MenuClient client = new MenuClient(menu);
+                // don't crash; we couldn't register into Session, but local client will still listen and call menu.updateView()
+            } catch (Exception inner) {
+                inner.printStackTrace();
+            }
+        } catch (Exception e) {
+            // safe fallback: create client and attach menu
+            try {
+                MenuClient tmp = new MenuClient(menu);
+                // won't be in Session, but will still listen/refresh this menu instance
+            } catch (Exception ignored) {}
+        }
+        // ------------------------------------------------------------------------------------
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -102,7 +131,22 @@ public class MenuPage {
         // Wire cart button (if present)
         Button cartButton = (Button) root.lookup("#cartButton");
         if (cartButton != null) {
+            menu.setCartButton(cartButton);
             Cart currentCart = menu.getCart();
+
+            // Restore badge count after returning to menu page
+            Label cartCountLabel = (Label) root.lookup("#cartCountLabel");
+
+            if (cartCountLabel != null && currentCart != null) {
+                int count = currentCart.getTotalItems(); // or getItemCount()
+
+                if (count > 0) {
+                    cartCountLabel.setText(String.valueOf(count));
+                    cartCountLabel.setVisible(true);
+                } else {
+                    cartCountLabel.setVisible(false);
+                }
+            }
             cartButton.setOnAction(e -> {
                 CartPage cp = new CartPage(primaryStage, currentCart);
                 primaryStage.setScene(cp.getScene());
@@ -125,6 +169,7 @@ public class MenuPage {
         navBar.setAlignment(Pos.CENTER_LEFT);
         navBar.setPadding(new Insets(12, 24, 12, 24));
         navBar.getStyleClass().add("nav-bar");
+        navBar.setStyle("-fx-background-color: #FF6B00;");
 
         // --- Logo (circular) ---
         Image logoImage = null;
@@ -201,32 +246,46 @@ public class MenuPage {
             }
         });
 
-
-//        searchField.setOnAction(e -> searchBtn.fire());
-
         StackPane searchPane = new StackPane(searchField,searchBtn);
         StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
         StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
         searchPane.setMaxWidth(320);
 
         // --- Right-side nav buttons ---
+        Label homeIcon = new Label("\uD83C\uDFE0"); // 🏠
+        homeIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        homeIcon.setStyle("-fx-text-fill: white;");
         Button homeButton = new Button("Home");
-        homeButton.getStyleClass().add("nav-text-button");
+        homeButton.setGraphic(homeIcon);
+        homeButton.getStyleClass().add("top-button");
+        homeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         homeButton.setOnAction(e -> returnToHomePerfectly());
 
+        Label aboutIcon = new Label("\u2139"); // ℹ
+        aboutIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        aboutIcon.setStyle("-fx-text-fill: white;");
         Button aboutButton = new Button("About Us");
-        aboutButton.getStyleClass().add("nav-text-button");
+        aboutButton.setGraphic(aboutIcon);
+        aboutButton.getStyleClass().add("top-button");
+        aboutButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         aboutButton.setOnAction(e -> navigateToAboutUs());
 
+        Label reservationIcon = new Label("\uD83D\uDDC5"); // 📅
+        reservationIcon.setFont(Font.font("Segoe UI Emoji", 22));
+        reservationIcon.setStyle("-fx-text-fill: white;");
         Button reservationButton = new Button("Reservation");
-        reservationButton.getStyleClass().add("nav-text-button");
+        reservationButton.setGraphic(reservationIcon);
+        reservationButton.getStyleClass().add("top-button");
+        reservationButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
         reservationButton.setOnAction(e -> navigateToReservation());
 
         Label profileLabel = new Label("\uD83D\uDC64"); // 👤
         profileLabel.setFont(Font.font("Segoe UI Emoji", 22));
+        profileLabel.setStyle("-fx-text-fill: white;");
         Button profileButton = new Button();
         profileButton.setGraphic(profileLabel);
         profileButton.getStyleClass().add("top-button");
+        profileButton.setStyle("-fx-background-color: transparent;");
 
         profileButton.setOnAction(e -> {
 
@@ -239,10 +298,39 @@ public class MenuPage {
 
         Label cartLabel = new Label("\uD83D\uDED2"); // 🛒
         cartLabel.setFont(Font.font("Segoe UI Emoji", 22));
+        cartLabel.setStyle("-fx-text-fill: white;");
+        Label cartCountLabel = new Label("0");
+        cartCountLabel.setId("cartCountLabel");
+        cartCountLabel.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-text-fill: black;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-min-width: 14px;" +
+                        "-fx-min-height: 14px;" +
+                        "-fx-max-width: 14px;" +
+                        "-fx-max-height: 14px;" +
+                        "-fx-alignment: center;" +
+                        "-fx-background-radius: 20;"
+        );
+        cartCountLabel.setVisible(false);
+
+// STACK cart icon + badge
+        StackPane cartPane = new StackPane(cartLabel, cartCountLabel);
+        StackPane.setAlignment(cartCountLabel, Pos.TOP_RIGHT);
+        // Move badge farther up-right
+        cartCountLabel.setTranslateX(10);   // push more right
+        cartCountLabel.setTranslateY(-10);  // push more up
+        StackPane.setMargin(cartCountLabel, new Insets(-4, -4, 0, 0));
+
         Button cartButton = new Button();
         cartButton.setId("cartButton");
-        cartButton.setGraphic(cartLabel);
+        cartButton.setGraphic(cartPane);
         cartButton.getStyleClass().add("top-button");
+        cartButton.setStyle("-fx-background-color: transparent;");
+
+        // Wrap right buttons in HBox for spacing
+        HBox rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
+        rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         // Assemble nav bar: logo + title + leftSpacer + centered search + rightSpacer + nav buttons
         navBar.getChildren().addAll(
@@ -250,13 +338,8 @@ public class MenuPage {
                 title,
                 leftSpacer,
                 searchPane,
-                searchBtn,
                 rightSpacer,
-                homeButton,
-                aboutButton,
-                reservationButton,
-                profileButton,
-                cartButton
+                rightButtons
         );
 
         // BACK PANEL beneath (keeps previous behavior)
@@ -269,14 +352,6 @@ public class MenuPage {
         Button backButton = new Button();
         backButton.setGraphic(backLabel);
         backButton.getStyleClass().add("back-button");
-
-        //For admin access, admin will back to adminDashboard from menu page
-       /* if (Session.getCurrentUsername().equalsIgnoreCase("admin")) {
-            backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
-        } else {
-            backButton.setOnAction(e -> returnToHomePerfectly());
-        }
-        */
 
         if (Session.isAdmin()) {
             backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());

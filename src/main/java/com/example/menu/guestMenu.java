@@ -38,8 +38,6 @@ public class guestMenu extends BaseMenu {
             //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {
                 javafx.application.Platform.runLater(() -> {
-                    //viewCartButton.setVisible(false);
-                    //checkoutButton.setVisible(false);
 
                     Label emoji = new Label("🍽");
                     emoji.setFont(Font.font("Segoe UI Emoji", 64));
@@ -58,6 +56,7 @@ public class guestMenu extends BaseMenu {
                     messageBox.setPadding(new Insets(80));
 
                     StackPane wrapper = new StackPane(messageBox);
+                    wrapper.setId("empty-message");
                     wrapper.setAlignment(Pos.CENTER);
                     wrapper.setStyle("-fx-background-color: linear-gradient(to bottom, #ffffff, #f9f9f9);");
 

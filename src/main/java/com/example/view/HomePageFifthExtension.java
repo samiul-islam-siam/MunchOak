@@ -33,7 +33,7 @@ public class HomePageFifthExtension implements HomePageComponent {
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
         // --- RADIAL GRADIENT BACKGROUND ---
-        extensionRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- IMAGES ---
         Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish.png").toExternalForm());
@@ -78,29 +78,29 @@ public class HomePageFifthExtension implements HomePageComponent {
         menuBox.setAlignment(Pos.CENTER);
 
         Label seaTitle = new Label("From the Sea");
-        seaTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        seaTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox seaItems = new VBox(2);
         seaItems.setAlignment(Pos.CENTER_LEFT);
         seaItems.getChildren().addAll(
-                createMenuItem("Crab Cakes", "$8.5"),
-                createMenuItem("Fish & Chips", "$7"),
-                createMenuItem("Salmon Grill", "$10.5"),
-                createMenuItem("Tuna Steak", "$11"),
-                createMenuItem("plateau de fruits de mer", "$11")
+                createMenuItem("Crab Cakes", "৳805"),
+                createMenuItem("Fish & Chips", "৳279"),
+                createMenuItem("Salmon Grill", "৳1000"),
+                createMenuItem("Tuna Steak", "৳1100"),
+                createMenuItem("plateau de fruits de mer", "৳119")
         );
 
         Label mainTitle = new Label("Main Course");
-        mainTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: white;");
+        mainTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox mainItems = new VBox(2);
         mainItems.setAlignment(Pos.CENTER_LEFT);
         mainItems.getChildren().addAll(
-                createMenuItem("Chicken Curry", "$5"),
-                createMenuItem("Chicken Biriyani", "$6"),
-                createMenuItem("Mutton Biriyani", "$8.5"),
-                createMenuItem("Lasagna", "$8"),
-                createMenuItem("Alfredo Pasta", "$7.5")
+                createMenuItem("Chicken Curry", "৳250"),
+                createMenuItem("Chicken Biryani", "৳360"),
+                createMenuItem("Mutton Biryani", "৳850"),
+                createMenuItem("Lasagna", "৳800"),
+                createMenuItem("Alfredo Pasta", "৳750")
         );
 
         menuBox.getChildren().addAll(seaTitle, seaItems, mainTitle, mainItems);
@@ -109,7 +109,7 @@ public class HomePageFifthExtension implements HomePageComponent {
 
     private HBox createMenuItem(String name, String price) {
         Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: white;");
+        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: black;");
 
         Label priceLabel = new Label(price);
         priceLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #ffdd00;");

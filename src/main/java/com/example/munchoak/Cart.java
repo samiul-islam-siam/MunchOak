@@ -15,8 +15,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cart implements Serializable {
-
+public class Cart implements Serializable
+{
+    private int totalCartCount =0;
     public static int numberOfCarts = 0;
     private final int id;
     private final HashMap<Integer, Integer> buyHistory;
@@ -83,6 +84,12 @@ public class Cart implements Serializable {
     // ============================================================
     public void addToCart(Integer foodId, int count) {
         buyHistory.put(foodId, buyHistory.getOrDefault(foodId, 0) + count);
+        totalCartCount++;
+    }
+
+    public int getTotalCartCount()
+    {
+        return totalCartCount;
     }
 
     public void updateQuantity(int foodId, int newQty) {
