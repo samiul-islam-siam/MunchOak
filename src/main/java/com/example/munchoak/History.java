@@ -138,7 +138,7 @@ public class History {
 
     private void goBack() {
         try {
-            HomePage homePage = new HomePage(primaryStage);
+            HomePage homePage = new HomePage(primaryStage,cart);
             primaryStage.setScene(homePage.getHomeScene());
         } catch (Exception ex) {
             System.err.println("Exception: " + ex.getMessage());

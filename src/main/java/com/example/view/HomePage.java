@@ -602,16 +602,16 @@ public class HomePage implements HomePageComponent {
     }
 
     private void openReservationPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new ReservationPage(primaryStage).getReservationScene()));
+        Platform.runLater(() -> preserveStageState(new ReservationPage(primaryStage,cart).getReservationScene()));
     }
 
     private void openAboutUsPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage).getAboutUsScene()));
+        Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage,cart).getAboutUsScene()));
     }
 
     // UPDATED: openHistoryPageDirectly now passes this.cart to History
     private void openHistoryPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new History(primaryStage, this.cart).getScene()));
+        Platform.runLater(() -> preserveStageState(new History(primaryStage, cart).getScene()));
     }
 
     private void openProfilePageDirectly() {

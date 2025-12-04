@@ -133,13 +133,26 @@ public class MenuPage {
         if (cartButton != null) {
             menu.setCartButton(cartButton);
             Cart currentCart = menu.getCart();
-
-            // Restore badge count after returning to menu page
-            Label cartCountLabel = (Label) root.lookup("#cartCountLabel");
-
-            if (cartCountLabel != null && currentCart != null) {
-                int count = currentCart.getTotalItems(); // or getItemCount()
-
+            cartButton.setOnAction(e -> {
+                CartPage cp = new CartPage(primaryStage, currentCart);
+                primaryStage.setScene(cp.getScene());
+            });
+        }
+        // Dynamically update cart badge
+        Cart currentCart = menu.getCart();
+        //Button cartButton = (Button) root.lookup("#cartButton");
+        if (cartButton != null && currentCart != null) {
+            StackPane cartPane = (StackPane) cartButton.getGraphic();
+            Label cartCountLabel = null;
+            // Find cartCountLabel inside StackPane
+            for (Node node : cartPane.getChildren()) {
+                if (node instanceof Label && "cartCountLabel".equals(node.getId())) {
+                    cartCountLabel = (Label) node;
+                    break;
+                }
+            }
+            if (cartCountLabel != null) {
+                int count = currentCart.getTotalItems();
                 if (count > 0) {
                     cartCountLabel.setText(String.valueOf(count));
                     cartCountLabel.setVisible(true);
@@ -147,10 +160,6 @@ public class MenuPage {
                     cartCountLabel.setVisible(false);
                 }
             }
-            cartButton.setOnAction(e -> {
-                CartPage cp = new CartPage(primaryStage, currentCart);
-                primaryStage.setScene(cp.getScene());
-            });
         }
 
 
@@ -384,7 +393,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+        AboutUsPage aboutPage = new AboutUsPage(primaryStage,cart);
         Scene aboutScene = aboutPage.getAboutUsScene();
         primaryStage.setScene(aboutScene);
 
@@ -404,7 +413,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        ReservationPage resPage = new ReservationPage(primaryStage);
+        ReservationPage resPage = new ReservationPage(primaryStage,cart);
         Scene resScene = resPage.getReservationScene();
         primaryStage.setScene(resScene);
 
@@ -425,7 +434,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        HomePage homePage = new HomePage(primaryStage);
+        HomePage homePage = new HomePage(primaryStage,cart);
         VBox fullPage = homePage.getFullPage();
 
         ScrollPane scrollPane = new ScrollPane(fullPage);
