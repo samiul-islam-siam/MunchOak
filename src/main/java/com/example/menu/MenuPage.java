@@ -133,13 +133,26 @@ public class MenuPage {
         if (cartButton != null) {
             menu.setCartButton(cartButton);
             Cart currentCart = menu.getCart();
-
-            // Restore badge count after returning to menu page
-            Label cartCountLabel = (Label) root.lookup("#cartCountLabel");
-
-            if (cartCountLabel != null && currentCart != null) {
-                int count = currentCart.getTotalItems(); // or getItemCount()
-
+            cartButton.setOnAction(e -> {
+                CartPage cp = new CartPage(primaryStage, currentCart);
+                primaryStage.setScene(cp.getScene());
+            });
+        }
+        // Dynamically update cart badge
+        Cart currentCart = menu.getCart();
+        //Button cartButton = (Button) root.lookup("#cartButton");
+        if (cartButton != null && currentCart != null) {
+            StackPane cartPane = (StackPane) cartButton.getGraphic();
+            Label cartCountLabel = null;
+            // Find cartCountLabel inside StackPane
+            for (Node node : cartPane.getChildren()) {
+                if (node instanceof Label && "cartCountLabel".equals(node.getId())) {
+                    cartCountLabel = (Label) node;
+                    break;
+                }
+            }
+            if (cartCountLabel != null) {
+                int count = currentCart.getTotalItems();
                 if (count > 0) {
                     cartCountLabel.setText(String.valueOf(count));
                     cartCountLabel.setVisible(true);
@@ -147,10 +160,6 @@ public class MenuPage {
                     cartCountLabel.setVisible(false);
                 }
             }
-            cartButton.setOnAction(e -> {
-                CartPage cp = new CartPage(primaryStage, currentCart);
-                primaryStage.setScene(cp.getScene());
-            });
         }
 
 

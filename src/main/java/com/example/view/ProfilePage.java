@@ -140,8 +140,16 @@ public class ProfilePage {
         backBtn.setOnAction(e -> primaryStage.setScene(previousScene));
 
         // --- Card layout ---
-        VBox card = new VBox(15, title, userLabel, emailLabel, passLabel,
-                new Label("Change Your Password:"), newPass, strengthLabel, updateBtn, status, backBtn);
+      //  VBox card = new VBox(15, title, userLabel, emailLabel, passLabel,
+        // new Label("Change Your Password:"), newPass, strengthLabel, updateBtn, status, backBtn);
+        Button changePassBtn = new Button("Change Password");
+        changePassBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
+        changePassBtn.setOnAction(e -> {
+            ChangePasswordPopup.show(primaryStage);
+        });
+
+        VBox card = new VBox(15, title, userLabel, emailLabel, passLabel, changePassBtn, backBtn);
+
         card.setAlignment(Pos.CENTER);
         card.setPadding(new Insets(30));
         card.setMaxWidth(400);
