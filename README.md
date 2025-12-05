@@ -18,10 +18,12 @@ this project demonstrates both frontend UI design and backend file system manage
 * Add items to the cart & place orders (only for logged-in users)
 * Reserve tables (only for logged-in users)
 * Real-time chat with admin using socket communication
+* User login is synchronized over the connected network
 * Smooth UI with animations and organized pages
 
 ### **Admin Features**
 
+* Dynamically update menu or food items
 * Manage menu items through an admin dashboard
 * Live chat with customers
 
@@ -31,6 +33,8 @@ this project demonstrates both frontend UI design and backend file system manage
 * Multiple clients can communicate with the admin
 * User to user communication is prohibited
 * Real-time message flow
+* Menu Server to update Food Items
+* Real-time updated menu page and user synchronization
 
 ## 📁 **Project Structure**
 
@@ -42,21 +46,64 @@ MunchOak/
 │       ├── java/
 │       │   └── com/
 │       │       ├── example/
-│       │       │       ├── login/        # Authentication system
-│       │       │       ├── manager/      # File & session management
-│       │       │       ├── menu/         # Menu & food items
-│       │       │       ├── munchoak/     # Main application logic
-│       │       │       ├── network/      # Chat server & client
-│       │       │       └── view/         # JavaFX UI layouts
-│       │       └── module-info.java
+│       │           ├── login/                  # Authentication system
+│       │           │   ├── AdminDashboard.java
+│       │           │   └── ChangeAdminPasswordPage.java
+│       │           │
+│       │           ├── manager/                # File, session & storage handling
+│       │           │   ├── AdminFileStorage.java
+│       │           │   ├── FileStorage.java
+│       │           │   ├── PasswordUtils.java
+│       │           │   └── Session.java
+│       │           │
+│       │           ├── menu/                   # Food items & menu handling
+│       │           │   ├── AdminMenu.java
+│       │           │   ├── BaseMenu.java
+│       │           │   ├── GuestMenu.java
+│       │           │   ├── MenuClient.java
+│       │           │   ├── MenuPage.java
+│       │           │   ├── MenuServer.java     @Run it first
+│       │           │   └── UserMenu.java
+│       │           │
+│       │           ├── munchoak/               # Main App Logic
+│       │           │   ├── Bill.java           
+│       │           │   ├── Cart.java
+│       │           │   ├── CartPage.java
+│       │           │   ├── CheckoutPage.java
+│       │           │   ├── FoodItems.java
+│       │           │   ├── History.java
+│       │           │   ├── Home.java           # Launcher
+│       │           │   └── Payment.java
+│       │           │
+│       │           ├── network/                # Chat server & client
+│       │           │   ├── ChatClient.java
+│       │           │   ├── ChatMessage.java
+│       │           │   └── ChatServer.java     @Run it secondly
+│       │           │
+│       │           ├── view/                   # UI logic
+│       │           │   ├── AboutUsPage.java
+│       │           │   ├── ChangePasswordPopup.java
+│       │           │   ├── HomePage.java
+│       │           │   ├── HomePageComponent.java
+│       │           │   ├── HomePageExtension.java
+│       │           │   ├── HomePageSecondExtension.java
+│       │           │   ├── HomePageThirdExtension.java
+│       │           │   ├── HomePageFourthExtension.java
+│       │           │   ├── HomePageFifthExtension.java
+│       │           │   ├── HomePageSixthExtension.java
+│       │           │   ├── HomePageSeventhExtension.java
+│       │           │   ├── HomePageEighthExtension.java
+│       │           │   ├── LoginPage.java
+│       │           │   ├── ProfilePage.java
+│       │           │   └── ReservationPage.java
+│       │           │
+│       │           └── module-info.java
 │       └── resources/
 │               └── com/
 │                   └── example/
-│                       ├── login/
 │                       ├── manager/
 │                       ├── munchoak/
-│                       ├── network/
-│                       └── view/
+│                       └── network/
 │
 ├── pom.xml
 ├── .idea/
@@ -82,21 +129,23 @@ MunchOak/
 1. Import the project into **IntelliJ IDEA**.
 2. Allow Maven to download all JavaFX dependencies.
 3. Build the entire project.
-4. Navigate to:
+4. First run `MenuServer.java` and then `ChatServer.java`.
+5. Navigate to:
 
 ```
 src/main/java/com/example/munchoak/Home.java
 ```
 
-5. Run `Home.java` to start the system.
+6. Run `Home.java` to start the system.
 
-### **Connecting to the Chat Server**
+### **Connecting to the Menu & Chat Server**
 
 #### **On Windows**
 
 1. **Turn off Windows Defender Firewall**
    (Required for socket communication over LAN)
-2. Choose one PC as the **server**
+2. Choose only one PC as the **server** <br> 
+   Menu Server will run at port 8080 and Chat Server will run at port 5050
 3. All other devices must be connected to the **same Wi-Fi network**
 4. To test connectivity, run:
 

@@ -676,7 +676,7 @@ public class BaseMenu {
         Button editBtn = null;
 
         // Add to Cart button (only for user)
-        if (!(this instanceof AdminMenu) && !(this instanceof guestMenu)) {
+        if (!(this instanceof AdminMenu) && !(this instanceof GuestMenu)) {
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
 
@@ -720,7 +720,7 @@ public class BaseMenu {
         }
 
         // Edit button (only for admin)
-        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
+        if (!(this instanceof GuestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));

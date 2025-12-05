@@ -84,7 +84,7 @@ public class MenuPage {
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
-            menu = new guestMenu();
+            menu = new GuestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
         } else {
             menu = new UserMenu();
