@@ -1,4 +1,3 @@
-
 package com.example.view;
 
 import com.example.manager.FileStorage;
@@ -100,9 +99,7 @@ public class ProfilePage {
         updateBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
 
         // --- Real-time password strength ---
-        newPass.textProperty().addListener((obs, oldVal, newVal) -> {
-            updateStrengthLabel(strengthLabel, newVal);
-        });
+        newPass.textProperty().addListener((obs, oldVal, newVal) -> updateStrengthLabel(strengthLabel, newVal));
 
         // --- Update button action ---
         updateBtn.setOnAction(e -> {
@@ -140,13 +137,9 @@ public class ProfilePage {
         backBtn.setOnAction(e -> primaryStage.setScene(previousScene));
 
         // --- Card layout ---
-      //  VBox card = new VBox(15, title, userLabel, emailLabel, passLabel,
-        // new Label("Change Your Password:"), newPass, strengthLabel, updateBtn, status, backBtn);
         Button changePassBtn = new Button("Change Password");
         changePassBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
-        changePassBtn.setOnAction(e -> {
-            ChangePasswordPopup.show(primaryStage);
-        });
+        changePassBtn.setOnAction(e -> ChangePasswordPopup.show(primaryStage));
 
         VBox card = new VBox(15, title, userLabel, emailLabel, passLabel, changePassBtn, backBtn);
 

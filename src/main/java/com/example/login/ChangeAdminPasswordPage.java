@@ -155,7 +155,7 @@ public class ChangeAdminPasswordPage {
         VBox layout = new VBox(15, title, adminIDField, newPassField, confirmPassField, strengthBox, saveBtn, backBtn, status);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
-       // layout.setStyle("-fx-background-color: linear-gradient(to bottom right, #add8e6, #87ceeb);");
+        // layout.setStyle("-fx-background-color: linear-gradient(to bottom right, #add8e6, #87ceeb);");
         LinearGradient gradient = new LinearGradient(
                 0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#20B2AA")),   // light sea green
@@ -167,18 +167,18 @@ public class ChangeAdminPasswordPage {
         popup.show();
     }
 
-private static String getPasswordStrength(String pwd) {
-    if (pwd == null || pwd.isEmpty()) return ""; // empty → no text
-    if (pwd.length() < 8) return "Weak";
-    int score = 0;
-    if (pwd.matches(".*[a-z].*")) score++;
-    if (pwd.matches(".*[A-Z].*")) score++;
-    if (pwd.matches(".*[0-9].*")) score++;
-    if (pwd.matches(".*[!@#$%^&*()-+=].*")) score++;
-    if (score <= 1) return "Weak";
-    if (score == 2 || score == 3) return "Normal";
-    return "Strong";
-}
+    private static String getPasswordStrength(String pwd) {
+        if (pwd == null || pwd.isEmpty()) return ""; // empty → no text
+        if (pwd.length() < 8) return "Weak";
+        int score = 0;
+        if (pwd.matches(".*[a-z].*")) score++;
+        if (pwd.matches(".*[A-Z].*")) score++;
+        if (pwd.matches(".*[0-9].*")) score++;
+        if (pwd.matches(".*[!@#$%^&*()-+=].*")) score++;
+        if (score <= 1) return "Weak";
+        if (score == 2 || score == 3) return "Normal";
+        return "Strong";
+    }
 
 
 }

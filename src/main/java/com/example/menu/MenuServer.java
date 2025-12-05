@@ -2,15 +2,10 @@ package com.example.menu;
 
 import com.example.manager.FileStorage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.write;
@@ -18,183 +13,226 @@ import static java.nio.file.Files.write;
 public class MenuServer {
 
     private static final int PORT = 8080;
-    private static final List<Socket> clients = new ArrayList<>();
 
+    // Store clients safely
+    private static final List<ClientWrapper> clients =
+            Collections.synchronizedList(new ArrayList<>());
+
+    // Cached data for new joiners
     private static byte[] latestMenu = null;
     private static String latestMenuName = "menu.dat";
     private static final Map<String, byte[]> latestImages = new HashMap<>();
     private static byte[] latestUserFile = null;
 
-
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Menu Server started on port " + PORT);
+        try (ServerSocket server = new ServerSocket(PORT)) {
+            System.out.println("Menu Server running on port " + PORT);
 
             while (true) {
-                Socket client = serverSocket.accept();
-                clients.add(client);
+                Socket socket = server.accept();
+                ClientWrapper cw = new ClientWrapper(socket);
+                clients.add(cw);
+
                 System.out.println("Client connected.");
 
-                // send latest menu to late joiners
-                if (latestMenu != null) {
-                    try {
-                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                        out.writeUTF("UPDATE_MENU");
-                        out.writeUTF(latestMenuName);
-                        out.writeInt(latestMenu.length);
-                        out.write(latestMenu);
-                    } catch (Exception ignored) {}
-                }
+                sendInitialSync(cw);
 
-                // send all previously stored images
-                for (var entry : latestImages.entrySet()) {
-                    try {
-                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                        out.writeUTF("UPDATE_IMAGE");
-                        out.writeUTF(entry.getKey());
-                        out.writeInt(entry.getValue().length);
-                        out.write(entry.getValue());
-                    } catch (Exception ignored) {}
-                }
-
-                // send latest user file to late joiners
-                if (latestUserFile != null) {
-                    try {
-                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                        out.writeUTF("UPDATE_USERFILE");
-                        out.writeUTF("users.dat");
-                        out.writeInt(latestUserFile.length);
-                        out.write(latestUserFile);
-                        out.flush();
-                    } catch (Exception ignored) {}
-                }
-
-
-                new Thread(() -> handleClient(client)).start();
+                new Thread(() -> handleClient(cw), "ClientHandler").start();
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    private static void handleClient(Socket client) {
+    // --------------------------
+    // SEND INITIAL DATA TO LATE JOINERS
+    // --------------------------
+    private static void sendInitialSync(ClientWrapper cw) {
         try {
-            DataInputStream in = new DataInputStream(client.getInputStream());
+
+            if (latestMenu != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_MENU");
+                    cw.out.writeUTF(latestMenuName);
+                    cw.out.writeInt(latestMenu.length);
+                    cw.out.write(latestMenu);
+                });
+            }
+
+            for (var entry : latestImages.entrySet()) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_IMAGE");
+                    cw.out.writeUTF(entry.getKey());
+                    cw.out.writeInt(entry.getValue().length);
+                    cw.out.write(entry.getValue());
+                });
+            }
+
+            if (latestUserFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_USERFILE");
+                    cw.out.writeUTF("users.dat");
+                    cw.out.writeInt(latestUserFile.length);
+                    cw.out.write(latestUserFile);
+                });
+            }
+
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    // --------------------------
+    // SAFE WRITING (THE REAL FIX)
+    // --------------------------
+    private static void sendSafe(ClientWrapper cw, IOBlock block) {
+        synchronized (cw.out) {
+            try {
+                block.run();
+                cw.out.flush();
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private interface IOBlock {
+        void run() throws Exception;
+    }
+
+    // --------------------------
+    // HANDLE CLIENT INPUT
+    // --------------------------
+    private static void handleClient(ClientWrapper cw) {
+        try {
 
             while (true) {
-                String cmd = in.readUTF();
 
-                if ("UPDATE_MENU".equals(cmd)) {
-                    String filename = in.readUTF();
-                    int size = in.readInt();
+                String cmd = cw.in.readUTF();
+
+                // ----- UPDATE MENU -----
+                if (cmd.equals("UPDATE_MENU")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
 
                     byte[] data = new byte[size];
-                    in.readFully(data);
+                    cw.in.readFully(data);
 
-                    // save for late clients
                     latestMenuName = filename;
                     latestMenu = data;
 
-                    // 🔥 WRITE new menu file to disk
                     File menuDir = new File("src/main/resources/com/example/manager/data/");
-                    if (!menuDir.exists()) menuDir.mkdirs();
+                    menuDir.mkdirs();
                     write(new File(menuDir, filename).toPath(), data);
 
-                    broadcastMenu(filename, data, client);
+                    broadcastMenu(filename, data, cw);
                 }
 
-                if ("UPDATE_IMAGE".equals(cmd)) {
-                    String filename = in.readUTF();
-                    int size = in.readInt();
+                // ----- UPDATE IMAGE -----
+                else if (cmd.equals("UPDATE_IMAGE")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
 
                     byte[] img = new byte[size];
-                    in.readFully(img);
+                    cw.in.readFully(img);
 
                     File imgDir = new File("src/main/resources/com/example/manager/images/");
-                    if (!imgDir.exists()) imgDir.mkdirs();
-
+                    imgDir.mkdirs();
                     write(new File(imgDir, filename).toPath(), img);
 
-                    // store for late clients
                     latestImages.put(filename, img);
 
-                    broadcastImage(filename, img);
+                    broadcastImage(filename, img, cw);
                 }
 
-                if ("REGISTER_USER".equals(cmd)) {
-                    String username = in.readUTF();
-                    String email = in.readUTF();
-                    String pwd = in.readUTF();
+                // ----- REGISTER USER -----
+                else if (cmd.equals("REGISTER_USER")) {
 
-                    // Write into server's user file
+                    String username = cw.in.readUTF();
+                    String email = cw.in.readUTF();
+                    String pwd = cw.in.readUTF();
+
                     File userFile = new File("src/main/resources/com/example/manager/data/users.dat");
-                    if (!userFile.exists()) userFile.createNewFile();
+                    userFile.getParentFile().mkdirs();
+                    userFile.createNewFile();
 
                     FileStorage.appendUser(username, email, pwd);
 
-                    // Read whole file so it can be broadcast to all clients
                     byte[] fullUserData = readAllBytes(userFile.toPath());
-
-                    // Store the latest version for late joiners
                     latestUserFile = fullUserData;
 
-                    // Broadcast to all clients
                     broadcastUserFile("users.dat", fullUserData);
 
-                    // Also respond to this client if you want confirmation
-                    DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                    out.writeUTF("REGISTER_RESPONSE");
-                    out.writeBoolean(true);
-                    out.writeUTF("Registration successful.");
-                    out.flush();
+                    sendSafe(cw, () -> {
+                        cw.out.writeUTF("REGISTER_RESPONSE");
+                        cw.out.writeBoolean(true);
+                        cw.out.writeUTF("Registration successful.");
+                    });
                 }
-
             }
 
-        } catch (Exception ignored) {
-            clients.remove(client);
+        } catch (Exception e) {
+            System.out.println("Client disconnected.");
+        } finally {
+            clients.remove(cw);
         }
     }
 
-    private static void broadcastMenu(String filename, byte[] data, Socket exclude) {
-        for (Socket c : clients) {
-            if (c == exclude) continue;
+    // --------------------------
+    // BROADCAST HELPERS
+    // --------------------------
+    private static void broadcastMenu(String filename, byte[] data, ClientWrapper exclude) {
+        for (ClientWrapper cw : clients) {
+            if (cw == exclude) continue;
 
-            try {
-                DataOutputStream out = new DataOutputStream(c.getOutputStream());
-                out.writeUTF("UPDATE_MENU");
-                out.writeUTF(filename);
-                out.writeInt(data.length);
-                out.write(data);
-                out.flush();
-            } catch (Exception ignored) {}
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_MENU");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
         }
     }
 
-    private static void broadcastImage(String filename, byte[] data) {
-        for (Socket c : clients) {
-            try {
-                DataOutputStream out = new DataOutputStream(c.getOutputStream());
-                out.writeUTF("UPDATE_IMAGE");
-                out.writeUTF(filename);
-                out.writeInt(data.length);
-                out.write(data);
-                out.flush();
-            } catch (Exception ignored) {}
+    private static void broadcastImage(String filename, byte[] data, ClientWrapper exclude) {
+        for (ClientWrapper cw : clients) {
+            if (cw == exclude) continue;
+
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_IMAGE");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
         }
     }
 
     private static void broadcastUserFile(String filename, byte[] data) {
-        for (Socket c : clients) {
-            try {
-                DataOutputStream out = new DataOutputStream(c.getOutputStream());
-                out.writeUTF("UPDATE_USERFILE");
-                out.writeUTF(filename);
-                out.writeInt(data.length);
-                out.write(data);
-                out.flush();
-            } catch (Exception ignored) {}
+        for (ClientWrapper cw : clients) {
+
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_USERFILE");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+
+    // --------------------------
+    // CLIENT WRAPPER CLASS
+    // --------------------------
+    private static class ClientWrapper {
+        Socket socket;
+        DataInputStream in;
+        DataOutputStream out;
+
+        ClientWrapper(Socket s) throws Exception {
+            socket = s;
+            in = new DataInputStream(s.getInputStream());
+            out = new DataOutputStream(s.getOutputStream());
         }
     }
 }

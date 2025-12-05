@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class ChatServer {
     private static final int PORT = 5050;
-    private static final String HISTORY_DIR ="src/main/resources/com/example/network/Chats";
+    private static final String HISTORY_DIR = "src/main/resources/com/example/network/Chats";
 
     private static final Map<String, ClientHandler> users = new ConcurrentHashMap<>();
     private static final Set<ClientHandler> admins = ConcurrentHashMap.newKeySet();
@@ -30,7 +30,7 @@ public class ChatServer {
                 new Thread(ch, "ClientHandler-" + socket.getRemoteSocketAddress()).start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -163,21 +163,35 @@ public class ChatServer {
                     if (line.startsWith("MSG|")) {
                         handleUserMessageToAdmin(line.substring(4));
                     } else if (line.startsWith("MSGTO|")) {
-                        if (!isAdmin) { send("SYS|Only admin can send MSGTO"); continue; }
+                        if (!isAdmin) {
+                            send("SYS|Only admin can send MSGTO");
+                            continue;
+                        }
                         String[] p = line.split("\\|", 3);
-                        if (p.length < 3) { send("SYS|Bad MSGTO format"); continue; }
+                        if (p.length < 3) {
+                            send("SYS|Bad MSGTO format");
+                            continue;
+                        }
                         handleAdminMessageToUser(p[1].trim(), p[2]);
                     } else if (line.startsWith("GETHIST|")) {
-                        if (!isAdmin) { send("SYS|Only admin can request history"); continue; }
+                        if (!isAdmin) {
+                            send("SYS|Only admin can request history");
+                            continue;
+                        }
                         String[] p = line.split("\\|", 2);
-                        if (p.length < 2) { send("SYS|Bad GETHIST format"); continue; }
+                        if (p.length < 2) {
+                            send("SYS|Bad GETHIST format");
+                            continue;
+                        }
                         sendHistoryToAdmin(p[1].trim());
                     } else {
                         send("SYS|Unknown command");
                     }
                 }
-            } catch (IOException ignored) {}
-            finally { close(); }
+            } catch (IOException ignored) {
+            } finally {
+                close();
+            }
         }
 
         private void handleUserMessageToAdmin(String text) {
@@ -188,7 +202,10 @@ public class ChatServer {
 
         private void handleAdminMessageToUser(String targetUser, String text) {
             ClientHandler target = users.get(targetUser);
-            if (target == null) { send("SYS|User not online: " + targetUser); return; }
+            if (target == null) {
+                send("SYS|User not online: " + targetUser);
+                return;
+            }
             appendHistory(targetUser, "ADMIN", text);
             target.send("INCOMING|ADMIN|" + text);
         }
@@ -204,7 +221,9 @@ public class ChatServer {
             send("HIST_END|" + targetUser);
         }
 
-        private void send(String msg) { if (out != null) out.println(msg); }
+        private void send(String msg) {
+            if (out != null) out.println(msg);
+        }
 
         private void close() {
             try {
@@ -217,7 +236,8 @@ public class ChatServer {
                 if (socket != null && !socket.isClosed()) socket.close();
                 if (in != null) in.close();
                 if (out != null) out.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 }

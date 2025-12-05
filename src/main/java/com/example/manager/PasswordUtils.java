@@ -11,7 +11,8 @@ public class PasswordUtils {
     private static final int SALT_LENGTH = 16;
     private static final int ITERATIONS = 65536;
     private static final int KEY_LENGTH = 256;
-    //Password hashing
+
+    // Password hashing
     // Generate a random salt
     public static String generateSalt() {
         byte[] salt = new byte[SALT_LENGTH];
