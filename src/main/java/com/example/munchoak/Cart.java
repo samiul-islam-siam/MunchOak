@@ -15,16 +15,17 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cart implements Serializable
-{
-    private int totalCartCount =0;
+public class Cart implements Serializable {
+    private int totalCartCount = 0;
     public static int numberOfCarts = 0;
     private final int id;
     private final HashMap<Integer, Integer> buyHistory;
+    private final HashMap<Integer, Double> addonPerItems;
 
     public Cart() {
         this.id = ++numberOfCarts;
         this.buyHistory = new HashMap<>();
+        this.addonPerItems = new HashMap<>();
     }
 
     public int getId() {
@@ -35,6 +36,10 @@ public class Cart implements Serializable
         return buyHistory;
     }
 
+    public HashMap<Integer, Double> getAddonPerItems() {
+        return addonPerItems;
+    }
+
     // ============================================================
     //                CART ITEM VIEW (INNER CLASS)
     // ============================================================
@@ -43,14 +48,16 @@ public class Cart implements Serializable
         private final String name;
         private int quantity;
         private final double price;
+        private final double addonPerItem;
         private double total;
 
-        public CartItemView(int id, String name, int quantity, double price) {
+        public CartItemView(int id, String name, int quantity, double price, double addonPerItem) {
             this.id = id;
             this.name = name;
             this.quantity = quantity;
             this.price = price;
-            this.total = price * quantity;
+            this.addonPerItem = addonPerItem;
+            this.total = (price + addonPerItem) * quantity;
         }
 
         public int getId() {
@@ -69,13 +76,17 @@ public class Cart implements Serializable
             return price;
         }
 
+        public double getAddonPerItem() {
+            return addonPerItem;
+        }
+
         public double getTotal() {
             return total;
         }
 
         public void setQuantity(int quantity) {
             this.quantity = quantity;
-            this.total = this.price * quantity;
+            this.total = (this.price + this.addonPerItem) * quantity;
         }
     }
 
@@ -83,37 +94,68 @@ public class Cart implements Serializable
     //                CART OPERATIONS
     // ============================================================
     public void addToCart(Integer foodId, int count) {
-        buyHistory.put(foodId, buyHistory.getOrDefault(foodId, 0) + count);
-        totalCartCount++;
+        addToCart(foodId, count, 0.0);
     }
 
-    public int getTotalCartCount()
-    {
+    public void addToCart(Integer foodId, int count, double addonPerItem) {
+        buyHistory.put(foodId, buyHistory.getOrDefault(foodId, 0) + count);
+        addonPerItems.put(foodId, addonPerItem);
+        totalCartCount += count;
+    }
+
+    public int getTotalCartCount() {
         return totalCartCount;
     }
 
     public void updateQuantity(int foodId, int newQty) {
-        if (newQty <= 0) buyHistory.remove(foodId);
-        else buyHistory.put(foodId, newQty);
+        if (newQty <= 0) {
+            buyHistory.remove(foodId);
+            addonPerItems.remove(foodId);
+        } else {
+            buyHistory.put(foodId, newQty);
+        }
+        // Recalculate totalCartCount
+        totalCartCount = 0;
+        for (int qty : buyHistory.values()) {
+            totalCartCount += qty;
+        }
     }
 
     public void removeFromCart(Integer foodId) {
         if (buyHistory.containsKey(foodId)) {
             int current = buyHistory.get(foodId);
-            if (current > 1) buyHistory.put(foodId, current - 1);
-            else buyHistory.remove(foodId);
+            if (current > 1) {
+                buyHistory.put(foodId, current - 1);
+            } else {
+                buyHistory.remove(foodId);
+                addonPerItems.remove(foodId);
+            }
+            totalCartCount--;
         }
     }
 
     public void removeFromCartEntirely(Integer foodId) {
-        buyHistory.remove(foodId);
+        if (buyHistory.containsKey(foodId)) {
+            int current = buyHistory.get(foodId);
+            totalCartCount -= current;
+            buyHistory.remove(foodId);
+            addonPerItems.remove(foodId);
+        }
+    }
+
+    public double getAddonPerItem(int foodId) {
+        return addonPerItems.getOrDefault(foodId, 0.0);
     }
 
     public double getTotalPrice(Map<Integer, FoodItems> foodMap) {
         double total = 0.0;
         for (Map.Entry<Integer, Integer> entry : buyHistory.entrySet()) {
             FoodItems item = foodMap.get(entry.getKey());
-            if (item != null) total += item.getPrice() * entry.getValue();
+            if (item != null) {
+                double base = item.getPrice() * entry.getValue();
+                double addon = getAddonPerItem(entry.getKey()) * entry.getValue();
+                total += base + addon;
+            }
         }
         return total;
     }
@@ -134,8 +176,9 @@ public class Cart implements Serializable
         for (Map.Entry<Integer, Integer> entry : buyHistory.entrySet()) {
             FoodItems food = foodMap.get(entry.getKey());
             if (food != null) {
+                double addon = getAddonPerItem(entry.getKey());
                 cartItems.add(
-                        new CartItemView(food.getId(), food.getName(), entry.getValue(), food.getPrice())
+                        new CartItemView(food.getId(), food.getName(), entry.getValue(), food.getPrice(), addon)
                 );
             }
         }
@@ -156,6 +199,21 @@ public class Cart implements Serializable
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
                 setText(empty || value == null ? null : String.format("%.2f", value));
+            }
+        });
+
+        // Add-on column
+        TableColumn<CartItemView, Double> addonCol = new TableColumn<>("Add-ons");
+        addonCol.setCellValueFactory(new PropertyValueFactory<>("addonPerItem"));
+        addonCol.setCellFactory(tc -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double value, boolean empty) {
+                super.updateItem(value, empty);
+                if (empty || value == null || value == 0.0) {
+                    setText(null);
+                } else {
+                    setText(String.format("+%.2f", value));
+                }
             }
         });
 
@@ -230,7 +288,7 @@ public class Cart implements Serializable
             }
         });
 
-        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, totalCol, actionCol);
+        cartTable.getColumns().addAll(nameCol, qtyCol, priceCol, addonCol, totalCol, actionCol);
 
         Button closeBtn = new Button("Close");
         closeBtn.setOnAction(e -> ((Stage) closeBtn.getScene().getWindow()).close());
@@ -244,7 +302,7 @@ public class Cart implements Serializable
 
         Stage stage = new Stage();
         stage.setTitle("Your Cart");
-        stage.setScene(new Scene(vbox, 600, 400));
+        stage.setScene(new Scene(vbox, 700, 400));
         stage.show();
     }
 
@@ -255,7 +313,10 @@ public class Cart implements Serializable
         }
         return total;
     }
+
     public void clearCart() {
         buyHistory.clear();
+        addonPerItems.clear();
+        totalCartCount = 0;
     }
 }

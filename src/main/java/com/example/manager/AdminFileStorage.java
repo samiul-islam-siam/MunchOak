@@ -10,7 +10,7 @@ public class AdminFileStorage {
     private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
     private static final File USERS_FILE = new File(DATA_DIR, "users.dat");
 
-    public static final String ADMIN_ID = "1"; // unique admin ID
+    public static final String ADMIN_ID = "2104"; // unique admin ID
 
     // Static block to initialize files
     static {

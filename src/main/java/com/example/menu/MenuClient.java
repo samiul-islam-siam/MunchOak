@@ -38,7 +38,7 @@ public class MenuClient {
             new Thread(this::listenLoop, "MenuClient-Listener").start();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -141,7 +141,7 @@ public class MenuClient {
             out.flush();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -156,7 +156,7 @@ public class MenuClient {
             out.flush();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -169,7 +169,7 @@ public class MenuClient {
             out.flush();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 }

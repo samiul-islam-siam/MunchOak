@@ -29,10 +29,12 @@ import java.util.Optional;
 public class ReservationPage {
     private final Stage primaryStage;
     private final Cart cart;  // ADDED: Cart field for state persistence
+
     public ReservationPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
         this.cart = cart;
     }
+
     public ReservationPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.cart = new Cart();
@@ -154,7 +156,7 @@ public class ReservationPage {
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
                 """);
 
-// Style inner text field (the spinner editor)
+        // Style inner text field (the spinner editor)
         guestSpinner.getEditor().setStyle("""
                     -fx-background-color: transparent;
                     -fx-text-fill: #001F3F;
@@ -266,8 +268,7 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            if(Session.getCurrentUsername().equals("guest"))
-            {
+            if (Session.getCurrentUsername().equals("guest")) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
@@ -407,7 +408,6 @@ public class ReservationPage {
         Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
         Button aboutBtn = createDashboardButton("ABOUT US");
-        Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
             double currentWidth = primaryStage.getWidth();
@@ -415,7 +415,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            HomePage homePage = new HomePage(primaryStage,cart);
+            HomePage homePage = new HomePage(primaryStage, cart);
             Scene homeScene = homePage.getHomeScene();
             primaryStage.setScene(homeScene);
 
@@ -435,7 +435,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            MenuPage menuPage = new MenuPage(primaryStage,cart);
+            MenuPage menuPage = new MenuPage(primaryStage, cart);
             Scene menuScene = menuPage.getMenuScene();
             primaryStage.setScene(menuScene);
 
@@ -463,7 +463,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            AboutUsPage aboutPage = new AboutUsPage(primaryStage,cart);
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage, cart);
             aboutPage.showAboutUs();
 
             Platform.runLater(() -> {

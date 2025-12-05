@@ -12,7 +12,6 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -23,13 +22,11 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-// import java.awt.Desktop;
-
-
 public class AboutUsPage {
 
     private final Stage primaryStage;
     private final Cart cart;  // ADDED: Cart field for state persistence
+
     public AboutUsPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
         this.cart = cart;
@@ -195,13 +192,6 @@ public class AboutUsPage {
         );
         contactDetails.setStyle("-fx-font-size: 16px; -fx-text-fill: #333333;");
         contactDetails.setWrapText(true);
-        contactDetails.setOnMouseClicked(e -> {
-//            try {
-//                Desktop.getDesktop().browse(new URI("https://www.google.com/maps/place/Dhaka,+Bangladesh"));
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-        });
 
         contactTextBox.getChildren().addAll(contactTitle, contactDetails);
 
@@ -315,7 +305,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        HomePage homePage = new HomePage(primaryStage,cart);
+        HomePage homePage = new HomePage(primaryStage, cart);
         Scene homeScene = homePage.getHomeScene();
         primaryStage.setScene(homeScene);
 
@@ -335,7 +325,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        MenuPage menuPage = new MenuPage(primaryStage,cart);
+        MenuPage menuPage = new MenuPage(primaryStage, cart);
         Scene menuScene = menuPage.getMenuScene();
         primaryStage.setScene(menuScene);
 
@@ -355,7 +345,7 @@ public class AboutUsPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        ReservationPage reservationPage = new ReservationPage(primaryStage,cart);
+        ReservationPage reservationPage = new ReservationPage(primaryStage, cart);
         reservationPage.showReservation();
 
         Platform.runLater(() -> {
@@ -381,7 +371,6 @@ public class AboutUsPage {
         if (userId == 0) userId = 0; // or fetch from session
         String token = ""; // Default to empty string if not logged in
 
-        //Cart cart = new Cart();
         CartPage cartPage = new CartPage(primaryStage, cart);
         Scene cartScene = cartPage.getScene();
         primaryStage.setScene(cartScene);
@@ -446,13 +435,5 @@ public class AboutUsPage {
                         "-fx-border-width: 2;"
         ));
         return btn;
-    }
-
-    private void showComingSoonAlert(String pageName) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Coming Soon");
-        alert.setHeaderText(null);
-        alert.setContentText(pageName + " page is coming soon!");
-        alert.showAndWait();
     }
 }

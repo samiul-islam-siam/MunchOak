@@ -280,7 +280,7 @@ public class FileStorage {
         return null; // or "" if you prefer
     }
 
-    //While Registration is successful new user information will append in user.dat file
+    // While Registration is successful new user information will append in user.dat file
     public static void appendUser(String username, String email, String password) throws IOException {
         ensureDataDir();
 
@@ -310,12 +310,12 @@ public class FileStorage {
                 break;
             }
         }
-        //guest has particular default data-formate
+        // guest has particular default data-formate
         if (!guestExists) {
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
                 dos.writeUTF("guest");
-                dos.writeUTF("guest@system.local");
-                dos.writeUTF("nopass");
+                dos.writeUTF("guest@munchoak.com");
+                dos.writeUTF("guestPass#123");
                 dos.writeInt(2025000);
             } catch (IOException e) {
                 System.err.println("IOException: " + e.getMessage());

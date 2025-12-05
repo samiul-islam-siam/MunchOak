@@ -9,7 +9,7 @@ import javafx.stage.Stage;
  * Minimal/clean HomePageExtension.
  * All UI nodes removed — this class preserves the API and connections
  * so it can be swapped into your app without breaking references.
- *
+ * <p>
  * Use this as a blank slate to add only the controls you actually need.
  */
 public class HomePageExtension implements HomePageComponent {
@@ -44,7 +44,8 @@ public class HomePageExtension implements HomePageComponent {
 
     // No-op initializer to preserve interface contract
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public Pane getRoot() {

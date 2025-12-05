@@ -41,7 +41,7 @@ public class MenuServer {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -79,7 +79,7 @@ public class MenuServer {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -91,7 +91,8 @@ public class MenuServer {
             try {
                 block.run();
                 cw.out.flush();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 

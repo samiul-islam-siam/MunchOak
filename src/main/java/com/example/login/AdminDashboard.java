@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdminDashboard {
 
@@ -29,6 +30,7 @@ public class AdminDashboard {
     public AdminDashboard(Stage stage) {
         primaryStage = stage;
     }
+
     private static HBox topBar;
 
     public static void openAdminDashboard() {
@@ -36,10 +38,6 @@ public class AdminDashboard {
         BorderPane dashboard = new BorderPane();
 
         dashboard.setStyle("-fx-background-color: lightyellow;");
-
-
-
-
 
 
         VBox centerContent = new VBox(20);
@@ -61,7 +59,6 @@ public class AdminDashboard {
         centerPane.setTop(titleBox);
         centerPane.setCenter(infoBox);
         centerPane.setStyle("-fx-background-color: transparent;");
-
 
 
         // --- Left Menu ---
@@ -162,7 +159,6 @@ public class AdminDashboard {
             table.getItems().addAll(users);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-            //centerPane.getChildren().setAll(table);
             centerPane.setCenter(table);
         });
 
@@ -171,9 +167,13 @@ public class AdminDashboard {
             primaryStage.setScene(menuPage.getMenuScene());
         });
 
+        AtomicBoolean isChatWindowOpen = new AtomicBoolean(false);
         chatServerBtn.setOnAction(event -> {
             HomePage homePage = new HomePage(primaryStage);
-            homePage.openChatWindow();
+            if(!isChatWindowOpen.get()) {
+                homePage.openChatWindow();
+                isChatWindowOpen.set(true);
+            }
         });
 
         changePassBtn.setOnAction(e ->
@@ -182,6 +182,7 @@ public class AdminDashboard {
 
         logoutBtn.setOnAction(e -> {
             Session.logout();
+            HomePage.closeChatWindow();
             primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
         });
     }

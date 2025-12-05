@@ -1,6 +1,7 @@
 package com.example.manager;
 
 import com.example.menu.MenuClient;
+
 import java.io.IOException;
 
 public class Session {
@@ -63,7 +64,7 @@ public class Session {
     public static void setAdminUser() throws IOException {
         currentUsername = "admin";
         currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
-        currentEmail = "admin@example.com"; // optional
+        currentEmail = "admin@munchoak.com"; // optional
         currentPassword = AdminFileStorage.getAdminPassword(); // <-- new getter needed
         isAdmin = true; // set admin flag
     }
@@ -74,13 +75,12 @@ public class Session {
 
     public static void resetToGuest() {
         currentUsername = "guest";
-        currentEmail = "guest@gmail.com";
-        currentPassword = "ai01*2#";
+        currentEmail = "guest@munchoak.com";
+        currentPassword = "guestPass#123";
         isAdmin = false;
     }
 
     public static void logout() {
         resetToGuest();
     }
-
 }
