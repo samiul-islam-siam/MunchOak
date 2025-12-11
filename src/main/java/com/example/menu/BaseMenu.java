@@ -676,7 +676,7 @@ public class BaseMenu {
         Button editBtn = null;
 
         // Add to Cart button (only for user)
-        if (!(this instanceof AdminMenu) && !(this instanceof guestMenu)) {
+        if (!(this instanceof AdminMenu) && !(this instanceof GuestMenu)) {
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
 
@@ -720,7 +720,7 @@ public class BaseMenu {
         }
 
         // Edit button (only for admin)
-        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
+        if (!(this instanceof GuestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));
@@ -735,8 +735,10 @@ public class BaseMenu {
         if (!buttons.getChildren().isEmpty()) card.getChildren().add(buttons);
 
         // Click event to show detail popup
-        card.setOnMouseClicked(e -> showFoodDetail(food, (VBox) e.getSource()));
-
+        if(!Session.isAdmin())
+        {
+            card.setOnMouseClicked(e -> showFoodDetail(food, (VBox) e.getSource()));
+        }
         return card;
     }
 
@@ -1024,11 +1026,6 @@ public class BaseMenu {
                 // Deduct actual selected quantity (not hardcoded -1)
                 int selectedQty = currentQuantity[0];
                 food.setQuantity(food.getQuantity() - selectedQty);
-
-                // TODO: Save updated food list to file, e.g.:
-                // List<FoodItems> updatedMenu = FileStorage.loadMenu();
-                // for (FoodItems f : updatedMenu) { if (f.getId() == food.getId()) { f.setQuantity(food.getQuantity()); break; } }
-                // FileStorage.rewriteMenu(updatedMenu);
 
                 cart.addToCart(food.getId(), selectedQty, addonPerItem);  // Pass add-on per item
                 updateCartIcon();

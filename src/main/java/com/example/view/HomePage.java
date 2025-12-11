@@ -58,7 +58,8 @@ public class HomePage implements HomePageComponent {
     private int currentIndex = 0;
 
     // UPDATED: Existing constructor now initializes cart
-    public HomePage(Stage primaryStage) {
+    public HomePage(Stage primaryStage)
+    {
         this.primaryStage = primaryStage;
         this.cart = new Cart();  // Initialize with empty cart
 
@@ -110,7 +111,15 @@ public class HomePage implements HomePageComponent {
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        HBox rightButtons;
+        if(!Session.isAdmin())
+        {
+            rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        }else
+        {
+            rightButtons = new HBox(10, menuBtn, authBtn, menuIconBtn);
+        }
+
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         BorderPane navBar = new BorderPane();
@@ -209,7 +218,15 @@ public class HomePage implements HomePageComponent {
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        //HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        HBox rightButtons;
+        if(!Session.isAdmin())
+        {
+            rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        }else
+        {
+            rightButtons = new HBox(10, menuBtn, authBtn, menuIconBtn);
+        }
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         BorderPane navBar = new BorderPane();
@@ -465,8 +482,16 @@ public class HomePage implements HomePageComponent {
                 System.out.println("Guest cannot chat");
             }
         });
+        VBox items;
+        if(!Session.isAdmin())
+        {
+            items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        }
+        else
 
-        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        {
+            items = new VBox(18, profileBtn, chatBtn, aboutBtn);
+        }
         items.setAlignment(Pos.CENTER_LEFT);
         items.setFillWidth(true);
 

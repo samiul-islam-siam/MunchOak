@@ -84,7 +84,7 @@ public class MenuPage {
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
-            menu = new guestMenu();
+            menu = new GuestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
         } else {
             menu = new UserMenu();
@@ -375,7 +375,15 @@ public class MenuPage {
         cartButton.setStyle("-fx-background-color: transparent;");
 
         // Wrap right buttons in HBox for spacing
-        HBox rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
+        HBox rightButtons;
+        if(!Session.isAdmin()) //for user
+        {
+            rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
+        }else //for admin
+        {
+            rightButtons = new HBox(8, homeButton, aboutButton, profileButton);
+        }
+
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         // Assemble nav bar: logo + title + leftSpacer + centered search + rightSpacer + nav buttons

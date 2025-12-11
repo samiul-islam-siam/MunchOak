@@ -1,4 +1,3 @@
-
 package com.example.login;
 
 import com.example.manager.AdminFileStorage;
@@ -64,7 +63,6 @@ public class ChangeAdminPasswordPage {
         backBtn.setStyle("-fx-background-color: #00c9ff; -fx-text-fill: black; -fx-font-size: 14px;");
 
         // --- Password Strength Listener ---
-
         newPassField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText.isEmpty()) {
                 // If field is empty, show nothing
@@ -89,7 +87,7 @@ public class ChangeAdminPasswordPage {
                 return;
             }
 
-            if (!"1".equals(adminID)) {
+            if (!"2104".equals(adminID)) {
                 status.setText("Invalid Admin ID!");
                 status.setStyle("-fx-text-fill: green;");
                 javafx.animation.PauseTransition clearError = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
@@ -179,6 +177,4 @@ public class ChangeAdminPasswordPage {
         if (score == 2 || score == 3) return "Normal";
         return "Strong";
     }
-
-
 }

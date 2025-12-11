@@ -148,7 +148,6 @@ public class History {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
-        // boolean isAdmin = Session.getCurrentUsername().equals("admin");
         double delivery = 7.99;
         double tax = 7.00;
         double service = 1.50;
@@ -157,8 +156,6 @@ public class History {
             if (!Session.isAdmin() && s.userId != currentUserId) continue;
 
             // Assume s.amount is the full total (including add-ons, fees, etc.)
-           // double fullAmount = s.amount;
-            //historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, fullAmount, "Success", s.paymentMethod));
             double discountVal = FileStorage.getPaymentDiscount(s.paymentId);  // Assume FileStorage method loads saved discount for paymentId
             double tipVal = FileStorage.getPaymentTip(s.paymentId);  // Assume FileStorage method loads saved tip for paymentId
             double subtotal = s.amount;  // Assuming s.amount is the subtotal saved in storage
@@ -205,7 +202,7 @@ public class History {
         TextArea receiptArea = new TextArea(receipt);
         receiptArea.setEditable(false);
         receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-        receiptArea.setPrefSize(500, 400);
+        receiptArea.setPrefSize(450, 500);
 
         VBox billBox = new VBox(15, receiptArea);
         billBox.setPadding(new Insets(20));
