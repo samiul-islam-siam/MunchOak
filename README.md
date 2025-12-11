@@ -44,6 +44,9 @@ MunchOak/
 ├── src/
 │   └── main/
 │       ├── java/
+│       │   │
+│       │   ├── module-info.java
+│       │   │  
 │       │   └── com/
 │       │       ├── example/
 │       │           ├── login/                  # Authentication system
@@ -97,13 +100,22 @@ MunchOak/
 │       │           │   ├── ProfilePage.java
 │       │           │   └── ReservationPage.java
 │       │           │
-│       │           └── module-info.java
+│       │           └── AppLauncher.java
+│       │
 │       └── resources/
 │               └── com/
 │                   └── example/
 │                       ├── manager/
-│                       ├── munchoak/
-│                       └── network/
+│                       │   ├── data/
+│                       │   └── images
+│                       │
+│                       ├── network/
+│                       │   ├── data/
+│                       │   └── images
+│                       │
+│                       └── view/
+│                           ├── data/
+│                           └── images
 │
 ├── pom.xml
 ├── .idea/
