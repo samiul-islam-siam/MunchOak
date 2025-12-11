@@ -151,7 +151,6 @@ public class CheckoutPage {
         submitBtn.setOnAction(e -> {
             int rating = currentRating.get();
             String comment = commentArea.getText().trim();
-            // TODO: Save feedback to file/database, e.g., FileStorage.saveFeedback(rating, comment);
             System.out.println("Feedback submitted: Rating=" + rating + ", Comment=" + comment); // Placeholder for now
             feedbackStage.close();
         });

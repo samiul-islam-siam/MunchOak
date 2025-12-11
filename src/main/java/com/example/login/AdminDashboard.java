@@ -5,6 +5,7 @@ import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

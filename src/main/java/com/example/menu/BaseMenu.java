@@ -1025,11 +1025,6 @@ public class BaseMenu {
                 int selectedQty = currentQuantity[0];
                 food.setQuantity(food.getQuantity() - selectedQty);
 
-                // TODO: Save updated food list to file, e.g.:
-                // List<FoodItems> updatedMenu = FileStorage.loadMenu();
-                // for (FoodItems f : updatedMenu) { if (f.getId() == food.getId()) { f.setQuantity(food.getQuantity()); break; } }
-                // FileStorage.rewriteMenu(updatedMenu);
-
                 cart.addToCart(food.getId(), selectedQty, addonPerItem);  // Pass add-on per item
                 updateCartIcon();
                 // Popup notification
