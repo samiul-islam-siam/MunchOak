@@ -210,7 +210,7 @@ public class BaseMenu {
 
             adminButtons = new HBox(15, showAddFormBtn, buttonMenu);
             adminButtons.setAlignment(Pos.CENTER);
-            adminButtons.setPadding(new Insets(10, 0, 10, 0));
+            adminButtons.setPadding(new Insets(0, 0, 0, 0));
         }
 
         // --- Assemble final layout ---
