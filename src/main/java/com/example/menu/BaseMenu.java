@@ -38,7 +38,7 @@ public class BaseMenu {
     private ObservableList<FoodItems> foodList;
     private VBox foodContainer;
 
-    private TextField nameField, detailsField, priceField, cuisineField, quantityField;
+    private TextField nameField, detailsField, priceField, cuisineField, quantityField,addOneField,addOnePriceField,addTwoField, addTwoPriceField;
     private ComboBox<String> categoryBox;
     private Label imageFilenameLabel;
     private File selectedImageFile = null;
@@ -194,6 +194,11 @@ public class BaseMenu {
         priceField = new TextField();
         cuisineField = new TextField();
         quantityField = new TextField();
+        addOneField = new TextField();
+        addOnePriceField = new TextField();
+        addTwoField = new TextField();
+        addTwoPriceField = new TextField();
+
         imageFilenameLabel = new Label("No image selected");
 
         categoryBox = new ComboBox<>();
@@ -217,6 +222,14 @@ public class BaseMenu {
         inputGrid.add(categoryBox, 1, 4);
         inputGrid.add(new Label("Quantity:"), 0, 5);
         inputGrid.add(quantityField, 1, 5);
+        inputGrid.add(new Label("Add-on-1"), 0, 5);
+        inputGrid.add(addOneField, 1, 5);
+        inputGrid.add(new Label("Add-on-1-Price"), 0, 5);
+        inputGrid.add(addOnePriceField, 1, 5);
+        inputGrid.add(new Label("Add-on-2"), 0, 5);
+        inputGrid.add(addTwoField, 1, 5);
+        inputGrid.add(new Label("Add-on-2-Price"), 0, 5);
+        inputGrid.add(addTwoPriceField, 1, 5);
 
         // Category management buttons
         Button addCatBtn = new Button("Add Category");
@@ -735,10 +748,8 @@ public class BaseMenu {
         if (!buttons.getChildren().isEmpty()) card.getChildren().add(buttons);
 
         // Click event to show detail popup
-        if(!Session.isAdmin())
-        {
-            card.setOnMouseClicked(e -> showFoodDetail(food, (VBox) e.getSource()));
-        }
+        card.setOnMouseClicked(e -> showFoodDetail(food, (VBox) e.getSource()));
+
         return card;
     }
 
@@ -775,6 +786,28 @@ public class BaseMenu {
             showAlert("Error", "Invalid Quantity.");
             return;
         }
+        double addOnePrice;
+        try {
+            addOnePrice = Double.parseDouble(priceField.getText().trim());
+            if (addOnePrice < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
+        double addTwoPrice;
+        try {
+            addTwoPrice = Double.parseDouble(priceField.getText().trim());
+            if (addTwoPrice < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
         // compute next id from existing items to avoid ID collisions
@@ -784,7 +817,7 @@ public class BaseMenu {
         }
 
         FoodItems newFood = new FoodItems(nextId, nameField.getText().trim(), detailsField.getText().trim(),
-                price, cuisine, imageFilename, categoryBox.getValue(), quantity);
+                price, cuisine, imageFilename, categoryBox.getValue(), quantity,addOneField.getText().trim(),addOnePrice,addTwoField.getText().trim(),addTwoPrice);
 
         try {
             FileStorage.appendMenuItem(newFood);
@@ -901,10 +934,12 @@ public class BaseMenu {
 
         // Define add-ons
         Map<String, Double> addOns = Map.of(
-                "Extra Patty", 99.0,
-                "Cheese", 50.0,
-                "Bacon", 80.0,
-                "Fries", 40.0
+//                "Extra Patty", 99.0,
+//                "Cheese", 50.0,
+//                "Bacon", 80.0,
+//                "Fries", 40.0
+                food.getAddOne(), food.getAddOnePrice(),
+                food.getAddTwo(), food.getAddTwoPrice()
         );
 
         // Counters for each add-on
@@ -1107,6 +1142,33 @@ public class BaseMenu {
         currentEditingFood.setImagePath(imageFilename);
         currentEditingFood.setCategory(categoryBox.getValue());
 
+        currentEditingFood.setAddOne(addOneField.getText().trim());
+        currentEditingFood.setAddTwo(addTwoField.getText().trim());
+        double addOnePrice;
+        try {
+            addOnePrice = Double.parseDouble(priceField.getText().trim());
+            if (addOnePrice < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+            currentEditingFood.setAddOnePrice(addOnePrice);
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
+        double addTwoPrice;
+        try {
+            addTwoPrice = Double.parseDouble(priceField.getText().trim());
+            if (addTwoPrice < 0) {
+                showAlert("Error", "Price cannot be negative.");
+                return;
+            }
+            currentEditingFood.setAddTwoPrice(addTwoPrice);
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid price.");
+            return;
+        }
+
         // ---- FIX: Update list item instance ----
         for (FoodItems f : foodList) {
             if (f.getId() == currentEditingFood.getId()) {
@@ -1117,6 +1179,10 @@ public class BaseMenu {
                 f.setQuantity(currentEditingFood.getQuantity());
                 f.setCategory(currentEditingFood.getCategory());
                 f.setImagePath(currentEditingFood.getImagePath());
+                f.setAddOne(currentEditingFood.getAddOne());
+                f.setAddOnePrice(currentEditingFood.getAddOnePrice());
+                f.setAddTwo(currentEditingFood.getAddTwo());
+                f.setAddTwoPrice(currentEditingFood.getAddTwoPrice());
                 break;
             }
         }
@@ -1169,6 +1235,14 @@ public class BaseMenu {
         cuisineField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         quantityField.setText(String.valueOf(food.getQuantity()));
         quantityField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        addOneField.setText(String.valueOf(food.getAddOne()));
+        addOneField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        addTwoField.setText(String.valueOf(food.getAddTwo()));
+        addTwoField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        addOnePriceField.setText(String.valueOf(food.getAddOnePrice()));
+        addOnePriceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
+        addTwoPriceField.setText(String.valueOf(food.getAddTwoPrice()));
+        addTwoPriceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
         imageFilenameLabel.setText(food.getImagePath());
         categoryBox.setValue(food.getCategory());
         categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #798965;");
@@ -1187,6 +1261,10 @@ public class BaseMenu {
         priceField.clear();
         cuisineField.clear();
         quantityField.clear();
+        addOneField.clear();
+        addTwoPriceField.clear();
+        addTwoField.clear();
+        addTwoPriceField.clear();
         imageFilenameLabel.setText("No image selected");
         imageFilenameLabel.setStyle("-fx-text-fill:#E53935;");
         categoryBox.setValue(null);
