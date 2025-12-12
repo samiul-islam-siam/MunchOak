@@ -17,7 +17,7 @@ public class FoodItems {
     private final DoubleProperty addTwoPrice;
 
 
-    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category, int quantity,String addOne, double addOnePrice, String addTwo,double addTwoPrice) {
+    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category, int quantity, String addOne, double addOnePrice, String addTwo, double addTwoPrice) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
@@ -29,7 +29,7 @@ public class FoodItems {
         this.addOne = new SimpleStringProperty(addOne);
         this.addOnePrice = new SimpleDoubleProperty(addOnePrice);
         this.addTwo = new SimpleStringProperty(addTwo);
-        this.addTwoPrice = new SimpleDoubleProperty(addOnePrice);
+        this.addTwoPrice = new SimpleDoubleProperty(addTwoPrice);
     }
 
     // ----- ID -----

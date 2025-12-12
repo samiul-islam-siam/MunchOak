@@ -16,17 +16,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,19 +31,11 @@ import java.util.stream.Collectors;
 
 public class BaseMenu {
 
-    private ObservableList<FoodItems> foodList;
-    private VBox foodContainer;
+    // made protected so MenuEdit can access/update
+    protected ObservableList<FoodItems> foodList;
+    protected VBox foodContainer;
 
-    private TextField nameField, detailsField, priceField, cuisineField, quantityField,addOneField,addOnePriceField,addTwoField, addTwoPriceField;
-    private ComboBox<String> categoryBox;
-    private Label imageFilenameLabel;
-    private File selectedImageFile = null;
-    private Button addOrUpdateButton;
-
-    private FoodItems currentEditingFood = null;
-    protected Button deleteMenuButton;
-
-    // ===== make UI sections accessible to subclasses =====
+    // UI sections accessible to subclasses and MenuEdit
     protected VBox mainLayout;
     protected Button showAddFormBtn;
     protected HBox categoryButtons;
@@ -56,6 +44,9 @@ public class BaseMenu {
     protected Button buttonMenu;
     protected String searchKeyword = "";
     protected Button cartButton;
+
+    // Edit delegate
+    protected MenuEdit menuEdit;
 
     public void setCartButton(Button cartButton) {
         this.cartButton = cartButton;
@@ -94,6 +85,7 @@ public class BaseMenu {
             VBox noResultBox = new VBox(10);
             noResultBox.setAlignment(Pos.CENTER);
             noResultBox.setPadding(new Insets(50));
+            noResultBox.setId("empty-message");
 
             Label bigEmoji = new Label("🔎");
             bigEmoji.setStyle("-fx-font-size: 60px;");
@@ -121,7 +113,6 @@ public class BaseMenu {
     // In-memory category list (backed by file)
     private List<String> categories = new ArrayList<>();
 
-
     public BaseMenu() {
         mainLayout = new VBox();
         mainLayout.setAlignment(Pos.TOP_CENTER);
@@ -148,6 +139,9 @@ public class BaseMenu {
         // --- Assemble Layout ---
         mainLayout.getChildren().addAll(navBar, bannerSection, foodContainer, cartButtons);
 
+        // create the MenuEdit delegate
+        menuEdit = new MenuEdit(this);
+
         // --- Load Foods ---
         loadFoodItems();
     }
@@ -156,7 +150,6 @@ public class BaseMenu {
     int userId = Session.getCurrentUserId();
 
     private Cart cart = new Cart();
-    //public void setSearchKeyword(String kw) {}
 
     public Node getView() {
         List<FoodItems> loaded = FileStorage.loadMenu();
@@ -188,93 +181,8 @@ public class BaseMenu {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // ==== Input fields & form ====
-        nameField = new TextField();
-        detailsField = new TextField();
-        priceField = new TextField();
-        cuisineField = new TextField();
-        quantityField = new TextField();
-        addOneField = new TextField();
-        addOnePriceField = new TextField();
-        addTwoField = new TextField();
-        addTwoPriceField = new TextField();
-
-        imageFilenameLabel = new Label("No image selected");
-
-        categoryBox = new ComboBox<>();
-        loadCategories();
-        categoryBox.setPromptText("Select Category");
-
-        GridPane inputGrid = new GridPane();
-        inputGrid.setPadding(new Insets(10));
-        inputGrid.setHgap(10);
-        inputGrid.setVgap(10);
-
-        inputGrid.add(new Label("Food Name:"), 0, 0);
-        inputGrid.add(nameField, 1, 0);
-        inputGrid.add(new Label("Details:"), 0, 1);
-        inputGrid.add(detailsField, 1, 1);
-        inputGrid.add(new Label("Price:"), 0, 2);
-        inputGrid.add(priceField, 1, 2);
-        inputGrid.add(new Label("Cuisine:"), 0, 3);
-        inputGrid.add(cuisineField, 1, 3);
-        inputGrid.add(new Label("Category:"), 0, 4);
-        inputGrid.add(categoryBox, 1, 4);
-        inputGrid.add(new Label("Quantity:"), 0, 5);
-        inputGrid.add(quantityField, 1, 5);
-        inputGrid.add(new Label("Add-on-1"), 0, 5);
-        inputGrid.add(addOneField, 1, 5);
-        inputGrid.add(new Label("Add-on-1-Price"), 0, 5);
-        inputGrid.add(addOnePriceField, 1, 5);
-        inputGrid.add(new Label("Add-on-2"), 0, 5);
-        inputGrid.add(addTwoField, 1, 5);
-        inputGrid.add(new Label("Add-on-2-Price"), 0, 5);
-        inputGrid.add(addTwoPriceField, 1, 5);
-
-        // Category management buttons
-        Button addCatBtn = new Button("Add Category");
-        Button renameCatBtn = new Button("Rename Category");
-        Button deleteCatBtn = new Button("Delete Category");
-        categoryButtons = new HBox(20, addCatBtn, renameCatBtn, deleteCatBtn);
-        inputGrid.add(categoryButtons, 1, 6);
-        categoryButtons.setSpacing(12);
-        categoryButtons.setPadding(new Insets(10, 0, 10, 0));
-
-        for (Node n : categoryButtons.getChildren()) {
-            if (n instanceof Button b) styleMainButton(b);
-        }
-        addCatBtn.setOnAction(e -> addCategory());
-        renameCatBtn.setOnAction(e -> renameCategory());
-        deleteCatBtn.setOnAction(e -> deleteCategory());
-
-        // Image selection
-        Button browseBtn = new Button("Browse...");
-        styleMainButton(browseBtn);
-        browseBtn.setOnAction(e -> chooseImage());
-        HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
-        imageBox.setAlignment(Pos.CENTER_LEFT);
-        inputGrid.add(new Label("Image:"), 0, 7);
-        inputGrid.add(imageBox, 1, 7);
-
-        for (Node node : inputGrid.getChildren()) {
-            if (node instanceof Label lbl) {
-                lbl.setStyle("-fx-text-fill:#E53935;");
-            }
-        }
-        // Add / Update button inside form
-        addOrUpdateButton = new Button("Add");
-        styleMainButton(addOrUpdateButton);
-        addOrUpdateButton.setOnAction(e -> {
-            if (currentEditingFood == null) {
-                addFoodItem();
-            } else {
-                updateFoodItem();
-            }
-        });
-
-        formBox = new VBox(10, inputGrid, addOrUpdateButton);
-        formBox.setVisible(false);
-        formBox.setManaged(false);
+        // Create formBox from MenuEdit (admin editing form)
+        formBox = menuEdit.getFormBox();
 
         HBox adminButtons = null;
         if (this instanceof AdminMenu) {
@@ -286,7 +194,7 @@ public class BaseMenu {
                     formBox.setVisible(false);
                     formBox.setManaged(false);
                 } else {
-                    clearFields();
+                    menuEdit.clearFields();
                     formBox.setVisible(true);
                     formBox.setManaged(true);
                 }
@@ -294,11 +202,11 @@ public class BaseMenu {
 
             buttonMenu = new Button("Add Menu");
             styleMainButton(buttonMenu);
-            buttonMenu.setOnAction(e -> chooseMenu());
+            buttonMenu.setOnAction(e -> menuEdit.chooseMenu());
 
-            deleteMenuButton = new Button("Delete Menu");
+            Button deleteMenuButton = new Button("Delete Menu");
             styleMainButton(deleteMenuButton);
-            deleteMenuButton.setOnAction(e -> deleteMenuFile());
+            deleteMenuButton.setOnAction(e -> menuEdit.deleteMenuFile());
 
             adminButtons = new HBox(15, showAddFormBtn, buttonMenu);
             adminButtons.setAlignment(Pos.CENTER);
@@ -316,40 +224,10 @@ public class BaseMenu {
         return mainLayout;
     }
 
-    protected void deleteMenuFile() {
-        File menuFile = FileStorage.getMenuFile();
-
-        if (!menuFile.exists()) {
-            showAlert("Menu file not found.", "There’s no menu file to delete.");
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Menu File");
-        confirm.setContentText("Are you sure you want to delete the entire menu file?\nThis action cannot be undone.");
-
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                boolean deleted = menuFile.delete();
-
-                if (deleted) {
-                    foodList.clear();
-                    loadFoodItems();
-                    showAlert("Menu Deleted", "The menu file has been deleted successfully.");
-                    // Broadcast to all clients
-                    Session.getMenuClient().sendMenuUpdate();
-                } else {
-                    showAlert("Error", "Failed to delete the menu file.");
-                }
-            }
-        });
-    }
-
-    // ================== CATEGORY MANAGEMENT ===================
-    protected void loadCategories() {
+    // ================== CATEGORY MANAGEMENT & EDIT DELEGATE ACCESS ===================
+    protected void loadCategories(ComboBox<String> categoryBox) {
         categoryBox.getItems().clear();
-        categories = FileStorage.loadCategories();
+        List<String> categories = FileStorage.loadCategories();
         categoryBox.getItems().addAll(categories);
     }
 
@@ -386,7 +264,6 @@ public class BaseMenu {
         String[] buttons = {"Home", "About Us", "Reservation", "Cart", "Profile"};
         for (String label : buttons) {
             Button btn = new Button(label);
-            //btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold;");
             btn.setStyle(
                     "-fx-background-color: transparent;" +
                             "-fx-text-fill: white;" +
@@ -398,50 +275,8 @@ public class BaseMenu {
         return nav;
     }
 
-    public void chooseMenu() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Add Menu File");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Data Files", "*.dat")
-        );
-
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            try {
-                // 1. Copy the file to local resource folder
-                File destDir = new File("src/main/resources/com/example/manager/data/");
-                if (!destDir.exists()) destDir.mkdirs();
-
-                File destFile = new File(destDir, file.getName());
-                Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                FileStorage.setMenuFile(file);
-
-                // 2. Load FoodItems from selected file
-                List<FoodItems> importedItems = FileStorage.loadMenu();
-
-                if (importedItems.isEmpty()) {
-                    showAlert("Info", "The selected menu file is empty or invalid.");
-                    return;
-                }
-                foodList.setAll(importedItems);
-                loadFoodItems();
-
-                // Broadcast to all clients
-                Session.getMenuClient().sendMenuUpdate();
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText(null);
-                alert.setContentText("Menu items imported successfully!");
-                alert.showAndWait();
-            } catch (Exception e) {
-                System.err.println("IOException: " + e.getMessage());
-                showAlert("Error", "Failed to import menu file.");
-            }
-        }
-    }
-
-    private void styleMainButton(Button button) {
+    // Exposed so MenuEdit can style buttons using same style
+    protected void styleMainButton(Button button) {
         button.setStyle(
                 "-fx-background-color: #FF6B00;" +
                         "-fx-text-fill: white;" +
@@ -466,89 +301,6 @@ public class BaseMenu {
         ));
     }
 
-    protected void addCategory() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add Category");
-        dialog.setHeaderText("Enter new category name:");
-        dialog.setContentText("Category:");
-        dialog.showAndWait().ifPresent(name -> {
-            if (name.isBlank()) {
-                showAlert("Error", "Invalid category name.");
-                return;
-            }
-            try {
-                FileStorage.addCategory(name);
-                loadCategories();
-                categoryBox.setValue(name);
-                // Broadcast to all clients
-                Session.getMenuClient().sendMenuUpdate();
-            } catch (Exception e) {
-                System.err.println("IOException: " + e.getMessage());
-                showAlert("Error", "Category already exists or invalid.");
-            }
-        });
-    }
-
-    protected void renameCategory() {
-        String selected = categoryBox.getValue();
-        if (selected == null) {
-            showAlert("Error", "Select a category first.");
-            return;
-        }
-
-        TextInputDialog dialog = new TextInputDialog(selected);
-        dialog.setTitle("Rename Category");
-        dialog.setHeaderText("Enter new name for category:");
-        dialog.setContentText("New Name:");
-        dialog.showAndWait().ifPresent(newName -> {
-            if (newName.isBlank() || categories.contains(newName)) {
-                showAlert("Error", "Invalid or duplicate category name.");
-                return;
-            }
-            try {
-                FileStorage.replaceCategory(selected, newName);
-                loadCategories();
-                categoryBox.setValue(newName);
-                // reload menu and UI
-                foodList.setAll(FileStorage.loadMenu());
-                loadFoodItems();
-                // Broadcast to all clients
-                Session.getMenuClient().sendMenuUpdate();
-            } catch (Exception e) {
-                System.err.println("IOException: " + e.getMessage());
-                showAlert("Error", "Rename failed.");
-            }
-        });
-    }
-
-    protected void deleteCategory() {
-        String selected = categoryBox.getValue();
-        if (selected == null) {
-            showAlert("Error", "Select a category to delete.");
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Delete category '" + selected + "'?\nAll foods in this category will also be deleted.",
-                ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(res -> {
-            if (res == ButtonType.YES) {
-                try {
-                    FileStorage.deleteCategory(selected);
-                    loadCategories();
-                    categoryBox.setValue(null);
-                    foodList.setAll(FileStorage.loadMenu());
-                    loadFoodItems();
-                    // Broadcast to all clients
-                    Session.getMenuClient().sendMenuUpdate();
-                } catch (Exception e) {
-                    System.err.println("IOException: " + e.getMessage());
-                    showAlert("Error", "Delete failed.");
-                }
-            }
-        });
-    }
-
     protected void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -556,7 +308,7 @@ public class BaseMenu {
         alert.show();
     }
 
-    // ================== FOOD ITEMS MANAGEMENT ===================
+    // ================== FOOD ITEMS MANAGEMENT (VIEW SIDE) ===================
     protected void loadFoodItems() {
         foodContainer.getChildren().clear();
         Map<String, HBox> categoryRows = new LinkedHashMap<>();
@@ -736,7 +488,7 @@ public class BaseMenu {
         if (!(this instanceof GuestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
-            editBtn.setOnAction(e -> showEditDialog(food));
+            editBtn.setOnAction(e -> menuEdit.showEditDialog(food));
         }
 
         // Combine buttons dynamically
@@ -753,97 +505,20 @@ public class BaseMenu {
         return card;
     }
 
-    protected void addFoodItem() {
-        if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
-            showAlert("Error", "No category selected.");
-            return;
-        }
-        if (nameField.getText().trim().isEmpty()) {
-            showAlert("Error", "Food name cannot be empty.");
-            return;
-        }
-
-        double price;
-        try {
-            price = Double.parseDouble(priceField.getText().trim());
-            if (price < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-        String cuisine = cuisineField.getText().trim();
-        int quantity;
-        try {
-            quantity = Integer.parseInt(quantityField.getText().trim());
-            if (quantity < 0) {
-                showAlert("Error", "Quantity cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid Quantity.");
-            return;
-        }
-        double addOnePrice;
-        try {
-            addOnePrice = Double.parseDouble(priceField.getText().trim());
-            if (addOnePrice < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-        double addTwoPrice;
-        try {
-            addTwoPrice = Double.parseDouble(priceField.getText().trim());
-            if (addTwoPrice < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-        String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
-
-        // compute next id from existing items to avoid ID collisions
-        int nextId = 1;
-        for (FoodItems f : FileStorage.loadMenu()) {
-            if (f.getId() >= nextId) nextId = f.getId() + 1;
-        }
-
-        FoodItems newFood = new FoodItems(nextId, nameField.getText().trim(), detailsField.getText().trim(),
-                price, cuisine, imageFilename, categoryBox.getValue(), quantity,addOneField.getText().trim(),addOnePrice,addTwoField.getText().trim(),addTwoPrice);
-
-        try {
-            FileStorage.appendMenuItem(newFood);
-            // reload menu into list & UI
-            foodList.setAll(FileStorage.loadMenu());
-            loadFoodItems();
-            clearFields();
-            // Broadcast to all clients
-            Session.getMenuClient().sendMenuUpdate();
-        } catch (Exception e) {
-            System.err.println("IOException: " + e.getMessage());
-            showAlert("Error", "Failed to add food item.");
-        }
-    }
-
-
     protected void updateCartIcon() {
         int count = cart.getTotalItems();   // You already have this function
 
-        Label cartCountLabel = (Label) ((StackPane) cartButton.getGraphic()).getChildren().get(1);
+        if (cartButton == null || cartButton.getGraphic() == null) return;
 
-        if (count > 0) {
-            cartCountLabel.setText(String.valueOf(count));
-            cartCountLabel.setVisible(true);
-        } else {
-            cartCountLabel.setVisible(false);
+        Node graphic = cartButton.getGraphic();
+        if (graphic instanceof StackPane stack && stack.getChildren().size() > 1 && stack.getChildren().get(1) instanceof Label) {
+            Label cartCountLabel = (Label) stack.getChildren().get(1);
+            if (count > 0) {
+                cartCountLabel.setText(String.valueOf(count));
+                cartCountLabel.setVisible(true);
+            } else {
+                cartCountLabel.setVisible(false);
+            }
         }
     }
 
@@ -926,80 +601,100 @@ public class BaseMenu {
         Label quantityLabel = new Label("Quantity: " + food.getQuantity());
         quantityLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
 
-        // Add On section with multiple options
         VBox addOnSection = new VBox(10);
-        Label addOnTitle = new Label("Add On");
-        addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        addOnSection.getChildren().add(addOnTitle);
+        Label optionalLabel = new Label();
+        if(!(food.getAddOne().isEmpty() && food.getAddTwo().isEmpty()))
+        {
+            // Add On section with multiple options
 
-        // Define add-ons
-        Map<String, Double> addOns = Map.of(
-//                "Extra Patty", 99.0,
-//                "Cheese", 50.0,
-//                "Bacon", 80.0,
-//                "Fries", 40.0
-                food.getAddOne(), food.getAddOnePrice(),
-                food.getAddTwo(), food.getAddTwoPrice()
-        );
+            Label addOnTitle = new Label("Add On");
+            addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            addOnSection.getChildren().add(addOnTitle);
 
-        // Counters for each add-on
-        Map<String, int[]> counters = new LinkedHashMap<>();
-        Map<String, Label> qtyLabels = new LinkedHashMap<>();
+            // Define add-ons
+            Map<String, Double> addOns;
+            if(food.getAddOne().isEmpty())
+            {
+                addOns = Map.of(
+                        //food.getAddOne(), food.getAddOnePrice(),
+                        food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }
+            else if(food.getAddTwo().isEmpty())
+            {
+                addOns = Map.of(
+                        food.getAddOne(), food.getAddOnePrice()
+                        //food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }else
+            {
+                addOns = Map.of(
+                        food.getAddOne(), food.getAddOnePrice(),
+                        food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }
 
-        for (Map.Entry<String, Double> entry : addOns.entrySet()) {
-            String name = entry.getKey();
-            double price = entry.getValue();
 
-            HBox addOnItem = new HBox(8);
-            Label addOnName = new Label(name);
-            addOnName.setPrefWidth(80);
-            Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
-            Button addOnMinus = new Button("-");
-            addOnMinus.setPrefSize(25, 25);
-            addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
-            Label extraQtyLabel = new Label(" x0");
-            extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
-            Button addOnPlus = new Button("+");
-            addOnPlus.setPrefSize(25, 25);
-            addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+            // Counters for each add-on
+            Map<String, int[]> counters = new LinkedHashMap<>();
+            Map<String, Label> qtyLabels = new LinkedHashMap<>();
 
-            int[] count = {0};
-            counters.put(name, count);
-            qtyLabels.put(name, extraQtyLabel);
+            for (Map.Entry<String, Double> entry : addOns.entrySet()) {
+                String name = entry.getKey();
+                double price = entry.getValue();
 
-            addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
+                HBox addOnItem = new HBox(8);
+                Label addOnName = new Label(name);
+                addOnName.setPrefWidth(80);
+                Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
+                Button addOnMinus = new Button("-");
+                addOnMinus.setPrefSize(25, 25);
+                addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+                Label extraQtyLabel = new Label(" x0");
+                extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+                Button addOnPlus = new Button("+");
+                addOnPlus.setPrefSize(25, 25);
+                addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
 
-            // Plus action
-            addOnPlus.setOnAction(e -> {
-                int totalSelected = 0;
-                for (int[] c : counters.values()) {
-                    totalSelected += c[0];
-                }
-                if (totalSelected < 5) {
-                    count[0]++;
-                    extraQtyLabel.setText(" x" + count[0]);
-                    // Update price (using array)
-                    currentTotalPriceHolder[0] += price;
-                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
-                }
-            });
+                int[] count = {0};
+                counters.put(name, count);
+                qtyLabels.put(name, extraQtyLabel);
 
-            // Minus action
-            addOnMinus.setOnAction(e -> {
-                if (count[0] > 0) {
-                    count[0]--;
-                    extraQtyLabel.setText(" x" + count[0]);
-                    // Update price (using array)
-                    currentTotalPriceHolder[0] -= price;
-                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
-                }
-            });
+                addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
 
-            addOnSection.getChildren().add(addOnItem);
+                // Plus action
+                addOnPlus.setOnAction(e -> {
+                    int totalSelected = 0;
+                    for (int[] c : counters.values()) {
+                        totalSelected += c[0];
+                    }
+                    if (totalSelected < 5) {
+                        count[0]++;
+                        extraQtyLabel.setText(" x" + count[0]);
+                        // Update price (using array)
+                        currentTotalPriceHolder[0] += price;
+                        priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    }
+                });
+
+                // Minus action
+                addOnMinus.setOnAction(e -> {
+                    if (count[0] > 0) {
+                        count[0]--;
+                        extraQtyLabel.setText(" x" + count[0]);
+                        // Update price (using array)
+                        currentTotalPriceHolder[0] -= price;
+                        priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    }
+                });
+
+                addOnSection.getChildren().add(addOnItem);
+            }
+
+            optionalLabel = new Label("Select up to 5 (optional)");
+            optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
         }
 
-        Label optionalLabel = new Label("Select up to 5 (optional)");
-        optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
 
         // Quantity
         HBox quantityBox = new HBox(10);
@@ -1097,243 +792,6 @@ public class BaseMenu {
 
         Scene scene = new Scene(root);
         dialog.setScene(scene);
-        dialog.show();
-    }
-
-
-    protected void updateFoodItem() {
-        if (currentEditingFood == null) return;
-
-        String imageFilename = currentEditingFood.getImagePath();
-        System.out.println(imageFilename);
-        if (selectedImageFile != null) {
-            imageFilename = selectedImageFile.getName();
-            System.out.println(imageFilename);
-        }
-        currentEditingFood.setName(nameField.getText().trim());
-        currentEditingFood.setDetails(detailsField.getText().trim());
-        double price;
-        try {
-            price = Double.parseDouble(priceField.getText().trim());
-            if (price < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-            currentEditingFood.setPrice(price);
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-        currentEditingFood.setCuisine(cuisineField.getText().trim());
-        int quantity;
-        try {
-            quantity = Integer.parseInt(quantityField.getText().trim());
-
-            if (quantity < 0) {
-                showAlert("Error", "Quantity cannot be negative.");
-                return;
-            }
-            currentEditingFood.setQuantity(quantity);
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid Quantity.");
-            return;
-        }
-
-        currentEditingFood.setImagePath(imageFilename);
-        currentEditingFood.setCategory(categoryBox.getValue());
-
-        currentEditingFood.setAddOne(addOneField.getText().trim());
-        currentEditingFood.setAddTwo(addTwoField.getText().trim());
-        double addOnePrice;
-        try {
-            addOnePrice = Double.parseDouble(priceField.getText().trim());
-            if (addOnePrice < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-            currentEditingFood.setAddOnePrice(addOnePrice);
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-        double addTwoPrice;
-        try {
-            addTwoPrice = Double.parseDouble(priceField.getText().trim());
-            if (addTwoPrice < 0) {
-                showAlert("Error", "Price cannot be negative.");
-                return;
-            }
-            currentEditingFood.setAddTwoPrice(addTwoPrice);
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Invalid price.");
-            return;
-        }
-
-        // ---- FIX: Update list item instance ----
-        for (FoodItems f : foodList) {
-            if (f.getId() == currentEditingFood.getId()) {
-                f.setName(currentEditingFood.getName());
-                f.setDetails(currentEditingFood.getDetails());
-                f.setPrice(currentEditingFood.getPrice());
-                f.setCuisine(currentEditingFood.getCuisine());
-                f.setQuantity(currentEditingFood.getQuantity());
-                f.setCategory(currentEditingFood.getCategory());
-                f.setImagePath(currentEditingFood.getImagePath());
-                f.setAddOne(currentEditingFood.getAddOne());
-                f.setAddOnePrice(currentEditingFood.getAddOnePrice());
-                f.setAddTwo(currentEditingFood.getAddTwo());
-                f.setAddTwoPrice(currentEditingFood.getAddTwoPrice());
-                break;
-            }
-        }
-
-        try {
-            // rewrite full menu file from in-memory list
-            FileStorage.rewriteMenu(new ArrayList<>(foodList));
-            foodList.setAll(FileStorage.loadMenu());
-            loadFoodItems();
-            System.out.println("Image UP");
-
-
-            // 2. send the image ONLY if changed
-            if (selectedImageFile != null) {
-                Session.getMenuClient().sendImageUpdate(selectedImageFile);
-            }
-
-            // Broadcast to all clients
-            Session.getMenuClient().sendMenuUpdate();
-
-            clearFields();
-        } catch (Exception e) {
-            System.err.println("IOException: " + e.getMessage());
-            showAlert("Error", "Failed to update food item.");
-        }
-    }
-
-    protected void deleteFoodItem(FoodItems food) {
-        foodList.remove(food);
-        try {
-            FileStorage.rewriteMenu(new ArrayList<>(foodList));
-            loadFoodItems();
-            // Broadcast to all clients
-            Session.getMenuClient().sendMenuUpdate();
-        } catch (Exception e) {
-            System.err.println("IOException: " + e.getMessage());
-            showAlert("Error", "Failed to delete item.");
-        }
-    }
-
-    protected void populateFieldsForEdit(FoodItems food) {
-        currentEditingFood = food;
-        nameField.setText(food.getName());
-        nameField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333; -fx-padding: 5;");
-        detailsField.setText(food.getDetails());
-        detailsField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        priceField.setText(String.valueOf(food.getPrice()));
-        priceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        cuisineField.setText(String.valueOf(food.getCuisine()));
-        cuisineField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        quantityField.setText(String.valueOf(food.getQuantity()));
-        quantityField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        addOneField.setText(String.valueOf(food.getAddOne()));
-        addOneField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        addTwoField.setText(String.valueOf(food.getAddTwo()));
-        addTwoField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        addOnePriceField.setText(String.valueOf(food.getAddOnePrice()));
-        addOnePriceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        addTwoPriceField.setText(String.valueOf(food.getAddTwoPrice()));
-        addTwoPriceField.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #333333;");
-        imageFilenameLabel.setText(food.getImagePath());
-        categoryBox.setValue(food.getCategory());
-        categoryBox.setStyle("-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #798965;");
-        selectedImageFile = null;
-        addOrUpdateButton.setText("Update");
-
-        // show form
-        addOrUpdateButton.getParent().setVisible(true);
-        addOrUpdateButton.getParent().setManaged(true);
-        styleMainButton(addOrUpdateButton);
-    }
-
-    protected void clearFields() {
-        nameField.clear();
-        detailsField.clear();
-        priceField.clear();
-        cuisineField.clear();
-        quantityField.clear();
-        addOneField.clear();
-        addTwoPriceField.clear();
-        addTwoField.clear();
-        addTwoPriceField.clear();
-        imageFilenameLabel.setText("No image selected");
-        imageFilenameLabel.setStyle("-fx-text-fill:#E53935;");
-        categoryBox.setValue(null);
-        selectedImageFile = null;
-        currentEditingFood = null;
-        addOrUpdateButton.setText("Add");
-
-        // hide form again
-        addOrUpdateButton.getParent().setVisible(false);
-        addOrUpdateButton.getParent().setManaged(false);
-    }
-
-    protected void chooseImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Food Image");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-        );
-
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            try {
-                File destDir = new File("src/main/resources/com/example/manager/images/");
-                if (!destDir.exists()) destDir.mkdirs();
-
-                File destFile = new File(destDir, file.getName());
-                Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                selectedImageFile = file;
-                imageFilenameLabel.setText(selectedImageFile.getName());
-
-                Session.getMenuClient().sendImageUpdate(destFile);
-                //Session.getMenuClient().sendMenuUpdate();
-
-            } catch (Exception e) {
-                System.err.println("IOException: " + e.getMessage());
-            }
-        }
-    }
-
-    // ================== EDIT ===================
-    protected void showEditDialog(FoodItems food) {
-        Stage dialog = new Stage();
-        dialog.setTitle("Edit " + food.getName());
-
-        Button updateBtn = new Button("Update");
-        styleMainButton(updateBtn);
-        updateBtn.setOnAction(e -> {
-            populateFieldsForEdit(food);  // fill input fields
-            dialog.close();
-        });
-
-        Button deleteBtn = new Button("Delete");
-        styleMainButton(deleteBtn);
-        deleteBtn.setOnAction(e -> {
-            deleteFoodItem(food);
-            dialog.close();
-        });
-
-        Button cancelBtn = new Button("Cancel");
-        styleMainButton(cancelBtn);
-        cancelBtn.setOnAction(e -> dialog.close());
-
-        VBox vbox = new VBox(15, new Label("Choose an action for " + food.getName()),
-                updateBtn, deleteBtn, cancelBtn);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(20));
-
-        dialog.setScene(new Scene(vbox, 300, 200));
         dialog.show();
     }
 
