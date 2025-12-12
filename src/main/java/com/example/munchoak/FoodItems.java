@@ -29,7 +29,7 @@ public class FoodItems {
         this.addOne = new SimpleStringProperty(addOne);
         this.addOnePrice = new SimpleDoubleProperty(addOnePrice);
         this.addTwo = new SimpleStringProperty(addTwo);
-        this.addTwoPrice = new SimpleDoubleProperty(addOnePrice);
+        this.addTwoPrice = new SimpleDoubleProperty(addTwoPrice);
     }
 
     // ----- ID -----

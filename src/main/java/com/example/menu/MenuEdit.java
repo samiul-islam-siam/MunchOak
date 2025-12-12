@@ -8,7 +8,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -37,14 +40,25 @@ public class MenuEdit {
         this.owner = owner;
         buildForm();
     }
-
     public VBox getFormBox() {
         // ensure visibility defaults are consistent with previous behavior
         if (formBox == null) buildForm();
         return formBox;
     }
 
+    private HBox labeledField(String labelText, Node input) {
+        Label lbl = new Label(labelText);
+        lbl.setStyle("-fx-text-fill:#E53935; -fx-font-weight: bold;");
+
+        HBox box = new HBox(10, lbl, input);
+        box.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(input, Priority.ALWAYS);
+
+        return box;
+    }
+
     private void buildForm() {
+
         nameField = new TextField();
         detailsField = new TextField();
         priceField = new TextField();
@@ -55,47 +69,65 @@ public class MenuEdit {
         addTwoField = new TextField();
         addTwoPriceField = new TextField();
 
-        imageFilenameLabel = new Label("No image selected");
-
         categoryBox = new ComboBox<>();
         owner.loadCategories(categoryBox);
         categoryBox.setPromptText("Select Category");
 
-        GridPane inputGrid = new GridPane();
-        inputGrid.setPadding(new Insets(10));
-        inputGrid.setHgap(10);
-        inputGrid.setVgap(10);
+        imageFilenameLabel = new Label("No image selected");
 
-        inputGrid.add(new Label("Food Name:"), 0, 0);
-        inputGrid.add(nameField, 1, 0);
-        inputGrid.add(new Label("Details:"), 0, 1);
-        inputGrid.add(detailsField, 1, 1);
-        inputGrid.add(new Label("Price:"), 0, 2);
-        inputGrid.add(priceField, 1, 2);
-        inputGrid.add(new Label("Cuisine:"), 0, 3);
-        inputGrid.add(cuisineField, 1, 3);
-        inputGrid.add(new Label("Category:"), 0, 4);
-        inputGrid.add(categoryBox, 1, 4);
-        inputGrid.add(new Label("Quantity:"), 0, 5);
-        inputGrid.add(quantityField, 1, 5);
-        inputGrid.add(new Label("Add-on-1"), 0, 6);
-        inputGrid.add(addOneField, 1, 6);
-        inputGrid.add(new Label("Add-on-1-Price"), 0, 7);
-        inputGrid.add(addOnePriceField, 1, 7);
-        inputGrid.add(new Label("Add-on-2"), 0, 8);
-        inputGrid.add(addTwoField, 1, 8);
-        inputGrid.add(new Label("Add-on-2-Price"), 0, 9);
-        inputGrid.add(addTwoPriceField, 1, 9);
+        // ================================
+        // LEFT COLUMN
+        // ================================
+        VBox leftCol = new VBox(7,
+                labeledField("Food Name:", nameField),
+                labeledField("Details:", detailsField),
+                labeledField("Price:", priceField),
+                labeledField("Cuisine:", cuisineField),
+                labeledField("Category:", categoryBox)
+        );
 
-        // Category management buttons
+        // ================================
+        // RIGHT COLUMN
+        // ================================
+        VBox rightCol = new VBox(7,
+                labeledField("Quantity:", quantityField),
+                labeledField("Add-on 1:", addOneField),
+                labeledField("Add-on 1 Price:", addOnePriceField),
+                labeledField("Add-on 2:", addTwoField),
+                labeledField("Add-on 2 Price:", addTwoPriceField)
+        );
+
+        // ================================
+        // TWO-COLUMN FORM (PERFECT BALANCED WIDTH)
+        // ================================
+
+        HBox twoColForm = new HBox(40, leftCol, rightCol);
+        twoColForm.setAlignment(Pos.TOP_CENTER);
+        twoColForm.setPadding(new Insets(10, 20, 10, 20));
+
+
+        twoColForm.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        twoColForm.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(leftCol, Priority.ALWAYS);
+        HBox.setHgrow(rightCol, Priority.ALWAYS);
+
+        // Force same width for text fields
+        setSameWidth(nameField, detailsField, priceField, cuisineField, quantityField,
+                addOneField, addOnePriceField, addTwoField, addTwoPriceField);
+
+        // ================================
+        // CATEGORY BUTTONS
+        // ================================
         Button addCatBtn = new Button("Add Category");
         Button renameCatBtn = new Button("Rename Category");
         Button deleteCatBtn = new Button("Delete Category");
-        HBox categoryButtons = new HBox(20, addCatBtn, renameCatBtn, deleteCatBtn);
-        inputGrid.add(categoryButtons, 1, 10);
-        categoryButtons.setSpacing(12);
-        categoryButtons.setPadding(new Insets(10, 0, 10, 0));
 
+        owner.styleMainButton(addCatBtn);
+        owner.styleMainButton(renameCatBtn);
+        owner.styleMainButton(deleteCatBtn);
+
+        HBox categoryButtons = new HBox(15, addCatBtn, renameCatBtn, deleteCatBtn);
+        categoryButtons.setAlignment(Pos.CENTER_LEFT);
         for (Node n : categoryButtons.getChildren()) {
             if (n instanceof Button b) owner.styleMainButton(b);
         }
@@ -103,35 +135,158 @@ public class MenuEdit {
         renameCatBtn.setOnAction(e -> renameCategory());
         deleteCatBtn.setOnAction(e -> deleteCategory());
 
-        // Image selection
+
+        // ================================
+        // IMAGE PICKER
+        // ================================
         Button browseBtn = new Button("Browse...");
         owner.styleMainButton(browseBtn);
         browseBtn.setOnAction(e -> chooseImage());
-        HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
-        imageBox.setAlignment(Pos.CENTER_LEFT);
-        inputGrid.add(new Label("Image:"), 0, 11);
-        inputGrid.add(imageBox, 1, 11);
 
-        for (Node node : inputGrid.getChildren()) {
-            if (node instanceof Label lbl) {
-                lbl.setStyle("-fx-text-fill:#E53935;");
-            }
-        }
-        // Add / Update button inside form
+        HBox imageRow = new HBox(15, imageFilenameLabel, browseBtn);
+        imageRow.setAlignment(Pos.CENTER_LEFT);
+
+        // ================================
+        // ADD/UPDATE BUTTON
+        // ================================
         addOrUpdateButton = new Button("Add");
         owner.styleMainButton(addOrUpdateButton);
+        addOrUpdateButton.setPrefWidth(220);
         addOrUpdateButton.setOnAction(e -> {
-            if (currentEditingFood == null) {
-                addFoodItem();
-            } else {
-                updateFoodItem();
-            }
+            if (currentEditingFood == null) addFoodItem();
+            else updateFoodItem();
         });
 
-        formBox = new VBox(10, inputGrid, addOrUpdateButton);
+
+
+        HBox buttonRow = new HBox(addOrUpdateButton);
+        buttonRow.setAlignment(Pos.CENTER);
+
+        // ================================
+        // BACK BUTTON
+        // ================================
+        Button backBtn = new Button("← Back");
+        owner.styleMainButton(backBtn);
+        backBtn.setOnAction(e -> {
+            formBox.setVisible(false);
+            formBox.setManaged(false);
+            currentEditingFood = null;
+        });
+        // ================================
+        // FINAL FORM CONTAINER
+        // ================================
+        formBox = new VBox(10,backBtn, twoColForm, categoryButtons, imageRow, buttonRow);
+        formBox.setPadding(new Insets(5));
+
+        formBox.setMaxWidth(Double.MAX_VALUE);
+        formBox.setFillWidth(true);
+
+
         formBox.setVisible(false);
         formBox.setManaged(false);
     }
+
+    private void setSameWidth(TextField... fields) {
+        for (TextField f : fields) {
+            f.setPrefWidth(180);
+        }
+    }
+
+//
+//    public VBox getFormBox() {
+//        // ensure visibility defaults are consistent with previous behavior
+//        if (formBox == null) buildForm();
+//        return formBox;
+//    }
+//
+//    private void buildForm() {
+//        nameField = new TextField();
+//        detailsField = new TextField();
+//        priceField = new TextField();
+//        cuisineField = new TextField();
+//        quantityField = new TextField();
+//        addOneField = new TextField();
+//        addOnePriceField = new TextField();
+//        addTwoField = new TextField();
+//        addTwoPriceField = new TextField();
+//
+//        imageFilenameLabel = new Label("No image selected");
+//
+//        categoryBox = new ComboBox<>();
+//        owner.loadCategories(categoryBox);
+//        categoryBox.setPromptText("Select Category");
+//
+//        GridPane inputGrid = new GridPane();
+//        inputGrid.setPadding(new Insets(10));
+//        inputGrid.setHgap(10);
+//        inputGrid.setVgap(10);
+//
+//        inputGrid.add(new Label("Food Name:"), 0, 0);
+//        inputGrid.add(nameField, 1, 0);
+//        inputGrid.add(new Label("Details:"), 0, 1);
+//        inputGrid.add(detailsField, 1, 1);
+//        inputGrid.add(new Label("Price:"), 0, 2);
+//        inputGrid.add(priceField, 1, 2);
+//        inputGrid.add(new Label("Cuisine:"), 0, 3);
+//        inputGrid.add(cuisineField, 1, 3);
+//        inputGrid.add(new Label("Category:"), 0, 4);
+//        inputGrid.add(categoryBox, 1, 4);
+//        inputGrid.add(new Label("Quantity:"), 0, 5);
+//        inputGrid.add(quantityField, 1, 5);
+//        inputGrid.add(new Label("Add-on-1"), 0, 6);
+//        inputGrid.add(addOneField, 1, 6);
+//        inputGrid.add(new Label("Add-on-1-Price"), 0, 7);
+//        inputGrid.add(addOnePriceField, 1, 7);
+//        inputGrid.add(new Label("Add-on-2"), 0, 8);
+//        inputGrid.add(addTwoField, 1, 8);
+//        inputGrid.add(new Label("Add-on-2-Price"), 0, 9);
+//        inputGrid.add(addTwoPriceField, 1, 9);
+//
+//        // Category management buttons
+//        Button addCatBtn = new Button("Add Category");
+//        Button renameCatBtn = new Button("Rename Category");
+//        Button deleteCatBtn = new Button("Delete Category");
+//        HBox categoryButtons = new HBox(20, addCatBtn, renameCatBtn, deleteCatBtn);
+//        inputGrid.add(categoryButtons, 1, 10);
+//        categoryButtons.setSpacing(12);
+//        categoryButtons.setPadding(new Insets(10, 0, 10, 0));
+//
+//        for (Node n : categoryButtons.getChildren()) {
+//            if (n instanceof Button b) owner.styleMainButton(b);
+//        }
+//        addCatBtn.setOnAction(e -> addCategory());
+//        renameCatBtn.setOnAction(e -> renameCategory());
+//        deleteCatBtn.setOnAction(e -> deleteCategory());
+//
+//        // Image selection
+//        Button browseBtn = new Button("Browse...");
+//        owner.styleMainButton(browseBtn);
+//        browseBtn.setOnAction(e -> chooseImage());
+//        HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
+//        imageBox.setAlignment(Pos.CENTER_LEFT);
+//        inputGrid.add(new Label("Image:"), 0, 11);
+//        inputGrid.add(imageBox, 1, 11);
+//
+//        for (Node node : inputGrid.getChildren()) {
+//            if (node instanceof Label lbl) {
+//                lbl.setStyle("-fx-text-fill:#E53935;");
+//            }
+//        }
+//        // Add / Update button inside form
+//        addOrUpdateButton = new Button("Add");
+//        owner.styleMainButton(addOrUpdateButton);
+//        addOrUpdateButton.setOnAction(e -> {
+//            if (currentEditingFood == null) {
+//                addFoodItem();
+//            } else {
+//                updateFoodItem();
+//            }
+//        });
+//
+//        formBox = new VBox(10, inputGrid, addOrUpdateButton);
+//        formBox.setVisible(false);
+//        formBox.setManaged(false);
+//    }
 
     // ---------------- Menu File Management (moved) ----------------
     public void chooseMenu() {
@@ -329,27 +484,56 @@ public class MenuEdit {
             owner.showAlert("Error", "Invalid Quantity.");
             return;
         }
-        double addOnePrice;
-        try {
-            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
-            if (addOnePrice < 0) {
-                owner.showAlert("Error", "Price cannot be negative.");
+//        double addOnePrice;
+//        try {
+//            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
+//            if (addOnePrice < 0) {
+//                owner.showAlert("Error", "Price cannot be negative.");
+//                return;
+//            }
+//        } catch (NumberFormatException e) {
+//            owner.showAlert("Error", "Invalid add-on price.");
+//            return;
+//        }
+//        double addTwoPrice;
+//        try {
+//            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
+//            if (addTwoPrice < 0) {
+//                owner.showAlert("Error", "Price cannot be negative.");
+//                return;
+//            }
+//        } catch (NumberFormatException e) {
+//            owner.showAlert("Error", "Invalid add-on price.");
+//            return;
+//        }
+        double addOnePrice = 0;
+        String addOneText = addOnePriceField.getText().trim();
+        if (!addOneText.isEmpty()) {
+            try {
+                addOnePrice = Double.parseDouble(addOneText);
+                if (addOnePrice < 0) {
+                    owner.showAlert("Error", "Add-on 1 price cannot be negative.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                owner.showAlert("Error", "Invalid Add-on 1 price.");
                 return;
             }
-        } catch (NumberFormatException e) {
-            owner.showAlert("Error", "Invalid add-on price.");
-            return;
         }
-        double addTwoPrice;
-        try {
-            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
-            if (addTwoPrice < 0) {
-                owner.showAlert("Error", "Price cannot be negative.");
+
+        double addTwoPrice = 0;
+        String addTwoText = addTwoPriceField.getText().trim();
+        if (!addTwoText.isEmpty()) {
+            try {
+                addTwoPrice = Double.parseDouble(addTwoText);
+                if (addTwoPrice < 0) {
+                    owner.showAlert("Error", "Add-on 2 price cannot be negative.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                owner.showAlert("Error", "Invalid Add-on 2 price.");
                 return;
             }
-        } catch (NumberFormatException e) {
-            owner.showAlert("Error", "Invalid add-on price.");
-            return;
         }
         String imageFilename = selectedImageFile != null ? selectedImageFile.getName() : "";
 
@@ -417,30 +601,68 @@ public class MenuEdit {
 
         currentEditingFood.setAddOne(addOneField.getText().trim());
         currentEditingFood.setAddTwo(addTwoField.getText().trim());
-        double addOnePrice;
-        try {
-            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
-            if (addOnePrice < 0) {
-                owner.showAlert("Error", "Price cannot be negative.");
+//        double addOnePrice;
+//        try {
+//            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
+//            if (addOnePrice < 0) {
+//                owner.showAlert("Error", "Price cannot be negative.");
+//                return;
+//            }
+//            currentEditingFood.setAddOnePrice(addOnePrice);
+//        } catch (NumberFormatException e) {
+//            owner.showAlert("Error", "Invalid price.");
+//            return;
+//        }
+//        double addTwoPrice;
+//        try {
+//            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
+//            if (addTwoPrice < 0) {
+//                owner.showAlert("Error", "Price cannot be negative.");
+//                return;
+//            }
+//            currentEditingFood.setAddTwoPrice(addTwoPrice);
+//        } catch (NumberFormatException e) {
+//            owner.showAlert("Error", "Invalid price.");
+//            return;
+//        }
+        double addOnePrice = 0;
+        String addOneText = addOnePriceField.getText().trim();
+        if (!addOneText.isEmpty()) {
+            try {
+                addOnePrice = Double.parseDouble(addOneText);
+                if (addOnePrice < 0) {
+                    owner.showAlert("Error", "Add-on 1 price cannot be negative.");
+                    return;
+                }
+                currentEditingFood.setAddOnePrice(addOnePrice);
+            } catch (NumberFormatException e) {
+                owner.showAlert("Error", "Invalid Add-on 1 price.");
                 return;
             }
-            currentEditingFood.setAddOnePrice(addOnePrice);
-        } catch (NumberFormatException e) {
-            owner.showAlert("Error", "Invalid price.");
-            return;
+        }else
+        {
+            currentEditingFood.setAddOnePrice(0);
         }
-        double addTwoPrice;
-        try {
-            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
-            if (addTwoPrice < 0) {
-                owner.showAlert("Error", "Price cannot be negative.");
+
+        double addTwoPrice = 0;
+        String addTwoText = addTwoPriceField.getText().trim();
+        if (!addTwoText.isEmpty()) {
+            try {
+                addTwoPrice = Double.parseDouble(addTwoText);
+                if (addTwoPrice < 0) {
+                    owner.showAlert("Error", "Add-on 2 price cannot be negative.");
+                    return;
+                }
+                currentEditingFood.setAddTwoPrice(addTwoPrice);
+            } catch (NumberFormatException e) {
+                owner.showAlert("Error", "Invalid Add-on 2 price.");
                 return;
             }
-            currentEditingFood.setAddTwoPrice(addTwoPrice);
-        } catch (NumberFormatException e) {
-            owner.showAlert("Error", "Invalid price.");
-            return;
+        }else
+        {
+            currentEditingFood.setAddTwoPrice(0);
         }
+
 
         // ---- Update list item instance ----
         for (FoodItems f : owner.foodList) {

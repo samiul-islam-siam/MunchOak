@@ -210,7 +210,7 @@ public class BaseMenu {
 
             adminButtons = new HBox(15, showAddFormBtn, buttonMenu);
             adminButtons.setAlignment(Pos.CENTER);
-            adminButtons.setPadding(new Insets(10, 0, 10, 0));
+            adminButtons.setPadding(new Insets(0, 0, 0, 0));
         }
 
         // --- Assemble final layout ---
@@ -601,76 +601,100 @@ public class BaseMenu {
         Label quantityLabel = new Label("Quantity: " + food.getQuantity());
         quantityLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFA000;");
 
-        // Add On section with multiple options
         VBox addOnSection = new VBox(10);
-        Label addOnTitle = new Label("Add On");
-        addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        addOnSection.getChildren().add(addOnTitle);
+        Label optionalLabel = new Label();
+        if(!(food.getAddOne().isEmpty() && food.getAddTwo().isEmpty()))
+        {
+            // Add On section with multiple options
 
-        // Define add-ons
-        Map<String, Double> addOns = Map.of(
-                food.getAddOne(), food.getAddOnePrice(),
-                food.getAddTwo(), food.getAddTwoPrice()
-        );
+            Label addOnTitle = new Label("Add On");
+            addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            addOnSection.getChildren().add(addOnTitle);
 
-        // Counters for each add-on
-        Map<String, int[]> counters = new LinkedHashMap<>();
-        Map<String, Label> qtyLabels = new LinkedHashMap<>();
+            // Define add-ons
+            Map<String, Double> addOns;
+            if(food.getAddOne().isEmpty())
+            {
+                addOns = Map.of(
+                        //food.getAddOne(), food.getAddOnePrice(),
+                        food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }
+            else if(food.getAddTwo().isEmpty())
+            {
+                addOns = Map.of(
+                        food.getAddOne(), food.getAddOnePrice()
+                        //food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }else
+            {
+                addOns = Map.of(
+                        food.getAddOne(), food.getAddOnePrice(),
+                        food.getAddTwo(), food.getAddTwoPrice()
+                );
+            }
 
-        for (Map.Entry<String, Double> entry : addOns.entrySet()) {
-            String name = entry.getKey();
-            double price = entry.getValue();
 
-            HBox addOnItem = new HBox(8);
-            Label addOnName = new Label(name);
-            addOnName.setPrefWidth(80);
-            Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
-            Button addOnMinus = new Button("-");
-            addOnMinus.setPrefSize(25, 25);
-            addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
-            Label extraQtyLabel = new Label(" x0");
-            extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
-            Button addOnPlus = new Button("+");
-            addOnPlus.setPrefSize(25, 25);
-            addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+            // Counters for each add-on
+            Map<String, int[]> counters = new LinkedHashMap<>();
+            Map<String, Label> qtyLabels = new LinkedHashMap<>();
 
-            int[] count = {0};
-            counters.put(name, count);
-            qtyLabels.put(name, extraQtyLabel);
+            for (Map.Entry<String, Double> entry : addOns.entrySet()) {
+                String name = entry.getKey();
+                double price = entry.getValue();
 
-            addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
+                HBox addOnItem = new HBox(8);
+                Label addOnName = new Label(name);
+                addOnName.setPrefWidth(80);
+                Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
+                Button addOnMinus = new Button("-");
+                addOnMinus.setPrefSize(25, 25);
+                addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+                Label extraQtyLabel = new Label(" x0");
+                extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+                Button addOnPlus = new Button("+");
+                addOnPlus.setPrefSize(25, 25);
+                addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
 
-            // Plus action
-            addOnPlus.setOnAction(e -> {
-                int totalSelected = 0;
-                for (int[] c : counters.values()) {
-                    totalSelected += c[0];
-                }
-                if (totalSelected < 5) {
-                    count[0]++;
-                    extraQtyLabel.setText(" x" + count[0]);
-                    // Update price (using array)
-                    currentTotalPriceHolder[0] += price;
-                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
-                }
-            });
+                int[] count = {0};
+                counters.put(name, count);
+                qtyLabels.put(name, extraQtyLabel);
 
-            // Minus action
-            addOnMinus.setOnAction(e -> {
-                if (count[0] > 0) {
-                    count[0]--;
-                    extraQtyLabel.setText(" x" + count[0]);
-                    // Update price (using array)
-                    currentTotalPriceHolder[0] -= price;
-                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
-                }
-            });
+                addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
 
-            addOnSection.getChildren().add(addOnItem);
+                // Plus action
+                addOnPlus.setOnAction(e -> {
+                    int totalSelected = 0;
+                    for (int[] c : counters.values()) {
+                        totalSelected += c[0];
+                    }
+                    if (totalSelected < 5) {
+                        count[0]++;
+                        extraQtyLabel.setText(" x" + count[0]);
+                        // Update price (using array)
+                        currentTotalPriceHolder[0] += price;
+                        priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    }
+                });
+
+                // Minus action
+                addOnMinus.setOnAction(e -> {
+                    if (count[0] > 0) {
+                        count[0]--;
+                        extraQtyLabel.setText(" x" + count[0]);
+                        // Update price (using array)
+                        currentTotalPriceHolder[0] -= price;
+                        priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    }
+                });
+
+                addOnSection.getChildren().add(addOnItem);
+            }
+
+            optionalLabel = new Label("Select up to 5 (optional)");
+            optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
         }
 
-        Label optionalLabel = new Label("Select up to 5 (optional)");
-        optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
 
         // Quantity
         HBox quantityBox = new HBox(10);
