@@ -129,7 +129,12 @@ public class FileStorage {
                 String imagePath = dis.readUTF();
                 String category = dis.readUTF();
                 int quantity = dis.readInt();   // NEW LINE
-                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity));
+                String addOne = dis.readUTF();
+                double addOnePrice = dis.readDouble();
+                String addTwo = dis.readUTF();;
+                double addTwoPrice = dis.readDouble();
+
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity,addOne,addOnePrice,addTwo,addTwoPrice));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -157,6 +162,10 @@ public class FileStorage {
             dos.writeUTF(item.getImagePath());
             dos.writeUTF(item.getCategory());
             dos.writeInt(item.getQuantity());   // NEW
+            dos.writeUTF(item.getAddOne());
+            dos.writeDouble(item.getAddOnePrice());
+            dos.writeUTF(item.getAddTwo());
+            dos.writeDouble(item.getAddTwoPrice());
         }
     }
 
@@ -173,6 +182,10 @@ public class FileStorage {
                 dos.writeUTF(item.getImagePath());
                 dos.writeUTF(item.getCategory());
                 dos.writeInt(item.getQuantity());   // NEW
+                dos.writeUTF(item.getAddOne());
+                dos.writeDouble(item.getAddOnePrice());
+                dos.writeUTF(item.getAddTwo());
+                dos.writeDouble(item.getAddTwoPrice());
             }
         }
     }
