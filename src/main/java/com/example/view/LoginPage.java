@@ -152,6 +152,10 @@ public class LoginPage {
         root.setCenter(rightContainer);
         return root;
     }
+    private boolean isValidContact(String contact) {
+        // Must be exactly 11 digits and start with 01 (Bangladeshi format)
+        return contact.matches("01\\d{9}");
+    }
 
     // ------------------ PANES --------------------
     private VBox createLoginPane() {
@@ -272,7 +276,8 @@ public class LoginPage {
 
     private boolean isValidEmail(String email) {
         // Basic email pattern: something@something.domain
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+        //return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+        return email.matches("^[A-Za-z0-9+_.-]+@gmail\\.com$");
     }
 
     private VBox createRegisterPane() {
@@ -288,6 +293,7 @@ public class LoginPage {
 
 
         emailField = createStyledTextField("Email");
+        TextField contactField = createStyledTextField("Contact No");
 
         PasswordField[] pf1 = new PasswordField[1], pf2 = new PasswordField[1];
         TextField[] tf1 = new TextField[1], tf2 = new TextField[1];
@@ -298,7 +304,7 @@ public class LoginPage {
         passwordField = pf1[0];
         confirmField = pf2[0];
 
-        Label passwordRulesLabel = new Label(
+       /* Label passwordRulesLabel = new Label(
                 "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."
         );
         passwordRulesLabel.setStyle(
@@ -306,8 +312,19 @@ public class LoginPage {
         );
 
 
+
         passwordRulesLabel.setWrapText(true);
         passwordRulesLabel.setMaxWidth(280);
+        */
+        Label passwordRulesLabel = new Label(
+                "Password must be at least 8 characters long\n" +
+                        "and include uppercase, lowercase, numbers, and special characters."
+        );
+        passwordRulesLabel.setStyle("-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+        passwordRulesLabel.setWrapText(true);
+        passwordRulesLabel.setMaxWidth(280); // ✅ ensures wrapping
+        passwordRulesLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevents vertical cutoff
+
         // Password strength label
         registerStrengthLabel = new Label("Password Strength: ");
 
@@ -322,6 +339,8 @@ public class LoginPage {
         registerBtn.setOnAction(e -> {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
+            String contactNo = contactField.getText().trim();
+
             String pwd = passwordField.getText();
             String conf = confirmField.getText();
             boolean invalidUser = !isValidUsername(username);
@@ -329,7 +348,7 @@ public class LoginPage {
             boolean invalidPassword = !"Strong".equals(getPasswordStrength(pwd));
             boolean invalidConfirm = !pwd.equals(conf);
 
-            if (!username.isEmpty() && !email.isEmpty() && !pwd.isEmpty() && !conf.isEmpty()
+            if (!username.isEmpty() && !email.isEmpty() &&  !contactNo.isEmpty() && !pwd.isEmpty() && !conf.isEmpty()
                     && invalidUser && invalidEmail && invalidPassword && invalidConfirm) {
                 showRegisterStatus("All fields are invalid!", true);
                 return;
@@ -348,6 +367,23 @@ public class LoginPage {
                 showRegisterStatus("Invalid email format!", true);
                 return;
             }
+
+            if (!isValidContact(contactNo)) {
+                registerStatusLabel.setText(
+                        "Invalid contact number!\n" +
+                                "(Must be 11 digits starting with 01)"
+                );
+                registerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;");
+                registerStatusLabel.setWrapText(true);       // ✅ allow wrapping
+                registerStatusLabel.setMaxWidth(280);        // ✅ force wrapping width
+                registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
+
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(ev -> registerStatusLabel.setText(""));
+                pause.play();
+                return;
+            }
+
             String strength = getPasswordStrength(pwd);
 
             if (!"Strong".equals(strength)) {
@@ -375,7 +411,7 @@ public class LoginPage {
                 }
 
                 // FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
-                Session.getMenuClient().sendRegister(username, email, pwd);
+                Session.getMenuClient().sendRegister(username, email, contactNo, pwd);
 
                 showRegisterStatus("Registering...", false);
 
@@ -425,7 +461,7 @@ public class LoginPage {
             updateStrengthLabel(strength);
         });
 
-        pane.getChildren().addAll(title, usernameField, emailField, passwordFieldBox, confirmFieldBox, passwordRulesLabel, registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
+        pane.getChildren().addAll(title, usernameField, emailField,  contactField,  passwordFieldBox, confirmFieldBox, passwordRulesLabel, registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
         return pane;
     }
 
@@ -461,6 +497,9 @@ public class LoginPage {
 
     private void showRegisterStatus(String message, boolean isError) {
         registerStatusLabel.setText(message);
+        registerStatusLabel.setWrapText(true);              // ✅ allow wrapping
+        registerStatusLabel.setMaxWidth(280);               // ✅ force wrapping width
+        registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
         registerStatusLabel.setStyle(isError ? "-fx-text-fill:white; -fx-font-weight: bold;"
                 : "-fx-text-fill: white; -fx-font-weight: bold;");
 
@@ -505,7 +544,7 @@ public class LoginPage {
                     return;
                 }
                 Session.setCurrentUser(usernameField.getText());
-                Session.setCurrentUser(usernameField.getText());
+               // Session.setCurrentUser(usernameField.getText());
                 showStatus("Login successful!", false);
                 PauseTransition pause = new PauseTransition(Duration.seconds(1.5)); // 2 sec delay
                 pause.setOnFinished(ev -> returnToHome());
@@ -581,7 +620,7 @@ public class LoginPage {
                     showAdminStatus("Incorrect password!", true); // <<< Use the right method!
                     return;
                 }
-                if (!"1".equals(idEntered) && !AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                if (!"2104".equals(idEntered) && !AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
                     showAdminStatus("Invalid Admin ID and Password!", true);
                     return;
                 }

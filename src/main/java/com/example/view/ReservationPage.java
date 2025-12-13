@@ -132,7 +132,18 @@ public class ReservationPage {
                     -fx-padding: 10 15 10 15;
                 """);
         phoneField.setMaxWidth(350);
+        // ✅ Autofill from user.dat if logged in
+        String currentUser = Session.getCurrentUsername();
+        if (!"guest".equals(currentUser)) {
+            // Use username as default name
+            nameField.setText(currentUser);
 
+            // Fetch contact number from FileStorage
+            String contact = FileStorage.getUserContact(currentUser);
+            if (contact != null && !contact.isBlank()) {
+                phoneField.setText(contact);
+            }
+        }
         VBox personalBox = new VBox(15, nameField, phoneField);
         personalBox.setAlignment(Pos.CENTER);
 
@@ -243,8 +254,6 @@ public class ReservationPage {
         );
         topRow.setAlignment(Pos.CENTER);
 
-        //topRow = new HBox(50, guestsBox, new HBox(5, dateLabel, datePicker));
-        //topRow.setAlignment(Pos.CENTER);
 
         // ADDITIONAL REQUESTS
         Label requestLabel = new Label("Additional Requests:");
@@ -296,7 +305,13 @@ public class ReservationPage {
                     showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
                     return;
                 }
-
+// ✅ Contact number validation
+                if (!phone.matches("^01\\d{9}$")) {
+                    showAlert(Alert.AlertType.ERROR,
+                            "Invalid Contact Number",
+                            "Phone number must be 11 digits and start with 01.\nExample: 01112345678");
+                    return;
+                }
                 String summary = "Reservation Summary:\n\n" +
                         "Name: " + name + "\n" +
                         "Phone: " + phone + "\n" +
@@ -320,7 +335,6 @@ public class ReservationPage {
             }
 
         });
-
         // FINAL EXTENSION LAYOUT
         VBox inputBox = new VBox(20, personalBox, topRow, requestLabel, requestArea, bookButton);
         inputBox.setAlignment(Pos.CENTER);

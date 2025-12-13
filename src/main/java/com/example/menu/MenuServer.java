@@ -2,7 +2,9 @@ package com.example.menu;
 
 import com.example.manager.FileStorage;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -152,13 +154,14 @@ public class MenuServer {
 
                     String username = cw.in.readUTF();
                     String email = cw.in.readUTF();
+                    String contactNo = cw.in.readUTF();
                     String pwd = cw.in.readUTF();
 
                     File userFile = new File("src/main/resources/com/example/manager/data/users.dat");
                     userFile.getParentFile().mkdirs();
                     userFile.createNewFile();
 
-                    FileStorage.appendUser(username, email, pwd);
+                    FileStorage.appendUser(username, email,contactNo, pwd);
 
                     byte[] fullUserData = readAllBytes(userFile.toPath());
                     latestUserFile = fullUserData;
