@@ -1,13 +1,4 @@
-
 package com.example.login;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Region;
 
 import com.example.manager.AdminFileStorage;
 import javafx.geometry.Insets;
@@ -17,9 +8,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 
 public class ChangeAdminPasswordPage {
@@ -68,7 +63,6 @@ public class ChangeAdminPasswordPage {
         backBtn.setStyle("-fx-background-color: #00c9ff; -fx-text-fill: black; -fx-font-size: 14px;");
 
         // --- Password Strength Listener ---
-
         newPassField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText.isEmpty()) {
                 // If field is empty, show nothing
@@ -93,7 +87,7 @@ public class ChangeAdminPasswordPage {
                 return;
             }
 
-            if (!"1".equals(adminID)) {
+            if (!"2104".equals(adminID)) {
                 status.setText("Invalid Admin ID!");
                 status.setStyle("-fx-text-fill: green;");
                 javafx.animation.PauseTransition clearError = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
@@ -159,7 +153,7 @@ public class ChangeAdminPasswordPage {
         VBox layout = new VBox(15, title, adminIDField, newPassField, confirmPassField, strengthBox, saveBtn, backBtn, status);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
-       // layout.setStyle("-fx-background-color: linear-gradient(to bottom right, #add8e6, #87ceeb);");
+        // layout.setStyle("-fx-background-color: linear-gradient(to bottom right, #add8e6, #87ceeb);");
         LinearGradient gradient = new LinearGradient(
                 0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#20B2AA")),   // light sea green
@@ -171,18 +165,16 @@ public class ChangeAdminPasswordPage {
         popup.show();
     }
 
-private static String getPasswordStrength(String pwd) {
-    if (pwd == null || pwd.isEmpty()) return ""; // empty → no text
-    if (pwd.length() < 8) return "Weak";
-    int score = 0;
-    if (pwd.matches(".*[a-z].*")) score++;
-    if (pwd.matches(".*[A-Z].*")) score++;
-    if (pwd.matches(".*[0-9].*")) score++;
-    if (pwd.matches(".*[!@#$%^&*()-+=].*")) score++;
-    if (score <= 1) return "Weak";
-    if (score == 2 || score == 3) return "Normal";
-    return "Strong";
-}
-
-
+    private static String getPasswordStrength(String pwd) {
+        if (pwd == null || pwd.isEmpty()) return ""; // empty → no text
+        if (pwd.length() < 8) return "Weak";
+        int score = 0;
+        if (pwd.matches(".*[a-z].*")) score++;
+        if (pwd.matches(".*[A-Z].*")) score++;
+        if (pwd.matches(".*[0-9].*")) score++;
+        if (pwd.matches(".*[!@#$%^&*()-+=].*")) score++;
+        if (score <= 1) return "Weak";
+        if (score == 2 || score == 3) return "Normal";
+        return "Strong";
+    }
 }

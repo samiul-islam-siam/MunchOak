@@ -1,5 +1,4 @@
 package com.example.view;
-import javafx.scene.control.Label;
 
 import com.example.login.AdminDashboard;
 import com.example.manager.AdminFileStorage;
@@ -7,7 +6,6 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.BaseMenu;
 import com.example.menu.MenuClient;
-import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
@@ -28,16 +26,13 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.layout.Region;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class LoginPage {
     private final Stage primaryStage;
-    private final Random random = new Random();
 
     private VBox loginPane;
     private VBox registerPane;
@@ -97,14 +92,15 @@ public class LoginPage {
                     MenuClient client = new MenuClient(menu);
                     // don't crash; we couldn't register into Session, but local client will still listen and call menu.updateView()
                 } catch (Exception inner) {
-                    inner.printStackTrace();
+                    System.err.println("IOException: " + inner.getMessage());
                 }
             } catch (Exception e) {
                 // safe fallback: create client and attach menu
                 try {
                     MenuClient tmp = new MenuClient(menu);
                     // won't be in Session, but will still listen/refresh this menu instance
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
         return loginScene;
@@ -124,7 +120,7 @@ public class LoginPage {
         titleSection.setAlignment(Pos.CENTER);
 
         // Load logo with updated path
-        Image logoImage = new Image(getClass().getResourceAsStream("/com/example/view/images/logo.png"));
+        Image logoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/view/images/logo.png")));
         ImageView logo = new ImageView(logoImage);
         logo.setFitWidth(40);
         logo.setFitHeight(40);
@@ -156,6 +152,10 @@ public class LoginPage {
 
         root.setCenter(rightContainer);
         return root;
+    }
+    private boolean isValidContact(String contact) {
+        // Must be exactly 11 digits and start with 01 (Bangladeshi format)
+        return contact.matches("01\\d{9}");
     }
 
     // ------------------ PANES --------------------
@@ -194,14 +194,10 @@ public class LoginPage {
         registerBtn.setOnAction(e -> showRegisterForm());
 
         Button guestBtn = createLoginButton("GUEST");
-        guestBtn.setOnAction(e -> {
-            returnToHome();
-        });
+        guestBtn.setOnAction(e -> returnToHome());
 
         Button backToHomeBtn = createLoginButton("BACK");
-        backToHomeBtn.setOnAction(e -> {
-            returnToHome();
-        });
+        backToHomeBtn.setOnAction(e -> returnToHome());
 
         buttonsVBox.getChildren().addAll(adminBtn, userBtn, registerBtn, guestBtn, backToHomeBtn);
         pane.getChildren().addAll(subtitle, brandTitle, buttonsVBox);
@@ -268,6 +264,7 @@ public class LoginPage {
 
         return fieldPane;
     }
+
     // ✅ Helper method inside LoginPage class
     private boolean isValidUsername(String username) {
         // Must contain at least one letter (uppercase or lowercase)
@@ -277,9 +274,11 @@ public class LoginPage {
 
         return hasLetter && minLength;
     }
+
     private boolean isValidEmail(String email) {
         // Basic email pattern: something@something.domain
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+        //return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+        return email.matches("^[A-Za-z0-9+_.-]+@gmail\\.com$");
     }
 
     private VBox createRegisterPane() {
@@ -295,17 +294,18 @@ public class LoginPage {
 
 
         emailField = createStyledTextField("Email");
+        TextField contactField = createStyledTextField("Contact No");
 
         PasswordField[] pf1 = new PasswordField[1], pf2 = new PasswordField[1];
         TextField[] tf1 = new TextField[1], tf2 = new TextField[1];
 
         StackPane passwordFieldBox = createStyledPasswordFieldWithEye("Password", pf1, tf1);
-        StackPane confirmFieldBox  = createStyledPasswordFieldWithEye("Confirm Password", pf2, tf2);
+        StackPane confirmFieldBox = createStyledPasswordFieldWithEye("Confirm Password", pf2, tf2);
 
         passwordField = pf1[0];
         confirmField = pf2[0];
 
-        Label passwordRulesLabel = new Label(
+       /* Label passwordRulesLabel = new Label(
                 "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."
         );
         passwordRulesLabel.setStyle(
@@ -313,8 +313,19 @@ public class LoginPage {
         );
 
 
+
         passwordRulesLabel.setWrapText(true);
         passwordRulesLabel.setMaxWidth(280);
+        */
+        Label passwordRulesLabel = new Label(
+                "Password must be at least 8 characters long\n" +
+                        "and include uppercase, lowercase, numbers, and special characters."
+        );
+        passwordRulesLabel.setStyle("-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+        passwordRulesLabel.setWrapText(true);
+        passwordRulesLabel.setMaxWidth(280); // ✅ ensures wrapping
+        passwordRulesLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevents vertical cutoff
+
         // Password strength label
         registerStrengthLabel = new Label("Password Strength: ");
 
@@ -329,6 +340,8 @@ public class LoginPage {
         registerBtn.setOnAction(e -> {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
+            String contactNo = contactField.getText().trim();
+
             String pwd = passwordField.getText();
             String conf = confirmField.getText();
             boolean invalidUser = !isValidUsername(username);
@@ -336,7 +349,7 @@ public class LoginPage {
             boolean invalidPassword = !"Strong".equals(getPasswordStrength(pwd));
             boolean invalidConfirm = !pwd.equals(conf);
 
-            if (!username.isEmpty() && !email.isEmpty() && !pwd.isEmpty() && !conf.isEmpty()
+            if (!username.isEmpty() && !email.isEmpty() &&  !contactNo.isEmpty() && !pwd.isEmpty() && !conf.isEmpty()
                     && invalidUser && invalidEmail && invalidPassword && invalidConfirm) {
                 showRegisterStatus("All fields are invalid!", true);
                 return;
@@ -355,6 +368,23 @@ public class LoginPage {
                 showRegisterStatus("Invalid email format!", true);
                 return;
             }
+
+            if (!isValidContact(contactNo)) {
+                registerStatusLabel.setText(
+                        "Invalid contact number!\n" +
+                                "(Must be 11 digits starting with 01)"
+                );
+                registerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;");
+                registerStatusLabel.setWrapText(true);       // ✅ allow wrapping
+                registerStatusLabel.setMaxWidth(280);        // ✅ force wrapping width
+                registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
+
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(ev -> registerStatusLabel.setText(""));
+                pause.play();
+                return;
+            }
+
             String strength = getPasswordStrength(pwd);
 
             if (!"Strong".equals(strength)) {
@@ -365,11 +395,10 @@ public class LoginPage {
                 showRegisterStatus("All fields are required!", true);
                 return;
             }
-           if (!pwd.equals(conf)) {
+            if (!pwd.equals(conf)) {
                 showRegisterStatus("Passwords do not match!", true);
                 return;
             }
-
 
 
             try {
@@ -383,7 +412,7 @@ public class LoginPage {
                 }
 
                 // FileStorage.appendUser(username, email, pwd); // handles binary writing automatically
-                Session.getMenuClient().sendRegister(username, email, pwd);
+                Session.getMenuClient().sendRegister(username, email, contactNo, pwd);
 
                 showRegisterStatus("Registering...", false);
 
@@ -433,7 +462,7 @@ public class LoginPage {
             updateStrengthLabel(strength);
         });
 
-        pane.getChildren().addAll(title, usernameField, emailField, passwordFieldBox, confirmFieldBox,passwordRulesLabel, registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
+        pane.getChildren().addAll(title, usernameField, emailField,  contactField,  passwordFieldBox, confirmFieldBox, passwordRulesLabel, registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
         return pane;
     }
 
@@ -441,34 +470,37 @@ public class LoginPage {
         // You can color and text per state, using switch statement (Java 17+ switch expression)
         if (passwordField.getText().isEmpty()) {
             registerStrengthLabel.setText("Password Strength: ");
-            registerStrengthLabel.setStyle( "-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+            registerStrengthLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             return;
         }
         switch (strength) {
             case "Invalid" -> {
                 registerStrengthLabel.setText("Password Strength: Invalid");
-                registerStrengthLabel.setStyle( "-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+                registerStrengthLabel.setStyle("-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             }
             case "Weak" -> {
                 registerStrengthLabel.setText("Password Strength: Weak");
-               // registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
-                registerStrengthLabel.setStyle( "-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+                // registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             }
             case "Normal" -> {
                 registerStrengthLabel.setText("Password Strength: Normal");
                 //registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
-                registerStrengthLabel.setStyle( "-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             }
             case "Strong" -> {
                 registerStrengthLabel.setText("Password Strength: Strong");
                 //registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
-                registerStrengthLabel.setStyle( "-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+                registerStrengthLabel.setStyle("-fx-text-fill: orange; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             }
         }
     }
 
     private void showRegisterStatus(String message, boolean isError) {
         registerStatusLabel.setText(message);
+        registerStatusLabel.setWrapText(true);              // ✅ allow wrapping
+        registerStatusLabel.setMaxWidth(280);               // ✅ force wrapping width
+        registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
         registerStatusLabel.setStyle(isError ? "-fx-text-fill:white; -fx-font-weight: bold;"
                 : "-fx-text-fill: white; -fx-font-weight: bold;");
 
@@ -477,6 +509,7 @@ public class LoginPage {
         pause.play();
 
     }
+
     private VBox createUserLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -488,7 +521,7 @@ public class LoginPage {
 
         // --- Input Fields ---
         TextField usernameField = createStyledTextField("Username");
-       // PasswordField passwordField = createStyledPasswordField("Password");
+        // PasswordField passwordField = createStyledPasswordField("Password");
         // ✅ Eye icon password field (same as register)
         PasswordField[] pf = new PasswordField[1];
         TextField[] tf = new TextField[1];
@@ -512,12 +545,12 @@ public class LoginPage {
                     return;
                 }
                 Session.setCurrentUser(usernameField.getText());
-                Session.setCurrentUser(usernameField.getText());
+               // Session.setCurrentUser(usernameField.getText());
                 showStatus("Login successful!", false);
                 PauseTransition pause = new PauseTransition(Duration.seconds(1.5)); // 2 sec delay
                 pause.setOnFinished(ev -> returnToHome());
                 pause.play();
-               // returnToHome();
+                // returnToHome();
             } catch (Exception ex) {
                 System.err.println("IOException: " + ex.getMessage());
                 showStatus("Error logging in!", true);
@@ -562,7 +595,7 @@ public class LoginPage {
         title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
 
         TextField adminIDField = createStyledTextField("Enter Admin ID");
-       // PasswordField adminPasswordField = createStyledPasswordField("Enter Admin Password");
+        // PasswordField adminPasswordField = createStyledPasswordField("Enter Admin Password");
         PasswordField[] pf = new PasswordField[1];
         TextField[] tf = new TextField[1];
         StackPane adminPasswordFieldBox = createStyledPasswordFieldWithEye("Enter Admin Password", pf, tf);
@@ -580,7 +613,7 @@ public class LoginPage {
                     showAdminStatus("Please fill up all the fields!", true);
                     return;
                 }
-                if (!"1".equals(idEntered)) {
+                if (!"2104".equals(idEntered)) {
                     showAdminStatus("Invalid Admin ID!", true);
                     return;
                 }
@@ -588,22 +621,21 @@ public class LoginPage {
                     showAdminStatus("Incorrect password!", true); // <<< Use the right method!
                     return;
                 }
-                if (!"1".equals(idEntered) && !AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                if (!"2104".equals(idEntered) && !AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
                     showAdminStatus("Invalid Admin ID and Password!", true);
                     return;
                 }
                 //   Session.setCurrentUser("admin");
-               // if (AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
-                    Session.setAdminUser(); // <-- sets isAdmin = true
-                    showAdminStatus("Admin login successful!", false);
-                    PauseTransition pause = new PauseTransition(Duration.seconds(1));
-                    pause.setOnFinished(ev -> {
-                        AdminDashboard dashboard = new AdminDashboard(primaryStage);
-                        dashboard.openAdminDashboard();
-                    });
-                    pause.play();
-                }
-            catch (IOException ex) {
+                // if (AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                Session.setAdminUser(); // <-- sets isAdmin = true
+                showAdminStatus("Admin login successful!", false);
+                PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                pause.setOnFinished(ev -> {
+                    AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                    dashboard.openAdminDashboard();
+                });
+                pause.play();
+            } catch (IOException ex) {
                 System.err.println("IOException: " + ex.getMessage());
                 showAdminStatus("Error verifying password!", true);
             }
@@ -627,13 +659,14 @@ public class LoginPage {
         VBox btnBox = new VBox(10, loginBtn, forgotLink, backBtn);
         btnBox.setAlignment(Pos.CENTER);
 
-        pane.getChildren().addAll(title, adminIDField, adminPasswordFieldBox, adminStatusLabel,btnBox);
+        pane.getChildren().addAll(title, adminIDField, adminPasswordFieldBox, adminStatusLabel, btnBox);
         return pane;
     }
+
     private void showAdminStatus(String message, boolean isError) {
         adminStatusLabel.setText(message);
         adminStatusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 13px;"   // error → white, ultra bold
-                : "-fx-text-fill: orange; -fx-font-weight: 900; -fx-font-size: 13px;" );
+                : "-fx-text-fill: orange; -fx-font-weight: 900; -fx-font-size: 13px;");
 
         if (isError) {
             PauseTransition pause = new PauseTransition(Duration.seconds(2));
@@ -780,7 +813,7 @@ public class LoginPage {
             } catch (Exception ex) {
                 errorLabel.setStyle("-fx-text-fill: red;");
                 errorLabel.setText("Error updating password.");
-                ex.printStackTrace();
+                System.err.println("IOException: " + ex.getMessage());
             }
         });
 
@@ -824,6 +857,7 @@ public class LoginPage {
             default -> "Weak";
         };
     }
+
     private void autoClearStatus(Label status) {
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(ev -> status.setText(""));
@@ -839,7 +873,7 @@ public class LoginPage {
         box.setPadding(new Insets(20));
 
         // ---- Gradient Background START ----
-        Stop[] stops = new Stop[] {
+        Stop[] stops = new Stop[]{
                 new Stop(0, Color.web("#36D1DC")),
                 new Stop(1, Color.web("#5B86E5"))
         };
@@ -908,7 +942,7 @@ public class LoginPage {
                 } catch (IOException e) {
                     status.setText("❌ Error saving password!");
                     status.setStyle("-fx-text-fill: black;");
-                    e.printStackTrace();
+                    System.err.println("IOException: " + e.getMessage());
                 }
             });
 
@@ -929,18 +963,17 @@ public class LoginPage {
         popup.initModality(Modality.WINDOW_MODAL);
 
         // This line ensures all popups close when main window closes:
-        primaryStage.setOnCloseRequest(e -> {
-            popup.close();
-
-        });
+        primaryStage.setOnCloseRequest(e ->
+                popup.close()
+        );
 
         popup.showAndWait();
     }
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle(isError? "-fx-text-fill: white; -fx-font-weight: bolder; -fx-font-size: 13px;"   // error → white, extra bold
-                : "-fx-text-fill: orange; -fx-font-weight: bolder; -fx-font-size: 13px;");   // success → black);
+        statusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: bolder; -fx-font-size: 13px;"   // error → white, extra bold
+                : "-fx-text-fill: orange; -fx-font-weight: bolder; -fx-font-size: 13px;");   // (success → black);
 
 
         PauseTransition pause = new PauseTransition(Duration.seconds(1));

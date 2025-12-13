@@ -151,7 +151,6 @@ public class CheckoutPage {
         submitBtn.setOnAction(e -> {
             int rating = currentRating.get();
             String comment = commentArea.getText().trim();
-            // TODO: Save feedback to file/database, e.g., FileStorage.saveFeedback(rating, comment);
             System.out.println("Feedback submitted: Rating=" + rating + ", Comment=" + comment); // Placeholder for now
             feedbackStage.close();
         });
@@ -193,31 +192,23 @@ public class CheckoutPage {
         }
     }
 
-    // Helper to show bill receipt
-    private void showBill(String receipt) {
-        Stage billStage = new Stage();
-        billStage.setTitle("Bill Receipt");
-        billStage.initModality(Modality.APPLICATION_MODAL);
-        billStage.initOwner(primaryStage);
-
-        TextArea receiptArea = new TextArea(receipt);
-        receiptArea.setEditable(false);
-        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-        receiptArea.setPrefSize(500, 400);
-
-        VBox billBox = new VBox(15, receiptArea);
-        billBox.setPadding(new Insets(20));
-        billBox.setAlignment(Pos.CENTER);
-
-        billStage.setScene(new Scene(billBox));
-        billStage.showAndWait();
-    }
-
     public Scene getScene() {
         Map<Integer, FoodItems> foodMap = buildFoodMap();
 
-        // FIXED: Calculate totals here to match Cart (using passed discount/tip)
-        double subtotal = cart.getTotalPrice(foodMap);
+        // FIXED: Calculate base subtotal and total add-ons to match CartPage
+        double baseSubtotal = 0.0;
+        double totalAddons = 0.0;
+        for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
+            int foodId = e.getKey();
+            int qty = e.getValue();
+            FoodItems item = foodMap.get(foodId);
+            if (item != null) {
+                baseSubtotal += item.getPrice() * qty;
+                double addonPer = cart.getAddonPerItem(foodId);
+                totalAddons += addonPer * qty;
+            }
+        }
+        double subtotal = baseSubtotal + totalAddons;
         boolean isEmptyCart = cart.getBuyHistory().isEmpty();
         double taxAmount = 7.00; // Fixed from Cart
         double serviceFeeAmount = 1.50; // Fixed from Cart
@@ -572,7 +563,9 @@ public class CheckoutPage {
                 int qty = e.getValue();
                 FoodItems item = foodMap.get(foodId);
                 if (item == null) continue;
-                orderSubtotal += item.getPrice() * qty;
+
+                double addonPerItem = cart.getAddonPerItem(foodId);
+                orderSubtotal += (item.getPrice() + addonPerItem) * qty;
 
                 HBox card = new HBox(20);
                 card.setPadding(new Insets(18));
@@ -602,7 +595,7 @@ public class CheckoutPage {
 
                 if (img != null) iv.setImage(img);
 
-                // INFO COLUMN (no qty controls)
+                // INFO COLUMN (no qty controls, include add-on if applicable)
                 VBox info = new VBox(6);
                 Label name = new Label(item.getName() + " (x" + qty + ")");
                 name.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
@@ -610,14 +603,23 @@ public class CheckoutPage {
                 details.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
                 details.setMaxWidth(300);
                 details.setWrapText(true);
-                info.getChildren().addAll(name, details);
+
+                // Add-on label if applicable
+                if (addonPerItem > 0) {
+                    Label addonLabel = new Label("Add-ons: +৳" + String.format("%.2f", addonPerItem));
+                    addonLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #E53935; -fx-font-weight: bold;");
+                    info.getChildren().addAll(name, details, addonLabel);
+                } else {
+                    info.getChildren().addAll(name, details);
+                }
 
                 // SPACER
                 Region spacer3 = new Region();
                 HBox.setHgrow(spacer3, Priority.ALWAYS);
 
-                // LINE TOTAL
-                Label lineTotal = new Label(String.format("৳ %.2f", item.getPrice() * qty));
+                // LINE TOTAL (includes add-ons)
+                double lineTotalValue = (item.getPrice() + addonPerItem) * qty;
+                Label lineTotal = new Label(String.format("৳ %.2f", lineTotalValue));
                 lineTotal.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
 
                 card.getChildren().addAll(iv, info, spacer3, lineTotal);
@@ -634,13 +636,19 @@ public class CheckoutPage {
         rightColumn.setPrefWidth(350);
         rightColumn.setStyle("-fx-background-color: transparent;");
 
-        // FIXED: Added Order Summary Box (mirrors Cart's summary for total visibility)
+        // FIXED: Updated Order Summary Box to match CartPage (breakdown with add-ons)
         if (!isEmptyCart) {
             VBox summaryBox = new VBox(15);
             summaryBox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-margin: 0 0 20 0;");
 
             Label yourOrder = new Label("Your Order Summary");
             yourOrder.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+            Label baseSubtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", baseSubtotal));
+            baseSubtotalLabel.setStyle("-fx-text-fill: black;");
+
+            Label addonsLabel = new Label("Add-ons: ৳" + String.format("%.2f", totalAddons));
+            addonsLabel.setStyle("-fx-text-fill: black;");
 
             Label subtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", subtotal));
             subtotalLabel.setStyle("-fx-text-fill: black;");
@@ -664,7 +672,7 @@ public class CheckoutPage {
             Label totalLabel = new Label("Total Payable: ৳" + String.format("%.2f", totalPayable));
             totalLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: black;");
 
-            summaryBox.getChildren().addAll(yourOrder, subtotalLabel, discountLabel, deliveryLabel, tipLabel, serviceFeeLabel, taxLabel, separator, totalLabel);
+            summaryBox.getChildren().addAll(yourOrder, baseSubtotalLabel, addonsLabel, subtotalLabel, discountLabel, deliveryLabel, tipLabel, serviceFeeLabel, taxLabel, separator, totalLabel);
             rightColumn.getChildren().add(summaryBox);
         }
 

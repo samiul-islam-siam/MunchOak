@@ -25,6 +25,91 @@ public class FileStorage {
     private static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
     // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
+    // In FileStorage.java (add near reservation methods)
+
+    private static final File RESERVATION_STATUS_FILE = new File(DATA_DIR, "reservation_status.dat");
+
+    public static class ReservationRecord {
+        public final int resId;
+        public final String name;
+        public final String phone;
+        public final int guests;
+        public final String date;
+        public final String time;
+        public final String request;
+        public final String createdAt;
+        public final String username;  // NEW
+        public final int userId;       // NEW
+        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time, String request, String createdAt,String username, int userId) {
+            this.resId = resId;
+            this.name = name;
+            this.phone = phone;
+            this.guests = guests;
+            this.date = date;
+            this.time = time;
+            this.request = request;
+            this.createdAt = createdAt;
+            this.username = username;
+            this.userId = userId;
+        }
+    }
+
+    public static List<ReservationRecord> loadReservations() {
+        ensureDataDir();
+        List<ReservationRecord> list = new ArrayList<>();
+        if (!RESERVATIONS_FILE.exists() || RESERVATIONS_FILE.length() == 0) return list;
+
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(RESERVATIONS_FILE))) {
+            while (dis.available() > 0) {
+                int resId = dis.readInt();
+                String name = dis.readUTF();
+                String phone = dis.readUTF();
+                int guests = dis.readInt();
+                String date = dis.readUTF();
+                String time = dis.readUTF();
+                String request = dis.readUTF();
+                String createdAt = dis.readUTF();
+                String username = dis.readUTF();
+                int userId = dis.readInt();
+                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt,username, userId));
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return list;
+    }
+
+    // Minimal status tracking: append last decision for each reservation
+    public static void setReservationStatus(int resId, String status) {
+        ensureDataDir();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(RESERVATION_STATUS_FILE, true))) {
+            dos.writeInt(resId);
+            dos.writeUTF(status); // "Pending", "Accepted", "Rejected"
+            dos.writeUTF(Instant.now().toString());
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    // Read last status; default "Pending"
+    public static String getReservationStatus(int resId) {
+        ensureDataDir();
+        if (!RESERVATION_STATUS_FILE.exists() || RESERVATION_STATUS_FILE.length() == 0) return "Pending";
+        String last = "Pending";
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(RESERVATION_STATUS_FILE))) {
+            while (dis.available() > 0) {
+                int id = dis.readInt();
+                String status = dis.readUTF();
+                dis.readUTF(); // timestamp skip
+                if (id == resId) last = status;
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return last;
+    }
 
     //Ensuring all necessary files in directory and pointer files
     public static void init() {
@@ -252,7 +337,7 @@ public class FileStorage {
         for (String[] user : loadUsers()) {
             if (user[0].equals(username)) {
                 try {
-                    return Integer.parseInt(user[3]);
+                    return Integer.parseInt(user[4]);
                 } catch (Exception ignored) {
                 }
             }
@@ -269,19 +354,28 @@ public class FileStorage {
         }
         return null; // or "" if you prefer
     }
+    public static String getUserContact(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {
+                return user[2]; // contactNo at index 2
+            }
+        }
+        return null;
+    }
 
     public static String getUserPassword(String username) {
         ensureDataDir();
         for (String[] user : loadUsers()) {
             if (user[0].equals(username)) {  // match by username
-                return user[2];             // password (salt:hash) is at index 2
+                return user[3];             // password (salt:hash) is at index 3
             }
         }
         return null; // or "" if you prefer
     }
 
-    //While Registration is successful new user information will append in user.dat file
-    public static void appendUser(String username, String email, String password) throws IOException {
+    // While Registration is successful new user information will append in user.dat file
+    public static void appendUser(String username, String email,String contactNo, String password) throws IOException {
         ensureDataDir();
 
         // Start from 2025001 for registered users
@@ -293,6 +387,7 @@ public class FileStorage {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
             dos.writeUTF(username);
             dos.writeUTF(email);
+            dos.writeUTF(contactNo);
             dos.writeUTF(storedPassword);
             dos.writeInt(uid);
         }
@@ -310,12 +405,13 @@ public class FileStorage {
                 break;
             }
         }
-        //guest has particular default data-formate
+        // guest has particular default data-formate
         if (!guestExists) {
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
                 dos.writeUTF("guest");
-                dos.writeUTF("guest@system.local");
-                dos.writeUTF("nopass");
+                dos.writeUTF("guest@munchoak.com");
+                dos.writeUTF("00000000000");
+                dos.writeUTF("guestPass#123");
                 dos.writeInt(2025000);
             } catch (IOException e) {
                 System.err.println("IOException: " + e.getMessage());
@@ -331,9 +427,10 @@ public class FileStorage {
             while (dis.available() > 0) {
                 String username = dis.readUTF();
                 String email = dis.readUTF();
+                String contactNo = dis.readUTF();
                 String password = dis.readUTF();
                 int uid = dis.readInt();
-                users.add(new String[]{username, email, password, String.valueOf(uid)});
+                users.add(new String[]{username, email,contactNo, password, String.valueOf(uid)});
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -536,7 +633,10 @@ public class FileStorage {
                 dos.writeUTF(time);
                 dos.writeUTF(request);
                 dos.writeUTF(createdAt);
+                dos.writeUTF(Session.getCurrentUsername());
+                dos.writeInt(Session.getCurrentUserId());
             }
+            setReservationStatus(resId, "Pending");
             return true;
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
@@ -559,6 +659,7 @@ public class FileStorage {
                 }
             } else if (f == USERS_FILE) {
                 while (dis.available() > 0) {
+                    dis.readUTF();
                     dis.readUTF();
                     dis.readUTF();
                     dis.readUTF();
@@ -599,6 +700,8 @@ public class FileStorage {
                     dis.readUTF();
                     dis.readUTF();
                     dis.readUTF();
+                    dis.readUTF();          // username
+                    dis.readInt();
                 }
             }
         } catch (EOFException ignored) {
@@ -607,6 +710,12 @@ public class FileStorage {
         }
         return lastId + 1;
     }
+
+
+
+
+
+
 
 
     // ----------------- History Record -----------------
@@ -648,7 +757,7 @@ public class FileStorage {
                 String uname = dis.readUTF();
                 dis.readUTF();  //email ignored here
                 //String pwd = dis.readUTF();
-
+                dis.readUTF();  // contactNo
                 String saltAndHash = dis.readUTF();
                 dis.readInt(); // userId, ignored here
                 if (uname.equals(username)) {
@@ -664,6 +773,8 @@ public class FileStorage {
         return false;
     }
 
+
+
     public static void updateUserPassword(String username, String newPassword) {
         ensureDataDir();
         List<String[]> users = loadUsers(); // load all users
@@ -673,7 +784,7 @@ public class FileStorage {
             if (u[0].equals(username)) {
                 String salt = PasswordUtils.generateSalt();
                 String hash = PasswordUtils.hashPassword(newPassword, salt);
-                u[2] = salt + ":" + hash; // replace password field
+                u[3] = salt + ":" + hash; // replace password field
 
                 updated = true;
                 break;
@@ -686,8 +797,9 @@ public class FileStorage {
                 for (String[] u : users) {
                     dos.writeUTF(u[0]);  // username
                     dos.writeUTF(u[1]);  // email
-                    dos.writeUTF(u[2]);  // salt:hash
-                    dos.writeInt(Integer.parseInt(u[3])); // userId
+                    dos.writeUTF(u[2]);//contact no
+                    dos.writeUTF(u[3]);  // salt:hash
+                    dos.writeInt(Integer.parseInt(u[4])); // userId
                 }
             } catch (IOException e) {
                 System.err.println("IOException: " + e.getMessage());

@@ -46,6 +46,8 @@ public class ChatClient {
     private String selectedUser = null;
     private boolean loadingHistory = false;
 
+    public static Stage chatStage;
+
     @FXML
     public void initialize() {
         getIdentityFromSession();

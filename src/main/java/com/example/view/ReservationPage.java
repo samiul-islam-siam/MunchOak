@@ -1,9 +1,9 @@
 package com.example.view;
 
 import com.example.manager.FileStorage;
-
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.Cart;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -28,9 +28,16 @@ import java.util.Optional;
 
 public class ReservationPage {
     private final Stage primaryStage;
+    private final Cart cart;  // ADDED: Cart field for state persistence
+
+    public ReservationPage(Stage primaryStage, Cart cart) {
+        this.primaryStage = primaryStage;
+        this.cart = cart;
+    }
 
     public ReservationPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.cart = new Cart();
     }
 
     public Scene getReservationScene() {
@@ -125,7 +132,18 @@ public class ReservationPage {
                     -fx-padding: 10 15 10 15;
                 """);
         phoneField.setMaxWidth(350);
+        // ✅ Autofill from user.dat if logged in
+        String currentUser = Session.getCurrentUsername();
+        if (!"guest".equals(currentUser)) {
+            // Use username as default name
+            nameField.setText(currentUser);
 
+            // Fetch contact number from FileStorage
+            String contact = FileStorage.getUserContact(currentUser);
+            if (contact != null && !contact.isBlank()) {
+                phoneField.setText(contact);
+            }
+        }
         VBox personalBox = new VBox(15, nameField, phoneField);
         personalBox.setAlignment(Pos.CENTER);
 
@@ -149,7 +167,7 @@ public class ReservationPage {
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
                 """);
 
-// Style inner text field (the spinner editor)
+        // Style inner text field (the spinner editor)
         guestSpinner.getEditor().setStyle("""
                     -fx-background-color: transparent;
                     -fx-text-fill: #001F3F;
@@ -236,8 +254,6 @@ public class ReservationPage {
         );
         topRow.setAlignment(Pos.CENTER);
 
-        //topRow = new HBox(50, guestsBox, new HBox(5, dateLabel, datePicker));
-        //topRow.setAlignment(Pos.CENTER);
 
         // ADDITIONAL REQUESTS
         Label requestLabel = new Label("Additional Requests:");
@@ -261,8 +277,7 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            if(Session.getCurrentUsername().equals("guest"))
-            {
+            if (Session.getCurrentUsername().equals("guest")) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
@@ -290,7 +305,13 @@ public class ReservationPage {
                     showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
                     return;
                 }
-
+// ✅ Contact number validation
+                if (!phone.matches("^01\\d{9}$")) {
+                    showAlert(Alert.AlertType.ERROR,
+                            "Invalid Contact Number",
+                            "Phone number must be 11 digits and start with 01.\nExample: 01112345678");
+                    return;
+                }
                 String summary = "Reservation Summary:\n\n" +
                         "Name: " + name + "\n" +
                         "Phone: " + phone + "\n" +
@@ -314,7 +335,6 @@ public class ReservationPage {
             }
 
         });
-
         // FINAL EXTENSION LAYOUT
         VBox inputBox = new VBox(20, personalBox, topRow, requestLabel, requestArea, bookButton);
         inputBox.setAlignment(Pos.CENTER);
@@ -402,7 +422,6 @@ public class ReservationPage {
         Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
         Button aboutBtn = createDashboardButton("ABOUT US");
-        Button reviewBtn = createDashboardButton("REVIEW");
 
         homeBtn.setOnAction(e -> {
             double currentWidth = primaryStage.getWidth();
@@ -410,7 +429,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            HomePage homePage = new HomePage(primaryStage);
+            HomePage homePage = new HomePage(primaryStage, cart);
             Scene homeScene = homePage.getHomeScene();
             primaryStage.setScene(homeScene);
 
@@ -430,7 +449,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            MenuPage menuPage = new MenuPage(primaryStage);
+            MenuPage menuPage = new MenuPage(primaryStage, cart);
             Scene menuScene = menuPage.getMenuScene();
             primaryStage.setScene(menuScene);
 
@@ -458,7 +477,7 @@ public class ReservationPage {
             boolean wasFullScreen = primaryStage.isFullScreen();
             boolean wasMaximized = primaryStage.isMaximized();
 
-            AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+            AboutUsPage aboutPage = new AboutUsPage(primaryStage, cart);
             aboutPage.showAboutUs();
 
             Platform.runLater(() -> {

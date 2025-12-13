@@ -1,5 +1,5 @@
 package com.example.menu;
-import com.example.menu.MenuPage;
+
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.munchoak.Cart;
@@ -676,7 +676,7 @@ public class BaseMenu {
         Button editBtn = null;
 
         // Add to Cart button (only for user)
-        if (!(this instanceof AdminMenu) && !(this instanceof guestMenu)) {
+        if (!(this instanceof AdminMenu) && !(this instanceof GuestMenu)) {
             addToCartBtn = new Button("Add to Cart");
             styleMainButton(addToCartBtn);
 
@@ -686,7 +686,7 @@ public class BaseMenu {
                     return;
                 }
 
-                cart.addToCart(food.getId(), 1);
+                cart.addToCart(food.getId(), 1, 0.0);  // No add-ons from quick add
                 updateCartIcon();
 
                 // Popup notification
@@ -720,7 +720,7 @@ public class BaseMenu {
         }
 
         // Edit button (only for admin)
-        if (!(this instanceof guestMenu) && !(this instanceof UserMenu)) {
+        if (!(this instanceof GuestMenu) && !(this instanceof UserMenu)) {
             editBtn = new Button("Edit");
             styleMainButton(editBtn);
             editBtn.setOnAction(e -> showEditDialog(food));
@@ -878,7 +878,7 @@ public class BaseMenu {
         // Base price
         final double basePrice = food.getPrice();
         double[] currentTotalPriceHolder = {basePrice};  // Use array for mutability in lambdas
-        Label priceLabel = new Label("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
+        Label priceLabel = new Label("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
         priceLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #E53935;");
 
         Label descLabel = new Label(food.getDetails());
@@ -916,7 +916,7 @@ public class BaseMenu {
             HBox addOnItem = new HBox(8);
             Label addOnName = new Label(name);
             addOnName.setPrefWidth(80);
-            Label addOnPrice = new Label("+" + String.format("Tk %.0f", price));
+            Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
             Button addOnMinus = new Button("-");
             addOnMinus.setPrefSize(25, 25);
             addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
@@ -943,7 +943,7 @@ public class BaseMenu {
                     extraQtyLabel.setText(" x" + count[0]);
                     // Update price (using array)
                     currentTotalPriceHolder[0] += price;
-                    priceLabel.setText("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
                 }
             });
 
@@ -954,7 +954,7 @@ public class BaseMenu {
                     extraQtyLabel.setText(" x" + count[0]);
                     // Update price (using array)
                     currentTotalPriceHolder[0] -= price;
-                    priceLabel.setText("Tk " + String.format("%.2f", currentTotalPriceHolder[0]));
+                    priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
                 }
             });
 
@@ -1018,16 +1018,14 @@ public class BaseMenu {
                     return;
                 }
 
+                // Calculate per-item add-on total
+                double addonPerItem = currentTotalPriceHolder[0] - basePrice;
+
                 // Deduct actual selected quantity (not hardcoded -1)
                 int selectedQty = currentQuantity[0];
                 food.setQuantity(food.getQuantity() - selectedQty);
 
-                // TODO: Save updated food list to file, e.g.:
-                // List<FoodItems> updatedMenu = FileStorage.loadMenu();
-                // for (FoodItems f : updatedMenu) { if (f.getId() == food.getId()) { f.setQuantity(food.getQuantity()); break; } }
-                // FileStorage.rewriteMenu(updatedMenu);
-
-                cart.addToCart(food.getId(), selectedQty);  // Note: This ignores add-ons; extend Cart if needed
+                cart.addToCart(food.getId(), selectedQty, addonPerItem);  // Pass add-on per item
                 updateCartIcon();
                 // Popup notification
                 Stage notifyPopup = new Stage();

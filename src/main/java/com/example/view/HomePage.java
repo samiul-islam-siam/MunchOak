@@ -31,7 +31,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import static com.example.network.ChatClient.chatStage;
 
 public class HomePage implements HomePageComponent {
     private final StackPane root;
@@ -129,6 +132,7 @@ public class HomePage implements HomePageComponent {
         {
             if (loggedIn) {
                 Session.logout();
+                closeChatWindow();
                 primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
             } else {
                 openLoginPageDirectly();
@@ -441,31 +445,28 @@ public class HomePage implements HomePageComponent {
         };
 
         profileBtn.setOnAction(e -> navigateAndClose.accept(this::openProfilePageDirectly));
-        historyBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new History(primaryStage, this.cart).getScene())));  // UPDATED: Pass this.cart to History
+        historyBtn.setOnAction(e -> {
+            if (!Session.getCurrentUsername().equals("guest")) {
+                navigateAndClose.accept(() -> primaryStage.setScene(new History(primaryStage, this.cart).getScene()));
+            } else {
+                System.out.println("Guest cannot access history");
+            }
+        });  // UPDATED: Pass this.cart to History
         cartBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new CartPage(primaryStage, this.cart).getScene())));  // ADDED: Cart navigation with this.cart
         reserveBtn.setOnAction(e -> navigateAndClose.accept(this::openReservationPageDirectly));
         aboutBtn.setOnAction(e -> navigateAndClose.accept(this::openAboutUsPageDirectly));
-        chatBtn.setOnAction(e -> openChatWindow());
 
-        Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
-        authBtn.setPrefWidth(Double.MAX_VALUE);
-        authBtn.getStyleClass().add("top-button");
-        if (!loggedIn) authBtn.getStyleClass().add("login-button");
-
-        authBtn.setOnAction(e -> {
-            if (loggedIn) {
-                loggedIn = false;
-                authBtn.setText("Log In");
-                authBtn.getStyleClass().remove("login-button");
-                navigatingAway = true;
-                toggleSidePanel();
-                System.out.println("Logged out");
+        AtomicBoolean isChatWindowOpen = new AtomicBoolean(false);
+        chatBtn.setOnAction(e -> {
+            if (!Session.getCurrentUsername().equals("guest") && !isChatWindowOpen.get()) {
+                openChatWindow();
+                isChatWindowOpen.set(true);
             } else {
-                navigateAndClose.accept(this::openLoginPageDirectly);
+                System.out.println("Guest cannot chat");
             }
         });
 
-        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn, authBtn);
+        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
         items.setAlignment(Pos.CENTER_LEFT);
         items.setFillWidth(true);
 
@@ -564,8 +565,8 @@ public class HomePage implements HomePageComponent {
     public void openChatWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
-            Stage chatStage = new Stage();
-            chatStage.setScene(new Scene(loader.load()));
+            Stage openChatStage = new Stage();
+            openChatStage.setScene(new Scene(loader.load()));
 
             ChatClient controller = loader.getController();
             String username = Session.getCurrentUsername();
@@ -575,13 +576,22 @@ public class HomePage implements HomePageComponent {
 
             controller.setUsername(username);
             controller.setAdmin(isAdmin);
-            chatStage.setTitle("Chatting as [" + username + "]");
-            chatStage.show();
-            chatStage.setOnCloseRequest(e -> controller.closeConnection());
+            openChatStage.setTitle("Chatting as [" + username + "]");
+            ChatClient.chatStage = openChatStage;             // <-- store stage
+            openChatStage.show();
+            openChatStage.setOnCloseRequest(e -> controller.closeConnection());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
+
+    public static void closeChatWindow() {
+        if (chatStage != null) {
+            chatStage.close();
+            chatStage = null;
+        }
+    }
+
 
     private void preserveStageState(Scene newScene) {
         double w = primaryStage.getWidth();
@@ -602,16 +612,16 @@ public class HomePage implements HomePageComponent {
     }
 
     private void openReservationPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new ReservationPage(primaryStage).getReservationScene()));
+        Platform.runLater(() -> preserveStageState(new ReservationPage(primaryStage, cart).getReservationScene()));
     }
 
     private void openAboutUsPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage).getAboutUsScene()));
+        Platform.runLater(() -> preserveStageState(new AboutUsPage(primaryStage, cart).getAboutUsScene()));
     }
 
     // UPDATED: openHistoryPageDirectly now passes this.cart to History
     private void openHistoryPageDirectly() {
-        Platform.runLater(() -> preserveStageState(new History(primaryStage, this.cart).getScene()));
+        Platform.runLater(() -> preserveStageState(new History(primaryStage, cart).getScene()));
     }
 
     private void openProfilePageDirectly() {

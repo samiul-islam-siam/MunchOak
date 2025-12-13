@@ -12,7 +12,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import java.io.File;
-public class guestMenu extends BaseMenu {
+
+public class GuestMenu extends BaseMenu {
 
     @Override
     public Node getView() {

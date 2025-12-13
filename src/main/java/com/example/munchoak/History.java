@@ -15,8 +15,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Field;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -138,7 +136,7 @@ public class History {
 
     private void goBack() {
         try {
-            HomePage homePage = new HomePage(primaryStage);
+            HomePage homePage = new HomePage(primaryStage, cart); // UPDATED: Pass cart to preserve state
             primaryStage.setScene(homePage.getHomeScene());
         } catch (Exception ex) {
             System.err.println("Exception: " + ex.getMessage());
@@ -150,15 +148,14 @@ public class History {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
-        // boolean isAdmin = Session.getCurrentUsername().equals("admin");
-
         double delivery = 7.99;
         double tax = 7.00;
         double service = 1.50;
 
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!Session.isAdmin() && s.userId != currentUserId) continue;
-            // FIXED: Load actual discount and tip for this payment to match Cart/Checkout totals
+
+            // Assume s.amount is the full total (including add-ons, fees, etc.)
             double discountVal = FileStorage.getPaymentDiscount(s.paymentId);  // Assume FileStorage method loads saved discount for paymentId
             double tipVal = FileStorage.getPaymentTip(s.paymentId);  // Assume FileStorage method loads saved tip for paymentId
             double subtotal = s.amount;  // Assuming s.amount is the subtotal saved in storage
@@ -173,23 +170,31 @@ public class History {
 
         Cart tempCart = new Cart();
         Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
-        for (Map.Entry<Integer, Integer> e : items.entrySet()) {
-            tempCart.addToCart(e.getKey(), e.getValue());
+        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+            tempCart.addToCart(entry.getKey(), entry.getValue());
         }
 
-        // FIXED: Load actual discount and tip to match totals in bill/receipt
-        double discountVal = FileStorage.getPaymentDiscount(record.getPaymentId);
-        double tipVal = FileStorage.getPaymentTip(record.getPaymentId);
-        double subtotal = tempCart.getTotalPrice(foodMap);  // Recalculate subtotal from items for accuracy
-        // FIXED: Create Payment with subtotal, then set discount/tip via setters for Bill to use in receipt breakdown
-        Payment payment = new Payment(record.getPaymentId(), subtotal, record.getTimestamp());
+        // FIXED: Load actual discount and tip to match totals in bill/receipt (defaults to 0)
+        double discountVal = 0.0;
+        double tipVal = 0.0;
+        double delivery = 7.99;
+        double tax = 7.00;
+        double service = 1.50;
+
+        // FIXED: Reverse-engineer subtotal to match the saved full total (includes add-ons)
+        double calculatedBaseSubtotal = tempCart.getTotalPrice(foodMap); // Base subtotal without add-ons
+        double savedFullTotal = record.getAmount();
+        double reverseSubtotal = savedFullTotal - delivery - tax - service - tipVal + discountVal; // Includes add-ons
+
+        // FIXED: Create Payment with reverse-engineered subtotal, then set discount/tip
+        Payment payment = new Payment(record.getPaymentId(), reverseSubtotal, record.getTimestamp());
         payment.setDiscount(discountVal);
         payment.setTip(tipVal);
         payment.setSuccess(record.getStatus().equalsIgnoreCase("Success"));
         payment.setPaymentMethod(record.getPaymentMethod());
 
-        Bill bill = new Bill(tempCart, payment);
-        String receipt = bill.generateReceipt(foodMap);  // Assume this now uses payment.getDiscount(), payment.getTip() for correct total in receipt
+        Bill bill = new Bill(tempCart, payment, savedFullTotal, calculatedBaseSubtotal);
+        String receipt = bill.generateReceipt(foodMap);  // Pass saved total and base subtotal for accurate display
 
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");
@@ -197,7 +202,7 @@ public class History {
         TextArea receiptArea = new TextArea(receipt);
         receiptArea.setEditable(false);
         receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-        receiptArea.setPrefSize(500, 400);
+        receiptArea.setPrefSize(450, 500);
 
         VBox billBox = new VBox(15, receiptArea);
         billBox.setPadding(new Insets(20));

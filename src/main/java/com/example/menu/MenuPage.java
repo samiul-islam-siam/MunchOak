@@ -7,6 +7,7 @@ import com.example.view.AboutUsPage;
 import com.example.view.HomePage;
 import com.example.view.ProfilePage;
 import com.example.view.ReservationPage;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -39,9 +40,11 @@ public class MenuPage {
         this.primaryStage = primaryStage;
         this.cart = null;
     }
+
     public void setSearchKeyword(String keyword) {
         this.searchKeyword = keyword == null ? "" : keyword.toLowerCase();
     }
+
     // Overloaded constructor (preserve cart)
     public MenuPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -77,11 +80,11 @@ public class MenuPage {
 
         // Decide which menu to load (AdminMenu or UserMenu)
         String username = Session.getCurrentUsername();
-        if (Session.isAdmin()){ // "admin".equalsIgnoreCase(username)
+        if (Session.isAdmin()) { // "admin".equalsIgnoreCase(username)
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
         } else if ("guest".equalsIgnoreCase(username)) {
-            menu = new guestMenu();
+            menu = new GuestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
         } else {
             menu = new UserMenu();
@@ -108,14 +111,15 @@ public class MenuPage {
                 MenuClient client = new MenuClient(menu);
                 // don't crash; we couldn't register into Session, but local client will still listen and call menu.updateView()
             } catch (Exception inner) {
-                inner.printStackTrace();
+                System.err.println("IOException: " + inner.getMessage());
             }
         } catch (Exception e) {
             // safe fallback: create client and attach menu
             try {
                 MenuClient tmp = new MenuClient(menu);
                 // won't be in Session, but will still listen/refresh this menu instance
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         // ------------------------------------------------------------------------------------
 
@@ -133,27 +137,64 @@ public class MenuPage {
         if (cartButton != null) {
             menu.setCartButton(cartButton);
             Cart currentCart = menu.getCart();
-
-            // Restore badge count after returning to menu page
-            Label cartCountLabel = (Label) root.lookup("#cartCountLabel");
-
-            if (cartCountLabel != null && currentCart != null) {
-                int count = currentCart.getTotalItems(); // or getItemCount()
-
-                if (count > 0) {
-                    cartCountLabel.setText(String.valueOf(count));
-                    cartCountLabel.setVisible(true);
-                } else {
-                    cartCountLabel.setVisible(false);
-                }
-            }
             cartButton.setOnAction(e -> {
                 CartPage cp = new CartPage(primaryStage, currentCart);
                 primaryStage.setScene(cp.getScene());
             });
         }
+        // Dynamically update cart badge
+        Cart currentCart = menu.getCart();
+        //Button cartButton = (Button) root.lookup("#cartButton");
+        if (cartButton != null && currentCart != null) {
+            StackPane cartPane = (StackPane) cartButton.getGraphic();
+            Label cartCountLabel = null;
+            // Find cartCountLabel inside StackPane
+            for (Node node : cartPane.getChildren()) {
+                if (node instanceof Label && "cartCountLabel".equals(node.getId())) {
+                    cartCountLabel = (Label) node;
+                    break;
+                }
+            }
 
+            if (cartCountLabel != null) {
+                int count = currentCart.getTotalItems();
+                if (count > 0) {
+                    String countText = String.valueOf(count);
+                    if (count > 99) {
+                        countText = "99+";
+                    }
+                    cartCountLabel.setText(countText);
+                    cartCountLabel.setVisible(true);
 
+                    // Dynamic sizing based on digit count
+                    double size;
+                    if (countText.length() == 1) {
+                        size = 18;
+                    } else if (countText.length() == 2) {
+                        size = 22;
+                    } else {
+                        size = 26;  // For 100+
+                    }
+                    cartCountLabel.setStyle(
+                            "-fx-background-color: white;" +
+                                    "-fx-text-fill: black;" +
+                                    "-fx-font-size: 12px;" +
+                                    "-fx-min-width: " + size + "px;" +
+                                    "-fx-min-height: " + size + "px;" +
+                                    "-fx-max-width: " + size + "px;" +
+                                    "-fx-max-height: " + size + "px;" +
+                                    "-fx-alignment: center;" +
+                                    "-fx-background-radius: " + (size / 2) + "px;" +
+                                    "-fx-border-color: black;" +
+                                    "-fx-border-width: 1px;" +
+                                    "-fx-border-radius: " + (size / 2) + "px;" +
+                                    "-fx-text-overrun: clip;"
+                    );
+                } else {
+                    cartCountLabel.setVisible(false);
+                }
+            }
+        }
 
         return menuScene;
     }
@@ -246,7 +287,7 @@ public class MenuPage {
             }
         });
 
-        StackPane searchPane = new StackPane(searchField,searchBtn);
+        StackPane searchPane = new StackPane(searchField, searchBtn);
         StackPane.setAlignment(searchBtn, Pos.CENTER_RIGHT);
         StackPane.setMargin(searchBtn, new Insets(0, 10, 0, 0));
         searchPane.setMaxWidth(320);
@@ -304,19 +345,24 @@ public class MenuPage {
         cartCountLabel.setStyle(
                 "-fx-background-color: white;" +
                         "-fx-text-fill: black;" +
-                        "-fx-font-size: 15px;" +
-                        "-fx-min-width: 14px;" +
-                        "-fx-min-height: 14px;" +
-                        "-fx-max-width: 14px;" +
-                        "-fx-max-height: 14px;" +
+                        "-fx-font-size: 12px;" +  // Reduced for better fit
+                        "-fx-min-width: 18px;" +   // Slightly larger min for single digits
+                        "-fx-min-height: 18px;" +
+                        "-fx-max-width: 22px;" +   // Increased to fit 3 digits
+                        "-fx-max-height: 22px;" +
                         "-fx-alignment: center;" +
-                        "-fx-background-radius: 20;"
+                        "-fx-background-radius: 11px;" +  // Adjusted radius for new size
+                        "-fx-border-color: red;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 11px;" +
+                        "-fx-text-overrun: clip;"   // Explicitly clip instead of ellipsis (optional but recommended)
         );
         cartCountLabel.setVisible(false);
 
-// STACK cart icon + badge
+        // STACK cart icon + badge
         StackPane cartPane = new StackPane(cartLabel, cartCountLabel);
         StackPane.setAlignment(cartCountLabel, Pos.TOP_RIGHT);
+
         // Move badge farther up-right
         cartCountLabel.setTranslateX(10);   // push more right
         cartCountLabel.setTranslateY(-10);  // push more up
@@ -384,7 +430,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        AboutUsPage aboutPage = new AboutUsPage(primaryStage);
+        AboutUsPage aboutPage = new AboutUsPage(primaryStage, cart);
         Scene aboutScene = aboutPage.getAboutUsScene();
         primaryStage.setScene(aboutScene);
 
@@ -404,7 +450,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        ReservationPage resPage = new ReservationPage(primaryStage);
+        ReservationPage resPage = new ReservationPage(primaryStage, cart);
         Scene resScene = resPage.getReservationScene();
         primaryStage.setScene(resScene);
 
@@ -425,7 +471,7 @@ public class MenuPage {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
 
-        HomePage homePage = new HomePage(primaryStage);
+        HomePage homePage = new HomePage(primaryStage, cart);
         VBox fullPage = homePage.getFullPage();
 
         ScrollPane scrollPane = new ScrollPane(fullPage);

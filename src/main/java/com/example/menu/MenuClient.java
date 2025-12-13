@@ -5,9 +5,7 @@ import com.example.munchoak.FoodItems;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
+import java.io.*;
 import java.net.Socket;
 
 import static java.nio.file.Files.readAllBytes;
@@ -19,26 +17,28 @@ public class MenuClient {
     private BaseMenu menu;
 
     private Socket socket;
+    private DataInputStream in;
     private DataOutputStream out;
 
     public MenuClient() {
-        initSocketAndListener();
+        init();
     }
 
     public MenuClient(BaseMenu menu) {
         this.menu = menu;
-        initSocketAndListener();
+        init();
     }
 
-    private void initSocketAndListener() {
+    private void init() {
         try {
             socket = new Socket("localhost", 8080);
+            in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            new Thread(this::listenForUpdates, "MenuClient-Listener").start();
+            new Thread(this::listenLoop, "MenuClient-Listener").start();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
@@ -50,129 +50,127 @@ public class MenuClient {
         this.foodList = foodList;
     }
 
-    private void listenForUpdates() {
+    private void listenLoop() {
         try {
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-
             while (true) {
+
                 String cmd = in.readUTF();
 
-                if ("UPDATE_MENU".equals(cmd)) {
+                switch (cmd) {
 
-                    String filename = in.readUTF();
-                    int size = in.readInt();
+                    case "UPDATE_MENU" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
 
-                    byte[] data = new byte[size];
-                    in.readFully(data);
+                        byte[] data = new byte[size];
+                        in.readFully(data);
 
-                    // ensure directory exists
-                    File dir = new File("src/main/resources/com/example/manager/data/");
-                    if (!dir.exists()) dir.mkdirs();
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
 
-                    File target = new File(dir, filename);
-                    write(target.toPath(), data);
+                        File target = new File(dir, filename);
+                        write(target.toPath(), data);
 
-                    // IMPORTANT: update FileStorage menu file to the new one
-                    FileStorage.setMenuFile(target);
+                        FileStorage.setMenuFile(target);
 
-                    Platform.runLater(() -> {
-                        try {
-                            if (menu != null) {
-                                menu.updateView();
-                            }
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-                } else if ("UPDATE_IMAGE".equals(cmd)) {
+                        Platform.runLater(() -> {
+                            if (menu != null) menu.updateView();
+                        });
+                    }
 
-                    String filename = in.readUTF();
-                    int size = in.readInt();
+                    case "UPDATE_IMAGE" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
 
-                    byte[] data = new byte[size];
-                    in.readFully(data);
+                        byte[] data = new byte[size];
+                        in.readFully(data);
 
-                    File imagesDir = new File("src/main/resources/com/example/manager/images/");
-                    if (!imagesDir.exists()) imagesDir.mkdirs();
+                        File dir = new File("src/main/resources/com/example/manager/images/");
+                        dir.mkdirs();
 
-                    File target = new File(imagesDir, filename);
-                    write(target.toPath(), data);
+                        File img = new File(dir, filename);
+                        write(img.toPath(), data);
 
-                    Platform.runLater(() -> {
-                        if (menu != null) menu.updateView();
-                        if (foodList != null) foodList.setAll(FileStorage.loadMenu());
-                    });
+                        Platform.runLater(() -> {
+                            if (menu != null) menu.updateView();
+                            if (foodList != null) foodList.setAll(FileStorage.loadMenu());
+                        });
+                    }
 
-                } else if ("UPDATE_USERFILE".equals(cmd)) {
-                    String filename = in.readUTF();
-                    int size = in.readInt();
+                    case "UPDATE_USERFILE" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
 
-                    byte[] data = new byte[size];
-                    in.readFully(data);
+                        byte[] data = new byte[size];
+                        in.readFully(data);
 
-                    File dir = new File("src/main/resources/com/example/manager/data/");
-                    if (!dir.exists()) dir.mkdirs();
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
 
-                    File target = new File(dir, filename);
-                    write(target.toPath(), data);
+                        File f = new File(dir, filename);
+                        write(f.toPath(), data);
 
-                    System.out.println("User file updated from server.");
+                        System.out.println("User file synced from server.");
+                    }
 
-                    // (optional) reload FileStorage users list
-                    // FileStorage.setUserFile(target);
+                    case "REGISTER_RESPONSE" -> {
+                        boolean ok = in.readBoolean();
+                        String msg = in.readUTF();
+                        System.out.println("Server response: " + msg);
+                    }
                 }
-
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Disconnected from server.");
         }
     }
 
-    public void sendMenuUpdate() {
+    // -------------------------
+    // SEND COMMANDS
+    // -------------------------
+    public synchronized void sendMenuUpdate() {
         try {
-            File menuFile = FileStorage.getMenuFile();   // <-- Automatically read current menu
+            File menuFile = FileStorage.getMenuFile();
             byte[] data = readAllBytes(menuFile.toPath());
 
             out.writeUTF("UPDATE_MENU");
-            out.writeUTF(menuFile.getName());  // send filename
+            out.writeUTF(menuFile.getName());
             out.writeInt(data.length);
             out.write(data);
             out.flush();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-
-    public void sendImageUpdate(File imageFile) {
+    public synchronized void sendImageUpdate(File img) {
         try {
-            if (!imageFile.exists()) return;
-
-            byte[] data = readAllBytes(imageFile.toPath());
+            byte[] data = readAllBytes(img.toPath());
 
             out.writeUTF("UPDATE_IMAGE");
-            out.writeUTF(imageFile.getName());
+            out.writeUTF(img.getName());
             out.writeInt(data.length);
             out.write(data);
             out.flush();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
 
-    public void sendRegister(String username, String email, String password) {
+    public synchronized void sendRegister(String username, String email,String contactNo, String pwd) {
         try {
-            out.writeUTF("REGISTER_USER");   // Command
+            out.writeUTF("REGISTER_USER");
             out.writeUTF(username);
             out.writeUTF(email);
-            out.writeUTF(password);
+            out.writeUTF(contactNo);
+            out.writeUTF(pwd);
             out.flush();
+
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("IOException: " + e.getMessage());
         }
     }
-
 }

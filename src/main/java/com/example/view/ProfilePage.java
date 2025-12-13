@@ -1,4 +1,3 @@
-
 package com.example.view;
 
 import com.example.manager.FileStorage;
@@ -35,6 +34,7 @@ public class ProfilePage {
         String email = Session.getCurrentEmail();
         String password = Session.getCurrentPassword();
         int userId = Session.getCurrentUserId();
+        String contactNo = Session.getCurrentContactNo();
 
         if (Session.getCurrentUsername().equals("guest")) {
             Label title = new Label("You are browsing \n as guest");
@@ -42,6 +42,8 @@ public class ProfilePage {
 
             Label passLabel = new Label("Default guest Id: " + userId);
             passLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
+            //Label contactLabel = new Label("Contact No: " + contactNo);
+            //contactLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
 
             Button backBtn = new Button("⬅ Back");
             backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: black; -fx-font-size: 16px;");
@@ -78,6 +80,8 @@ public class ProfilePage {
         Label emailLabel = new Label("Email: " + email);
         //Label passLabel = new Label("Password: " + password);
         Label passLabel = new Label("Your Id: " + userId);
+        Label contactLabel = new Label("Contact No: " + contactNo);
+        contactLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
 
         userLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
         emailLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
@@ -100,9 +104,7 @@ public class ProfilePage {
         updateBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
 
         // --- Real-time password strength ---
-        newPass.textProperty().addListener((obs, oldVal, newVal) -> {
-            updateStrengthLabel(strengthLabel, newVal);
-        });
+        newPass.textProperty().addListener((obs, oldVal, newVal) -> updateStrengthLabel(strengthLabel, newVal));
 
         // --- Update button action ---
         updateBtn.setOnAction(e -> {
@@ -140,15 +142,11 @@ public class ProfilePage {
         backBtn.setOnAction(e -> primaryStage.setScene(previousScene));
 
         // --- Card layout ---
-      //  VBox card = new VBox(15, title, userLabel, emailLabel, passLabel,
-        // new Label("Change Your Password:"), newPass, strengthLabel, updateBtn, status, backBtn);
         Button changePassBtn = new Button("Change Password");
         changePassBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
-        changePassBtn.setOnAction(e -> {
-            ChangePasswordPopup.show(primaryStage);
-        });
+        changePassBtn.setOnAction(e -> ChangePasswordPopup.show(primaryStage));
 
-        VBox card = new VBox(15, title, userLabel, emailLabel, passLabel, changePassBtn, backBtn);
+        VBox card = new VBox(15, title, userLabel, emailLabel,contactLabel, passLabel, changePassBtn, backBtn);
 
         card.setAlignment(Pos.CENTER);
         card.setPadding(new Insets(30));

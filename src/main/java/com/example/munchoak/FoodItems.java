@@ -82,9 +82,11 @@ public class FoodItems {
     public void setCategory(String category) {
         this.category.set(category);
     }
+
     public int getQuantity() {
         return quantity.get();
     }
+
     public void setQuantity(int q) {
         this.quantity.set(q);
     }

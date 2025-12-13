@@ -127,8 +127,8 @@ public class HomePageEighthExtension implements HomePageComponent {
 
         VBox col4 = buildColumn("Contact Info",
                 "+0123-456-789",
-                "munchoak@example.com",
-                "8502 Preston Rd.\nInglewood, Maine 98380"
+                "info@munchoak.com",
+                "8502 Oak Rd.\nMunchwood, Dhaka 98380"
         );
 
         HBox footerColumns = new HBox(col1, col2, col3, col4);
@@ -204,7 +204,8 @@ public class HomePageEighthExtension implements HomePageComponent {
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public double getPrefHeight() {

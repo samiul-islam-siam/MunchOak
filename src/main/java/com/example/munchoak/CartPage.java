@@ -71,6 +71,21 @@ public class CartPage {
     public Scene getScene() {
         Map<Integer, FoodItems> foodMap = buildFoodMap();
 
+        // Calculate base subtotal and total add-ons
+        double baseSubtotal = 0.0;
+        double totalAddons = 0.0;
+        for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
+            int foodId = e.getKey();
+            int qty = e.getValue();
+            FoodItems item = foodMap.get(foodId);
+            if (item != null) {
+                baseSubtotal += item.getPrice() * qty;
+                double addonPer = cart.getAddonPerItem(foodId);
+                totalAddons += addonPer * qty;
+            }
+        }
+        double subtotal = baseSubtotal + totalAddons;
+
         // PAGE BACKGROUND
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #FFDAB9;");  // Peach yellow background
@@ -233,7 +248,7 @@ public class CartPage {
                             delay.setOnFinished(e2 -> notifyPopup.close());
                             delay.play();
                         } else {
-                            cart.addToCart(item.getId(), 1);
+                            cart.addToCart(item.getId(), 1, 0.0);  // No add-ons from search
                             primaryStage.setScene(getScene());  // Refresh to update cart
                         }
                     });
@@ -277,7 +292,6 @@ public class CartPage {
         menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         menuBtn.setOnMouseEntered(e -> menuBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         menuBtn.setOnMouseExited(e -> menuBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // TODO: Add navigation action, e.g., menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getScene()));
         menuBtn.setOnAction(e -> primaryStage.setScene(new MenuPage(primaryStage, cart).getMenuScene()));
 
         Button cartBtn = new Button("Cart");
@@ -365,7 +379,8 @@ public class CartPage {
         itemList.setAlignment(Pos.TOP_CENTER);
 
         // EMPTY CART
-        if (cart.getBuyHistory().isEmpty()) {
+        boolean isEmptyCart = cart.getBuyHistory().isEmpty();
+        if (isEmptyCart) {
             Label empty = new Label("Your cart is empty.");
             empty.setStyle("-fx-font-size: 18px; -fx-text-fill: #666;");
             itemList.getChildren().add(empty);
@@ -376,6 +391,9 @@ public class CartPage {
                 int qty = e.getValue();
                 FoodItems item = foodMap.get(foodId);
                 if (item == null) continue;
+
+                // Get add-on per item for this foodId (assume Cart has getAddonPerItem(int id) method)
+                double addonPerItem = cart.getAddonPerItem(foodId);
 
                 HBox card = new HBox(20);
                 card.setPadding(new Insets(18));
@@ -424,7 +442,14 @@ public class CartPage {
                 priceEach.setAlignment(Pos.CENTER_RIGHT);
                 priceRow.getChildren().addAll(priceSpacer, priceEach);
 
-                info.getChildren().addAll(name, details, priceRow);
+                // Add-on label if applicable
+                if (addonPerItem > 0) {
+                    Label addonLabel = new Label("Add-ons: +৳" + String.format("%.2f", addonPerItem));
+                    addonLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #E53935; -fx-font-weight: bold;");
+                    info.getChildren().addAll(name, details, priceRow, addonLabel);
+                } else {
+                    info.getChildren().addAll(name, details, priceRow);
+                }
 
                 // SPACER
                 Region spacer3 = new Region();
@@ -445,7 +470,7 @@ public class CartPage {
                     primaryStage.setScene(getScene());
                 });
                 plus.setOnAction(evt -> {
-                    cart.addToCart(foodId, 1);
+                    cart.addToCart(foodId, 1, addonPerItem);  // Pass existing add-on per item
                     primaryStage.setScene(getScene());
                 });
 
@@ -462,11 +487,12 @@ public class CartPage {
                 VBox sideControls = new VBox(6, qtyBox, remove);
                 sideControls.setAlignment(Pos.CENTER_RIGHT);
 
-                // Right-aligned line total row to prevent truncation
+                // Right-aligned line total row to prevent truncation (includes add-ons)
                 HBox totalRow = new HBox(10);
                 Region totalSpacer = new Region();
                 HBox.setHgrow(totalSpacer, Priority.ALWAYS);
-                Label lineTotal = new Label(String.format("৳ %.2f", item.getPrice() * qty));
+                double lineTotalValue = (item.getPrice() + addonPerItem) * qty;
+                Label lineTotal = new Label(String.format("৳ %.2f", lineTotalValue));
                 lineTotal.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: black;");
                 lineTotal.setMinWidth(70);
                 lineTotal.setAlignment(Pos.CENTER_RIGHT);
@@ -625,7 +651,7 @@ public class CartPage {
                         delay.play();
 
                     } else {
-                        cart.addToCart(item.getId(), 1);
+                        cart.addToCart(item.getId(), 1, 0.0);  // No add-ons from suggestions
                         primaryStage.setScene(getScene());  // Refresh the scene to update cart
                     }
                 });
@@ -669,8 +695,11 @@ public class CartPage {
         Label yourOrder = new Label("Your Order");
         yourOrder.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
 
-        double subtotal = cart.getTotalPrice(foodMap);
-        boolean isEmptyCart = cart.getBuyHistory().isEmpty();
+        Label baseSubtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", baseSubtotal));
+        baseSubtotalLabel.setStyle("-fx-text-fill: black;");
+
+        Label addonsLabel = new Label("Add-ons: ৳" + String.format("%.2f", totalAddons));
+        addonsLabel.setStyle("-fx-text-fill: black;");
 
         Label subtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", subtotal));
         subtotalLabel.setStyle("-fx-text-fill: black;");
@@ -808,7 +837,7 @@ public class CartPage {
             });
         }
 
-        summaryBox.getChildren().addAll(yourOrder, subtotalLabel);
+        summaryBox.getChildren().addAll(yourOrder, baseSubtotalLabel, addonsLabel, subtotalLabel);
 
         if (!isEmptyCart) {
             summaryBox.getChildren().add(discountLabel);
