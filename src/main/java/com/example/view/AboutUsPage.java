@@ -94,7 +94,14 @@ public class AboutUsPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        navBar.getChildren().addAll(navTitle, spacer, homeBtn, menuBtn, reservationBtn, profileBtn, cartBtn);
+        if(Session.isAdmin())
+        {
+            navBar.getChildren().addAll(navTitle, spacer, homeBtn, menuBtn, profileBtn);
+        }else
+        {
+            navBar.getChildren().addAll(navTitle, spacer, homeBtn, menuBtn, reservationBtn, profileBtn, cartBtn);
+        }
+
         root.setTop(navBar);
 
         // ---------------- Scrollable Content ----------------

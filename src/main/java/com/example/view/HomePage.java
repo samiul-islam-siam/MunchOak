@@ -213,7 +213,14 @@ public class HomePage implements HomePageComponent {
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        HBox rightButtons;
+        if(Session.isAdmin())
+        {
+           rightButtons =  new HBox(10, menuBtn, authBtn, menuIconBtn);
+        }else {
+            rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        }
+
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         BorderPane navBar = new BorderPane();
@@ -245,9 +252,19 @@ public class HomePage implements HomePageComponent {
 
         createOverlay();
         createSidePanel();
-        createMessageButton(); // ADDED: Create message button
+        if(!Session.isAdmin())
+        {
+            createMessageButton(); // ADDED: Create message button
+        }
 
-        root.getChildren().setAll(content, overlay, sidePanel, messageBtn);
+        if(Session.isAdmin())
+        {
+            root.getChildren().setAll(content, overlay, sidePanel);
+        }else
+        {
+            root.getChildren().setAll(content, overlay, sidePanel, messageBtn);
+        }
+
 
         this.sections = Arrays.asList(
                 this,
@@ -271,6 +288,7 @@ public class HomePage implements HomePageComponent {
         messageBtn.setOnAction(e -> openMessagePageDirectly());
 
         // Make it dynamic: Add a subtle pulse animation
+
         RotateTransition rotate = new RotateTransition(Duration.seconds(2), messageBtn);
         rotate.setByAngle(360);
         rotate.setCycleCount(RotateTransition.INDEFINITE);
@@ -418,7 +436,14 @@ public class HomePage implements HomePageComponent {
         bookBtn.setStyle("-fx-text-fill: black;-fx-border-color: black;");
         bookBtn.setOnAction(e -> openReservationPageDirectly());
 
-        textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
+        if(Session.isAdmin())
+        {
+            textBox.getChildren().addAll(titleLabel, paraLabel);
+        }else
+        {
+            textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
+        }
+
         group.getChildren().addAll(iv, textBox);
         return group;
     }
@@ -510,8 +535,15 @@ public class HomePage implements HomePageComponent {
                 System.out.println("Guest cannot chat");
             }
         });
-
-        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        VBox items;
+        if(Session.isAdmin())
+        {
+            items = new VBox(18, profileBtn, chatBtn, aboutBtn);
+        }else
+        {
+            items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        }
+        //VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
         items.setAlignment(Pos.CENTER_LEFT);
         items.setFillWidth(true);
 
@@ -576,6 +608,32 @@ public class HomePage implements HomePageComponent {
     }
 
     public Scene getHomeScene() {
+//        VBox fullPage = getFullPage();
+//        scrollPane = new ScrollPane(fullPage);
+//        scrollPane.setFitToWidth(true);
+//        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+//        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+//        scrollPane.setStyle("-fx-background-color: lightyellow;");
+//        scrollPane.setPadding(new Insets(0));
+//        scrollPane.prefHeightProperty().bind(primaryStage.heightProperty());
+//
+//        double stageWidth = primaryStage.getWidth() > 0 ? primaryStage.getWidth() : WIDTH;
+//        double stageHeight = primaryStage.getHeight() > 0 ? primaryStage.getHeight() : HEIGHT;
+//
+//        Scene scene = new Scene(root, stageWidth, stageHeight); // CHANGED: Use root instead of scrollPane for fixed button
+//        scene.getStylesheets().clear();
+//        var css = getClass().getResource("/com/example/view/styles/style.css");
+//        if (css != null) {
+//            scene.getStylesheets().add(css.toExternalForm());
+//        } else {
+//            System.err.println("CSS not found!");
+//            scene.getStylesheets().add(Application.STYLESHEET_MODENA);
+//        }
+//
+//        // Ensure scrollPane is added to content after scene creation if needed
+//        content.setCenter(scrollPane);
+//
+//        return scene;
         VBox fullPage = getFullPage();
         scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
@@ -587,8 +645,8 @@ public class HomePage implements HomePageComponent {
 
         double stageWidth = primaryStage.getWidth() > 0 ? primaryStage.getWidth() : WIDTH;
         double stageHeight = primaryStage.getHeight() > 0 ? primaryStage.getHeight() : HEIGHT;
+        Scene scene = new Scene(scrollPane, stageWidth, stageHeight);
 
-        Scene scene = new Scene(root, stageWidth, stageHeight); // CHANGED: Use root instead of scrollPane for fixed button
         scene.getStylesheets().clear();
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
@@ -597,10 +655,6 @@ public class HomePage implements HomePageComponent {
             System.err.println("CSS not found!");
             scene.getStylesheets().add(Application.STYLESHEET_MODENA);
         }
-
-        // Ensure scrollPane is added to content after scene creation if needed
-        content.setCenter(scrollPane);
-
         return scene;
     }
 

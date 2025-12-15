@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 import javafx.animation.PauseTransition;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -102,21 +104,42 @@ public class MessagePage {
                 // Clear input
                 messageInput.clear();
 
-                // Remove placeholder if present
-                if (!chatArea.getChildren().isEmpty() && chatArea.getChildren().get(0) instanceof Label && "No messages yet. Send a message to start a conversation.".equals(((Label) chatArea.getChildren().get(0)).getText())) {
-                    chatArea.getChildren().remove(0);
+                if (Session.getCurrentUsername().equals("guest")) {
+                    Stage notifyPopup = new Stage();
+                    notifyPopup.initStyle(StageStyle.TRANSPARENT);
+                    notifyPopup.setAlwaysOnTop(true);
+                    Label notifyLabel = new Label("Please Login !");
+                    notifyLabel.setWrapText(true); // Enable text wrapping for longer messages
+                    notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 15 25 15 25; -fx-background-radius: 10;");
+                    VBox notifyBox = new VBox(notifyLabel);
+                    notifyBox.setAlignment(Pos.CENTER);
+                    notifyBox.setStyle("-fx-background-color: transparent;");
+                    Scene popupScene = new Scene(notifyBox, 320, 80);
+                    popupScene.setFill(Color.TRANSPARENT);
+                    notifyPopup.setScene(popupScene);
+                    notifyPopup.show();
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(e2 -> notifyPopup.close());
+                    delay.play();
+                }else
+                {
+                    // Remove placeholder if present
+                    if (!chatArea.getChildren().isEmpty() && chatArea.getChildren().get(0) instanceof Label && "No messages yet. Send a message to start a conversation.".equals(((Label) chatArea.getChildren().get(0)).getText())) {
+                        chatArea.getChildren().remove(0);
+                    }
+
+                    // TODO: Save user message to FileStorage
+
+                    // Simulate support response after delay (incoming message only)
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(ev -> {
+                        String response = "Support: Thank you for your message. We'll get back to you shortly.";
+                        addIncomingMessage(chatArea, response);
+                        chatScroll.setVvalue(1.0); // Scroll to bottom
+                    });
+                    delay.play();
                 }
 
-                // TODO: Save user message to FileStorage
-
-                // Simulate support response after delay (incoming message only)
-                PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                delay.setOnFinished(ev -> {
-                    String response = "Support: Thank you for your message. We'll get back to you shortly.";
-                    addIncomingMessage(chatArea, response);
-                    chatScroll.setVvalue(1.0); // Scroll to bottom
-                });
-                delay.play();
             }
         });
 
