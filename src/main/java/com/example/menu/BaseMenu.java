@@ -603,37 +603,31 @@ public class BaseMenu {
 
         VBox addOnSection = new VBox(10);
         Label optionalLabel = new Label();
-        if(!(food.getAddOne().isEmpty() && food.getAddTwo().isEmpty()))
-        {
+        if (!(food.getAddOne().isEmpty() && food.getAddTwo().isEmpty())) {
             // Add On section with multiple options
 
             Label addOnTitle = new Label("Add On");
-            addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            addOnTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FF6B00;"); // Orange text to match banner style
             addOnSection.getChildren().add(addOnTitle);
 
             // Define add-ons
             Map<String, Double> addOns;
-            if(food.getAddOne().isEmpty())
-            {
+            if (food.getAddOne().isEmpty()) {
                 addOns = Map.of(
-                        //food.getAddOne(), food.getAddOnePrice(),
+                        // food.getAddOne(), food.getAddOnePrice(),
                         food.getAddTwo(), food.getAddTwoPrice()
                 );
-            }
-            else if(food.getAddTwo().isEmpty())
-            {
+            } else if (food.getAddTwo().isEmpty()) {
                 addOns = Map.of(
                         food.getAddOne(), food.getAddOnePrice()
-                        //food.getAddTwo(), food.getAddTwoPrice()
+                        // food.getAddTwo(), food.getAddTwoPrice()
                 );
-            }else
-            {
+            } else {
                 addOns = Map.of(
                         food.getAddOne(), food.getAddOnePrice(),
                         food.getAddTwo(), food.getAddTwoPrice()
                 );
             }
-
 
             // Counters for each add-on
             Map<String, int[]> counters = new LinkedHashMap<>();
@@ -643,24 +637,104 @@ public class BaseMenu {
                 String name = entry.getKey();
                 double price = entry.getValue();
 
-                HBox addOnItem = new HBox(8);
+                // Outer HBox for the entire add-on row (to create a "block" feel)
+                HBox addOnBlock = new HBox(8);
+                addOnBlock.setPadding(new Insets(8, 12, 8, 12)); // Padding for block-like appearance
+                addOnBlock.setStyle(
+                        "-fx-background-color: #FAFAFA;" + // Light gray background for block
+                                "-fx-background-radius: 8;" +     // Rounded corners
+                                "-fx-border-color: #E0E0E0;" +    // Subtle border
+                                "-fx-border-radius: 8;" +
+                                "-fx-border-width: 1;"
+                );
+                addOnBlock.setAlignment(Pos.CENTER_LEFT);
+
+                // Left: Name only
                 Label addOnName = new Label(name);
-                addOnName.setPrefWidth(80);
+                addOnName.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"); // Bold name
+                addOnName.setPrefWidth(150); // Fixed width for alignment
+
+                // Spacer to push right side to the right
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                // Right side: Price and Counter in a VBox or HBox for vertical alignment
+                VBox rightSide = new VBox(2);
+                rightSide.setAlignment(Pos.CENTER_RIGHT);
+
+                // Price label above the counter
                 Label addOnPrice = new Label("+" + String.format("৳ %.0f", price));
+                addOnPrice.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #E53935;"); // Red price to match image
+
+                // Counter HBox (centered horizontally within right side)
+                HBox counterBox = new HBox(4);
+                counterBox.setAlignment(Pos.CENTER);
+
                 Button addOnMinus = new Button("-");
-                addOnMinus.setPrefSize(25, 25);
-                addOnMinus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
-                Label extraQtyLabel = new Label(" x0");
-                extraQtyLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+                addOnMinus.setPrefSize(30, 30); // Slightly larger square buttons
+                addOnMinus.setStyle(
+                        "-fx-background-color: #E53935;" + // Red background
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;" + // Slight rounding
+                                "-fx-cursor: hand;"
+                );
+                addOnMinus.setOnMouseEntered(e -> addOnMinus.setStyle(
+                        "-fx-background-color: #D32F2F;" + // Darker red on hover
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;"
+                ));
+                addOnMinus.setOnMouseExited(e -> addOnMinus.setStyle(
+                        "-fx-background-color: #E53935;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;"
+                ));
+
+                Label extraQtyLabel = new Label("x0");
+                extraQtyLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #666;"); // Bold and gray for visibility
+
                 Button addOnPlus = new Button("+");
-                addOnPlus.setPrefSize(25, 25);
-                addOnPlus.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2;");
+                addOnPlus.setPrefSize(30, 30);
+                addOnPlus.setStyle(
+                        "-fx-background-color: #E53935;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;" +
+                                "-fx-cursor: hand;"
+                );
+                addOnPlus.setOnMouseEntered(e -> addOnPlus.setStyle(
+                        "-fx-background-color: #D32F2F;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;"
+                ));
+                addOnPlus.setOnMouseExited(e -> addOnPlus.setStyle(
+                        "-fx-background-color: #E53935;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-background-radius: 4;"
+                ));
+
+                counterBox.getChildren().addAll(addOnMinus, extraQtyLabel, addOnPlus);
+
+                rightSide.getChildren().addAll(addOnPrice, counterBox);
+
+                // Add name, spacer, and right side to the block
+                addOnBlock.getChildren().addAll(addOnName, spacer, rightSide);
 
                 int[] count = {0};
                 counters.put(name, count);
                 qtyLabels.put(name, extraQtyLabel);
 
-                addOnItem.getChildren().addAll(addOnName, addOnPrice, addOnMinus, extraQtyLabel, addOnPlus);
+                addOnSection.getChildren().add(addOnBlock);
 
                 // Plus action
                 addOnPlus.setOnAction(e -> {
@@ -670,7 +744,7 @@ public class BaseMenu {
                     }
                     if (totalSelected < 5) {
                         count[0]++;
-                        extraQtyLabel.setText(" x" + count[0]);
+                        extraQtyLabel.setText("x" + count[0]);
                         // Update price (using array)
                         currentTotalPriceHolder[0] += price;
                         priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
@@ -681,18 +755,18 @@ public class BaseMenu {
                 addOnMinus.setOnAction(e -> {
                     if (count[0] > 0) {
                         count[0]--;
-                        extraQtyLabel.setText(" x" + count[0]);
+                        extraQtyLabel.setText("x" + count[0]);
                         // Update price (using array)
                         currentTotalPriceHolder[0] -= price;
                         priceLabel.setText("৳ " + String.format("%.2f", currentTotalPriceHolder[0]));
                     }
                 });
-
-                addOnSection.getChildren().add(addOnItem);
             }
 
             optionalLabel = new Label("Select up to 5 (optional)");
-            optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+            optionalLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999; -fx-padding: 0 0 0 4;");
+            optionalLabel.setAlignment(Pos.CENTER_LEFT);
+            addOnSection.getChildren().add(optionalLabel); // Add the optional label inside the section for better grouping
         }
 
 
@@ -783,7 +857,7 @@ public class BaseMenu {
         // Info VBox
         VBox infoVBox = new VBox(15);
         infoVBox.setPrefWidth(400);
-        infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, optionalLabel, quantityBox, addToCartDetail);
+        infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, quantityBox, addToCartDetail);
 
         center.getChildren().addAll(largeImgView, infoVBox);
         root.setCenter(scrollPane);
