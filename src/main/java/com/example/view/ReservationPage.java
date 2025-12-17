@@ -337,6 +337,7 @@ public class ReservationPage {
                 Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
+                    Session.getMenuClient().sendReservationUpdate();
                     if (saved) {
                         showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
                                 "Your table has been successfully reserved!\nWe look forward to serving you.");

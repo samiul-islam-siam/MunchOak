@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
@@ -19,6 +20,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.List;
 
 public class MessagePage {
     private final Stage primaryStage;
@@ -65,6 +67,8 @@ public class MessagePage {
                 -fx-padding: 10;
                 """);
 
+
+
         // Initial placeholder
         Label noMessageLabel = new Label("No messages yet. Send a message to start a conversation.");
         noMessageLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #666; -fx-alignment: center;");
@@ -78,6 +82,27 @@ public class MessagePage {
         chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         chatScroll.setStyle("-fx-background-color: transparent;");
+
+
+//        int userId = Session.getCurrentUserId();
+//
+//        chatArea.getChildren().clear();
+//
+//        List<FileStorage.MessageRecord> messages =
+//                FileStorage.loadMessagesForUser(userId);
+//
+//        if (messages.isEmpty()) {
+//            chatArea.getChildren().add(noMessageLabel);
+//        } else {
+//            for (FileStorage.MessageRecord m : messages) {
+//                addIncomingMessage(chatArea, m.message);
+//            }
+//        }
+        refreshMessages(chatArea, noMessageLabel);
+        Session.addMessageListener(() ->
+                Platform.runLater(() -> refreshMessages(chatArea, noMessageLabel))
+        );
+
 
         // INPUT SECTION (always shown)
         HBox inputBox = new HBox(10);
@@ -130,14 +155,14 @@ public class MessagePage {
 
                     // TODO: Save user message to FileStorage
 
-                    // Simulate support response after delay (incoming message only)
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(ev -> {
-                        String response = "Support: Thank you for your message. We'll get back to you shortly.";
-                        addIncomingMessage(chatArea, response);
-                        chatScroll.setVvalue(1.0); // Scroll to bottom
-                    });
-                    delay.play();
+//                    // Simulate support response after delay (incoming message only)
+//                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+//                    delay.setOnFinished(ev -> {
+//                        String response = "Support: Thank you for your message. We'll get back to you shortly.";
+//                        addIncomingMessage(chatArea, response);
+//                        chatScroll.setVvalue(1.0); // Scroll to bottom
+//                    });
+//                    delay.play();
                 }
 
             }
@@ -167,6 +192,7 @@ public class MessagePage {
     private void addIncomingMessage(VBox chatArea, String text) {
         Label msgLabel = new Label("Support: " + text);
         msgLabel.setWrapText(true);
+        msgLabel.setMaxWidth(420);
         msgLabel.setPadding(new Insets(10, 15, 10, 15));
         msgLabel.setStyle("""
                 -fx-background-color: #E3F2FD;
@@ -322,6 +348,23 @@ public class MessagePage {
 
         dashboard.getChildren().addAll(homeBtn, menuBtn, reservationBtn, profileBtn, messageBtn, aboutBtn);
         return dashboard;
+    }
+
+    private void refreshMessages(VBox chatArea, Label noMessageLabel) {
+        int userId = Session.getCurrentUserId();
+
+        chatArea.getChildren().clear();
+
+        List<FileStorage.MessageRecord> messages =
+                FileStorage.loadMessagesForUser(userId);
+
+        if (messages.isEmpty()) {
+            chatArea.getChildren().add(noMessageLabel);
+        } else {
+            for (FileStorage.MessageRecord m : messages) {
+                addIncomingMessage(chatArea, m.message);
+            }
+        }
     }
 
     private Button createDashboardButton(String text) {

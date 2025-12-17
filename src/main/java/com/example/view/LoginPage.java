@@ -6,12 +6,15 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.BaseMenu;
 import com.example.menu.MenuClient;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
+
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,39 +26,49 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
+
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
+import javafx.util.Duration;
 import java.util.Objects;
+
 public class LoginPage {
     private final Stage primaryStage;
+
     private VBox loginPane;
     private VBox registerPane;
     private VBox userLoginPane;
     private VBox adminLoginPane;
+
     private TextField usernameField;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField confirmField;
+
     private Label statusLabel;
     private Label registerStatusLabel;
     private Label registerStrengthLabel;
     private Label adminStatusLabel;
+
     private static final double NORMAL_WIDTH = 1000;
     private static final double NORMAL_HEIGHT = 700;
+
     private Scene loginScene; // Only one scene ever
     private BorderPane root; // Reusable root
     public BaseMenu menu; // current menu instance
+
     public LoginPage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
+
     public Scene getLoginScene() {
         if (loginScene == null) {
             // Use current stage size if already in full screen/maximized, else normal
             double initWidth = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getWidth(), NORMAL_WIDTH) : NORMAL_WIDTH;
             double initHeight = primaryStage.isFullScreen() || primaryStage.isMaximized() ? Math.max(primaryStage.getHeight(), NORMAL_HEIGHT) : NORMAL_HEIGHT;
+
             root = buildRoot(); // Build layout once
             loginScene = new Scene(root, initWidth, initHeight);
             try {
@@ -64,6 +77,7 @@ public class LoginPage {
                 System.err.println("Exception: " + npe.getMessage());
             }
             attachResizeListeners(); // Renamed and fixed to handle full screen too
+
             // ----------------- NEW: create / register MenuClient and attach menu -----------------
             try {
                 // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
@@ -96,17 +110,21 @@ public class LoginPage {
         }
         return loginScene;
     }
+
     private BorderPane buildRoot() {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #FFFFE0;");
+
         // --- Top Bar with Logo and Title (Centered, No Navigation) ---
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10));
         topBar.setAlignment(Pos.CENTER);
         topBar.setStyle("-fx-background-color: red;");
+
         // Logo and Title Section
         HBox titleSection = new HBox(10);
         titleSection.setAlignment(Pos.CENTER);
+
         // Load logo with updated path
         Image logoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/view/images/logo.png")));
         ImageView logo = new ImageView(logoImage);
@@ -115,11 +133,13 @@ public class LoginPage {
         Circle clip = new Circle(20, 20, 20);
         logo.setClip(clip);
         titleSection.getChildren().add(logo);
+
         Label title = new Label("MUNCHOAK");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
         titleSection.getChildren().add(title);
         topBar.getChildren().add(titleSection);
         root.setTop(topBar);
+
         // --- RIGHT PANE (Full Center) ---
         StackPane rightContainer = new StackPane();
         rightContainer.setAlignment(Pos.CENTER);
@@ -136,20 +156,24 @@ public class LoginPage {
         root.setCenter(rightContainer);
         return root;
     }
+
     private boolean isValidContact(String contact) {
         // Must be exactly 11 digits and start with 01 (Bangladeshi format)
         return contact.matches("01\\d{9}");
     }
+
     // ------------------ PANES --------------------
     private VBox createLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(40));
+
         // Subtitle at the top
         Label subtitle = new Label("Fresh flavors, just one login away.");
         subtitle.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Comic Sans MS', cursive;");
         subtitle.setAlignment(Pos.CENTER);
         subtitle.setOpacity(0.0);
+
         // Transition effect for subtitle
         FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), subtitle);
         fadeIn.setFromValue(0.0);
@@ -162,6 +186,7 @@ public class LoginPage {
         loginAsLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: black; -fx-font-weight: bold;");
         VBox buttonsVBox = new VBox(7);
         buttonsVBox.setAlignment(Pos.CENTER);
+
         //------Button Logics-------------------------------------//
         Button adminBtn = createLoginButton("ADMIN");
         adminBtn.setOnAction(e -> showAdminLoginForm());
@@ -177,6 +202,7 @@ public class LoginPage {
         pane.getChildren().addAll(subtitle, brandTitle, loginAsLabel, buttonsVBox);
         return pane;
     }
+
     private StackPane createStyledPasswordFieldWithEye(String prompt, PasswordField[] pfOut, TextField[] tfOut) {
         double fieldWidth = 280; // Whatever your fields use
         double fieldHeight = 45;
@@ -229,6 +255,7 @@ public class LoginPage {
         if (tfOut != null && tfOut.length > 0) tfOut[0] = textField;
         return fieldPane;
     }
+
     // ✅ Helper method inside LoginPage class
     private boolean isValidUsername(String username) {
         // Must contain at least one letter (uppercase or lowercase)
@@ -237,16 +264,19 @@ public class LoginPage {
         boolean minLength = username.length() >= 3;
         return hasLetter && minLength;
     }
+
     private boolean isValidEmail(String email) {
         // Basic email pattern: something@something.domain
         //return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
         return email.matches("^[A-Za-z0-9+_.-]+@gmail\\.com$");
     }
+
     private VBox createRegisterPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
         pane.setPadding(new Insets(30, 40, 30, 40));
         pane.setMaxWidth(300);
+
         Label title = new Label("Create Account");
         title.setStyle("-fx-font-size: 28px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
         usernameField = createStyledTextField("Username");
@@ -258,15 +288,7 @@ public class LoginPage {
         StackPane confirmFieldBox = createStyledPasswordFieldWithEye("Confirm Password", pf2, tf2);
         passwordField = pf1[0];
         confirmField = pf2[0];
-       /* Label passwordRulesLabel = new Label(
-                "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."
-        );
-        passwordRulesLabel.setStyle(
-                "-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';"
-        );
-        passwordRulesLabel.setWrapText(true);
-        passwordRulesLabel.setMaxWidth(280);
-        */
+
         Label passwordRulesLabel = new Label(
                 "Password must be at least 8 characters long\n" +
                         "and include uppercase, lowercase, numbers, and special characters."
@@ -275,6 +297,7 @@ public class LoginPage {
         passwordRulesLabel.setWrapText(true);
         passwordRulesLabel.setMaxWidth(280); // ✅ ensures wrapping
         passwordRulesLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevents vertical cutoff
+
         // Password strength label
         registerStrengthLabel = new Label("Password Strength: ");
         registerStrengthLabel.setStyle(
@@ -390,6 +413,7 @@ public class LoginPage {
         pane.getChildren().addAll(title, usernameField, emailField, contactField, passwordFieldBox, confirmFieldBox, passwordRulesLabel, registerStrengthLabel, registerStatusLabel, buttonBox, loginLink);
         return pane;
     }
+
     private void updateStrengthLabel(String strength) {
         // You can color and text per state, using switch statement (Java 17+ switch expression)
         if (passwordField.getText().isEmpty()) {
@@ -419,6 +443,7 @@ public class LoginPage {
             }
         }
     }
+
     private void showRegisterStatus(String message, boolean isError) {
         registerStatusLabel.setText(message);
         registerStatusLabel.setWrapText(true); // ✅ allow wrapping
@@ -430,6 +455,7 @@ public class LoginPage {
         pause.setOnFinished(ev -> registerStatusLabel.setText(""));
         pause.play();
     }
+
     private VBox createUserLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -493,6 +519,7 @@ public class LoginPage {
         pane.getChildren().addAll(title, usernameField, passwordFieldBox, statusLabel, btnBox);
         return pane;
     }
+
     private VBox createAdminLoginPane() {
         VBox pane = new VBox(15);
         pane.setAlignment(Pos.CENTER);
@@ -564,6 +591,7 @@ public class LoginPage {
         pane.getChildren().addAll(title, adminIDField, adminPasswordFieldBox, adminStatusLabel, btnBox);
         return pane;
     }
+
     private void showAdminStatus(String message, boolean isError) {
         adminStatusLabel.setText(message);
         adminStatusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 13px;" // error → white, ultra bold
@@ -574,6 +602,7 @@ public class LoginPage {
             pause.play();
         }
     }
+
     // showing register form
     private void showRegisterForm() {
         loginPane.setVisible(false);
@@ -583,6 +612,7 @@ public class LoginPage {
         fadeIn.setToValue(1.0);
         fadeIn.play();
     }
+
     private void showLoginForm() {
         FadeTransition fadeOut = new FadeTransition(Duration.millis(300), registerPane);
         fadeOut.setFromValue(1.0);
@@ -598,12 +628,15 @@ public class LoginPage {
         });
         fadeOut.play();
     }
+
     private void showUserLoginForm() {
         switchPane(loginPane, userLoginPane);
     }
+
     private void showAdminLoginForm() {
         switchPane(loginPane, adminLoginPane);
     }
+
     private void switchPane(VBox from, VBox to) {
         FadeTransition fadeOut = new FadeTransition(Duration.millis(300), from);
         fadeOut.setFromValue(1.0);
@@ -618,6 +651,7 @@ public class LoginPage {
         });
         fadeOut.play();
     }
+
     private void showUserForgotPasswordPopup(Stage parentStage) {
         Stage popup = new Stage();
         popup.initOwner(parentStage);
@@ -634,9 +668,11 @@ public class LoginPage {
         root.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         Label title = new Label("Reset Your Password");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+
         // Username field
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter your username");
+
         // Password fields
         PasswordField newPass = new PasswordField();
         newPass.setPromptText("New Password (min 8 chars)");
@@ -644,6 +680,7 @@ public class LoginPage {
         confirmPass.setPromptText("Confirm Password");
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: yellow; -fx-font-weight: bold;");
+
         // Buttons
         Button saveBtn = new Button("Save");
         Button backBtn = new Button("Back");
@@ -704,6 +741,7 @@ public class LoginPage {
         popup.setScene(scene);
         popup.showAndWait();
     }
+
     // Put these at the class level, not inside a method
     private boolean isValidPassword(String password) {
         if (password.length() < 8) return false;
@@ -713,6 +751,7 @@ public class LoginPage {
         boolean hasSpecial = password.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:'\",.<>/?".indexOf(ch) >= 0);
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
+
     private String getPasswordStrength(String password) {
         int score = 0;
         if (password.length() >= 8) score++;
@@ -727,11 +766,13 @@ public class LoginPage {
             default -> "Weak";
         };
     }
+
     private void autoClearStatus(Label status) {
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(ev -> status.setText(""));
         pause.play();
     }
+
     private void openForgotPasswordWindow(boolean isAdmin) {
         Stage popup = new Stage();
         popup.setTitle(isAdmin ? "Admin Password Reset" : "User Password Reset");
@@ -749,6 +790,7 @@ public class LoginPage {
         box.setBackground(new Background(
                 new BackgroundFill(gradient, new CornerRadii(16), Insets.EMPTY)
         ));
+
         // ---- Gradient Background END ----
         PasswordField newPass = new PasswordField();
         newPass.setPromptText("Enter new password");
@@ -812,15 +854,18 @@ public class LoginPage {
         }
         Scene scene = new Scene(box, 400, 280); // Slightly bigger for nice padding
         popup.setScene(scene);
+
         // --- Popup will always close with main window ---
         popup.initOwner(primaryStage);
         popup.initModality(Modality.WINDOW_MODAL);
+
         // This line ensures all popups close when main window closes:
         primaryStage.setOnCloseRequest(e ->
                 popup.close()
         );
         popup.showAndWait();
     }
+
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
         statusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: bolder; -fx-font-size: 13px;" // error → white, extra bold
@@ -829,6 +874,7 @@ public class LoginPage {
         pause.setOnFinished(e -> statusLabel.setText(""));
         pause.play();
     }
+
     private TextField createStyledTextField(String prompt) {
         TextField field = new TextField();
         field.setPromptText(prompt);
@@ -836,6 +882,7 @@ public class LoginPage {
         field.setPrefWidth(280);
         return field;
     }
+
     private PasswordField createStyledPasswordField(String prompt) {
         PasswordField field = new PasswordField();
         field.setPromptText(prompt);
@@ -843,19 +890,21 @@ public class LoginPage {
         field.setPrefWidth(280);
         return field;
     }
+
     private Button createLoginButton(String text) {
         Button btn = new Button(text);
         btn.getStyleClass().add("top-button");
         btn.setPrefWidth(110);
         btn.setStyle("-fx-text-fill: black; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 5;");
-        // btn.setOnAction(e -> System.out.println(text + " clicked"));
         return btn;
     }
+
     public void returnToHome() {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
         double currentWidth = primaryStage.getWidth();
         double currentHeight = primaryStage.getHeight();
+
         HomePage homePage = new HomePage(primaryStage);
         VBox fullPage = homePage.getFullPage();
         ScrollPane scrollPane = new ScrollPane(fullPage);
@@ -864,7 +913,8 @@ public class LoginPage {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
         Scene homeScene = new Scene(scrollPane, currentWidth, currentHeight);
-        // ✅ Reapply global stylesheet here
+
+        // Reapply global stylesheet here
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
             homeScene.getStylesheets().add(css.toExternalForm());
@@ -872,7 +922,9 @@ public class LoginPage {
         } else {
             System.out.println("❌ CSS not found! Check file path.");
         }
+
         primaryStage.setScene(homeScene);
+
         if (wasFullScreen) {
             primaryStage.setFullScreen(true);
         } else if (wasMaximized) {
@@ -881,8 +933,10 @@ public class LoginPage {
         primaryStage.setTitle("Home Page + Extension");
         primaryStage.show();
     }
-    // --- FIXED: Handle both full screen and maximized without manual resizing ---
+
+    // --- Handle both full screen and maximized without manual resizing ---
     private void attachResizeListeners() {
+
         // Full screen listener: No manual resize needed; just force layout refresh
         ChangeListener<Boolean> fullScreenListener = (obs, wasFull, isNowFull) -> {
             if (loginScene != null) {
@@ -890,6 +944,7 @@ public class LoginPage {
             }
         };
         primaryStage.fullScreenProperty().addListener(fullScreenListener);
+
         // Maximized listener: Same as above
         ChangeListener<Boolean> maximizedListener = (obs, wasMax, isNowMax) -> {
             if (loginScene != null) {
@@ -897,6 +952,7 @@ public class LoginPage {
             }
         };
         primaryStage.maximizedProperty().addListener(maximizedListener);
+
         // Scene attach listener: Trigger layout if scene is set while in special mode
         primaryStage.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene == loginScene && (primaryStage.isFullScreen() || primaryStage.isMaximized())) {

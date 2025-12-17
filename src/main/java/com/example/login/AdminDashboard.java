@@ -6,6 +6,9 @@ import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
+import com.example.view.AddCouponPopup;
+import com.example.view.EditCouponPopup;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,6 +33,7 @@ public class AdminDashboard {
     }
 
     private static HBox topBar;
+
     // Place this outside openAdminDashboard(), anywhere inside AdminDashboard class
     private static void showRequestPopup(String requestText) {
         Stage popup = new Stage();
@@ -88,10 +92,14 @@ public class AdminDashboard {
         Button changePassBtn = new Button("Change Password");
         Button profileBtn = new Button("Profile");
         Button reservationBtn = new Button("Reservation");   // ✅ NEW button
+        Button addCouponBtn = new Button("Add Coupon");
+        addCouponBtn.setOnAction(e -> AddCouponPopup.show(primaryStage));
+        Button editCouponBtn = new Button("Edit Coupon");
+        editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
         Button logoutBtn = new Button("Logout");
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn}) {
             btn.setStyle(
                     "-fx-background-color: #b30000;" +
                             "-fx-text-fill: white;" +
@@ -130,7 +138,7 @@ public class AdminDashboard {
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn
         );
         // --- Button Actions ---
         profileBtn.setOnAction(e -> {
@@ -140,8 +148,13 @@ public class AdminDashboard {
 
 
         reservationBtn.setOnAction(e -> {
+
             TableView<FileStorage.ReservationRecord> table = new TableView<>();
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+            Session.setReservationListener(() -> {
+                table.getItems().setAll(FileStorage.loadReservations());
+                table.refresh();
+            });
 
             TableColumn<FileStorage.ReservationRecord, String> usernameCol = new TableColumn<>("Username");
             usernameCol.setStyle("-fx-alignment: CENTER_LEFT;");
@@ -233,6 +246,39 @@ public class AdminDashboard {
                 private void handleDecision(String decision) {
                     FileStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
                     FileStorage.setReservationStatus(rec.resId, decision);
+                    String message;
+
+                    if ("Accepted".equals(decision)) {
+                        message =
+                                "Hello " + rec.username + ",\n\n" +
+                                        "Your reservation has been ACCEPTED successfully.\n\n" +
+                                        "Reservation Details:\n" +
+                                        "👥 Guests: " + rec.guests + "\n" +
+                                        "📅 Date: " + rec.date + "\n" +
+                                        "⏰ Time: " + rec.time + "\n\n" +
+                                        "Thank you for choosing us.\n" +
+                                        "We look forward to serving you.\n\n" +
+                                        "— MUNCH-OAK Team";
+                    } else {
+                        message =
+                                "Hello " + rec.username + ",\n\n" +
+                                        "We are sorry to inform you that your reservation has been REJECTED.\n\n" +
+                                        "Reservation Details:\n" +
+                                        "👥 Guests: " + rec.guests + "\n" +
+                                        "📅 Date: " + rec.date + "\n" +
+                                        "⏰ Time: " + rec.time + "\n\n" +
+                                        "Please try again with a different date or time.\n\n" +
+                                        "— MUNCH-OAK Team";
+                    }
+
+                    // 🔒 SAVE ONLY FOR THIS USER
+                    FileStorage.saveMessageForUser(
+                            rec.userId,
+                            "Admin",
+                            message
+                    );
+                    Session.getMenuClient().sendMessageUpdate();
+                    Session.getMenuClient().sendReservationUpdate();
                     getTableView().refresh();
 
                 }
@@ -263,7 +309,7 @@ public class AdminDashboard {
             });
 
             table.getColumns().addAll(
-                    usernameCol,userIdCol,nameCol, phoneCol, guestsCol, dateCol, timeCol, reqCol, statusCol, actionCol
+                    usernameCol, userIdCol, nameCol, phoneCol, guestsCol, dateCol, timeCol, reqCol, statusCol, actionCol
             );
 
             table.getItems().setAll(FileStorage.loadReservations());

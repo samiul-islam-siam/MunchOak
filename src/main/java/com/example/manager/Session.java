@@ -3,6 +3,8 @@ package com.example.manager;
 import com.example.menu.MenuClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Session {
 
@@ -10,18 +12,33 @@ public class Session {
     private static String currentUsername = "guest";
     private static String currentEmail = "guest@gmail.com";
     private static String currentPassword = "ai01*2#";
+    private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
 
-    // ===== NEW: Global menu socket client =====
     private static MenuClient menuClient;
+    private static Runnable reservationListener;
+    private static final List<Runnable> messageListeners = new ArrayList<>();
 
-    public static void initializeSocket() {
-        if (menuClient == null) {
-            menuClient = new MenuClient(); // connect to server
+
+    public static void setReservationListener(Runnable r) {
+        reservationListener = r;
+    }
+
+    public static void notifyReservationUpdated() {
+        if (reservationListener != null) {
+            reservationListener.run();
         }
     }
-    private static String currentContactNo = "N/A"; // default
 
+    public static void addMessageListener(Runnable r) {
+        messageListeners.add(r);
+    }
+
+    public static void notifyMessageUpdated() {
+        for (Runnable r : messageListeners) r.run();
+    }
+
+    // Contact No get-set pair
     public static String getCurrentContactNo() {
         return currentContactNo;
     }
@@ -30,30 +47,52 @@ public class Session {
         currentContactNo = contactNo;
     }
 
-    public static void setMenuClient(MenuClient client) {
-        menuClient = client;
-    }
-
-    public static MenuClient getMenuClient() {
-        return menuClient;
-    }
-
-    public static int getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public static String getCurrentUsername() {
-        return currentUsername;
-    }
-
+    // Email get-set pair
     public static String getCurrentEmail() {
         return currentEmail;
     }
 
+    public static void setCurrentEmail(String email) {
+        currentEmail = email;
+    }
+
+    // Menu client get-set pair
+    public static MenuClient getMenuClient() {
+        return menuClient;
+    }
+
+    public static void setMenuClient(MenuClient client) {
+        menuClient = client;
+    }
+
+    // User ID get-set pair
+    public static int getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public static void setCurrentUserId(int userId) {
+        currentUserId = userId;
+    }
+
+    // Username get-set pair
+    public static String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public static void setCurrentUsername(String username) {
+        currentUsername = username;
+    }
+
+    // Password get-set pair
     public static String getCurrentPassword() {
         return currentPassword;
     }
 
+    public static void setCurrentPassword(String password) {
+        currentPassword = password;
+    }
+
+    // --------------------LOGIN VALIDATION-----------------------------------
     public static boolean isAdmin() {
         return isAdmin;
     }
@@ -76,23 +115,16 @@ public class Session {
         currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
         currentEmail = "admin@munchoak.com"; // optional
         currentContactNo = "N/A";
-
-        currentPassword = AdminFileStorage.getAdminPassword(); // <-- new getter needed
+        currentPassword = AdminFileStorage.getAdminPassword();
         isAdmin = true; // set admin flag
-    }
-
-    public static void setCurrentUsername(String username) {
-        currentUsername = username;
     }
 
     public static void resetToGuest() {
         currentUsername = "guest";
         currentEmail = "guest@munchoak.com";
         currentContactNo = "00000000000";
-
         currentPassword = "guestPass#123";
-       // currentContactNo = "00000000000";
-
+        currentUserId = 2025000;
         isAdmin = false;
     }
 
