@@ -4,26 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Reservation update (Admin side)">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AddCouponPopup.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/EditCouponPopup.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/view/EditProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/GuestMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/GuestMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
-    </list>
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Reservation sync &amp; coupon edit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -167,15 +148,7 @@
       <workItem from="1765605724774" duration="620000" />
       <workItem from="1765633576402" duration="3058000" />
       <workItem from="1765809865717" duration="4944000" />
-      <workItem from="1765989686176" duration="3452000" />
-    </task>
-    <task id="LOCAL-00043" summary="updated chat server">
-      <option name="closed" value="true" />
-      <created>1762966246066</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1762966246066</updated>
+      <workItem from="1765989686176" duration="3976000" />
     </task>
     <task id="LOCAL-00044" summary="updated menu page">
       <option name="closed" value="true" />
@@ -561,14 +534,21 @@
       <option name="project" value="LOCAL" />
       <updated>1765635979292</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="Reservation sync &amp; coupon edit">
+      <option name="closed" value="true" />
+      <created>1765993508945</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1765993508945</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="bug fixes" />
     <MESSAGE value="new update" />
     <MESSAGE value="menu updated" />
     <MESSAGE value="login, logout fixed" />
@@ -593,7 +573,8 @@
     <MESSAGE value="Menu with Add-ons" />
     <MESSAGE value="Add on bug fixed" />
     <MESSAGE value="Reservation update (Admin side)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reservation update (Admin side)" />
+    <MESSAGE value="Reservation sync &amp; coupon edit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reservation sync &amp; coupon edit" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

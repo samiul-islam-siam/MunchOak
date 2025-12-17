@@ -4,6 +4,7 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -247,20 +248,33 @@ public class ReservationPage {
         // Set initial value to today
         datePicker.setValue(LocalDate.now());
 
+//         Listener to prevent past dates and update times
+//        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+//            LocalDate today = LocalDate.now();
+//            if (newVal != null && newVal.isBefore(today)) {
+//                datePicker.setValue(today);
+//            } else {
+//                updateTimeOptions(timeBox, datePicker);
+//            }
+//        });
+
         // Listener to prevent past dates and update times
         datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
             LocalDate today = LocalDate.now();
+
             if (newVal != null && newVal.isBefore(today)) {
                 datePicker.setValue(today);
-            } else {
-                updateTimeOptions(timeBox, datePicker.getValue());
+                return;
             }
+
+            updateTimeOptions(timeBox, datePicker);
         });
 
-        // Initial population of times
-        updateTimeOptions(timeBox, datePicker.getValue());
 
-// ROW CONTAINING GUESTS, DATE & TIME
+        // Initial population of times
+        updateTimeOptions(timeBox, datePicker);
+
+        // ROW CONTAINING GUESTS, DATE & TIME
         HBox topRow = new HBox(50,
                 guestsBox,
                 new HBox(5, dateLabel, datePicker),
@@ -319,7 +333,8 @@ public class ReservationPage {
                     showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
                     return;
                 }
-// ✅ Contact number validation
+
+                // Contact number validation
                 if (!phone.matches("^01\\d{9}$")) {
                     showAlert(Alert.AlertType.ERROR,
                             "Invalid Contact Number",
@@ -347,7 +362,7 @@ public class ReservationPage {
                         requestArea.clear();
                         guestSpinner.getValueFactory().setValue(1);
                         datePicker.setValue(LocalDate.now());
-                        updateTimeOptions(timeBox, LocalDate.now());
+                        updateTimeOptions(timeBox, datePicker);
                     } else {
                         showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
                     }
@@ -356,6 +371,7 @@ public class ReservationPage {
             }
 
         });
+
         // FINAL EXTENSION LAYOUT
         VBox inputBox = new VBox(20, personalBox, topRow, requestLabel, requestArea, bookButton);
         inputBox.setAlignment(Pos.CENTER);
@@ -398,33 +414,72 @@ public class ReservationPage {
         return scene;
     }
 
-    private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
+// This is previous version:
+//        private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
+//        timeBox.getItems().clear();
+//        if (selectedDate == null) {
+//            for (int hour = 10; hour <= 22; hour++) {
+//                timeBox.getItems().add(String.format("%02d:00", hour));
+//            }
+//            return;
+//        }
+//
+//        LocalDate today = LocalDate.now();
+//        LocalTime now = LocalTime.now();
+//        int startHour;
+//        if (selectedDate.isEqual(today)) {
+//            // For today, start from the next hour after current time
+//            startHour = now.getHour() + 1;
+//        } else {
+//            // For future dates, start from 10:00
+//            startHour = 10;
+//        }
+//
+//        for (int hour = Math.max(10, startHour); hour <= 22; hour++) {
+//            timeBox.getItems().add(String.format("%02d:00", hour));
+//        }
+//
+//        // Set default to first available if none selected
+//        if (timeBox.getValue() == null || !timeBox.getItems().contains(timeBox.getValue())) {
+//            timeBox.setValue(timeBox.getItems().isEmpty() ? null : timeBox.getItems().get(0));
+//        }
+//    }
+
+    private void updateTimeOptions(ComboBox<String> timeBox, DatePicker datePicker) {
         timeBox.getItems().clear();
-        if (selectedDate == null) {
-            for (int hour = 10; hour <= 22; hour++) {
-                timeBox.getItems().add(String.format("%02d:00", hour));
-            }
-            return;
-        }
+
+        LocalDate selectedDate = datePicker.getValue();
+        if (selectedDate == null) return;
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
-        int startHour;
-        if (selectedDate.isEqual(today)) {
-            // For today, start from the next hour after current time
-            startHour = now.getHour() + 1;
-        } else {
-            // For future dates, start from 10:00
-            startHour = 10;
+
+        // 🔴 If today selected but restaurant is closed
+        if (selectedDate.isEqual(today) && now.getHour() >= 22) {
+
+            LocalDate tomorrow = today.plusDays(1);
+
+            // ✅ Directly update DatePicker (safe & clean)
+            datePicker.setValue(tomorrow);
+
+            for (int hour = 10; hour <= 22; hour++) {
+                timeBox.getItems().add(String.format("%02d:00", hour));
+            }
+
+            timeBox.setValue("10:00");
+            return;
         }
+
+        int startHour = selectedDate.isEqual(today)
+                ? now.getHour() + 1
+                : 10;
 
         for (int hour = Math.max(10, startHour); hour <= 22; hour++) {
             timeBox.getItems().add(String.format("%02d:00", hour));
         }
 
-        // Set default to first available if none selected
-        if (timeBox.getValue() == null || !timeBox.getItems().contains(timeBox.getValue())) {
-            timeBox.setValue(timeBox.getItems().isEmpty() ? null : timeBox.getItems().get(0));
+        if (!timeBox.getItems().isEmpty()) {
+            timeBox.setValue(timeBox.getItems().get(0));
         }
     }
 
