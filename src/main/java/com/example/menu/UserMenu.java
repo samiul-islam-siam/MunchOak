@@ -67,25 +67,4 @@ public class UserMenu extends BaseMenu {
         System.out.println("User Menu Loaded");
         return node;
     }
-
-    // Override admin-only functions to disable them
-    @Override
-    protected void addCategory() {
-        System.out.println("User cannot manage categories.");
-    }
-
-    @Override
-    protected void addFoodItem() {
-        System.out.println("User cannot add food items.");
-    }
-
-    @Override
-    protected void deleteFoodItem(FoodItems food) {
-        System.out.println("User cannot delete food items.");
-    }
-
-    @Override
-    protected void updateFoodItem() {
-        System.out.println("User cannot update food items.");
-    }
 }

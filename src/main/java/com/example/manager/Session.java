@@ -26,9 +26,6 @@ public class Session {
         return currentContactNo;
     }
 
-    public static void setCurrentContactNo(String contactNo) {
-        currentContactNo = contactNo;
-    }
 
 
     public static void setMenuClient(MenuClient client) {
@@ -70,6 +67,13 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
         currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
+    }
+    public static void setCurrentEmail(String email) {
+        currentEmail = email;
+    }
+
+    public static void setCurrentContactNo(String contact) {
+        currentContactNo = contact;
     }
 
     public static void setAdminUser() throws IOException {

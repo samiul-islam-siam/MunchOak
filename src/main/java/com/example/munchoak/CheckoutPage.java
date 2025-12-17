@@ -1,5 +1,5 @@
 package com.example.munchoak;
-
+import com.example.munchoak.CartPage;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
@@ -20,6 +20,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
+import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
 import java.io.InputStream;
@@ -213,7 +215,10 @@ public class CheckoutPage {
         double taxAmount = 7.00; // Fixed from Cart
         double serviceFeeAmount = 1.50; // Fixed from Cart
         double deliveryAmount = 7.99; // Fixed from Cart
-        double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
+      //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
+        double discountAmount = subtotal * discount; // discount is percentage (e.g. 0.1 = 10%)
+        double discountedSubtotal = subtotal - discountAmount;
+        double totalPayable = discountedSubtotal + deliveryAmount + tip + serviceFeeAmount + taxAmount;
 
         // PAGE BACKGROUND
         BorderPane root = new BorderPane();
@@ -653,7 +658,7 @@ public class CheckoutPage {
             Label subtotalLabel = new Label("Subtotal: ৳" + String.format("%.2f", subtotal));
             subtotalLabel.setStyle("-fx-text-fill: black;");
 
-            Label discountLabel = new Label("Discount: -৳" + String.format("%.2f", discount));
+            Label discountLabel = new Label("Discount: -৳" + String.format("%.2f", discountAmount));
             discountLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
 
             Label deliveryLabel = new Label("Delivery: ৳" + String.format("%.2f", deliveryAmount));
@@ -688,7 +693,7 @@ public class CheckoutPage {
         cardLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
         TextField cardField = new TextField();
-        cardField.setPromptText("1234 5678 9012 3456");
+        cardField.setPromptText("Card Number (16 digits)");
         cardField.setStyle("-fx-background-radius: 6; -fx-padding: 10; -fx-background-color: #f5f5f5;");
 
         // Expiry and CVV
@@ -705,13 +710,18 @@ public class CheckoutPage {
         cvvLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
         TextField cvvField = new TextField();
-        cvvField.setPromptText("123");
+        cvvField.setPromptText("3 digits");
         cvvField.setPrefWidth(80);
         cvvField.setStyle("-fx-background-radius: 6; -fx-padding: 10; -fx-background-color: #f5f5f5;");
 
         VBox expiryCvvContainer = new VBox(5, expiryLabel, expiryField);
         VBox cvvContainer = new VBox(5, cvvLabel, cvvField);
         expiryCvv.getChildren().addAll(expiryCvvContainer, cvvContainer);
+
+
+        Label paymentStatus = new Label();
+        paymentStatus.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        paymentStatus.setAlignment(Pos.CENTER);
 
         // FIXED: Updated pay button to reference totalPayable in alert
         Button payBtn = new Button("PAY NOW (৳" + String.format("%.2f", totalPayable) + ")");
@@ -728,6 +738,54 @@ public class CheckoutPage {
                 alert.showAndWait();
                 return;
             }
+
+                String cardNumber = cardField.getText().trim();
+                String expiry = expiryField.getText().trim();
+                String cvv = cvvField.getText().trim();
+
+                // --- Card number validation ---
+                if (!cardNumber.matches("\\d{16}")) {
+                    paymentStatus.setText("Card number must be 16 digits!");
+                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(evt -> paymentStatus.setText(""));
+                    delay.play();
+                    return;
+                }
+
+                // --- Expiry validation (MM/YY) ---
+                if (!expiry.matches("(0[1-9]|1[0-2])/\\d{2}")) {
+                    paymentStatus.setText("Expiry must be in MM/YY format!");
+                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(evt -> paymentStatus.setText(""));
+                    delay.play();
+                    return;
+                } else {
+                    // check if expiry is in the future
+                    String[] parts = expiry.split("/");
+                    int month = Integer.parseInt(parts[0]);
+                    int year = Integer.parseInt(parts[1]) + 2000; // convert YY to YYYY
+                    java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
+                    if (!expDate.isAfter(java.time.YearMonth.now())) {
+                        paymentStatus.setText("Card has expired!");
+                        paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                        delay.setOnFinished(evt -> paymentStatus.setText(""));
+                        delay.play();
+                        return;
+                    }
+                }
+
+                // --- CVV validation ---
+                if (!cvv.matches("\\d{3}")) {
+                    paymentStatus.setText("CVV must be 3 digits!");
+                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(evt -> paymentStatus.setText(""));
+                    delay.play();
+                    return;
+                }
 
             try {
 
@@ -790,7 +848,7 @@ public class CheckoutPage {
         });
 
         // Add to payment box
-        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(), payBtn);
+        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(),paymentStatus, payBtn);
 
         rightColumn.getChildren().add(paymentBox);
 

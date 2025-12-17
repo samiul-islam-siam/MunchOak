@@ -5,7 +5,9 @@ import com.example.munchoak.FoodItems;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.net.Socket;
 
 import static java.nio.file.Files.readAllBytes;

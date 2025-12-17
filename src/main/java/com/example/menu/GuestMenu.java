@@ -69,24 +69,4 @@ public class GuestMenu extends BaseMenu {
         System.out.println("Guest Menu Loaded");
         return node;
     }
-
-    @Override
-    protected void addCategory() {
-        System.out.println("Guest cannot manage categories.");
-    }
-
-    @Override
-    protected void addFoodItem() {
-        System.out.println("Guest cannot add food items.");
-    }
-
-    @Override
-    protected void deleteFoodItem(FoodItems food) {
-        System.out.println("Guest cannot delete food items.");
-    }
-
-    @Override
-    protected void updateFoodItem() {
-        System.out.println("Guest cannot update food items.");
-    }
 }

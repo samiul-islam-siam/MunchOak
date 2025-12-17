@@ -1,21 +1,18 @@
 package com.example.login;
-import com.example.view.ProfilePage;
+import com.example.view.AddCouponPopup;
+import com.example.view.EditCouponPopup;
+
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TextField;
-
+import com.example.view.ProfilePage;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -94,9 +91,14 @@ public class AdminDashboard {
         Button profileBtn = new Button("Profile");
         Button reservationBtn = new Button("Reservation");   // ✅ NEW button
         Button logoutBtn = new Button("Logout");
+        Button addCouponBtn = new Button("Add Coupon");
+        addCouponBtn.setOnAction(e -> AddCouponPopup.show(primaryStage));
+
+        Button editCouponBtn = new Button("Edit Coupon");
+        editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn ,addCouponBtn, editCouponBtn, logoutBtn}) {
             btn.setStyle(
                     "-fx-background-color: #b30000;" +
                             "-fx-text-fill: white;" +
@@ -135,7 +137,7 @@ public class AdminDashboard {
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn,addCouponBtn, editCouponBtn, logoutBtn
         );
         // --- Button Actions ---
         profileBtn.setOnAction(e -> {

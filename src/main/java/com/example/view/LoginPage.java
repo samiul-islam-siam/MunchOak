@@ -26,7 +26,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.util.Objects;
