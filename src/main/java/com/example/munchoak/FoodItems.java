@@ -7,18 +7,29 @@ public class FoodItems {
     private final StringProperty name;
     private final StringProperty details;
     private final DoubleProperty price;
-    private final DoubleProperty ratings;
+    private final StringProperty cuisine;
     private final StringProperty imagePath;
     private final StringProperty category;
+    private final IntegerProperty quantity;
+    private final StringProperty addOne;
+    private final DoubleProperty addOnePrice;
+    private final StringProperty addTwo;
+    private final DoubleProperty addTwoPrice;
 
-    public FoodItems(int id, String name, String details, double price, double ratings, String imagePath, String category) {
+
+    public FoodItems(int id, String name, String details, double price, String cuisine, String imagePath, String category, int quantity, String addOne, double addOnePrice, String addTwo, double addTwoPrice) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.details = new SimpleStringProperty(details);
         this.price = new SimpleDoubleProperty(price);
-        this.ratings = new SimpleDoubleProperty(ratings);
+        this.cuisine = new SimpleStringProperty(cuisine);
         this.imagePath = new SimpleStringProperty(imagePath);
         this.category = new SimpleStringProperty(category);
+        this.quantity = new SimpleIntegerProperty(quantity);
+        this.addOne = new SimpleStringProperty(addOne);
+        this.addOnePrice = new SimpleDoubleProperty(addOnePrice);
+        this.addTwo = new SimpleStringProperty(addTwo);
+        this.addTwoPrice = new SimpleDoubleProperty(addTwoPrice);
     }
 
     // ----- ID -----
@@ -26,17 +37,9 @@ public class FoodItems {
         return id.get();
     }
 
-    public IntegerProperty idProperty() {
-        return id;
-    }
-
     // ----- Name -----
     public String getName() {
         return name.get();
-    }
-
-    public StringProperty nameProperty() {
-        return name;
     }
 
     public void setName(String name) {
@@ -48,10 +51,6 @@ public class FoodItems {
         return details.get();
     }
 
-    public StringProperty detailsProperty() {
-        return details;
-    }
-
     public void setDetails(String details) {
         this.details.set(details);
     }
@@ -61,34 +60,22 @@ public class FoodItems {
         return price.get();
     }
 
-    public DoubleProperty priceProperty() {
-        return price;
-    }
-
     public void setPrice(double price) {
         this.price.set(price);
     }
 
     // ----- Ratings -----
-    public double getRatings() {
-        return ratings.get();
+    public String getCuisine() {
+        return cuisine.get();
     }
 
-    public DoubleProperty ratingsProperty() {
-        return ratings;
-    }
-
-    public void setRatings(double ratings) {
-        this.ratings.set(ratings);
+    public void setCuisine(String cuisine) {
+        this.cuisine.set(cuisine);
     }
 
     // ----- Image Path -----
     public String getImagePath() {
         return imagePath.get();
-    }
-
-    public StringProperty imagePathProperty() {
-        return imagePath;
     }
 
     public void setImagePath(String imagePath) {
@@ -100,11 +87,42 @@ public class FoodItems {
         return category.get();
     }
 
-    public StringProperty categoryProperty() {
-        return category;
-    }
-
     public void setCategory(String category) {
         this.category.set(category);
+    }
+
+    public int getQuantity() {
+        return quantity.get();
+    }
+
+    public void setQuantity(int q) {
+        this.quantity.set(q);
+    }
+
+    public String getAddOne(){return addOne.get();}
+    public void setAddOne(String addOne)
+    {
+        this.addOne.set(addOne);
+    }
+    public double getAddOnePrice()
+    {
+        return addOnePrice.get();
+    }
+    public void setAddOnePrice(double addOnePrice)
+    {
+        this.addOnePrice.set(addOnePrice);
+    }
+    public String getAddTwo(){return addTwo.get();}
+    public void setAddTwo(String addTwo)
+    {
+        this.addTwo.set(addTwo);
+    }
+    public double getAddTwoPrice()
+    {
+        return addTwoPrice.get();
+    }
+    public void setAddTwoPrice(double addTwoPrice)
+    {
+        this.addTwoPrice.set(addTwoPrice);
     }
 }

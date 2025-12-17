@@ -1,186 +1,220 @@
 package com.example.view;
 
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class HomePageEighthExtension implements HomePageComponent {
+
     private final AnchorPane extensionRoot;
 
     public HomePageEighthExtension() {
-        extensionRoot = new AnchorPane();
-        extensionRoot.setPrefSize(getPrefWidth(), getPrefHeight());
-        extensionRoot.setMinSize(getPrefWidth(), getPrefHeight());
 
-        // --- SOLID BLACK BACKGROUND ---
+        extensionRoot = new AnchorPane();
         extensionRoot.setStyle("-fx-background-color: #000000;");
 
-        // -----------------------------------------------------------------
-        // 1. Three columns with content
-        // -----------------------------------------------------------------
-        VBox left   = createContactColumn();
-        VBox center = createAddressColumn();
-        VBox right  = createHoursColumn();
+        // MAIN RESPONSIVE CONTAINER
+        VBox container = new VBox();
+        container.setAlignment(Pos.CENTER);
+        container.setSpacing(30);
+        container.setPadding(new Insets(20));
+        container.maxWidthProperty().set(900); // stops left-right movement
+        container.setFillWidth(true);
 
-        HBox.setHgrow(left,   Priority.ALWAYS);
-        HBox.setHgrow(center, Priority.ALWAYS);
-        HBox.setHgrow(right,  Priority.ALWAYS);
+        AnchorPane.setTopAnchor(container, 0.0);
+        AnchorPane.setLeftAnchor(container, 0.0);
+        AnchorPane.setRightAnchor(container, 0.0);
+        AnchorPane.setBottomAnchor(container, 0.0);
 
-        // -----------------------------------------------------------------
-        // 2. Layout: HBox for columns
-        // -----------------------------------------------------------------
-        HBox columns = new HBox(left, center, right);
-        columns.setAlignment(Pos.CENTER);
-        AnchorPane.setTopAnchor(columns, 0.0);
-        AnchorPane.setBottomAnchor(columns, 100.0); // leave space for footer
-        AnchorPane.setLeftAnchor(columns, 0.0);
-        AnchorPane.setRightAnchor(columns, 0.0);
+        // Bind container spacing and padding to root width for responsiveness
+        container.spacingProperty().bind(Bindings.createDoubleBinding(() -> Math.max(15, extensionRoot.getWidth() * 0.03), extensionRoot.widthProperty()));
+        container.paddingProperty().bind(Bindings.createObjectBinding(() -> new Insets(extensionRoot.getWidth() * 0.02), extensionRoot.widthProperty()));
 
-        // -----------------------------------------------------------------
-        // 3. Responsive vertical white lines (shortened to 85%)
-        // -----------------------------------------------------------------
-        Line line1 = createVerticalLine();
-        Line line2 = createVerticalLine();
+        // ======================================================
+        // SECTION 1 — HEADINGS
+        // ======================================================
+        Label headline1 = new Label("Subscribe to MUNCHOAK Newsletter");
+        headline1.setTextFill(Color.WHITE);
+        headline1.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", FontWeight.BOLD, Math.max(18, extensionRoot.getWidth() / 35)),
+                extensionRoot.widthProperty()));
 
-        // Bind X positions to 1/3 and 2/3 of root width
-        line1.startXProperty().bind(extensionRoot.widthProperty().divide(3));
-        line1.endXProperty().bind(extensionRoot.widthProperty().divide(3));
-        line2.startXProperty().bind(extensionRoot.widthProperty().multiply(2.0 / 3.0));
-        line2.endXProperty().bind(extensionRoot.widthProperty().multiply(2.0 / 3.0));
+        Label headline2 = new Label("Get Updates on Our Latest Offers");
+        headline2.setTextFill(Color.web("#bb86fc")); // purple
+        headline2.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", FontWeight.BOLD, Math.max(18, extensionRoot.getWidth() / 35)),
+                extensionRoot.widthProperty()));
 
-        // Bind Y positions (10% to 85%) to leave space for footer
-        line1.startYProperty().bind(extensionRoot.heightProperty().multiply(0.1));
-        line1.endYProperty().bind(extensionRoot.heightProperty().multiply(0.85));
-        line2.startYProperty().bind(extensionRoot.heightProperty().multiply(0.1));
-        line2.endYProperty().bind(extensionRoot.heightProperty().multiply(0.85));
+        Label subText = new Label(
+                "Get 20% off on your first order at MUNCHOAK by subscribing to our newsletter."
+        );
+        subText.setTextFill(Color.web("#cccccc"));
+        subText.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", Math.max(12, extensionRoot.getWidth() / 60)),
+                extensionRoot.widthProperty()));
+        subText.setWrapText(true);
 
-        // -----------------------------------------------------------------
-        // 4. Footer: Text with side lines
-        // -----------------------------------------------------------------
-        Label munchoakLabel = new Label("Thank You For Visiting MUNCHOAK");
-        munchoakLabel.setTextFill(Color.WHITE);
-        munchoakLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-        munchoakLabel.setAlignment(Pos.CENTER);
+        VBox headingBox = new VBox(headline1, headline2, subText);
+        headingBox.setSpacing(8);
+        headingBox.setAlignment(Pos.CENTER);
+        headingBox.setFillWidth(true);
 
-        // Left line
-        Line leftLine = new Line();
-        leftLine.setStroke(Color.WHITE);
-        leftLine.setStrokeWidth(1.5);
+        // ======================================================
+        // SECTION 2 — EMAIL INPUT + SUBSCRIBE BUTTON
+        // ======================================================
+        TextField emailField = new TextField();
+        emailField.setPromptText("Enter Email Address");
+        emailField.prefWidthProperty().bind(Bindings.createDoubleBinding(() ->
+                Math.max(250, extensionRoot.getWidth() * 0.35), extensionRoot.widthProperty()));
+        emailField.setStyle(
+                "-fx-background-radius: 20; -fx-border-radius: 20;" +
+                        "-fx-font-size: 14px; -fx-prompt-text-fill: #888;" +
+                        "-fx-background-color: #111111; -fx-text-fill: white;" +
+                        "-fx-border-color: #444444; -fx-padding: 10;"
+        );
+        emailField.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", Math.max(12, extensionRoot.getWidth() / 60)),
+                extensionRoot.widthProperty()));
 
-        // Right line
-        Line rightLine = new Line();
-        rightLine.setStroke(Color.WHITE);
-        rightLine.setStrokeWidth(1.5);
+        Button subscribeBtn = new Button("Subscribe");
+        subscribeBtn.prefHeightProperty().bind(Bindings.createDoubleBinding(() ->
+                Math.max(35, extensionRoot.getWidth() / 25), extensionRoot.widthProperty()));
+        subscribeBtn.setStyle(
+                "-fx-background-color: #bb86fc; -fx-text-fill: black;" +
+                        "-fx-background-radius: 20; -fx-font-size: 14px;"
+        );
+        subscribeBtn.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", FontWeight.BOLD, Math.max(12, extensionRoot.getWidth() / 60)),
+                extensionRoot.widthProperty()));
 
-        // Bind line widths dynamically
-        leftLine.endXProperty().bind(Bindings.createDoubleBinding(() ->
-                        (extensionRoot.getWidth() - computeTextWidth(munchoakLabel) - 60) / 2,
-                extensionRoot.widthProperty(), munchoakLabel.widthProperty()));
-        rightLine.endXProperty().bind(Bindings.createDoubleBinding(() ->
-                        (extensionRoot.getWidth() - computeTextWidth(munchoakLabel) - 60) / 2,
-                extensionRoot.widthProperty(), munchoakLabel.widthProperty()));
+        HBox subscribeBox = new HBox(emailField, subscribeBtn);
+        subscribeBox.setSpacing(12);
+        subscribeBox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(emailField, Priority.ALWAYS);
 
-        // Layout: HBox to place left line, text, right line
-        HBox footerBox = new HBox(10, leftLine, munchoakLabel, rightLine);
-        footerBox.setAlignment(Pos.CENTER);
+        // ======================================================
+        // SECTION 3 — SOCIAL MEDIA ICONS (NO IMAGES)
+        // ======================================================
+        Label fb = createIcon("\uD83D\uDC99");  // 💙 (Facebook-themed)
+        Label ig = createIcon("\uD83D\uDCF7");  // 📷 (Instagram camera)
+        Label tw = createIcon("\uD83D\uDD4A");  // 🕊 (Twitter bird)
+        Label yt = createIcon("\u25B6");        // ▶ (YouTube play)
 
-        // Anchor at bottom with spacing (moved farther down)
-        AnchorPane.setBottomAnchor(footerBox, 10.0);
-        AnchorPane.setLeftAnchor(footerBox, 0.0);
-        AnchorPane.setRightAnchor(footerBox, 0.0);
+        HBox socialBar = new HBox(fb, ig, tw, yt);
+        socialBar.setSpacing(20);
+        socialBar.setAlignment(Pos.CENTER);
 
-        // -----------------------------------------------------------------
-        // 5. Add all to root
-        // -----------------------------------------------------------------
-        extensionRoot.getChildren().addAll(columns, line1, line2, footerBox);
+        // ======================================================
+        // SECTION 4 — FOOTER COLUMNS
+        // ======================================================
+        VBox col1 = buildColumn("MUNCHOAK",
+                "Premium Restaurant Experience.",
+                "Fresh | Fast | Delicious"
+        );
 
-        initialize();
+        VBox col2 = buildColumn("Company",
+                "About Us", "Menu", "Contact Us", "Career"
+        );
+
+        VBox col3 = buildColumn("Customer Service",
+                "My Orders", "Track Order", "Return Policy", "FAQ"
+        );
+
+        VBox col4 = buildColumn("Contact Info",
+                "+0123-456-789",
+                "info@munchoak.com",
+                "8502 Oak Rd.\nMunchwood, Dhaka 98380"
+        );
+
+        HBox footerColumns = new HBox(col1, col2, col3, col4);
+        footerColumns.setSpacing(50);
+        footerColumns.setAlignment(Pos.TOP_CENTER);
+        footerColumns.setFillHeight(false);
+
+        // Make columns responsive
+        for (VBox col : new VBox[]{col1, col2, col3, col4}) {
+            HBox.setHgrow(col, Priority.ALWAYS);
+            col.minWidthProperty().bind(Bindings.createDoubleBinding(() -> Math.max(120, footerColumns.getWidth() / 4 - 50), footerColumns.widthProperty()));
+        }
+
+        // ======================================================
+        // ADD EVERYTHING TO MAIN CONTAINER
+        // ======================================================
+        container.getChildren().addAll(
+                headingBox,
+                subscribeBox,
+                socialBar,
+                footerColumns
+        );
+
+        extensionRoot.getChildren().add(container);
     }
 
-    // Helper: Measure text width
-    private double computeTextWidth(Label label) {
-        javafx.scene.text.Text text = new javafx.scene.text.Text(label.getText());
-        text.setFont(label.getFont());
-        return text.getLayoutBounds().getWidth();
+    // ===== Social Media Icon Builder (Unicode) =====
+    private Label createIcon(String symbol) {
+        Label icon = new Label(symbol);
+        icon.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", Math.max(16, extensionRoot.getWidth() / 45)),
+                extensionRoot.widthProperty()));
+        icon.setStyle(
+                "-fx-text-fill: #bb86fc;"
+        );
+
+        icon.setOnMouseEntered(e ->
+                icon.setStyle("-fx-text-fill: #ffffff;")
+        );
+        icon.setOnMouseExited(e ->
+                icon.setStyle("-fx-text-fill: #bb86fc;")
+        );
+
+        return icon;
     }
 
-    private VBox createContactColumn() {
-        Label title = new Label("Contact Us");
-        title.setTextFill(Color.WHITE);
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    // ===== Footer Column Builder =====
+    private VBox buildColumn(String title, String... items) {
 
-        Label phone = new Label("T. +12 344 0567899");
-        phone.setTextFill(Color.WHITE);
-        phone.setStyle("-fx-font-size: 18px;");
+        Label titleLabel = new Label(title);
+        titleLabel.setTextFill(Color.WHITE);
+        titleLabel.fontProperty().bind(Bindings.createObjectBinding(() ->
+                        Font.font("Arial", FontWeight.BOLD, Math.max(14, extensionRoot.getWidth() / 50)),
+                extensionRoot.widthProperty()));
 
-        Label email = new Label("M. fidalgo@example.com");
-        email.setTextFill(Color.WHITE);
-        email.setStyle("-fx-font-size: 18px;");
+        VBox box = new VBox();
+        box.setSpacing(8);
+        box.getChildren().add(titleLabel);
 
-        VBox box = new VBox(8, title, phone, email);
-        box.setAlignment(Pos.CENTER); // center all vertically in column
+        for (String text : items) {
+            Label l = new Label(text);
+            l.setTextFill(Color.web("#bbbbbb"));
+            l.fontProperty().bind(Bindings.createObjectBinding(() ->
+                            Font.font("Arial", Math.max(11, extensionRoot.getWidth() / 70)),
+                    extensionRoot.widthProperty()));
+            l.setWrapText(true);
+            box.getChildren().add(l);
+        }
+
+        box.setAlignment(Pos.TOP_LEFT);
+        box.setFillWidth(true);
         return box;
-    }
-
-    private VBox createAddressColumn() {
-        Label title = new Label("Address");
-        title.setTextFill(Color.WHITE);
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        Label line1 = new Label("Piazza Della Signoria, 12");
-        line1.setTextFill(Color.WHITE);
-        line1.setStyle("-fx-font-size: 18px;");
-
-        Label line2 = new Label("21562 . Firenze . Italy");
-        line2.setTextFill(Color.WHITE);
-        line2.setStyle("-fx-font-size: 18px;");
-
-        VBox box = new VBox(8, title, line1, line2);
-        box.setAlignment(Pos.CENTER); // center all vertically in column
-        return box;
-    }
-
-    private VBox createHoursColumn() {
-        Label title = new Label("Opening Hours");
-        title.setTextFill(Color.WHITE);
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        Label line1 = new Label("Everyday : From 12.30 To 23.00");
-        line1.setTextFill(Color.WHITE);
-        line1.setStyle("-fx-font-size: 18px;");
-
-        Label line2 = new Label("Kitchen Closes At 22.00");
-        line2.setTextFill(Color.WHITE);
-        line2.setStyle("-fx-font-size: 18px;");
-
-        VBox box = new VBox(8, title, line1, line2);
-        box.setAlignment(Pos.CENTER); // center all vertically in column
-        return box;
-    }
-
-    private Line createVerticalLine() {
-        Line line = new Line();
-        line.setStroke(Color.WHITE);
-        line.setStrokeWidth(2);
-        return line;
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public double getPrefHeight() {
-        return 450;
+        return 350;
     }
 
     @Override
     public double getPrefWidth() {
-        return 1000;
+        return 900;
     }
 
     @Override

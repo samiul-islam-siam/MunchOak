@@ -12,40 +12,38 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class Home extends Application {
-
     private Stage primaryStage;
-    private Scene mainScene;
 
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-        mainScene = createMainScene(); // load homepage scene
+        Scene mainScene = createMainScene(); // load homepage scene
         stage.setScene(mainScene);
-        stage.setTitle("Home Page + Extension");
+        stage.setTitle("Home Page");
 
-        // FIXED: Load GLOBAL stylesheet - applies to ALL scenes (Home, Login, Reservation, etc.)
-        // This ensures buttons keep custom styles after navigating back from Login "X" close
+        // Load global stylesheet
         var css = getClass().getResource("/com/example/view/styles/style.css");
         if (css != null) {
-            setUserAgentStylesheet(css.toExternalForm()); // Key: App-wide CSS!
-            System.out.println("✅ Global CSS loaded for all scenes: " + css.toExternalForm());
+            mainScene.getStylesheets().add(css.toExternalForm());
+            System.out.println("CSS loaded successfully: " + css);
         } else {
-            System.err.println("❌ CSS not found! Check file path: /com/example/view/styles/style.css");
+            System.out.println("CSS not found! Check file path.");
         }
-
         stage.show();
     }
 
     private Scene createMainScene() {
         HomePage home = new HomePage(primaryStage);
         VBox fullPage = home.getFullPage();
+
         // --- ScrollPane with smoother scroll ---
         ScrollPane scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setStyle("-fx-background-color: transparent;");
-        // 🔹 Smooth scroll effect (gradual movement)
+
+        // --- Smooth scroll effect (gradual movement) ---
         scrollPane.setOnScroll(e -> {
             double deltaY = e.getDeltaY() * 0.002; // scroll speed factor
             double targetV = scrollPane.getVvalue() - deltaY;
@@ -57,15 +55,11 @@ public class Home extends Application {
             );
             smoothScroll.play();
         });
-        return new Scene(scrollPane, 1000, 700);
-        // REMOVED: No need for per-scene CSS add - global handles it!
-    }
-
-    public Scene getMainScene() {
-        return mainScene;
+        return new Scene(scrollPane, 1000, 700); // Scene area
     }
 
     public static void main(String[] args) {
+        FileStorage.init();
         FileStorage.ensureDefaultGuestUser();
         launch();
     }

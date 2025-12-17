@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,13 +10,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -25,6 +22,7 @@ public class HomePageSixthExtension implements HomePageComponent {
     private final ImageView rightImageView;
     private final VBox middleMenu;
     private final Button enterMenuBtn;
+    private final String originalStyle;
 
     private static final double PREF_WIDTH = 1000;
     private static final double PREF_HEIGHT = 700;
@@ -41,27 +39,36 @@ public class HomePageSixthExtension implements HomePageComponent {
         extensionRoot.setMinSize(PREF_WIDTH, PREF_HEIGHT);
 
         // --- RADIAL GRADIENT BACKGROUND (UPSIDE DOWN: DARK CENTER, LIGHT EDGES) ---
-        RadialGradient gradient = new RadialGradient(
-                0, 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#004aad")),
-                new Stop(1.0, Color.web("#5de0e6"))
-        );
-        extensionRoot.setBackground(new Background(new BackgroundFill(
-                gradient, CornerRadii.EMPTY, Insets.EMPTY
-        )));
+        extensionRoot.setBackground(new Background(new BackgroundFill(Color.LIGHTYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // --- LEFT & RIGHT IMAGES ---
         Image leftImg = new Image(getClass().getResource("/com/example/view/images/left_dish2.png").toExternalForm());
         Image rightImg = new Image(getClass().getResource("/com/example/view/images/right_dish2.png").toExternalForm());
-        leftImageView = createFramedImage(leftImg);
-        rightImageView = createFramedImage(rightImg);
+        leftImageView = createImageView(leftImg);
+        rightImageView = createImageView(rightImg);
 
         // --- MIDDLE MENU: TOP-ALIGNED ---
         middleMenu = createMenuSection();
 
         // --- ENTER MENU BUTTON ---
         enterMenuBtn = new Button("ENTER MENU");
-        enterMenuBtn.getStyleClass().add("top-button");
+        originalStyle = "-fx-background-color: transparent; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 2; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.6), 20, 0, 0, 0);";
+        enterMenuBtn.setStyle(originalStyle);
+
+        // Add hover effects
+        enterMenuBtn.setOnMouseEntered((MouseEvent e) -> {
+            enterMenuBtn.setScaleX(1.05);
+            enterMenuBtn.setScaleY(1.05);
+            enterMenuBtn.setStyle(originalStyle.replace("rgba(255,255,255,0.6)", "rgba(255,255,255,0.8)") + " -fx-background-color: rgba(255,255,255,0.1);");
+        });
+        enterMenuBtn.setOnMouseExited((MouseEvent e) -> {
+            enterMenuBtn.setScaleX(1.0);
+            enterMenuBtn.setScaleY(1.0);
+            enterMenuBtn.setStyle(originalStyle);
+        });
+
+        // Button click action: Navigate to MenuPage
+        enterMenuBtn.setOnAction(e -> navigateToMenu(primaryStage));
 
         StackPane buttonContainer = new StackPane(enterMenuBtn);
         buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
@@ -80,18 +87,26 @@ public class HomePageSixthExtension implements HomePageComponent {
         initialize();
     }
 
-    // --- Create framed image ---
-    private ImageView createFramedImage(Image image) {
+    // --- Navigate to MenuPage ---
+    private void navigateToMenu(Stage stage) {
+        MenuPage menuPage = new MenuPage(stage);
+        stage.setScene(menuPage.getMenuScene());
+        stage.setTitle("MunchOak - Menu");
+    }
+
+    // --- Create image view without frame ---
+    private ImageView createImageView(Image image) {
         ImageView iv = new ImageView(image);
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
-        StackPane frame = new StackPane(iv);
-        frame.setStyle("-fx-background-color: white; -fx-border-color: white; -fx-border-width: 6; -fx-border-radius: 12; -fx-background-radius: 12;");
+
+        // Softer, more modern drop shadow
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.rgb(0, 0, 0, 0.4));
         shadow.setRadius(18);
         shadow.setOffsetY(10);
-        frame.setEffect(shadow);
+        iv.setEffect(shadow);
+
         return iv;
     }
 
@@ -101,30 +116,28 @@ public class HomePageSixthExtension implements HomePageComponent {
         menuBox.setAlignment(Pos.TOP_LEFT);
 
         Label appTitle = new Label("Appetizers");
-        appTitle.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
-        appTitle.setTextFill(Color.WHITE);
+        appTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox appItems = new VBox(2);
         appItems.setAlignment(Pos.CENTER_LEFT);
         appItems.getChildren().addAll(
-                createMenuItem("Samosa", "$2"),
-                createMenuItem("Fries", "$2.5"),
-                createMenuItem("Spring Rolls", "$2.8"),
-                createMenuItem("Garlic Bread", "$2.2"),
-                createMenuItem("Onion Rings", "$2.5")
+                createMenuItem("Samosa", "৳20"),
+                createMenuItem("Fries", "৳25"),
+                createMenuItem("Spring Rolls", "৳40"),
+                createMenuItem("Garlic Bread", "৳220"),
+                createMenuItem("Onion Rings", "৳120")
         );
 
         Label soupTitle = new Label("Soup");
-        soupTitle.setFont(Font.font("Georgia", FontWeight.BOLD, 18));
-        soupTitle.setTextFill(Color.WHITE);
+        soupTitle.setStyle("-fx-font-family: 'Georgia'; -fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: black;");
 
         VBox soupItems = new VBox(2);
         soupItems.setAlignment(Pos.CENTER_LEFT);
         soupItems.getChildren().addAll(
-                createMenuItem("Mushroom Soup", "$5"),
-                createMenuItem("Hot Soup", "$3.5"),
-                createMenuItem("Clam Chowder", "$6.5"),
-                createMenuItem("Miso Soup", "$3")
+                createMenuItem("Mushroom Soup", "৳499"),
+                createMenuItem("Hot Soup", "৳350"),
+                createMenuItem("Clam Chowder", "৳650"),
+                createMenuItem("Miso Soup", "৳300")
         );
 
         menuBox.getChildren().addAll(appTitle, appItems, soupTitle, soupItems);
@@ -134,12 +147,10 @@ public class HomePageSixthExtension implements HomePageComponent {
     // --- Create menu item ---
     private HBox createMenuItem(String name, String price) {
         Label nameLabel = new Label(name);
-        nameLabel.setFont(Font.font("Arial", 16));
-        nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-text-fill: black;");
 
         Label priceLabel = new Label(price);
-        priceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        priceLabel.setTextFill(Color.web("#ffdd00"));
+        priceLabel.setStyle("-fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #ffdd00;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -164,6 +175,7 @@ public class HomePageSixthExtension implements HomePageComponent {
             imageWidth = imageHeight / ASPECT_RATIO;
         }
 
+        // --- IMAGE SIZES ---
         leftImageView.setFitWidth(imageWidth);
         leftImageView.setFitHeight(imageHeight);
         rightImageView.setFitWidth(imageWidth);
