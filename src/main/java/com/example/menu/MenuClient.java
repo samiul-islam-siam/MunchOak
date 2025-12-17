@@ -35,7 +35,7 @@ public class MenuClient {
     private void init() {
         try {
 
-            socket = new Socket(MenuServer.getServerIP(), 8080);
+            socket = new Socket(ServerConfig.SERVER_IP, ServerConfig.MENU_PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 

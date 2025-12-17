@@ -48,7 +48,7 @@ public class MenuServer {
                 setServerIP(args[0]);
             }
 
-            ServerSocket server = new ServerSocket(PORT, 50, InetAddress.getByName(serverIP));
+            ServerSocket server = new ServerSocket(PORT, 50, InetAddress.getByName("0.0.0.0"));
             System.out.println("Menu Server running on port " + PORT);
 
             while (true) {
