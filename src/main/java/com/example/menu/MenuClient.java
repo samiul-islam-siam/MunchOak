@@ -153,6 +153,25 @@ public class MenuClient {
 
                         Platform.runLater(() -> Session.notifyReservationUpdated());
                     }
+                    case "UPDATE_MESSAGES" -> {
+
+                        String filename = in.readUTF();
+                        int size = in.readInt();
+
+                        byte[] data = new byte[size];
+                        in.readFully(data);
+
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
+
+                        File f = new File(dir, filename);
+                        write(f.toPath(), data);
+
+                        System.out.println("Messages synced from server.");
+
+                        Platform.runLater(() -> Session.notifyMessageUpdated());
+                    }
+
 
 
                 }
@@ -179,6 +198,26 @@ public class MenuClient {
 
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    public synchronized void sendMessageUpdate() {
+        try {
+            File msgFile =
+                    new File("src/main/resources/com/example/manager/data/messages.dat");
+
+            if (!msgFile.exists()) return;
+
+            byte[] data = readAllBytes(msgFile.toPath());
+
+            out.writeUTF("UPDATE_MESSAGES");
+            out.writeUTF(msgFile.getName());
+            out.writeInt(data.length);
+            out.write(data);
+            out.flush();
+
+        } catch (Exception e) {
+            System.err.println("Message sync error: " + e.getMessage());
         }
     }
 

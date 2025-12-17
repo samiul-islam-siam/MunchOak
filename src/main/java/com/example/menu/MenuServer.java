@@ -28,6 +28,9 @@ public class MenuServer {
     private static byte[] latestReservationFile = null;
     private static byte[] latestReservationStatusFile = null;
     private static String latestReservationStatusName = "reservation_status.dat";
+    private static byte[] latestMessageFile = null;
+    private static String latestMessageFileName = "messages.dat";
+
 
 
 
@@ -100,6 +103,15 @@ public class MenuServer {
                     cw.out.write(latestReservationStatusFile);
                 });
             }
+            if (latestMessageFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_MESSAGES");
+                    cw.out.writeUTF(latestMessageFileName);
+                    cw.out.writeInt(latestMessageFile.length);
+                    cw.out.write(latestMessageFile);
+                });
+            }
+
 
 
 
@@ -232,6 +244,26 @@ public class MenuServer {
                     latestReservationStatusName = filename;
                     broadcastReservationStatus(filename, data);
                 }
+                else if (cmd.equals("UPDATE_MESSAGES")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+
+                    write(new File(dir, filename).toPath(), data);
+
+                    // ✅ cache for late joiners
+                    latestMessageFile = data;
+                    latestMessageFileName = filename;
+
+                    broadcastMessages(filename, data);
+                }
+
 
 
             }
@@ -273,6 +305,16 @@ public class MenuServer {
         for (ClientWrapper cw : clients) {
             sendSafe(cw, () -> {
                 cw.out.writeUTF("UPDATE_RESERVATIONS");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+    private static void broadcastMessages(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_MESSAGES");
                 cw.out.writeUTF(filename);
                 cw.out.writeInt(data.length);
                 cw.out.write(data);

@@ -3,6 +3,8 @@ package com.example.manager;
 import com.example.menu.MenuClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Session {
 
@@ -80,6 +82,7 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
         currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
+
     }
 
     public static void setAdminUser() throws IOException {
@@ -102,6 +105,7 @@ public class Session {
         currentContactNo = "00000000000";
 
         currentPassword = "guestPass#123";
+        currentUserId = 2025000;
        // currentContactNo = "00000000000";
 
         isAdmin = false;
@@ -110,4 +114,14 @@ public class Session {
     public static void logout() {
         resetToGuest();
     }
+    private static final List<Runnable> messageListeners = new ArrayList<>();
+
+    public static void addMessageListener(Runnable r) {
+        messageListeners.add(r);
+    }
+
+    public static void notifyMessageUpdated() {
+        for (Runnable r : messageListeners) r.run();
+    }
+
 }

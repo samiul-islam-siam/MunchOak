@@ -238,6 +238,38 @@ public class AdminDashboard {
                 private void handleDecision(String decision) {
                     FileStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
                     FileStorage.setReservationStatus(rec.resId, decision);
+                    String message;
+
+                    if ("Accepted".equals(decision)) {
+                        message =
+                                "Hello " + rec.username + ",\n\n" +
+                                        "Your reservation has been ACCEPTED successfully.\n\n" +
+                                        "Reservation Details:\n" +
+                                        "👥 Guests: " + rec.guests + "\n" +
+                                        "📅 Date: " + rec.date + "\n" +
+                                        "⏰ Time: " + rec.time + "\n\n" +
+                                        "Thank you for choosing us.\n" +
+                                        "We look forward to serving you.\n\n" +
+                                        "— MUNCH-OAK Team";
+                    } else {
+                        message =
+                                "Hello " + rec.username + ",\n\n" +
+                                        "We are sorry to inform you that your reservation has been REJECTED.\n\n" +
+                                        "Reservation Details:\n" +
+                                        "👥 Guests: " + rec.guests + "\n" +
+                                        "📅 Date: " + rec.date + "\n" +
+                                        "⏰ Time: " + rec.time + "\n\n" +
+                                        "Please try again with a different date or time.\n\n" +
+                                        "— MUNCH-OAK Team";
+                    }
+
+                    // 🔒 SAVE ONLY FOR THIS USER
+                    FileStorage.saveMessageForUser(
+                            rec.userId,
+                            "Admin",
+                            message
+                    );
+                    Session.getMenuClient().sendMessageUpdate();
                     Session.getMenuClient().sendReservationUpdate();
                     getTableView().refresh();
 

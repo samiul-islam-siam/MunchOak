@@ -4,16 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Reservation update (Admin side)">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Reservation Synced">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservations.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +31,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Database" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -86,11 +86,11 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/menu&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/munchoak&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -106,11 +106,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager\data" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\login" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example" />
@@ -125,11 +125,11 @@
       <recent name="com.example.munchoak" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.munchoak" />
+      <recent name="com.example.menu" />
       <recent name="com.example.view" />
       <recent name="com.example.manager" />
       <recent name="com.example.login" />
-      <recent name="com.example.munchoak" />
-      <recent name="com.example.menu" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -149,17 +149,31 @@
       <updated>1759067535159</updated>
       <workItem from="1765266365981" duration="2413000" />
       <workItem from="1765339976997" duration="424000" />
-      <workItem from="1765424657661" duration="6073000" />
-      <workItem from="1765438205287" duration="924000" />
-      <workItem from="1765445475413" duration="2531000" />
-      <workItem from="1765469418200" duration="2518000" />
-      <workItem from="1765509016223" duration="7569000" />
-      <workItem from="1765555250670" duration="2048000" />
-      <workItem from="1765605724774" duration="620000" />
-      <workItem from="1765633576402" duration="3058000" />
-      <workItem from="1765809865717" duration="4944000" />
-      <workItem from="1765895299290" duration="1049000" />
-      <workItem from="1765949202735" duration="7114000" />
+      <workItem from="1765424657661" duration="3514000" />
+      <workItem from="1765440968948" duration="28000" />
+      <workItem from="1765444436242" duration="1993000" />
+      <workItem from="1765502147893" duration="5462000" />
+      <workItem from="1765508546363" duration="7705000" />
+      <workItem from="1765522054913" duration="355000" />
+      <workItem from="1765525814460" duration="571000" />
+      <workItem from="1765528176375" duration="306000" />
+      <workItem from="1765958662886" duration="4551000" />
+    </task>
+    <task id="LOCAL-00041" summary="several changes">
+      <option name="closed" value="true" />
+      <created>1762954293748</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1762954293748</updated>
+    </task>
+    <task id="LOCAL-00042" summary="updated chat server">
+      <option name="closed" value="true" />
+      <created>1762966193207</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1762966193207</updated>
     </task>
     <task id="LOCAL-00043" summary="updated chat server">
       <option name="closed" value="true" />
@@ -513,53 +527,39 @@
       <option name="project" value="LOCAL" />
       <updated>1765080196138</updated>
     </task>
-    <task id="LOCAL-00087" summary="Run by one click">
+    <task id="LOCAL-00087" summary="Add ons">
       <option name="closed" value="true" />
-      <created>1765428256379</created>
+      <created>1765508663049</created>
       <option name="number" value="00087" />
       <option name="presentableId" value="LOCAL-00087" />
       <option name="project" value="LOCAL" />
-      <updated>1765428256379</updated>
+      <updated>1765508663049</updated>
     </task>
-    <task id="LOCAL-00088" summary="compressed images">
+    <task id="LOCAL-00088" summary="Bug fixed Add ons">
       <option name="closed" value="true" />
-      <created>1765472218770</created>
+      <created>1765522280769</created>
       <option name="number" value="00088" />
       <option name="presentableId" value="LOCAL-00088" />
       <option name="project" value="LOCAL" />
-      <updated>1765472218770</updated>
+      <updated>1765522280769</updated>
     </task>
-    <task id="LOCAL-00089" summary="Menu with Add-ons">
+    <task id="LOCAL-00089" summary="Reservation Synced">
       <option name="closed" value="true" />
-      <created>1765516318575</created>
+      <created>1765956425878</created>
       <option name="number" value="00089" />
       <option name="presentableId" value="LOCAL-00089" />
       <option name="project" value="LOCAL" />
-      <updated>1765516318575</updated>
+      <updated>1765956425879</updated>
     </task>
-    <task id="LOCAL-00090" summary="Add on bug fixed">
-      <option name="closed" value="true" />
-      <created>1765556686103</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1765556686103</updated>
-    </task>
-    <task id="LOCAL-00091" summary="Reservation update (Admin side)">
-      <option name="closed" value="true" />
-      <created>1765635979291</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1765635979292</updated>
-    </task>
-    <option name="localTasksCounter" value="92" />
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="profile added" />
+    <MESSAGE value="UI upgrade" />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="new update" />
     <MESSAGE value="menu updated" />
@@ -580,12 +580,10 @@
     <MESSAGE value="Admin page fix" />
     <MESSAGE value="MenuServer &amp; Cart empty issue fixed" />
     <MESSAGE value="Final commit" />
-    <MESSAGE value="Run by one click" />
-    <MESSAGE value="compressed images" />
-    <MESSAGE value="Menu with Add-ons" />
-    <MESSAGE value="Add on bug fixed" />
-    <MESSAGE value="Reservation update (Admin side)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reservation update (Admin side)" />
+    <MESSAGE value="Add ons" />
+    <MESSAGE value="Bug fixed Add ons" />
+    <MESSAGE value="Reservation Synced" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reservation Synced" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

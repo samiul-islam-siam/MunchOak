@@ -23,6 +23,8 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
+    private static final File MESSAGES_FILE = new File(DATA_DIR, "messages.dat");
+
     // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
 
@@ -111,6 +113,62 @@ public class FileStorage {
         return last;
     }
 
+    public static List<MessageRecord> loadMessagesForUser(int userId) {
+        ensureDataDir();
+        List<MessageRecord> list = new ArrayList<>();
+
+        if (!MESSAGES_FILE.exists() || MESSAGES_FILE.length() == 0)
+            return list;
+
+        try (DataInputStream dis =
+                     new DataInputStream(new FileInputStream(MESSAGES_FILE))) {
+
+            while (dis.available() > 0) {
+                int uid = dis.readInt();
+                String sender = dis.readUTF();
+                String msg = dis.readUTF();
+                String time = dis.readUTF();
+
+                if (uid == userId) {
+                    list.add(new MessageRecord(uid, sender, msg, time));
+                }
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("Message load error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public static void saveMessageForUser(int userId, String sender, String message) {
+        ensureDataDir();
+        try (DataOutputStream dos =
+                     new DataOutputStream(new FileOutputStream(MESSAGES_FILE, true))) {
+
+            dos.writeInt(userId);
+            dos.writeUTF(sender);
+            dos.writeUTF(message);
+            dos.writeUTF(Instant.now().toString());
+
+        } catch (IOException e) {
+            System.err.println("Message save error: " + e.getMessage());
+        }
+    }
+
+    public static class MessageRecord {
+        public final int userId;
+        public final String sender;
+        public final String message;
+        public final String timestamp;
+
+        public MessageRecord(int userId, String sender, String message, String timestamp) {
+            this.userId = userId;
+            this.sender = sender;
+            this.message = message;
+            this.timestamp = timestamp;
+        }
+    }
+
     //Ensuring all necessary files in directory and pointer files
     public static void init() {
         try {
@@ -187,6 +245,8 @@ public class FileStorage {
             if (!RESERVATIONS_FILE.exists()) RESERVATIONS_FILE.createNewFile();
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
             if (!PAYMENT_DISCOUNTS_FILE.exists()) PAYMENT_DISCOUNTS_FILE.createNewFile();
+            if (!MESSAGES_FILE.exists()) MESSAGES_FILE.createNewFile();
+
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
