@@ -14,11 +14,31 @@ public class Session {
 
     // ===== NEW: Global menu socket client =====
     private static MenuClient menuClient;
+    private static Runnable reservationListener;
+
+    public static void setReservationListener(Runnable r) {
+        reservationListener = r;
+    }
+
+    public static void notifyReservationUpdated() {
+        if (reservationListener != null) {
+            reservationListener.run();
+        }
+    }
 
     public static void initializeSocket() {
         if (menuClient == null) {
             menuClient = new MenuClient(); // connect to server
         }
+    }
+    private static String currentContactNo = "N/A"; // default
+
+    public static String getCurrentContactNo() {
+        return currentContactNo;
+    }
+
+    public static void setCurrentContactNo(String contactNo) {
+        currentContactNo = contactNo;
     }
 
     public static void setMenuClient(MenuClient client) {
@@ -58,6 +78,7 @@ public class Session {
         currentUserId = FileStorage.getUserId(username);
         currentEmail = FileStorage.getUserEmail(username);
         currentPassword = FileStorage.getUserPassword(username);
+        currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
     }
 
@@ -65,6 +86,8 @@ public class Session {
         currentUsername = "admin";
         currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
         currentEmail = "admin@munchoak.com"; // optional
+        currentContactNo = "N/A";
+
         currentPassword = AdminFileStorage.getAdminPassword(); // <-- new getter needed
         isAdmin = true; // set admin flag
     }
@@ -76,7 +99,11 @@ public class Session {
     public static void resetToGuest() {
         currentUsername = "guest";
         currentEmail = "guest@munchoak.com";
+        currentContactNo = "00000000000";
+
         currentPassword = "guestPass#123";
+       // currentContactNo = "00000000000";
+
         isAdmin = false;
     }
 

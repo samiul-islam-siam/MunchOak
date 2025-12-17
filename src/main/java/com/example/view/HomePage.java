@@ -37,11 +37,13 @@ import java.util.function.Consumer;
 import static com.example.network.ChatClient.chatStage;
 
 public class HomePage implements HomePageComponent {
+
     private final StackPane root;
     private final List<HBox> heroGroups = new ArrayList<>();
     private final List<HomePageComponent> sections;
     private final Stage primaryStage;
-    private final Cart cart;  // ADDED: Cart field for state persistence
+    private final Cart cart; // ADDED: Cart field for state persistence
+
     private final double WIDTH = 1000;
     private final double HEIGHT = 700;
 
@@ -57,10 +59,13 @@ public class HomePage implements HomePageComponent {
     private HBox heroSection;
     private int currentIndex = 0;
 
+    // Message Button
+    private Button messageBtn;
+
     // UPDATED: Existing constructor now initializes cart
     public HomePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.cart = new Cart();  // Initialize with empty cart
+        this.cart = new Cart(); // Initialize with empty cart
 
         // === HAMBURGER ICON ===
         Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
@@ -75,10 +80,8 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
-        loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
-                (Session.getCurrentEmail() != null &&
-                        !Session.getCurrentEmail().isEmpty());
+        loggedIn = (Session.getCurrentUsername() != null && !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null && !Session.getCurrentEmail().isEmpty());
 
         // === Top Buttons ===
         Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
@@ -128,21 +131,23 @@ public class HomePage implements HomePageComponent {
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        authBtn.setOnAction(e ->
-        {
+        authBtn.setOnAction(e -> {
             if (loggedIn) {
                 Session.logout();
                 closeChatWindow();
-                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+                Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
             } else {
                 openLoginPageDirectly();
             }
         });
+
         menuIconBtn.setOnAction(e -> toggleSidePanel());
 
         createOverlay();
         createSidePanel();
-        root.getChildren().setAll(content, overlay, sidePanel);
+        createMessageButton(); // ADDED: Create message button
+
+        root.getChildren().setAll(content, overlay, sidePanel, messageBtn);
 
         this.sections = Arrays.asList(
                 this,
@@ -153,13 +158,14 @@ public class HomePage implements HomePageComponent {
                 new HomePageSeventhExtension(),
                 new HomePageEighthExtension()
         );
+
         initialize();
     }
 
     // ADDED: Overloaded constructor to accept and preserve Cart state
     public HomePage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
-        this.cart = cart;  // Use passed cart to preserve state
+        this.cart = cart; // Use passed cart to preserve state
 
         // === HAMBURGER ICON ===
         Image hamburgerImg = new Image(getClass().getResource("/com/example/view/images/hamburger.png").toExternalForm());
@@ -174,10 +180,8 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
-        loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
-                (Session.getCurrentEmail() != null &&
-                        !Session.getCurrentEmail().isEmpty());
+        loggedIn = (Session.getCurrentUsername() != null && !Session.getCurrentUsername().equals("guest")) &&
+                (Session.getCurrentEmail() != null && !Session.getCurrentEmail().isEmpty());
 
         // === Top Buttons ===
         Button authBtn = new Button(loggedIn ? "Log Out" : "Log In");
@@ -209,7 +213,14 @@ public class HomePage implements HomePageComponent {
         HBox leftPart = new HBox(10, logoView, title);
         leftPart.setAlignment(Pos.CENTER_LEFT);
 
-        HBox rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        HBox rightButtons;
+        if(Session.isAdmin())
+        {
+           rightButtons =  new HBox(10, menuBtn, authBtn, menuIconBtn);
+        }else {
+            rightButtons = new HBox(10, menuBtn, reservationBtn, authBtn, menuIconBtn);
+        }
+
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         BorderPane navBar = new BorderPane();
@@ -227,20 +238,33 @@ public class HomePage implements HomePageComponent {
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        authBtn.setOnAction(e ->
-        {
+        authBtn.setOnAction(e -> {
             if (loggedIn) {
                 Session.logout();
-                primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+                closeChatWindow();
+                Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
             } else {
                 openLoginPageDirectly();
             }
         });
+
         menuIconBtn.setOnAction(e -> toggleSidePanel());
 
         createOverlay();
         createSidePanel();
-        root.getChildren().setAll(content, overlay, sidePanel);
+        if(!Session.isAdmin())
+        {
+            createMessageButton(); // ADDED: Create message button
+        }
+
+        if(Session.isAdmin())
+        {
+            root.getChildren().setAll(content, overlay, sidePanel);
+        }else
+        {
+            root.getChildren().setAll(content, overlay, sidePanel, messageBtn);
+        }
+
 
         this.sections = Arrays.asList(
                 this,
@@ -251,7 +275,49 @@ public class HomePage implements HomePageComponent {
                 new HomePageSeventhExtension(),
                 new HomePageEighthExtension()
         );
+
         initialize();
+    }
+
+    // ADDED: Method to create the dynamic message button
+    private void createMessageButton() {
+        messageBtn = new Button("💬"); // Using emoji as app-type icon for messages
+        messageBtn.setPrefSize(60, 60);
+        messageBtn.getStyleClass().addAll("top-button", "login-button");
+        messageBtn.setStyle("-fx-background-color: #b30000; -fx-background-radius: 50%; -fx-font-size: 24px; -fx-text-fill: white; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 8, 0, 0, 0);");
+        messageBtn.setOnAction(e -> openMessagePageDirectly());
+
+        // Make it dynamic: Add a subtle pulse animation
+
+        RotateTransition rotate = new RotateTransition(Duration.seconds(2), messageBtn);
+        rotate.setByAngle(360);
+        rotate.setCycleCount(RotateTransition.INDEFINITE);
+        rotate.setInterpolator(Interpolator.LINEAR);
+        rotate.play();
+
+        StackPane.setAlignment(messageBtn, Pos.BOTTOM_RIGHT);
+        messageBtn.setPadding(new Insets(0));
+        AnchorPane.setBottomAnchor(messageBtn, 20.0);
+        AnchorPane.setRightAnchor(messageBtn, 20.0);
+
+        // ADDED: Make it slide up/down with scroll (hide on scroll down, show on scroll up)
+        if (scrollPane != null) {
+            final Double[] lastVvalue = {0.0};
+            scrollPane.vvalueProperty().addListener((obs, oldV, newV) -> {
+                if (newV.doubleValue() > lastVvalue[0].doubleValue() + 0.05) {
+                    // Scrolling down - slide up (hide)
+                    TranslateTransition hide = new TranslateTransition(Duration.millis(300), messageBtn);
+                    hide.setToY(-80);
+                    hide.play();
+                } else if (lastVvalue[0].doubleValue() - newV.doubleValue() > 0.05) {
+                    // Scrolling up - slide down (show)
+                    TranslateTransition show = new TranslateTransition(Duration.millis(300), messageBtn);
+                    show.setToY(0);
+                    show.play();
+                }
+                lastVvalue[0] = newV.doubleValue();
+            });
+        }
     }
 
     @Override
@@ -272,6 +338,7 @@ public class HomePage implements HomePageComponent {
     @Override
     public void initialize() {
         createHeroGroups();
+
         for (HBox group : heroGroups) {
             group.prefWidthProperty().bind(content.widthProperty());
         }
@@ -290,6 +357,7 @@ public class HomePage implements HomePageComponent {
                 }
             }
         };
+
         content.widthProperty().addListener(widthListener);
     }
 
@@ -329,10 +397,8 @@ public class HomePage implements HomePageComponent {
 
         TranslateTransition leftTrans = new TranslateTransition(Duration.millis(400), img);
         leftTrans.setToX(0);
-
         TranslateTransition rightTrans = new TranslateTransition(Duration.millis(400), txt);
         rightTrans.setToX(0);
-
         FadeTransition ft = new FadeTransition(Duration.millis(400), group);
         ft.setFromValue(0.0);
         ft.setToValue(1.0);
@@ -370,22 +436,24 @@ public class HomePage implements HomePageComponent {
         bookBtn.setStyle("-fx-text-fill: black;-fx-border-color: black;");
         bookBtn.setOnAction(e -> openReservationPageDirectly());
 
-        textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
+        if(Session.isAdmin())
+        {
+            textBox.getChildren().addAll(titleLabel, paraLabel);
+        }else
+        {
+            textBox.getChildren().addAll(titleLabel, paraLabel, bookBtn);
+        }
+
         group.getChildren().addAll(iv, textBox);
         return group;
     }
 
     private void createHeroGroups() {
-        heroGroups.add(createHeroGroup("/com/example/view/images/bg2.png",
-                "Savor the MAGIC!!",
+        heroGroups.add(createHeroGroup("/com/example/view/images/bg2.png", "Savor the MAGIC!!",
                 "Join us for a culinary journey with our master chefs, crafting every dish with passion and flair. Fresh ingredients, bold flavors, and an unforgettable dining experience await at Munch-Oak."));
-
-        heroGroups.add(createHeroGroup("/com/example/view/images/bg3.png",
-                "Indulge in Bold Flavors",
+        heroGroups.add(createHeroGroup("/com/example/view/images/bg3.png", "Indulge in Bold Flavors",
                 "Our menu features a delightful array of dishes, each prepared with the finest ingredients sourced locally. From appetizers to desserts, every bite is a testament to our commitment to excellence."));
-
-        heroGroups.add(createHeroGroup("/com/example/view/images/bg4.png",
-                "Join Our Community",
+        heroGroups.add(createHeroGroup("/com/example/view/images/bg4.png", "Join Our Community",
                 "Our team of passionate chefs brings years of experience to create memorable meals. Let us take you on a gastronomic adventure you'll never forget."));
     }
 
@@ -424,14 +492,14 @@ public class HomePage implements HomePageComponent {
         closeBtn.getStyleClass().addAll("top-button", "login-button");
         closeBtn.setPrefSize(30, 30);
         closeBtn.setOnAction(e -> {
-            e.consume();                    // ← THIS FIXES THE JUMP TO 5TH SCREEN
+            e.consume(); // ← THIS FIXES THE JUMP TO 5TH SCREEN
             navigatingAway = false;
             toggleSidePanel();
         });
 
         Button profileBtn = createSideButton("Profile");
         Button historyBtn = createSideButton("History");
-        Button cartBtn = createSideButton("Cart");  // UPDATED: Add onAction for Cart navigation with this.cart
+        Button cartBtn = createSideButton("Cart"); // UPDATED: Add onAction for Cart navigation with this.cart
         Button reserveBtn = createSideButton("Reservation");
         Button chatBtn = createSideButton("Chat");
         Button aboutBtn = createSideButton("About Us");
@@ -451,8 +519,10 @@ public class HomePage implements HomePageComponent {
             } else {
                 System.out.println("Guest cannot access history");
             }
-        });  // UPDATED: Pass this.cart to History
-        cartBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new CartPage(primaryStage, this.cart).getScene())));  // ADDED: Cart navigation with this.cart
+        }); // UPDATED: Pass this.cart to History
+
+        cartBtn.setOnAction(e -> navigateAndClose.accept(() -> primaryStage.setScene(new CartPage(primaryStage, this.cart).getScene()))); // ADDED: Cart navigation with this.cart
+
         reserveBtn.setOnAction(e -> navigateAndClose.accept(this::openReservationPageDirectly));
         aboutBtn.setOnAction(e -> navigateAndClose.accept(this::openAboutUsPageDirectly));
 
@@ -465,8 +535,15 @@ public class HomePage implements HomePageComponent {
                 System.out.println("Guest cannot chat");
             }
         });
-
-        VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        VBox items;
+        if(Session.isAdmin())
+        {
+            items = new VBox(18, profileBtn, chatBtn, aboutBtn);
+        }else
+        {
+            items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
+        }
+        //VBox items = new VBox(18, profileBtn, cartBtn, reserveBtn, historyBtn, chatBtn, aboutBtn);
         items.setAlignment(Pos.CENTER_LEFT);
         items.setFillWidth(true);
 
@@ -531,6 +608,32 @@ public class HomePage implements HomePageComponent {
     }
 
     public Scene getHomeScene() {
+//        VBox fullPage = getFullPage();
+//        scrollPane = new ScrollPane(fullPage);
+//        scrollPane.setFitToWidth(true);
+//        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+//        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+//        scrollPane.setStyle("-fx-background-color: lightyellow;");
+//        scrollPane.setPadding(new Insets(0));
+//        scrollPane.prefHeightProperty().bind(primaryStage.heightProperty());
+//
+//        double stageWidth = primaryStage.getWidth() > 0 ? primaryStage.getWidth() : WIDTH;
+//        double stageHeight = primaryStage.getHeight() > 0 ? primaryStage.getHeight() : HEIGHT;
+//
+//        Scene scene = new Scene(root, stageWidth, stageHeight); // CHANGED: Use root instead of scrollPane for fixed button
+//        scene.getStylesheets().clear();
+//        var css = getClass().getResource("/com/example/view/styles/style.css");
+//        if (css != null) {
+//            scene.getStylesheets().add(css.toExternalForm());
+//        } else {
+//            System.err.println("CSS not found!");
+//            scene.getStylesheets().add(Application.STYLESHEET_MODENA);
+//        }
+//
+//        // Ensure scrollPane is added to content after scene creation if needed
+//        content.setCenter(scrollPane);
+//
+//        return scene;
         VBox fullPage = getFullPage();
         scrollPane = new ScrollPane(fullPage);
         scrollPane.setFitToWidth(true);
@@ -567,17 +670,15 @@ public class HomePage implements HomePageComponent {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/network/ChatWindow.fxml"));
             Stage openChatStage = new Stage();
             openChatStage.setScene(new Scene(loader.load()));
-
             ChatClient controller = loader.getController();
             String username = Session.getCurrentUsername();
             if (username == null || username.isEmpty()) username = "Guest";
             String role = Session.getCurrentRole();
             boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
-
             controller.setUsername(username);
             controller.setAdmin(isAdmin);
             openChatStage.setTitle("Chatting as [" + username + "]");
-            ChatClient.chatStage = openChatStage;             // <-- store stage
+            ChatClient.chatStage = openChatStage; // <-- store stage
             openChatStage.show();
             openChatStage.setOnCloseRequest(e -> controller.closeConnection());
         } catch (IOException e) {
@@ -592,13 +693,11 @@ public class HomePage implements HomePageComponent {
         }
     }
 
-
     private void preserveStageState(Scene newScene) {
         double w = primaryStage.getWidth();
         double h = primaryStage.getHeight();
         boolean fs = primaryStage.isFullScreen();
         boolean max = primaryStage.isMaximized();
-
         primaryStage.setScene(newScene);
         primaryStage.setWidth(w);
         primaryStage.setHeight(h);
@@ -629,5 +728,10 @@ public class HomePage implements HomePageComponent {
         Platform.runLater(() -> preserveStageState(
                 new ProfilePage(primaryStage, currentScene).getProfileScene()
         ));
+    }
+
+    // ADDED: Method to open Message Page
+    private void openMessagePageDirectly() {
+        Platform.runLater(() -> preserveStageState(new MessagePage(primaryStage, cart).getMessageScene()));
     }
 }

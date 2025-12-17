@@ -375,9 +375,17 @@ public class MenuPage {
         cartButton.setStyle("-fx-background-color: transparent;");
 
         // Wrap right buttons in HBox for spacing
-        HBox rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
-        rightButtons.setAlignment(Pos.CENTER_RIGHT);
+        HBox rightButtons=null;
 
+
+        if(Session.isAdmin())
+        {
+            rightButtons = new HBox(8, homeButton, aboutButton, profileButton);
+        }else
+        {
+            rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
+        }
+        rightButtons.setAlignment(Pos.CENTER_RIGHT);
         // Assemble nav bar: logo + title + leftSpacer + centered search + rightSpacer + nav buttons
         navBar.getChildren().addAll(
                 logoFrame,
