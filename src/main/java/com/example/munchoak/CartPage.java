@@ -232,7 +232,7 @@ public class CartPage {
                     );
                     addBtn.setMaxWidth(Double.MAX_VALUE);
                     addBtn.setOnAction(evt -> {
-                        if (Session.getCurrentUsername().equals("guest")) {
+                        if (Session.isGuest()) {
                             // Show login popup
                             Stage notifyPopup = new Stage();
                             notifyPopup.initStyle(StageStyle.UNDECORATED);
@@ -299,7 +299,7 @@ public class CartPage {
         cartBtn.setOnAction(e -> primaryStage.setScene(getScene()));
 
         boolean loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
+                !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null &&
                         !Session.getCurrentEmail().isEmpty());
 
@@ -635,7 +635,7 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    if (Session.getCurrentUsername().equals("guest")) {
+                    if (Session.isGuest()) {
                         Stage notifyPopup = new Stage();
                         notifyPopup.initStyle(StageStyle.TRANSPARENT);
                         notifyPopup.setAlwaysOnTop(true);

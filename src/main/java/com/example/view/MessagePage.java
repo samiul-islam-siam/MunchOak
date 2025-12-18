@@ -129,7 +129,7 @@ public class MessagePage {
                 // Clear input
                 messageInput.clear();
 
-                if (Session.getCurrentUsername().equals("guest")) {
+                if (Session.isGuest()) {
                     Stage notifyPopup = new Stage();
                     notifyPopup.initStyle(StageStyle.TRANSPARENT);
                     notifyPopup.setAlwaysOnTop(true);

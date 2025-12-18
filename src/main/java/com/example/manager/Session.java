@@ -10,13 +10,21 @@ public class Session {
 
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
-    private static String currentEmail = "guest@gmail.com";
-    private static String currentPassword = "ai01*2#";
+    private static String currentEmail = "N/A";
+    private static String currentPassword = "N/A";
+    private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
+    private static boolean isGuest = true;
+    public static boolean isGuest()
+    {
+        return isGuest;
+    }
 
-    // ===== NEW: Global menu socket client =====
+
     private static MenuClient menuClient;
     private static Runnable reservationListener;
+    private static final List<Runnable> messageListeners = new ArrayList<>();
+
 
     public static void setReservationListener(Runnable r) {
         reservationListener = r;
@@ -28,13 +36,15 @@ public class Session {
         }
     }
 
-    public static void initializeSocket() {
-        if (menuClient == null) {
-            menuClient = new MenuClient(); // connect to server
-        }
+    public static void addMessageListener(Runnable r) {
+        messageListeners.add(r);
     }
-    private static String currentContactNo = "N/A"; // default
 
+    public static void notifyMessageUpdated() {
+        for (Runnable r : messageListeners) r.run();
+    }
+
+    // Contact No get-set pair
     public static String getCurrentContactNo() {
         return currentContactNo;
     }
@@ -43,30 +53,52 @@ public class Session {
         currentContactNo = contactNo;
     }
 
-    public static void setMenuClient(MenuClient client) {
-        menuClient = client;
-    }
-
-    public static MenuClient getMenuClient() {
-        return menuClient;
-    }
-
-    public static int getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public static String getCurrentUsername() {
-        return currentUsername;
-    }
-
+    // Email get-set pair
     public static String getCurrentEmail() {
         return currentEmail;
     }
 
+    public static void setCurrentEmail(String email) {
+        currentEmail = email;
+    }
+
+    // Menu client get-set pair
+    public static MenuClient getMenuClient() {
+        return menuClient;
+    }
+
+    public static void setMenuClient(MenuClient client) {
+        menuClient = client;
+    }
+
+    // User ID get-set pair
+    public static int getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public static void setCurrentUserId(int userId) {
+        currentUserId = userId;
+    }
+
+    // Username get-set pair
+    public static String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public static void setCurrentUsername(String username) {
+        currentUsername = username;
+    }
+
+    // Password get-set pair
     public static String getCurrentPassword() {
         return currentPassword;
     }
 
+    public static void setCurrentPassword(String password) {
+        currentPassword = password;
+    }
+
+    // --------------------LOGIN VALIDATION-----------------------------------
     public static boolean isAdmin() {
         return isAdmin;
     }
@@ -82,7 +114,7 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
         currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
-
+        isGuest = false;
     }
 
     public static void setAdminUser() throws IOException {
@@ -90,38 +122,22 @@ public class Session {
         currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
         currentEmail = "admin@munchoak.com"; // optional
         currentContactNo = "N/A";
-
-        currentPassword = AdminFileStorage.getAdminPassword(); // <-- new getter needed
+        currentPassword = AdminFileStorage.getAdminPassword();
         isAdmin = true; // set admin flag
-    }
-
-    public static void setCurrentUsername(String username) {
-        currentUsername = username;
+        isGuest = false;
     }
 
     public static void resetToGuest() {
         currentUsername = "guest";
-        currentEmail = "guest@munchoak.com";
-        currentContactNo = "00000000000";
-
-        currentPassword = "guestPass#123";
+        currentEmail = "N/A";
+        currentContactNo = "N/A";
+        currentPassword = "N/A";
         currentUserId = 2025000;
-       // currentContactNo = "00000000000";
-
         isAdmin = false;
+        isGuest = true;
     }
 
     public static void logout() {
         resetToGuest();
     }
-    private static final List<Runnable> messageListeners = new ArrayList<>();
-
-    public static void addMessageListener(Runnable r) {
-        messageListeners.add(r);
-    }
-
-    public static void notifyMessageUpdated() {
-        for (Runnable r : messageListeners) r.run();
-    }
-
 }

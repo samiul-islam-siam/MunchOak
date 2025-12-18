@@ -60,7 +60,7 @@ public class Home extends Application {
 
     public static void main(String[] args) {
         FileStorage.init();
-        FileStorage.ensureDefaultGuestUser();
+        //FileStorage.ensureDefaultGuestUser();
         launch();
     }
 }

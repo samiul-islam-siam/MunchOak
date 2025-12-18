@@ -6,6 +6,9 @@ import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
+import com.example.view.AddCouponPopup;
+import com.example.view.EditCouponPopup;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,6 +33,7 @@ public class AdminDashboard {
     }
 
     private static HBox topBar;
+
     // Place this outside openAdminDashboard(), anywhere inside AdminDashboard class
     private static void showRequestPopup(String requestText) {
         Stage popup = new Stage();
@@ -88,10 +92,14 @@ public class AdminDashboard {
         Button changePassBtn = new Button("Change Password");
         Button profileBtn = new Button("Profile");
         Button reservationBtn = new Button("Reservation");   // ✅ NEW button
+        Button addCouponBtn = new Button("Add Coupon");
+        addCouponBtn.setOnAction(e -> AddCouponPopup.show(primaryStage));
+        Button editCouponBtn = new Button("Edit Coupon");
+        editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
         Button logoutBtn = new Button("Logout");
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn}) {
             btn.setStyle(
                     "-fx-background-color: #b30000;" +
                             "-fx-text-fill: white;" +
@@ -130,7 +138,7 @@ public class AdminDashboard {
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn
         );
         // --- Button Actions ---
         profileBtn.setOnAction(e -> {
@@ -301,7 +309,7 @@ public class AdminDashboard {
             });
 
             table.getColumns().addAll(
-                    usernameCol,userIdCol,nameCol, phoneCol, guestsCol, dateCol, timeCol, reqCol, statusCol, actionCol
+                    usernameCol, userIdCol, nameCol, phoneCol, guestsCol, dateCol, timeCol, reqCol, statusCol, actionCol
             );
 
             table.getItems().setAll(FileStorage.loadReservations());
@@ -335,17 +343,21 @@ public class AdminDashboard {
 
             TableColumn<String[], String> usernameCol = new TableColumn<>("Username");
             usernameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[0]));
-            usernameCol.setPrefWidth(200);
+            usernameCol.setPrefWidth(150);
+
+            TableColumn<String[], String> userContactCol = new TableColumn<>("Contact No:");
+            userContactCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[2]));
+            userContactCol.setPrefWidth(200);
 
             TableColumn<String[], String> emailCol = new TableColumn<>("Email");
             emailCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[1]));
-            emailCol.setPrefWidth(250);
+            emailCol.setPrefWidth(200);
 
             TableColumn<String[], String> passwordCol = new TableColumn<>("Password");
             passwordCol.setCellValueFactory(data -> new SimpleStringProperty("********"));
-            passwordCol.setPrefWidth(150);
+            passwordCol.setPrefWidth(100);
 
-            table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
+            table.getColumns().addAll(idCol, usernameCol,userContactCol, emailCol, passwordCol);
             table.getItems().addAll(users);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 

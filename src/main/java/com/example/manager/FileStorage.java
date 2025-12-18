@@ -3,6 +3,7 @@ package com.example.manager;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
 
+import java.time.LocalDate;
 import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,6 +32,151 @@ public class FileStorage {
     // In FileStorage.java (add near reservation methods)
     private static final File RESERVATION_STATUS_FILE = new File(DATA_DIR, "reservation_status.dat");
 
+    private static final File COUPON_USAGE_FILE = new File(DATA_DIR, "coupon_usage.dat");
+    private static final File COUPONS_FILE = new File(DATA_DIR, "coupons.dat");
+
+    public static class Coupon {
+        public final String code;
+        public final double discount;
+        public final String expiry; // expiry string
+        public final int usageLimit;
+        public final int usedCount;
+
+        public Coupon(String code, double discount, String expiry, int usageLimit, int usedCount) {
+            this.code = code;
+            this.discount = discount;
+            this.expiry = expiry;
+            this.usageLimit = usageLimit;
+            this.usedCount = usedCount;
+        }
+    }
+
+    public static void addCoupon(String code, double discount, String expiry, int usageLimit) throws IOException {
+
+        try {
+            LocalDate expiryDate = LocalDate.parse(expiry);
+            if (!expiryDate.isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Expiry date must be in the future!");
+            }
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Invalid expiry format! Must be YYYY-MM-DD");
+        }
+
+
+        ensureDataDir();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, true))) {
+            dos.writeUTF(code);
+            dos.writeDouble(discount);
+            dos.writeUTF(expiry);
+            dos.writeInt(usageLimit);
+            dos.writeInt(0);
+        }
+    }
+
+
+    public static List<Coupon> loadCoupons() {
+        ensureDataDir();
+        List<Coupon> coupons = new ArrayList<>();
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(COUPONS_FILE))) {
+            while (dis.available() > 0) {
+                String code = dis.readUTF();
+                double discount = dis.readDouble();
+                String expiry = dis.readUTF();
+                int usageLimit = dis.readInt();
+                int usedCount = dis.readInt();
+                coupons.add(new Coupon(code, discount, expiry, usageLimit, usedCount));
+            }
+        } catch (IOException ignored) {
+        }
+        return coupons;
+    }
+
+    public static void editCoupon(String code, Double newDiscount, String newExpiry, Integer newUsageLimit) throws IOException {
+        List<Coupon> coupons = loadCoupons();
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false))) {
+            for (Coupon c : coupons) {
+                Coupon updated = c;
+                if (c.code.equals(code)) {
+                    // শুধু যেটা edit করবে সেটাই নতুন হবে, বাকি unchanged
+                    double discount = (newDiscount != null) ? newDiscount : c.discount;
+                    String expiry = (newExpiry != null && !newExpiry.isEmpty()) ? newExpiry : c.expiry;
+                    int usageLimit = (newUsageLimit != null) ? newUsageLimit : c.usageLimit;
+
+                    updated = new Coupon(code, discount, expiry, usageLimit, c.usedCount);
+                }
+
+                // সবসময় updated coupon লিখো
+                dos.writeUTF(updated.code);
+                dos.writeDouble(updated.discount);
+                dos.writeUTF(updated.expiry);
+                dos.writeInt(updated.usageLimit);
+                dos.writeInt(updated.usedCount);
+            }
+        }
+    }
+
+    public static int applyCoupon(String code, int userId) {
+        try {
+            List<Coupon> coupons = loadCoupons();
+            File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+
+            // usage history check
+            if (usageFile.exists()) {
+                try (DataInputStream dis = new DataInputStream(new FileInputStream(usageFile))) {
+                    while (dis.available() > 0) {
+                        String usedCode = dis.readUTF();
+                        int uid = dis.readInt();
+                        if (uid == userId) {
+                            if (usedCode.equals(code)) {
+                                return 1; // already used same coupon
+                            } else {
+                                return 2; // already used another coupon
+                            }
+                        }
+                    }
+                }
+            }
+
+            int resultCode = -1;
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false));
+                 DataOutputStream usageOut = new DataOutputStream(new FileOutputStream(usageFile, true))) {
+
+                for (Coupon c : coupons) {
+                    Coupon updated = c;
+
+                    if (c.code.equals(code)) {
+                        // expiry check
+                        LocalDate expiryDate = LocalDate.parse(c.expiry);
+                        if (!expiryDate.isAfter(LocalDate.now())) {
+                            resultCode = 3; // expired
+                        } else if (c.usedCount >= c.usageLimit) {
+                            resultCode = 4; // usage limit exceeded
+                        } else {
+                            // apply coupon
+                            updated = new Coupon(c.code, c.discount, c.expiry, c.usageLimit, c.usedCount + 1);
+                            usageOut.writeUTF(code);
+                            usageOut.writeInt(userId);
+                            resultCode = 0; // success
+                        }
+                    }
+
+                    // সবসময় coupon লিখো (updated বা unchanged)
+                    dos.writeUTF(updated.code);
+                    dos.writeDouble(updated.discount);
+                    dos.writeUTF(updated.expiry);
+                    dos.writeInt(updated.usageLimit);
+                    dos.writeInt(updated.usedCount);
+                }
+            }
+
+            return resultCode;
+        } catch (IOException e) {
+            System.err.println("IOException in applyCoupon: " + e.getMessage());
+            return -1; // error
+        }
+    }
+
+
     public static class ReservationRecord {
         public final int resId;
         public final String name;
@@ -42,7 +188,8 @@ public class FileStorage {
         public final String createdAt;
         public final String username;  // NEW
         public final int userId;       // NEW
-        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time, String request, String createdAt,String username, int userId) {
+
+        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time, String request, String createdAt, String username, int userId) {
             this.resId = resId;
             this.name = name;
             this.phone = phone;
@@ -73,7 +220,7 @@ public class FileStorage {
                 String createdAt = dis.readUTF();
                 String username = dis.readUTF();
                 int userId = dis.readInt();
-                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt,username, userId));
+                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt, username, userId));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -221,6 +368,10 @@ public class FileStorage {
     public static void ensureDataDir() {
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs(); //to create directory
         try {
+            if (!COUPONS_FILE.exists()) COUPONS_FILE.createNewFile();
+            File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+            if (!usageFile.exists()) usageFile.createNewFile();
+
             if (!USERS_FILE.exists()) USERS_FILE.createNewFile(); //To create category file when it is not created
             if (!CATEGORIES_FILE.exists())      // By default, to have some predefined categories
             {
@@ -276,10 +427,11 @@ public class FileStorage {
                 int quantity = dis.readInt();   // NEW LINE
                 String addOne = dis.readUTF();
                 double addOnePrice = dis.readDouble();
-                String addTwo = dis.readUTF();;
+                String addTwo = dis.readUTF();
+                ;
                 double addTwoPrice = dis.readDouble();
 
-                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity,addOne,addOnePrice,addTwo,addTwoPrice));
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity, addOne, addOnePrice, addTwo, addTwoPrice));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -404,6 +556,32 @@ public class FileStorage {
         return false;
     }
 
+    public static boolean updateUserInfo(int userId, String newUsername, String newEmail, String newContact) {
+        List<String[]> allUsers = loadUsers();
+        boolean updated = false;
+
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, false))) {
+            for (String[] user : allUsers) {
+                if (Integer.parseInt(user[4]) == userId) {
+                    user[0] = newUsername;
+                    user[1] = newEmail;
+                    user[2] = newContact;
+                    updated = true;
+                }
+                dos.writeUTF(user[0]); // username
+                dos.writeUTF(user[1]); // email
+                dos.writeUTF(user[2]); // contact
+                dos.writeUTF(user[3]); // password
+                dos.writeInt(Integer.parseInt(user[4])); // userId
+            }
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+            return false;
+        }
+
+        return updated;
+    }
+
     //Accessing user id for a particular user (To track current user)
     public static int getUserId(String username) {
         ensureDataDir();
@@ -453,7 +631,7 @@ public class FileStorage {
         ensureDataDir();
 
         // Start from 2025001 for registered users
-        int uid = generateNextIdInFile(USERS_FILE, 4);
+        int uid = generateNextIdInFile(USERS_FILE, 2025001);
         // Generate salt and hash
         String salt = PasswordUtils.generateSalt();
         String hash = PasswordUtils.hashPassword(password, salt);
@@ -470,17 +648,17 @@ public class FileStorage {
     //'guest' is default user while no login is occurred
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
-        List<String[]> users = loadUsers();
+        //List<String[]> users = loadUsers();
 
-        boolean guestExists = false;
-        for (String[] user : users) {
-            if (user[0].equals("guest")) {
-                guestExists = true;
-                break;
-            }
-        }
+       // boolean guestExists = false;
+//        for (String[] user : users) {
+//            if (user[0].equals("guest")) {
+//                guestExists = true;
+//                break;
+//            }
+//        }
         // guest has particular default data-formate
-        if (!guestExists) {
+        if (Session.isGuest()) {
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
                 dos.writeUTF("guest");
                 dos.writeUTF("guest@munchoak.com");

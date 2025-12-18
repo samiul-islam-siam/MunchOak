@@ -4,6 +4,7 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -135,7 +136,7 @@ public class ReservationPage {
         phoneField.setMaxWidth(350);
         // ✅ Autofill from user.dat if logged in
         String currentUser = Session.getCurrentUsername();
-        if (!"guest".equals(currentUser)) {
+        if (!Session.isGuest()) {
             // Use username as default name
             nameField.setText(currentUser);
 
@@ -247,7 +248,7 @@ public class ReservationPage {
         // Set initial value to today
         datePicker.setValue(LocalDate.now());
 
-        // Listener to prevent past dates and update times
+//         Listener to prevent past dates and update times
 //        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
 //            LocalDate today = LocalDate.now();
 //            if (newVal != null && newVal.isBefore(today)) {
@@ -256,6 +257,7 @@ public class ReservationPage {
 //                updateTimeOptions(timeBox, datePicker);
 //            }
 //        });
+
         // Listener to prevent past dates and update times
         datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
             LocalDate today = LocalDate.now();
@@ -272,7 +274,7 @@ public class ReservationPage {
         // Initial population of times
         updateTimeOptions(timeBox, datePicker);
 
-// ROW CONTAINING GUESTS, DATE & TIME
+        // ROW CONTAINING GUESTS, DATE & TIME
         HBox topRow = new HBox(50,
                 guestsBox,
                 new HBox(5, dateLabel, datePicker),
@@ -303,7 +305,7 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            if (Session.getCurrentUsername().equals("guest")) {
+            if (Session.isGuest()) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
@@ -331,7 +333,8 @@ public class ReservationPage {
                     showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
                     return;
                 }
-// ✅ Contact number validation
+
+                // Contact number validation
                 if (!phone.matches("^01\\d{9}$")) {
                     showAlert(Alert.AlertType.ERROR,
                             "Invalid Contact Number",
@@ -368,6 +371,7 @@ public class ReservationPage {
             }
 
         });
+
         // FINAL EXTENSION LAYOUT
         VBox inputBox = new VBox(20, personalBox, topRow, requestLabel, requestArea, bookButton);
         inputBox.setAlignment(Pos.CENTER);
@@ -410,7 +414,8 @@ public class ReservationPage {
         return scene;
     }
 
-    //    private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
+// This is previous version:
+//        private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
 //        timeBox.getItems().clear();
 //        if (selectedDate == null) {
 //            for (int hour = 10; hour <= 22; hour++) {
@@ -439,6 +444,7 @@ public class ReservationPage {
 //            timeBox.setValue(timeBox.getItems().isEmpty() ? null : timeBox.getItems().get(0));
 //        }
 //    }
+
     private void updateTimeOptions(ComboBox<String> timeBox, DatePicker datePicker) {
         timeBox.getItems().clear();
 

@@ -800,7 +800,7 @@ public class BaseMenu {
         styleMainButton(addToCartDetail);
         addToCartDetail.setPrefWidth(Double.MAX_VALUE);
         addToCartDetail.setOnAction(ev -> {
-            if (Session.getCurrentUsername().equals("guest")) {
+            if (Session.isGuest()) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
