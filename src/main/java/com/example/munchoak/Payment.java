@@ -183,17 +183,18 @@ public class Payment {
             int userId = Session.getCurrentUserId(); // Identify user making purchase
 
             // Store payment + cart contents into file (persistence) - saves subtotal as amount
-            int paymentId = FileStorage.createPaymentAndCart(
-                    userId,
-                    cart,
-                    foodMap,
-                    "Card"  // Default; can be overridden later
-            );
+//            int paymentId = FileStorage.createPaymentAndCart(
+//                    userId,
+//                    cart,
+//                    foodMap,
+//                    "Card"  // Default; can be overridden later
+//
+//            );
 
             // FIXED: The caller (e.g., CheckoutPage) should save discount/tip separately via FileStorage.savePaymentDiscountTip(paymentId, discount, tip)
 
             // Create Payment instance for handling UI + method (subtotal only)
-            Payment payment = new Payment(paymentId, subtotal);
+            //Payment payment = new Payment(paymentId, subtotal);
 
             // Show payment method selection popup (uncomment if needed)
             // payment.processPayment(cart, foodMap);

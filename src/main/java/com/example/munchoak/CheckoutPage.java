@@ -211,12 +211,13 @@ public class CheckoutPage {
                 totalAddons += addonPer * qty;
             }
         }
+        final double TOTAL=totalAddons;
         double subtotal = baseSubtotal + totalAddons;
         boolean isEmptyCart = cart.getBuyHistory().isEmpty();
         double taxAmount = 7.00; // Fixed from Cart
         double serviceFeeAmount = 1.50; // Fixed from Cart
         double deliveryAmount = 7.99; // Fixed from Cart
-      //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
+        //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
         double discountAmount = subtotal * discount; // discount is percentage (e.g. 0.1 = 10%)
         double discountedSubtotal = subtotal - discountAmount;
         double totalPayable = discountedSubtotal + deliveryAmount + tip + serviceFeeAmount + taxAmount;
@@ -740,53 +741,53 @@ public class CheckoutPage {
                 return;
             }
 
-                String cardNumber = cardField.getText().trim();
-                String expiry = expiryField.getText().trim();
-                String cvv = cvvField.getText().trim();
+            String cardNumber = cardField.getText().trim();
+            String expiry = expiryField.getText().trim();
+            String cvv = cvvField.getText().trim();
 
-                // --- Card number validation ---
-                if (!cardNumber.matches("\\d{16}")) {
-                    paymentStatus.setText("Card number must be 16 digits!");
+            // --- Card number validation ---
+            if (!cardNumber.matches("\\d{16}")) {
+                paymentStatus.setText("Card number must be 16 digits!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            }
+
+            // --- Expiry validation (MM/YY) ---
+            if (!expiry.matches("(0[1-9]|1[0-2])/\\d{2}")) {
+                paymentStatus.setText("Expiry must be in MM/YY format!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            } else {
+                // check if expiry is in the future
+                String[] parts = expiry.split("/");
+                int month = Integer.parseInt(parts[0]);
+                int year = Integer.parseInt(parts[1]) + 2000; // convert YY to YYYY
+                java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
+                if (!expDate.isAfter(java.time.YearMonth.now())) {
+                    paymentStatus.setText("Card has expired!");
                     paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
                     PauseTransition delay = new PauseTransition(Duration.seconds(2));
                     delay.setOnFinished(evt -> paymentStatus.setText(""));
                     delay.play();
                     return;
                 }
+            }
 
-                // --- Expiry validation (MM/YY) ---
-                if (!expiry.matches("(0[1-9]|1[0-2])/\\d{2}")) {
-                    paymentStatus.setText("Expiry must be in MM/YY format!");
-                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(evt -> paymentStatus.setText(""));
-                    delay.play();
-                    return;
-                } else {
-                    // check if expiry is in the future
-                    String[] parts = expiry.split("/");
-                    int month = Integer.parseInt(parts[0]);
-                    int year = Integer.parseInt(parts[1]) + 2000; // convert YY to YYYY
-                    java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
-                    if (!expDate.isAfter(java.time.YearMonth.now())) {
-                        paymentStatus.setText("Card has expired!");
-                        paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                        delay.setOnFinished(evt -> paymentStatus.setText(""));
-                        delay.play();
-                        return;
-                    }
-                }
-
-                // --- CVV validation ---
-                if (!cvv.matches("\\d{3}")) {
-                    paymentStatus.setText("CVV must be 3 digits!");
-                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(evt -> paymentStatus.setText(""));
-                    delay.play();
-                    return;
-                }
+            // --- CVV validation ---
+            if (!cvv.matches("\\d{3}")) {
+                paymentStatus.setText("CVV must be 3 digits!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            }
 
             try {
 
@@ -826,8 +827,17 @@ public class CheckoutPage {
                 Session.getMenuClient().sendMenuUpdate();
 
                 Payment.checkout(cart);
-                int paymentId = Payment.getLastPaymentId();
+                //int paymentId = Payment.getLastPaymentId();
+                int paymentId = FileStorage.createPaymentAndCart(
+                        Session.getCurrentUserId(),
+                        cart,
+                        foodMap,
+                        "card",
+                        totalPayable   // 👈 ADD THIS
+                );
+
                 FileStorage.savePaymentDiscountTip(paymentId, discount, tip);
+                FileStorage.savePaymentBreakdown(paymentId,subtotal,TOTAL,discountAmount,tip,deliveryAmount,taxAmount,serviceFeeAmount,totalPayable);
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {
                     FileStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());

@@ -25,6 +25,9 @@ public class FileStorage {
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
     private static final File MESSAGES_FILE = new File(DATA_DIR, "messages.dat");
+    private static final File PAYMENT_BREAKDOWN_FILE =
+            new File(DATA_DIR, "payment_breakdown.dat");
+
 
     // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
@@ -175,68 +178,6 @@ public class FileStorage {
             }
         }
     }
-
-    public static int applyCoupon(String code, int userId) {
-        try {
-            List<Coupon> coupons = loadCoupons();
-            File usageFile = new File(DATA_DIR, "coupon_usage.dat");
-
-            // usage history check
-            if (usageFile.exists()) {
-                try (DataInputStream dis = new DataInputStream(new FileInputStream(usageFile))) {
-                    while (dis.available() > 0) {
-                        String usedCode = dis.readUTF();
-                        int uid = dis.readInt();
-                        if (uid == userId) {
-                            if (usedCode.equals(code)) {
-                                return 1; // already used same coupon
-                            } else {
-                                return 2; // already used another coupon
-                            }
-                        }
-                    }
-                }
-            }
-
-            int resultCode = -1;
-            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false));
-                 DataOutputStream usageOut = new DataOutputStream(new FileOutputStream(usageFile, true))) {
-
-                for (Coupon c : coupons) {
-                    Coupon updated = c;
-
-                    if (c.code.equals(code)) {
-                        // expiry check
-                        LocalDate expiryDate = LocalDate.parse(c.expiry);
-                        if (!expiryDate.isAfter(LocalDate.now())) {
-                            resultCode = 3; // expired
-                        } else if (c.usedCount >= c.usageLimit) {
-                            resultCode = 4; // usage limit exceeded
-                        } else {
-                            // apply coupon
-                            updated = new Coupon(c.code, c.discount, c.expiry, c.usageLimit, c.usedCount + 1);
-                            usageOut.writeUTF(code);
-                            usageOut.writeInt(userId);
-                            resultCode = 0; // success
-                        }
-                    }
-
-
-                    dos.writeUTF(updated.code);
-                    dos.writeDouble(updated.discount);
-                    dos.writeUTF(updated.expiry);
-                    dos.writeInt(updated.usageLimit);
-                    dos.writeInt(updated.usedCount);
-                }
-            }
-
-            return resultCode;
-        } catch (IOException e) {
-            System.err.println("IOException in applyCoupon: " + e.getMessage());
-            return -1; // error
-        }
-    }
-
 
     public static class ReservationRecord {
         public final int resId;
@@ -458,6 +399,9 @@ public class FileStorage {
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
             if (!PAYMENT_DISCOUNTS_FILE.exists()) PAYMENT_DISCOUNTS_FILE.createNewFile();
             if (!MESSAGES_FILE.exists()) MESSAGES_FILE.createNewFile();
+            if (!PAYMENT_BREAKDOWN_FILE.exists())
+                PAYMENT_BREAKDOWN_FILE.createNewFile();
+
 
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
@@ -706,31 +650,6 @@ public class FileStorage {
         }
     }
 
-    //'guest' is default user while no login is occurred
-    public static void ensureDefaultGuestUser() {
-        ensureDataDir();
-        //List<String[]> users = loadUsers();
-
-       // boolean guestExists = false;
-//        for (String[] user : users) {
-//            if (user[0].equals("guest")) {
-//                guestExists = true;
-//                break;
-//            }
-//        }
-        // guest has particular default data-formate
-        if (Session.isGuest()) {
-            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
-                dos.writeUTF("guest");
-                dos.writeUTF("guest@munchoak.com");
-                dos.writeUTF("00000000000");
-                dos.writeUTF("guestPass#123");
-                dos.writeInt(2025000);
-            } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
-            }
-        }
-    }
 
     //To load all information of users
     public static List<String[]> loadUsers() {
@@ -759,7 +678,7 @@ public class FileStorage {
      * Creates a payment, cart, and payment-items entry.
      * Returns the generated payment ID.
      */
-    public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method) throws IOException {
+    public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method,double finalTotal) throws IOException {
         ensureDataDir();
 
         int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);  //First payemnt id starts from 3001
@@ -770,9 +689,11 @@ public class FileStorage {
         try (DataOutputStream pw = new DataOutputStream(new FileOutputStream(PAYMENTS_FILE, true))) {
             pw.writeInt(paymentId);
             pw.writeInt(userId);
-            pw.writeDouble(cart.getTotalPrice(foodMap));
+            //pw.writeDouble(cart.getTotalPrice(foodMap));
+            pw.writeDouble(finalTotal);
             pw.writeUTF(method);
             pw.writeUTF(timestamp);
+
         }
 
         // Save cart record
@@ -1022,6 +943,101 @@ public class FileStorage {
             System.err.println("IOException: " + e.getMessage());
         }
         return lastId + 1;
+    }
+    public static PaymentBreakdown getPaymentBreakdown(int paymentId) {
+        ensureDataDir();
+        if (!PAYMENT_BREAKDOWN_FILE.exists()) return null;
+
+        try (DataInputStream dis =
+                     new DataInputStream(new FileInputStream(PAYMENT_BREAKDOWN_FILE))) {
+
+            while (dis.available() > 0) {
+                int pid = dis.readInt();
+                double baseSubtotal = dis.readDouble();
+                double addons = dis.readDouble();
+                double discountAmount = dis.readDouble();
+                double tip = dis.readDouble();
+                double delivery = dis.readDouble();
+                double tax = dis.readDouble();
+                double service = dis.readDouble();
+                double total = dis.readDouble();
+
+                if (pid == paymentId) {
+                    return new PaymentBreakdown(
+                            baseSubtotal,
+                            addons,
+                            discountAmount,
+                            tip,
+                            delivery,
+                            tax,
+                            service,
+                            total
+                    );
+                }
+            }
+        } catch (IOException ignored) {}
+
+        return null;
+    }
+
+    public static void savePaymentBreakdown(
+            int paymentId,
+            double baseSubtotal,
+            double addons,
+            double discountAmount,
+            double tip,
+            double delivery,
+            double tax,
+            double service,
+            double total
+    ) throws IOException {
+
+        ensureDataDir();
+        try (DataOutputStream dos =
+                     new DataOutputStream(new FileOutputStream(PAYMENT_BREAKDOWN_FILE, true))) {
+
+            dos.writeInt(paymentId);
+            dos.writeDouble(baseSubtotal);
+            dos.writeDouble(addons);
+            dos.writeDouble(discountAmount);
+            dos.writeDouble(tip);
+            dos.writeDouble(delivery);
+            dos.writeDouble(tax);
+            dos.writeDouble(service);
+            dos.writeDouble(total);
+        }
+    }
+
+
+    public static class PaymentBreakdown {
+        public final double baseSubtotal;
+        public final double addons;
+        public final double discountAmount;
+        public final double tip;
+        public final double delivery;
+        public final double tax;
+        public final double service;
+        public final double total;
+
+        public PaymentBreakdown(
+                double baseSubtotal,
+                double addons,
+                double discountAmount,
+                double tip,
+                double delivery,
+                double tax,
+                double service,
+                double total
+        ) {
+            this.baseSubtotal = baseSubtotal;
+            this.addons = addons;
+            this.discountAmount = discountAmount;
+            this.tip = tip;
+            this.delivery = delivery;
+            this.tax = tax;
+            this.service = service;
+            this.total = total;
+        }
     }
 
 
