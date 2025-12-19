@@ -374,7 +374,7 @@ public class CheckoutPage {
                     );
                     addBtn.setMaxWidth(Double.MAX_VALUE);
                     addBtn.setOnAction(evt -> {
-                        if (Session.getCurrentUsername().equals("guest")) {
+                        if (Session.isGuest()) {
                             // Show login popup
                         } else {
                             cart.addToCart(item.getId(), 1);
@@ -427,7 +427,7 @@ public class CheckoutPage {
         cartBtn.setOnAction(e -> primaryStage.setScene(new CartPage(primaryStage, cart).getScene()));
 
         boolean loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
+                !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null &&
                         !Session.getCurrentEmail().isEmpty());
 
