@@ -631,7 +631,7 @@ public class FileStorage {
         ensureDataDir();
 
         // Start from 2025001 for registered users
-        int uid = generateNextIdInFile(USERS_FILE, 4);
+        int uid = generateNextIdInFile(USERS_FILE, 2025001);
         // Generate salt and hash
         String salt = PasswordUtils.generateSalt();
         String hash = PasswordUtils.hashPassword(password, salt);
@@ -648,17 +648,17 @@ public class FileStorage {
     //'guest' is default user while no login is occurred
     public static void ensureDefaultGuestUser() {
         ensureDataDir();
-        List<String[]> users = loadUsers();
+        //List<String[]> users = loadUsers();
 
-        boolean guestExists = false;
-        for (String[] user : users) {
-            if (user[0].equals("guest")) {
-                guestExists = true;
-                break;
-            }
-        }
+       // boolean guestExists = false;
+//        for (String[] user : users) {
+//            if (user[0].equals("guest")) {
+//                guestExists = true;
+//                break;
+//            }
+//        }
         // guest has particular default data-formate
-        if (!guestExists) {
+        if (Session.isGuest()) {
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
                 dos.writeUTF("guest");
                 dos.writeUTF("guest@munchoak.com");

@@ -136,7 +136,7 @@ public class ReservationPage {
         phoneField.setMaxWidth(350);
         // ✅ Autofill from user.dat if logged in
         String currentUser = Session.getCurrentUsername();
-        if (!"guest".equals(currentUser)) {
+        if (!Session.isGuest()) {
             // Use username as default name
             nameField.setText(currentUser);
 
@@ -305,7 +305,7 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            if (Session.getCurrentUsername().equals("guest")) {
+            if (Session.isGuest()) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);

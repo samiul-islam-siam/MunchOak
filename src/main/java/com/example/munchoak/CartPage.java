@@ -6,6 +6,7 @@ import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
@@ -232,7 +233,7 @@ public class CartPage {
                     );
                     addBtn.setMaxWidth(Double.MAX_VALUE);
                     addBtn.setOnAction(evt -> {
-                        if (Session.getCurrentUsername().equals("guest")) {
+                        if (Session.isGuest()) {
                             // Show login popup
                             Stage notifyPopup = new Stage();
                             notifyPopup.initStyle(StageStyle.UNDECORATED);
@@ -298,8 +299,9 @@ public class CartPage {
         cartBtn.setStyle("-fx-background-color: white; -fx-text-fill: #FF6B00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 20; -fx-cursor: hand;");  // Active state
         cartBtn.setOnAction(e -> primaryStage.setScene(getScene()));
 
+
         boolean loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
+                !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null &&
                         !Session.getCurrentEmail().isEmpty());
 
@@ -635,7 +637,7 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    if (Session.getCurrentUsername().equals("guest")) {
+                    if (Session.isGuest()) {
                         Stage notifyPopup = new Stage();
                         notifyPopup.initStyle(StageStyle.TRANSPARENT);
                         notifyPopup.setAlwaysOnTop(true);
@@ -673,24 +675,26 @@ public class CartPage {
         rightColumn.setPrefWidth(350);
         rightColumn.setStyle("-fx-background-color: transparent;");  // Ensure transparency
 
-        // COUPON BOX
-        VBox couponBox = new VBox(10);
-        Label couponLabel = new Label("Coupons");
-        couponLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: black;");
+        // --- COUPON SECTION ---
+        VBox couponSection = new VBox(8);
+        couponSection.setAlignment(Pos.CENTER);
+        couponSection.setPadding(new Insets(10));
+        couponSection.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;");
 
-        HBox couponInput = new HBox(8);
-        TextField couponField = new TextField();
-        couponField.setPromptText("Coupon code");
-        Button applyBtn = new Button("APPLY NOW");
-        applyBtn.setStyle("-fx-background-color: black; -fx-text-fill: white;");
 
-        couponInput.getChildren().addAll(couponField, applyBtn);
-        couponBox.getChildren().addAll(couponLabel, couponInput);
-        couponBox.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;");
+        // Load coupons from admin
+        List<FileStorage.Coupon> coupons = FileStorage.loadCoupons();
+
+        ComboBox<String> couponDropdown = new ComboBox<>();
+        for (FileStorage.Coupon c : coupons) {
+            couponDropdown.getItems().add(c.code);
+        }
+
+        Label couponStatusLabel = new Label("No coupon applied");
 
         // SUMMARY BOX
         VBox summaryBox = new VBox(15);
-        summaryBox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20;");
+        summaryBox.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20;");
 
         Label yourOrder = new Label("Your Order");
         yourOrder.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
@@ -764,7 +768,7 @@ public class CartPage {
         Button checkoutBtn = new Button("PROCEED TO CHECKOUT");
         checkoutBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 15px; -fx-padding: 10;");
         checkoutBtn.setMaxWidth(Double.MAX_VALUE);
-        // FIXED: Pass current discount and tip to CheckoutPage for matching totals
+
         checkoutBtn.setOnAction(e -> {
             double currentTip = 0.0;
             if (!isEmptyCart && tipGroup != null && tipGroup.getSelectedToggle() != null) {
@@ -772,49 +776,151 @@ public class CartPage {
                 else if (tipGroup.getSelectedToggle() == tip4) currentTip = 4.0;
                 else if (tipGroup.getSelectedToggle() == tip7) currentTip = 7.0;
             }
-            primaryStage.setScene(new CheckoutPage(primaryStage, cart, discount.get(), currentTip).getScene());
+            // Always show updated total
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Checkout");
+
+            primaryStage.setScene(new CheckoutPage(primaryStage, cart, getDisCount(), currentTip).getScene());
+
         });
-        // Coupon validation logic (FIXED: Added setDisCount and this.total update after successful apply)
-        applyBtn.setOnAction(e -> {
-            if (isEmptyCart) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText(null);
-                alert.setContentText("Add items to your cart to apply a coupon!");
-                alert.showAndWait();
-                return;
-            }
-            String code = couponField.getText().trim().toUpperCase();
-            if (code.isEmpty()) {
-                return;
-            }
-            boolean valid = false;
-            if ("SAVE10".equals(code)) {
-                discount.set(subtotal * 0.10);
-                valid = true;
-            } else if ("SAVE20".equals(code)) {
-                discount.set(20.0);  // Fixed $20 discount
-                valid = true;
-            }
-            // Add more coupons as needed
-            if (valid) {
-                discountLabel.setText(String.format("Discount: -৳%.2f", discount.get()));
-                double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
-                totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
-                // FIXED: Update class fields to pass correct discount to CheckoutPage
-                setDisCount(discount.get());
-                this.total = newTotal;
-                couponField.clear();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText(null);
-                alert.setContentText("Coupon applied successfully!");
-                alert.showAndWait();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setHeaderText(null);
-                alert.setContentText("Invalid coupon code. Please try again.");
-                alert.showAndWait();
-            }
-        });
+
+        // --- Guest Mode Handling ---
+        if (Session.isGuest()) {
+            couponSection.setVisible(false);
+            couponSection.setManaged(false);
+        } else {
+            couponDropdown.setPromptText("Select a coupon");
+
+            Button availableCouponsBtn = new Button("Available Coupons");
+            availableCouponsBtn.setStyle(
+                    "-fx-background-color: blue;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 6;" +
+                            "-fx-padding: 8 16;"
+            );
+
+
+// Prompt text + selected item styling
+            couponDropdown.setButtonCell(new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText("Select A Coupon");
+                    } else {
+                        setText(item);
+                    }
+                    setStyle(
+                            "-fx-background-color: black;" +   // কালো background
+                                    "-fx-text-fill: white;" +          // সাদা text
+                                    "-fx-font-weight: bold;" +
+                                    "-fx-background-radius: 6;" +
+                                    "-fx-padding: 8 16;"
+                    );
+                }
+            });
+
+// Dropdown list items styling
+            couponDropdown.setCellFactory(listView -> new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item);
+                    }
+                    setStyle(
+                            "-fx-background-color: orange;" +
+                                    "-fx-text-fill: black;" +
+                                    "-fx-font-weight: bold;" +
+                                    "-fx-background-radius: 6;" +
+                                    "-fx-padding: 8 16;"
+                    );
+                }
+            });
+
+            Button applyBtn = new Button("Apply Now");
+            applyBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+            couponSection.getChildren().addAll(
+                    new Label("Available Coupons"),
+                    couponDropdown,
+                    applyBtn,
+                    couponStatusLabel
+            );
+            applyBtn.setOnAction(e -> {
+
+                String selectedCode = couponDropdown.getValue();
+                if (cart.getBuyHistory().isEmpty()) {
+                    //showError("You must add food items before applying a coupon!");
+                    showErrorPopup("Your must buy food items before applying a coupon!");
+                    return;
+                }
+
+                String code = selectedCode;
+                int userId = FileStorage.getUserId(Session.getCurrentUsername());
+
+                int result = FileStorage.applyCoupon(code, userId);
+
+                switch (result) {
+                    case 0:
+                        showPopup("Coupon applied successfully!", "#43A047"); // green
+                        if (selectedCode != null) {
+                            //double discountRate = coupons.get(selectedCode);
+                            double discountRate = 0.0;
+                            for (FileStorage.Coupon c : coupons) {
+                                if (c.code.equals(selectedCode)) {
+                                    discountRate = c.discount;
+                                    break;
+                                }
+                            }
+
+                            setDisCount(discountRate);
+
+                            couponStatusLabel.setText("Applied " + selectedCode + " (" + (int) (discountRate * 100) + "% off)");
+                            couponStatusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+
+                            // 👉 Recalculate totals
+                            double discountAmount = subtotal * disCount;
+                            double discountedSubtotal = subtotal - discountAmount;
+                            double finalTotal = discountedSubtotal + getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
+                            this.total = finalTotal;
+
+                            // Update labels
+                            discountLabel.setText("Discount: -৳" + String.format("%.2f", discountAmount));
+                            totalLabel.setText("Total Payable: ৳" + String.format("%.2f", finalTotal));
+                        } else {
+                            couponStatusLabel.setText("Please select a coupon!");
+                            couponStatusLabel.setStyle("-fx-text-fill: red;");
+                        }
+
+
+                        break;
+                    case 1:
+                        showPopup("You have already used this coupon!", "#E53935"); // red
+                        break;
+                    case 2:
+                        showPopup("You can't use more than one coupon!", "#E53935");
+                        break;
+                    case 3:
+                        showPopup("Coupon expired!", "#E53935");
+                        break;
+                    case 4:
+                        showPopup("Coupon usage limit exceeded!", "#E53935");
+                        break;
+                    case 5:
+                        showPopup("Invalid coupon code!", "#E53935");
+                        break;
+                    default:
+                        showPopup("Error applying coupon!", "#E53935");
+                        break;
+                }
+
+
+            });
+
+        }
 
         if (!isEmptyCart) {
             tipGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -829,11 +935,15 @@ public class CartPage {
 
                 // this.disCount = discount.get();
                 setDisCount(discount.get());
+                double discountAmount = subtotal * disCount;
+                double discountedSubtotal = subtotal - discountAmount;
+                double finalTotal = tip.get() + discountedSubtotal + getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
+                //   this.total = finalTotal;
 
 
-                double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
-                this.total = newTotal;
-                totalLabel.setText("Total Payable: ৳" + String.format("%.2f", newTotal));
+                // double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
+                this.total = finalTotal;
+                totalLabel.setText("Total Payable: ৳" + String.format("%.2f", finalTotal));
             });
         }
 
@@ -856,7 +966,7 @@ public class CartPage {
             summaryBox.getChildren().add(totalLabel);
         }
 
-        rightColumn.getChildren().addAll(couponBox, summaryBox);
+        rightColumn.getChildren().addAll(couponSection, summaryBox);
 
         // Add columns to main content
         HBox.setHgrow(leftColumn, Priority.ALWAYS);
@@ -957,6 +1067,42 @@ public class CartPage {
         widthListener.changed(null, null, primaryStage.getWidth());
 
         return scene;
+    }
+
+    // helper popup method
+    private void showPopup(String msg, String color) {
+        Stage popup = new Stage();
+        popup.initStyle(StageStyle.UNDECORATED);
+        popup.setAlwaysOnTop(true);
+        Label lbl = new Label(msg);
+        lbl.setStyle("-fx-background-color:" + color + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 10;");
+
+        popup.setScene(new Scene(lbl, 300, 60));
+        popup.show();
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(e -> popup.close());
+        delay.play();
+    }
+
+    private void showErrorPopup(String message) {
+        Stage popup = new Stage();
+        popup.initStyle(StageStyle.UNDECORATED);
+        popup.setAlwaysOnTop(true);
+
+        Label label = new Label(message);
+        label.setStyle("-fx-background-color: #E53935; " +   // লাল ব্যাকগ্রাউন্ড
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-padding: 10 20 10 20; " +
+                "-fx-background-radius: 10;");
+
+
+        popup.setScene(new Scene(label, 350, 60));
+        popup.show();
+
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(e -> popup.close());
+        delay.play();
     }
 
     private void updateSuggestionCards(FlowPane pane, double cardWidth, double imgSize, double nameFont, double priceFont, double btnFont, String btnPadding) {

@@ -343,17 +343,21 @@ public class AdminDashboard {
 
             TableColumn<String[], String> usernameCol = new TableColumn<>("Username");
             usernameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[0]));
-            usernameCol.setPrefWidth(200);
+            usernameCol.setPrefWidth(150);
+
+            TableColumn<String[], String> userContactCol = new TableColumn<>("Contact No:");
+            userContactCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[2]));
+            userContactCol.setPrefWidth(200);
 
             TableColumn<String[], String> emailCol = new TableColumn<>("Email");
             emailCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[1]));
-            emailCol.setPrefWidth(250);
+            emailCol.setPrefWidth(200);
 
             TableColumn<String[], String> passwordCol = new TableColumn<>("Password");
             passwordCol.setCellValueFactory(data -> new SimpleStringProperty("********"));
-            passwordCol.setPrefWidth(150);
+            passwordCol.setPrefWidth(100);
 
-            table.getColumns().addAll(idCol, usernameCol, emailCol, passwordCol);
+            table.getColumns().addAll(idCol, usernameCol,userContactCol, emailCol, passwordCol);
             table.getItems().addAll(users);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 

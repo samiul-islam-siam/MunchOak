@@ -83,7 +83,7 @@ public class MenuPage {
         if (Session.isAdmin()) { // "admin".equalsIgnoreCase(username)
             menu = new AdminMenu();
             System.out.println("Admin Menu loaded in MenuPage");
-        } else if ("guest".equalsIgnoreCase(username)) {
+        } else if (Session.isGuest()) {
             menu = new GuestMenu();
             System.out.println("Guest Menu loaded in MenuPage");
         } else {

@@ -10,10 +10,16 @@ public class Session {
 
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
-    private static String currentEmail = "guest@gmail.com";
-    private static String currentPassword = "ai01*2#";
+    private static String currentEmail = "N/A";
+    private static String currentPassword = "N/A";
     private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
+    private static boolean isGuest = true;
+    public static boolean isGuest()
+    {
+        return isGuest;
+    }
+
 
     private static MenuClient menuClient;
     private static Runnable reservationListener;
@@ -108,6 +114,7 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
         currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
+        isGuest = false;
     }
 
     public static void setAdminUser() throws IOException {
@@ -117,15 +124,17 @@ public class Session {
         currentContactNo = "N/A";
         currentPassword = AdminFileStorage.getAdminPassword();
         isAdmin = true; // set admin flag
+        isGuest = false;
     }
 
     public static void resetToGuest() {
         currentUsername = "guest";
-        currentEmail = "guest@munchoak.com";
-        currentContactNo = "00000000000";
-        currentPassword = "guestPass#123";
+        currentEmail = "N/A";
+        currentContactNo = "N/A";
+        currentPassword = "N/A";
         currentUserId = 2025000;
         isAdmin = false;
+        isGuest = true;
     }
 
     public static void logout() {

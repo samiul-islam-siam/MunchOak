@@ -27,7 +27,7 @@ public class ProfilePage {
         String password = Session.getCurrentPassword();
         int userId = Session.getCurrentUserId();
         String contactNo = Session.getCurrentContactNo();
-        if (Session.getCurrentUsername().equals("guest")) {
+        if (Session.isGuest()) {
             Label title = new Label("You are browsing \n as guest");
             title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: black;");
             Label passLabel = new Label("Default guest Id: " + userId);
