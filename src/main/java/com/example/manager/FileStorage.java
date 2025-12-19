@@ -97,7 +97,7 @@ public class FileStorage {
             for (Coupon c : coupons) {
                 Coupon updated = c;
                 if (c.code.equals(code)) {
-                    // শুধু যেটা edit করবে সেটাই নতুন হবে, বাকি unchanged
+
                     double discount = (newDiscount != null) ? newDiscount : c.discount;
                     String expiry = (newExpiry != null && !newExpiry.isEmpty()) ? newExpiry : c.expiry;
                     int usageLimit = (newUsageLimit != null) ? newUsageLimit : c.usageLimit;
@@ -105,7 +105,68 @@ public class FileStorage {
                     updated = new Coupon(code, discount, expiry, usageLimit, c.usedCount);
                 }
 
-                // সবসময় updated coupon লিখো
+
+                dos.writeUTF(updated.code);
+                dos.writeDouble(updated.discount);
+                dos.writeUTF(updated.expiry);
+                dos.writeInt(updated.usageLimit);
+                dos.writeInt(updated.usedCount);
+            }
+        }
+    }
+    public static int validateCoupon(String code, int userId) {
+        try {
+            List<Coupon> coupons = loadCoupons();
+
+            // Check if user already used a coupon (ONLY CONFIRMED USAGE)
+            File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+            if (usageFile.exists()) {
+                try (DataInputStream dis = new DataInputStream(new FileInputStream(usageFile))) {
+                    while (dis.available() > 0) {
+                        String usedCode = dis.readUTF();
+                        int uid = dis.readInt();
+                        if (uid == userId) {
+                            return usedCode.equals(code) ? 1 : 2;
+                        }
+                    }
+                }
+            }
+
+            for (Coupon c : coupons) {
+                if (c.code.equals(code)) {
+                    LocalDate expiryDate = LocalDate.parse(c.expiry);
+                    if (!expiryDate.isAfter(LocalDate.now())) return 3;
+                    if (c.usedCount >= c.usageLimit) return 4;
+                    return 0; // VALID
+                }
+            }
+            return 5; // invalid
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static void consumeCoupon(String code, int userId) throws IOException {
+        List<Coupon> coupons = loadCoupons();
+        File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false));
+             DataOutputStream usageOut = new DataOutputStream(new FileOutputStream(usageFile, true))) {
+
+            for (Coupon c : coupons) {
+                Coupon updated = c;
+                if (c.code.equals(code)) {
+                    updated = new Coupon(
+                            c.code,
+                            c.discount,
+                            c.expiry,
+                            c.usageLimit,
+                            c.usedCount + 1
+                    );
+                    usageOut.writeUTF(code);
+                    usageOut.writeInt(userId);
+                }
+
                 dos.writeUTF(updated.code);
                 dos.writeDouble(updated.discount);
                 dos.writeUTF(updated.expiry);
@@ -160,7 +221,7 @@ public class FileStorage {
                         }
                     }
 
-                    // সবসময় coupon লিখো (updated বা unchanged)
+
                     dos.writeUTF(updated.code);
                     dos.writeDouble(updated.discount);
                     dos.writeUTF(updated.expiry);
