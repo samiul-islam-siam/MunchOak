@@ -92,7 +92,8 @@ public class ProfilePage {
         logoutBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
         logoutBtn.setOnAction(e -> {
             Session.logout();
-            primaryStage.setScene(new ProfilePage(primaryStage, previousScene).getProfileScene());
+            primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            //primaryStage.setScene(new ProfilePage(primaryStage, previousScene).getProfileScene());
         });
 
         VBox card = new VBox(15, title, userLabel, emailLabel, contactLabel, passLabel, editBtn, logoutBtn, backBtn);
