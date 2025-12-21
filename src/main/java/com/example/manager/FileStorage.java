@@ -961,6 +961,8 @@ public class FileStorage {
                 double tax = dis.readDouble();
                 double service = dis.readDouble();
                 double total = dis.readDouble();
+                int userId = dis.readInt();
+                String userName = dis.readUTF();
 
                 if (pid == paymentId) {
                     return new PaymentBreakdown(
@@ -971,7 +973,9 @@ public class FileStorage {
                             delivery,
                             tax,
                             service,
-                            total
+                            total,
+                            userId,
+                            userName
                     );
                 }
             }
@@ -989,7 +993,9 @@ public class FileStorage {
             double delivery,
             double tax,
             double service,
-            double total
+            double total,
+            int userId,
+            String userName
     ) throws IOException {
 
         ensureDataDir();
@@ -1005,6 +1011,8 @@ public class FileStorage {
             dos.writeDouble(tax);
             dos.writeDouble(service);
             dos.writeDouble(total);
+            dos.writeInt(userId);
+            dos.writeUTF(userName);
         }
     }
 
@@ -1018,6 +1026,8 @@ public class FileStorage {
         public final double tax;
         public final double service;
         public final double total;
+        public final int userId;
+        public final String userName;
 
         public PaymentBreakdown(
                 double baseSubtotal,
@@ -1027,7 +1037,9 @@ public class FileStorage {
                 double delivery,
                 double tax,
                 double service,
-                double total
+                double total,
+                int userId,
+                String userName
         ) {
             this.baseSubtotal = baseSubtotal;
             this.addons = addons;
@@ -1037,6 +1049,8 @@ public class FileStorage {
             this.tax = tax;
             this.service = service;
             this.total = total;
+            this.userId = userId;
+            this.userName = userName;
         }
     }
 

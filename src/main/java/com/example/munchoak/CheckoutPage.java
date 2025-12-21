@@ -837,7 +837,7 @@ public class CheckoutPage {
                 );
 
                 FileStorage.savePaymentDiscountTip(paymentId, discount, tip);
-                FileStorage.savePaymentBreakdown(paymentId,subtotal,TOTAL,discountAmount,tip,deliveryAmount,taxAmount,serviceFeeAmount,totalPayable);
+                FileStorage.savePaymentBreakdown(paymentId,subtotal,TOTAL,discountAmount,tip,deliveryAmount,taxAmount,serviceFeeAmount,totalPayable,Session.getCurrentUserId(),Session.getCurrentUsername());
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {
                     FileStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());

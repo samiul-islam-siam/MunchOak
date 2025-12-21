@@ -24,11 +24,14 @@ public class Bill {
     }
 
     public String generateReceipt(Map<Integer, FoodItems> foodMap) {
+        FileStorage.PaymentBreakdown b =
+                FileStorage.getPaymentBreakdown(payment.getId());
         StringBuilder sb = new StringBuilder();
         sb.append("============================================\n");
         sb.append("\t   MunchOak Restaurant \n");
         sb.append("============================================\n");
-        //sb.append("User ID : ").append(Session.getCurrentUserId()).append("\n");
+        sb.append("User ID : ").append(b.userId).append("\n");
+        sb.append("User Name : ").append(b.userName).append("\n");
         sb.append("Payment ID : ").append(payment.getId()).append("\n");
         sb.append("Date/Time : ")
                 .append(payment.getTimestamp().substring(0, 19).replace("T", " "))
@@ -54,8 +57,7 @@ public class Bill {
         }
 
 
-        FileStorage.PaymentBreakdown b =
-                FileStorage.getPaymentBreakdown(payment.getId());
+
         sb.append("--------------------------------------------\n");
         sb.append(String.format("%-31s %10.2f\n\n", "Total Add-ons:", b.addons));
         sb.append(String.format("%-26s %15.2f\n\n", "Subtotal:", b.baseSubtotal)); // Subtotal includes add-ons

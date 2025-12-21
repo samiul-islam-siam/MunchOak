@@ -4,22 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="logout">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="graph">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/new_menu_with_addons2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_breakdown.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,23 +177,7 @@
       <workItem from="1766136218877" duration="224000" />
       <workItem from="1766145514657" duration="49000" />
       <workItem from="1766235628304" duration="2145000" />
-      <workItem from="1766292927493" duration="440000" />
-    </task>
-    <task id="LOCAL-00046" summary="new login system">
-      <option name="closed" value="true" />
-      <created>1763091926280</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1763091926280</updated>
-    </task>
-    <task id="LOCAL-00047" summary="fresh chat server">
-      <option name="closed" value="true" />
-      <created>1763140869983</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1763140869983</updated>
+      <workItem from="1766292927493" duration="3557000" />
     </task>
     <task id="LOCAL-00048" summary="login bug fixed">
       <option name="closed" value="true" />
@@ -574,14 +555,29 @@
       <option name="project" value="LOCAL" />
       <updated>1766128140910</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="graph">
+      <option name="closed" value="true" />
+      <created>1766293387630</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1766293387630</updated>
+    </task>
+    <task id="LOCAL-00096" summary="graph">
+      <option name="closed" value="true" />
+      <created>1766293410239</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1766293410239</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="login, logout fixed" />
     <MESSAGE value="guest browsing fixed" />
     <MESSAGE value="Chat history problem" />
     <MESSAGE value="Chat bug fixed" />
@@ -606,7 +602,8 @@
     <MESSAGE value="Bill fixing" />
     <MESSAGE value="bill" />
     <MESSAGE value="logout" />
-    <option name="LAST_COMMIT_MESSAGE" value="logout" />
+    <MESSAGE value="graph" />
+    <option name="LAST_COMMIT_MESSAGE" value="graph" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
