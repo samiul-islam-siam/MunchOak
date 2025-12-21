@@ -28,7 +28,7 @@ public class Bill {
         sb.append("============================================\n");
         sb.append("\t   MunchOak Restaurant \n");
         sb.append("============================================\n");
-        sb.append("User ID : ").append(Session.getCurrentUserId()).append("\n");
+        //sb.append("User ID : ").append(Session.getCurrentUserId()).append("\n");
         sb.append("Payment ID : ").append(payment.getId()).append("\n");
         sb.append("Date/Time : ")
                 .append(payment.getTimestamp().substring(0, 19).replace("T", " "))

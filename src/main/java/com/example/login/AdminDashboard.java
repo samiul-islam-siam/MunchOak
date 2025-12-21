@@ -3,16 +3,24 @@ package com.example.login;
 import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
+import com.example.munchoak.History;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
 import com.example.view.AddCouponPopup;
 import com.example.view.EditCouponPopup;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.BorderPane;
@@ -22,9 +30,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
+
 
 public class AdminDashboard {
+    private static BorderPane centerPane;
 
     private static Stage primaryStage = new Stage();
 
@@ -75,7 +88,7 @@ public class AdminDashboard {
         VBox infoBox = new VBox(infoLabel);
         infoBox.setAlignment(Pos.CENTER); // Vertically center the instruction
 
-        BorderPane centerPane = new BorderPane();
+        centerPane = new BorderPane();
         centerPane.setTop(titleBox);
         centerPane.setCenter(infoBox);
         centerPane.setStyle("-fx-background-color: transparent;");
@@ -97,9 +110,15 @@ public class AdminDashboard {
         Button editCouponBtn = new Button("Edit Coupon");
         editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
         Button logoutBtn = new Button("Logout");
+        Button historyBtn = new Button("Payment History");
+
+        historyBtn.setStyle("-fx-background-color: #b30000; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bolder; -fx-pref-width: 200; -fx-padding: 12 0; -fx-background-radius: 25;");
+        menuBox.getChildren().add(historyBtn);
+
+        historyBtn.setOnAction(e -> openAdminHistory(dashboard));
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, historyBtn,chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn}) {
             btn.setStyle(
                     "-fx-background-color: #b30000;" +
                             "-fx-text-fill: white;" +
@@ -388,4 +407,128 @@ public class AdminDashboard {
             primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
         });
     }
+    private static void openAdminHistory(BorderPane dashboard) {
+        BorderPane centerPane = new BorderPane();
+
+        VBox mainLayout = new VBox(20);
+        mainLayout.setPadding(new Insets(20));
+
+        // --- Total Income ---
+        double totalIncome = FileStorage.loadPaymentHistory()
+                .stream().mapToDouble(r -> r.amount).sum();
+        Label totalIncomeLabel = new Label("Total Income: $" + String.format("%.2f", totalIncome));
+        totalIncomeLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+        totalIncomeLabel.setWrapText(true);
+
+        VBox incomeBox = new VBox(totalIncomeLabel);
+        incomeBox.setAlignment(Pos.CENTER_LEFT);
+        incomeBox.setPadding(new Insets(10));
+        incomeBox.setStyle("-fx-background-color: #f1f1f1; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
+        incomeBox.setPrefWidth(300);
+
+        // --- Daily Income Chart ---
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Date");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Income");
+        BarChart<String, Number> dailyChart = new BarChart<>(xAxis, yAxis);
+        dailyChart.setTitle("Daily Income");
+        dailyChart.setLegendVisible(false);
+        dailyChart.setPrefSize(600, 250);
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+//        Map<String, Double> dailyIncome = FileStorage.loadPaymentHistory()
+//                .stream()
+//                .collect(Collectors.groupingBy(
+//                        r -> r.timestamp.split("T")[0],
+//                        Collectors.summingDouble(r -> r.amount)
+//                ));
+//        dailyIncome.forEach((date, income) -> series.getData().add(new XYChart.Data<>(date, income)));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+// Aggregate income by date
+        Map<String, Double> incomeMap = FileStorage.loadPaymentHistory()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        r -> r.timestamp.split("T")[0],
+                        Collectors.summingDouble(r -> r.amount)
+                ));
+
+// Get last 7 consecutive days (including today)
+        LocalDate today = LocalDate.now();
+
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            String dateStr = date.format(formatter);
+
+            double income = incomeMap.getOrDefault(dateStr, 0.0);
+            series.getData().add(new XYChart.Data<>(dateStr, income));
+        }
+        dailyChart.getData().add(series);
+        dailyChart.setAnimated(false);
+        dailyChart.setCategoryGap(20);
+        dailyChart.setBarGap(5);
+
+        VBox chartBox = new VBox(dailyChart);
+        chartBox.setPadding(new Insets(10));
+        chartBox.setStyle("-fx-background-color: #f1f1f1; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+        // --- Top HBox for Income + Chart ---
+        HBox topBox = new HBox(20, incomeBox, chartBox);
+        topBox.setAlignment(Pos.CENTER_LEFT);
+
+        // --- History Table ---
+        TableView<History.HistoryRecord> table = new TableView<>();
+        table.setItems(FXCollections.observableArrayList(
+                FileStorage.loadPaymentHistory().stream()
+                        .map(s -> new History.HistoryRecord(
+                                s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod))
+                        .toList()
+        ));
+
+        TableColumn<History.HistoryRecord, Integer> userIdCol = new TableColumn<>("User ID");
+        userIdCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getUserId()).asObject());
+
+        TableColumn<History.HistoryRecord, Integer> paymentIdCol = new TableColumn<>("Payment ID");
+        paymentIdCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getPaymentId()).asObject());
+
+        TableColumn<History.HistoryRecord, String> dateCol = new TableColumn<>("Date/Time");
+        dateCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTimestamp()));
+
+        TableColumn<History.HistoryRecord, Double> amountCol = new TableColumn<>("Amount");
+        amountCol.setCellValueFactory(data -> new javafx.beans.property.SimpleDoubleProperty(data.getValue().getAmount()).asObject());
+
+        TableColumn<History.HistoryRecord, String> methodCol = new TableColumn<>("Payment Method");
+        methodCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getPaymentMethod()));
+
+        TableColumn<History.HistoryRecord, Void> billCol = new TableColumn<>("Bill");
+        billCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("View");
+            {
+                btn.setOnAction(e -> {
+                    History.HistoryRecord record = getTableView().getItems().get(getIndex());
+                    new History(primaryStage).showBill(record);
+                });
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btn);
+            }
+        });
+
+        table.getColumns().addAll(userIdCol, paymentIdCol, dateCol, amountCol, methodCol, billCol);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        table.setPrefHeight(400);
+
+        // --- Layout ---
+        mainLayout.getChildren().addAll(topBox, table);
+        centerPane.setCenter(mainLayout);
+
+        // Replace the center of the dashboard
+        //dashboard.setCenter(centerPane);
+        AdminDashboard.centerPane.setCenter(mainLayout);
+
+    }
+
 }

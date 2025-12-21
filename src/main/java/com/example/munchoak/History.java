@@ -164,7 +164,7 @@ public class History {
     }
 
     // ------------------ Bill Popup ------------------
-    private void showBill(HistoryRecord record) {
+    public void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
         Cart tempCart = new Cart();
