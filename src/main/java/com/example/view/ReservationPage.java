@@ -4,6 +4,7 @@ import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -24,6 +25,7 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 
 public class ReservationPage {
@@ -134,7 +136,7 @@ public class ReservationPage {
         phoneField.setMaxWidth(350);
         // ✅ Autofill from user.dat if logged in
         String currentUser = Session.getCurrentUsername();
-        if (!"guest".equals(currentUser)) {
+        if (!Session.isGuest()) {
             // Use username as default name
             nameField.setText(currentUser);
 
@@ -179,6 +181,24 @@ public class ReservationPage {
         HBox guestsBox = new HBox(10, guestsLabel, guestSpinner);
         guestsBox.setAlignment(Pos.CENTER);
 
+        // TIME SELECTOR (declared early for scope)
+        Label timeLabel = new Label("Time:");
+        timeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
+
+        ComboBox<String> timeBox = new ComboBox<>();
+        timeBox.setPromptText("Select Time");
+        timeBox.setStyle("""
+                    -fx-background-color: #FFB266;
+                    -fx-text-fill: #001F3F;
+                    -fx-font-weight: bold;
+                    -fx-font-size: 16px;
+                    -fx-background-radius: 10;
+                    -fx-border-radius: 10;
+                    -fx-padding: 6 15 6 15;
+                    -fx-cursor: hand;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+                """);
+        timeBox.setPrefWidth(150);
 
         // DATE PICKER
         Label dateLabel = new Label("Date:");
@@ -224,29 +244,37 @@ public class ReservationPage {
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
                 """);
         datePicker.setPrefWidth(190);
-// TIME SELECTOR
-        Label timeLabel = new Label("Time:");
-        timeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #001F3F;");
 
-        ComboBox<String> timeBox = new ComboBox<>();
-        for (int hour = 10; hour <= 22; hour++) {
-            timeBox.getItems().add(String.format("%02d:00", hour));
-        }
-        timeBox.setPromptText("Select Time");
-        timeBox.setStyle("""
-                    -fx-background-color: #FFB266;
-                    -fx-text-fill: #001F3F;
-                    -fx-font-weight: bold;
-                    -fx-font-size: 16px;
-                    -fx-background-radius: 10;
-                    -fx-border-radius: 10;
-                    -fx-padding: 6 15 6 15;
-                    -fx-cursor: hand;
-                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
-                """);
-        timeBox.setPrefWidth(150);
+        // Set initial value to today
+        datePicker.setValue(LocalDate.now());
 
-// ROW CONTAINING GUESTS, DATE & TIME
+//         Listener to prevent past dates and update times
+//        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+//            LocalDate today = LocalDate.now();
+//            if (newVal != null && newVal.isBefore(today)) {
+//                datePicker.setValue(today);
+//            } else {
+//                updateTimeOptions(timeBox, datePicker);
+//            }
+//        });
+
+        // Listener to prevent past dates and update times
+        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+            LocalDate today = LocalDate.now();
+
+            if (newVal != null && newVal.isBefore(today)) {
+                datePicker.setValue(today);
+                return;
+            }
+
+            updateTimeOptions(timeBox, datePicker);
+        });
+
+
+        // Initial population of times
+        updateTimeOptions(timeBox, datePicker);
+
+        // ROW CONTAINING GUESTS, DATE & TIME
         HBox topRow = new HBox(50,
                 guestsBox,
                 new HBox(5, dateLabel, datePicker),
@@ -277,7 +305,7 @@ public class ReservationPage {
         Button bookButton = new Button("Book Now");
         bookButton.getStyleClass().add("dashboard-button");
         bookButton.setOnAction(e -> {
-            if (Session.getCurrentUsername().equals("guest")) {
+            if (Session.isGuest()) {
                 Stage notifyPopup = new Stage();
                 notifyPopup.initStyle(StageStyle.TRANSPARENT);
                 notifyPopup.setAlwaysOnTop(true);
@@ -305,7 +333,8 @@ public class ReservationPage {
                     showAlert(Alert.AlertType.WARNING, "Incomplete Information", "Please fill in all required fields.");
                     return;
                 }
-// ✅ Contact number validation
+
+                // Contact number validation
                 if (!phone.matches("^01\\d{9}$")) {
                     showAlert(Alert.AlertType.ERROR,
                             "Invalid Contact Number",
@@ -323,10 +352,17 @@ public class ReservationPage {
                 Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
+                    Session.getMenuClient().sendReservationUpdate();
                     if (saved) {
                         showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
                                 "Your table has been successfully reserved!\nWe look forward to serving you.");
-                        clearFields(nameField, phoneField, requestArea, datePicker, timeBox, guestSpinner);
+                        // Clear fields manually with dynamic reset
+                        nameField.clear();
+                        phoneField.clear();
+                        requestArea.clear();
+                        guestSpinner.getValueFactory().setValue(1);
+                        datePicker.setValue(LocalDate.now());
+                        updateTimeOptions(timeBox, datePicker);
                     } else {
                         showAlert(Alert.AlertType.ERROR, "Error", "Failed to save reservation. Please try again.");
                     }
@@ -335,6 +371,7 @@ public class ReservationPage {
             }
 
         });
+
         // FINAL EXTENSION LAYOUT
         VBox inputBox = new VBox(20, personalBox, topRow, requestLabel, requestArea, bookButton);
         inputBox.setAlignment(Pos.CENTER);
@@ -375,6 +412,75 @@ public class ReservationPage {
         if (cssURL != null) scene.getStylesheets().add(cssURL.toExternalForm());
 
         return scene;
+    }
+
+// This is previous version:
+//        private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
+//        timeBox.getItems().clear();
+//        if (selectedDate == null) {
+//            for (int hour = 10; hour <= 22; hour++) {
+//                timeBox.getItems().add(String.format("%02d:00", hour));
+//            }
+//            return;
+//        }
+//
+//        LocalDate today = LocalDate.now();
+//        LocalTime now = LocalTime.now();
+//        int startHour;
+//        if (selectedDate.isEqual(today)) {
+//            // For today, start from the next hour after current time
+//            startHour = now.getHour() + 1;
+//        } else {
+//            // For future dates, start from 10:00
+//            startHour = 10;
+//        }
+//
+//        for (int hour = Math.max(10, startHour); hour <= 22; hour++) {
+//            timeBox.getItems().add(String.format("%02d:00", hour));
+//        }
+//
+//        // Set default to first available if none selected
+//        if (timeBox.getValue() == null || !timeBox.getItems().contains(timeBox.getValue())) {
+//            timeBox.setValue(timeBox.getItems().isEmpty() ? null : timeBox.getItems().get(0));
+//        }
+//    }
+
+    private void updateTimeOptions(ComboBox<String> timeBox, DatePicker datePicker) {
+        timeBox.getItems().clear();
+
+        LocalDate selectedDate = datePicker.getValue();
+        if (selectedDate == null) return;
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        // 🔴 If today selected but restaurant is closed
+        if (selectedDate.isEqual(today) && now.getHour() >= 22) {
+
+            LocalDate tomorrow = today.plusDays(1);
+
+            // ✅ Directly update DatePicker (safe & clean)
+            datePicker.setValue(tomorrow);
+
+            for (int hour = 10; hour <= 22; hour++) {
+                timeBox.getItems().add(String.format("%02d:00", hour));
+            }
+
+            timeBox.setValue("10:00");
+            return;
+        }
+
+        int startHour = selectedDate.isEqual(today)
+                ? now.getHour() + 1
+                : 10;
+
+        for (int hour = Math.max(10, startHour); hour <= 22; hour++) {
+            timeBox.getItems().add(String.format("%02d:00", hour));
+        }
+
+        if (!timeBox.getItems().isEmpty()) {
+            timeBox.setValue(timeBox.getItems().get(0));
+        }
     }
 
     private Optional<ButtonType> showConfirm(String title, String message) {
@@ -421,6 +527,7 @@ public class ReservationPage {
         Button homeBtn = createDashboardButton("HOME");
         Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
+        Button messageBtn = createDashboardButton("MESSAGES");
         Button aboutBtn = createDashboardButton("ABOUT US");
 
         homeBtn.setOnAction(e -> {
@@ -471,6 +578,26 @@ public class ReservationPage {
 
         });
 
+        messageBtn.setOnAction(e -> {
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            boolean wasMaximized = primaryStage.isMaximized();
+
+            MessagePage messagePage = new MessagePage(primaryStage, cart);
+            Scene messageScene = messagePage.getMessageScene();
+            primaryStage.setScene(messageScene);
+
+            Platform.runLater(() -> {
+                if (wasFullScreen) primaryStage.setFullScreen(true);
+                else if (wasMaximized) primaryStage.setMaximized(true);
+                else {
+                    primaryStage.setWidth(currentWidth);
+                    primaryStage.setHeight(currentHeight);
+                }
+            });
+        });
+
         aboutBtn.setOnAction(e -> {
             double currentWidth = primaryStage.getWidth();
             double currentHeight = primaryStage.getHeight();
@@ -490,7 +617,7 @@ public class ReservationPage {
             });
         });
 
-        dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, aboutBtn);
+        dashboard.getChildren().addAll(homeBtn, menuBtn, profileBtn, messageBtn, aboutBtn);
         return dashboard;
     }
 

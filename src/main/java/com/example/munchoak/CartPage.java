@@ -6,6 +6,7 @@ import com.example.menu.MenuPage;
 import com.example.view.HomePage;
 import com.example.view.LoginPage;
 import com.example.view.ProfilePage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
@@ -20,7 +21,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import java.util.List;
 
 import java.io.InputStream;
 import java.util.*;
@@ -32,6 +32,7 @@ public class CartPage {
     private final Cart cart;
     private double disCount;
     private double total;
+    private String couponCode;
 
     public void setDisCount(double disCount) {
         this.disCount = disCount;
@@ -233,7 +234,7 @@ public class CartPage {
                     );
                     addBtn.setMaxWidth(Double.MAX_VALUE);
                     addBtn.setOnAction(evt -> {
-                        if (Session.getCurrentUsername().equals("guest")) {
+                        if (Session.isGuest()) {
                             // Show login popup
                             Stage notifyPopup = new Stage();
                             notifyPopup.initStyle(StageStyle.UNDECORATED);
@@ -301,7 +302,7 @@ public class CartPage {
 
 
         boolean loggedIn = (Session.getCurrentUsername() != null &&
-                !Session.getCurrentUsername().equals("guest")) &&
+                !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null &&
                         !Session.getCurrentEmail().isEmpty());
 
@@ -637,7 +638,7 @@ public class CartPage {
                                 "-fx-cursor: hand;"
                 ));
                 addSuggestionBtn.setOnAction(evt -> {
-                    if (Session.getCurrentUsername().equals("guest")) {
+                    if (Session.isGuest()) {
                         Stage notifyPopup = new Stage();
                         notifyPopup.initStyle(StageStyle.TRANSPARENT);
                         notifyPopup.setAlwaysOnTop(true);
@@ -654,6 +655,7 @@ public class CartPage {
 
                     } else {
                         cart.addToCart(item.getId(), 1, 0.0);  // No add-ons from suggestions
+
                         primaryStage.setScene(getScene());  // Refresh the scene to update cart
                     }
                 });
@@ -682,15 +684,13 @@ public class CartPage {
         couponSection.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;");
 
 
-// Load coupons from admin
-
+        // Load coupons from admin
         List<FileStorage.Coupon> coupons = FileStorage.loadCoupons();
 
         ComboBox<String> couponDropdown = new ComboBox<>();
         for (FileStorage.Coupon c : coupons) {
             couponDropdown.getItems().add(c.code);
         }
-
 
         Label couponStatusLabel = new Label("No coupon applied");
 
@@ -778,19 +778,19 @@ public class CartPage {
                 else if (tipGroup.getSelectedToggle() == tip4) currentTip = 4.0;
                 else if (tipGroup.getSelectedToggle() == tip7) currentTip = 7.0;
             }
-            // 👉 Always show updated total
+            // Always show updated total
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Checkout");
 
-            primaryStage.setScene(new CheckoutPage(primaryStage, cart, getDisCount(), currentTip).getScene());
+            primaryStage.setScene(new CheckoutPage(primaryStage, cart, getDisCount(), currentTip, couponCode ).getScene());
 
         });
+
         // --- Guest Mode Handling ---
-        if (Session.getCurrentUsername().equals("guest")) {
+        if (Session.isGuest()) {
             couponSection.setVisible(false);
             couponSection.setManaged(false);
-        }
-        else {
+        } else {
             couponDropdown.setPromptText("Select a coupon");
 
             Button availableCouponsBtn = new Button("Available Coupons");
@@ -814,11 +814,14 @@ public class CartPage {
                         setText(item);
                     }
                     setStyle(
-                            "-fx-background-color: black;" +   // কালো background
-                                    "-fx-text-fill: white;" +          // সাদা text
-                                    "-fx-font-weight: bold;" +
-                                    "-fx-background-radius: 6;" +
-                                    "-fx-padding: 8 16;"
+
+                            "-fx-background-color: #FFDAB9;" +
+                             "-fx-font-weight: bold;" +
+                                    "-fx-text-fill: black;" +
+                                    "-fx-border-color: #ccc;" +
+                                    "-fx-border-radius: 8;" +
+                                    "-fx-background-radius: 8;" +
+                                    "-fx-padding: 8 12;"
                     );
                 }
             });
@@ -843,8 +846,38 @@ public class CartPage {
                 }
             });
 
+
             Button applyBtn = new Button("Apply Now");
-            applyBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+            applyBtn.setStyle(
+                    "-fx-background-color: #FF6B00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            );
+
+// Optional hover effect
+            applyBtn.setOnMouseEntered(e -> applyBtn.setStyle(
+                    "-fx-background-color: #e55a00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            ));
+            applyBtn.setOnMouseExited(e -> applyBtn.setStyle(
+                    "-fx-background-color: #FF6B00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            ));
+            applyBtn.setDefaultButton(true); // ✅ Enter key triggers Save
             couponSection.getChildren().addAll(
                     new Label("Available Coupons"),
                     couponDropdown,
@@ -854,72 +887,74 @@ public class CartPage {
             applyBtn.setOnAction(e -> {
 
                 String selectedCode = couponDropdown.getValue();
-                if (cart.getBuyHistory().isEmpty())
-                {
+                if (cart.getBuyHistory().isEmpty()) {
                     //showError("You must add food items before applying a coupon!");
                     showErrorPopup("Your must buy food items before applying a coupon!");
                     return;
                 }
 
-                    String code = selectedCode;
-                    int userId = FileStorage.getUserId(Session.getCurrentUsername());
+                String code = selectedCode;
+                int userId = FileStorage.getUserId(Session.getCurrentUsername());
 
-                    int result = FileStorage.applyCoupon(code, userId);
+                //int result = FileStorage.applyCoupon(code, userId);
+                int result = FileStorage.validateCoupon(code, userId);
 
-                    switch (result) {
-                        case 0:
-                            showPopup("Coupon applied successfully!", "#43A047"); // green
-                            if (selectedCode != null) {
-                                //double discountRate = coupons.get(selectedCode);
-                                double discountRate = 0.0;
-                                for (FileStorage.Coupon c : coupons) {
-                                    if (c.code.equals(selectedCode)) {
-                                        discountRate = c.discount;
-                                        break;
-                                    }
+                switch (result) {
+                    case 0:
+                        showPopup("Coupon applied successfully!", "#43A047"); // green
+                        this.couponCode = code;
+                        if (selectedCode != null) {
+                            //double discountRate = coupons.get(selectedCode);
+                            double discountRate = 0.0;
+                            for (FileStorage.Coupon c : coupons) {
+                                if (c.code.equals(selectedCode)) {
+                                    discountRate = c.discount;
+                                    break;
                                 }
-
-                                setDisCount(discountRate);
-
-                                couponStatusLabel.setText("Applied " + selectedCode + " (" + (int) (discountRate * 100) + "% off)");
-                                couponStatusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-
-                                // 👉 Recalculate totals
-                                double discountAmount = subtotal * disCount;
-                                double discountedSubtotal = subtotal - discountAmount;
-                                double finalTotal = discountedSubtotal +  getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
-                                this.total = finalTotal;
-
-                                // Update labels
-                                discountLabel.setText("Discount: -৳" + String.format("%.2f", discountAmount));
-                                totalLabel.setText("Total Payable: ৳" + String.format("%.2f", finalTotal));
-                            } else {
-                                couponStatusLabel.setText("Please select a coupon!");
-                                couponStatusLabel.setStyle("-fx-text-fill: red;");
                             }
 
+                            setDisCount(discountRate);
 
-                            break;
-                        case 1:
-                            showPopup("You have already used this coupon!", "#E53935"); // red
-                            break;
-                        case 2:
-                            showPopup("You can't use more than one coupon!", "#E53935");
-                            break;
-                        case 3:
-                            showPopup("Coupon expired!", "#E53935");
-                            break;
-                        case 4:
-                            showPopup("Coupon usage limit exceeded!", "#E53935");
-                            break;
-                        case 5:
-                            showPopup("Invalid coupon code!", "#E53935");
-                            break;
-                        default:
-                            showPopup("Error applying coupon!", "#E53935");
-                            break;
-                    }
+                            couponStatusLabel.setText("Applied " + selectedCode + " (" + (int) (discountRate * 100) + "% off)");
+                            couponStatusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                            delay.setOnFinished(evt -> couponStatusLabel.setText(""));
+                            delay.play();
+                            // 👉 Recalculate totals
+                            double discountAmount = subtotal * disCount;
+                            double discountedSubtotal = subtotal - discountAmount;
+                            double finalTotal = discountedSubtotal + getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
+                            this.total = finalTotal;
 
+                            // Update labels
+                            discountLabel.setText("Discount: -৳" + String.format("%.2f", discountAmount));
+                            totalLabel.setText("Total Payable: ৳" + String.format("%.2f", finalTotal));
+                        } else {
+                            couponStatusLabel.setText("Please select a coupon!");
+                            couponStatusLabel.setStyle("-fx-text-fill: red;");
+                        }
+
+
+                        break;
+                    case 1:
+                        showPopup("You have already used this coupon!", "#E53935"); // red
+                        break;
+                    case 2:
+                        showPopup("You can't use more than one coupon!", "#E53935");
+                        break;
+                    case 3:
+                        showPopup("Coupon expired!", "#E53935");
+                        break;
+                    case 4:
+                        showPopup("Coupon usage limit exceeded!", "#E53935");
+                        break;
+                    case 5:
+                        showPopup("Invalid coupon code!", "#E53935");
+                        break;
+                    default:
+                        showPopup("Error applying coupon!", "#E53935");
+                        break;
+                }
 
 
             });
@@ -938,14 +973,14 @@ public class CartPage {
                 }
 
                 // this.disCount = discount.get();
-                setDisCount(discount.get());
+                //setDisCount(discount.get());
                 double discountAmount = subtotal * disCount;
                 double discountedSubtotal = subtotal - discountAmount;
-                double finalTotal = tip.get()+discountedSubtotal + getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
-             //   this.total = finalTotal;
+                double finalTotal = tip.get() + discountedSubtotal + getTaxAmount() + getDeliveryAmount() + getServiceFeeAmount();
+                //   this.total = finalTotal;
 
 
-               // double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
+                // double newTotal = subtotal - discount.get() + taxAmount + serviceFeeAmount + deliveryAmount + tip.get();
                 this.total = finalTotal;
                 totalLabel.setText("Total Payable: ৳" + String.format("%.2f", finalTotal));
             });
@@ -1072,6 +1107,7 @@ public class CartPage {
 
         return scene;
     }
+
     // helper popup method
     private void showPopup(String msg, String color) {
         Stage popup = new Stage();

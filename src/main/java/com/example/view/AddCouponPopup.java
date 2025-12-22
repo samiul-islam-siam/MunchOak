@@ -1,21 +1,28 @@
 
 package com.example.view;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
+
 import com.example.manager.FileStorage;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class AddCouponPopup {
 
-    public static void show(Stage owner) {
+    public static void show(Stage owner, Runnable onSuccess) {
         Stage popup = new Stage();
         popup.initOwner(owner);
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -38,6 +45,7 @@ public class AddCouponPopup {
         // --- Save button ---
         Button saveBtn = new Button("Save");
         saveBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+        saveBtn.setDefaultButton(true); // ✅ Enter key will trigger this button
 
         saveBtn.setOnAction(e -> {
             String code = codeField.getText().trim().toUpperCase();
@@ -152,6 +160,7 @@ public class AddCouponPopup {
 
         popup.setScene(new Scene(box, 340, 220));
         popup.showAndWait();
+        onSuccess.run();
     }
         // --- Helper method ---
         private static void clearMessageAfterDelay(Label status) {

@@ -2,8 +2,8 @@ package com.example.manager;
 
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
-import java.time.LocalDate;
 
+import java.time.LocalDate;
 import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,43 +24,71 @@ public class FileStorage {
     private static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
     private static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
+    private static final File MESSAGES_FILE = new File(DATA_DIR, "messages.dat");
+    private static final File PAYMENT_BREAKDOWN_FILE =
+            new File(DATA_DIR, "payment_breakdown.dat");
+    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+
+
     // Active menu file (changes when attaching a different menu)
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
-    private static final File COUPON_USAGE_FILE = new File(DATA_DIR, "coupon_usage.dat");
+
     // In FileStorage.java (add near reservation methods)
     private static final File RESERVATION_STATUS_FILE = new File(DATA_DIR, "reservation_status.dat");
+
+    private static final File COUPON_USAGE_FILE = new File(DATA_DIR, "coupon_usage.dat");
     private static final File COUPONS_FILE = new File(DATA_DIR, "coupons.dat");
-    public static class Coupon
-    {
+
+    public static class Coupon {
         public final String code;
         public final double discount;
         public final String expiry; // expiry string
         public final int usageLimit;
         public final int usedCount;
-         public Coupon(String code, double discount, String expiry,int usageLimit,int usedCount)
-         {
-             this.code = code;
-             this.discount = discount;
-             this.expiry = expiry;
-             this.usageLimit = usageLimit;
-             this.usedCount = usedCount;
-         }
+
+        public Coupon(String code, double discount, String expiry, int usageLimit, int usedCount) {
+            this.code = code;
+            this.discount = discount;
+            this.expiry = expiry;
+            this.usageLimit = usageLimit;
+            this.usedCount = usedCount;
+        }
+    }
+    public static boolean deleteCoupon(String codeToDelete) {
+        try {
+            List<Coupon> coupons = loadCoupons();
+            boolean existed = false;
+
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false))) {
+                for (Coupon c : coupons) {
+                    if (c.code.equals(codeToDelete)) {
+                        existed = true;
+                        continue; // skip writing this one (delete)
+                    }
+                    dos.writeUTF(c.code);
+                    dos.writeDouble(c.discount);
+                    dos.writeUTF(c.expiry);
+                    dos.writeInt(c.usageLimit);
+                    dos.writeInt(c.usedCount);
+                }
+            }
+            return existed;
+        } catch (IOException e) {
+            System.err.println("deleteCoupon IOException: " + e.getMessage());
+            return false;
+        }
     }
 
-    public static void addCoupon(String code, double discount,String expiry,int usageLimit) throws IOException {
+    public static void addCoupon(String code, double discount, String expiry, int usageLimit) throws IOException {
 
         try {
             LocalDate expiryDate = LocalDate.parse(expiry);
-            if (!expiryDate.isAfter(LocalDate.now()))
-            {
+            if (!expiryDate.isAfter(LocalDate.now())) {
                 throw new IllegalArgumentException("Expiry date must be in the future!");
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new IllegalArgumentException("Invalid expiry format! Must be YYYY-MM-DD");
         }
-
 
 
         ensureDataDir();
@@ -84,9 +112,10 @@ public class FileStorage {
                 String expiry = dis.readUTF();
                 int usageLimit = dis.readInt();
                 int usedCount = dis.readInt();
-                coupons.add(new Coupon(code, discount, expiry,usageLimit,usedCount));
+                coupons.add(new Coupon(code, discount, expiry, usageLimit, usedCount));
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return coupons;
     }
 
@@ -96,7 +125,7 @@ public class FileStorage {
             for (Coupon c : coupons) {
                 Coupon updated = c;
                 if (c.code.equals(code)) {
-                    // শুধু যেটা edit করবে সেটাই নতুন হবে, বাকি unchanged
+
                     double discount = (newDiscount != null) ? newDiscount : c.discount;
                     String expiry = (newExpiry != null && !newExpiry.isEmpty()) ? newExpiry : c.expiry;
                     int usageLimit = (newUsageLimit != null) ? newUsageLimit : c.usageLimit;
@@ -104,7 +133,7 @@ public class FileStorage {
                     updated = new Coupon(code, discount, expiry, usageLimit, c.usedCount);
                 }
 
-                // সবসময় updated coupon লিখো
+
                 dos.writeUTF(updated.code);
                 dos.writeDouble(updated.discount);
                 dos.writeUTF(updated.expiry);
@@ -113,53 +142,59 @@ public class FileStorage {
             }
         }
     }
+    public static int validateCoupon(String code, int userId) {
+        try {
+            List<Coupon> coupons = loadCoupons();
 
-public static int applyCoupon(String code, int userId) {
-    try {
-        List<Coupon> coupons = loadCoupons();
-        File usageFile = new File(DATA_DIR, "coupon_usage.dat");
-
-        // usage history check
-        if (usageFile.exists()) {
-            try (DataInputStream dis = new DataInputStream(new FileInputStream(usageFile))) {
-                while (dis.available() > 0) {
-                    String usedCode = dis.readUTF();
-                    int uid = dis.readInt();
-                    if (uid == userId) {
-                        if (usedCode.equals(code)) {
-                            return 1; // already used same coupon
-                        } else {
-                            return 2; // already used another coupon
+            // Check if user already used a coupon (ONLY CONFIRMED USAGE)
+            File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+            if (usageFile.exists()) {
+                try (DataInputStream dis = new DataInputStream(new FileInputStream(usageFile))) {
+                    while (dis.available() > 0) {
+                        String usedCode = dis.readUTF();
+                        int uid = dis.readInt();
+                        if (uid == userId) {
+                            return usedCode.equals(code) ? 1 : 2;
                         }
                     }
                 }
             }
-        }
 
-        int resultCode = -1;
+            for (Coupon c : coupons) {
+                if (c.code.equals(code)) {
+                    LocalDate expiryDate = LocalDate.parse(c.expiry);
+                    if (!expiryDate.isAfter(LocalDate.now())) return 3;
+                    if (c.usedCount >= c.usageLimit) return 4;
+                    return 0; // VALID
+                }
+            }
+            return 5; // invalid
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static void consumeCoupon(String code, int userId) throws IOException {
+        List<Coupon> coupons = loadCoupons();
+        File usageFile = new File(DATA_DIR, "coupon_usage.dat");
+
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(COUPONS_FILE, false));
              DataOutputStream usageOut = new DataOutputStream(new FileOutputStream(usageFile, true))) {
 
             for (Coupon c : coupons) {
                 Coupon updated = c;
-
                 if (c.code.equals(code)) {
-                    // expiry check
-                    LocalDate expiryDate = LocalDate.parse(c.expiry);
-                    if (!expiryDate.isAfter(LocalDate.now())) {
-                        resultCode = 3; // expired
-                    } else if (c.usedCount >= c.usageLimit) {
-                        resultCode = 4; // usage limit exceeded
-                    } else {
-                        // apply coupon
-                        updated = new Coupon(c.code, c.discount, c.expiry, c.usageLimit, c.usedCount + 1);
-                        usageOut.writeUTF(code);
-                        usageOut.writeInt(userId);
-                        resultCode = 0; // success
-                    }
+                    updated = new Coupon(
+                            c.code,
+                            c.discount,
+                            c.expiry,
+                            c.usageLimit,
+                            c.usedCount + 1
+                    );
+                    usageOut.writeUTF(code);
+                    usageOut.writeInt(userId);
                 }
 
-                // সবসময় coupon লিখো (updated বা unchanged)
                 dos.writeUTF(updated.code);
                 dos.writeDouble(updated.discount);
                 dos.writeUTF(updated.expiry);
@@ -167,13 +202,7 @@ public static int applyCoupon(String code, int userId) {
                 dos.writeInt(updated.usedCount);
             }
         }
-
-        return resultCode;
-    } catch (IOException e) {
-        System.err.println("IOException in applyCoupon: " + e.getMessage());
-        return -1; // error
     }
-}
 
     public static class ReservationRecord {
         public final int resId;
@@ -186,7 +215,8 @@ public static int applyCoupon(String code, int userId) {
         public final String createdAt;
         public final String username;  // NEW
         public final int userId;       // NEW
-        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time, String request, String createdAt,String username, int userId) {
+
+        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time, String request, String createdAt, String username, int userId) {
             this.resId = resId;
             this.name = name;
             this.phone = phone;
@@ -217,7 +247,7 @@ public static int applyCoupon(String code, int userId) {
                 String createdAt = dis.readUTF();
                 String username = dis.readUTF();
                 int userId = dis.readInt();
-                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt,username, userId));
+                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt, username, userId));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -255,6 +285,62 @@ public static int applyCoupon(String code, int userId) {
             System.err.println("IOException: " + e.getMessage());
         }
         return last;
+    }
+
+    public static List<MessageRecord> loadMessagesForUser(int userId) {
+        ensureDataDir();
+        List<MessageRecord> list = new ArrayList<>();
+
+        if (!MESSAGES_FILE.exists() || MESSAGES_FILE.length() == 0)
+            return list;
+
+        try (DataInputStream dis =
+                     new DataInputStream(new FileInputStream(MESSAGES_FILE))) {
+
+            while (dis.available() > 0) {
+                int uid = dis.readInt();
+                String sender = dis.readUTF();
+                String msg = dis.readUTF();
+                String time = dis.readUTF();
+
+                if (uid == userId) {
+                    list.add(new MessageRecord(uid, sender, msg, time));
+                }
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("Message load error: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public static void saveMessageForUser(int userId, String sender, String message) {
+        ensureDataDir();
+        try (DataOutputStream dos =
+                     new DataOutputStream(new FileOutputStream(MESSAGES_FILE, true))) {
+
+            dos.writeInt(userId);
+            dos.writeUTF(sender);
+            dos.writeUTF(message);
+            dos.writeUTF(Instant.now().toString());
+
+        } catch (IOException e) {
+            System.err.println("Message save error: " + e.getMessage());
+        }
+    }
+
+    public static class MessageRecord {
+        public final int userId;
+        public final String sender;
+        public final String message;
+        public final String timestamp;
+
+        public MessageRecord(int userId, String sender, String message, String timestamp) {
+            this.userId = userId;
+            this.sender = sender;
+            this.message = message;
+            this.timestamp = timestamp;
+        }
     }
 
     //Ensuring all necessary files in directory and pointer files
@@ -307,9 +393,10 @@ public static int applyCoupon(String code, int userId) {
     }
 
     public static void ensureDataDir() {
-
         if (!DATA_DIR.exists()) DATA_DIR.mkdirs(); //to create directory
         try {
+
+
             if (!COUPONS_FILE.exists()) COUPONS_FILE.createNewFile();
             File usageFile = new File(DATA_DIR, "coupon_usage.dat");
             if (!usageFile.exists()) usageFile.createNewFile();
@@ -338,6 +425,11 @@ public static int applyCoupon(String code, int userId) {
             if (!RESERVATIONS_FILE.exists()) RESERVATIONS_FILE.createNewFile();
             if (!MENU_POINTER_FILE.exists()) MENU_POINTER_FILE.createNewFile();
             if (!PAYMENT_DISCOUNTS_FILE.exists()) PAYMENT_DISCOUNTS_FILE.createNewFile();
+            if (!MESSAGES_FILE.exists()) MESSAGES_FILE.createNewFile();
+            if (!PAYMENT_BREAKDOWN_FILE.exists())
+                PAYMENT_BREAKDOWN_FILE.createNewFile();
+
+
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
@@ -367,10 +459,11 @@ public static int applyCoupon(String code, int userId) {
                 int quantity = dis.readInt();   // NEW LINE
                 String addOne = dis.readUTF();
                 double addOnePrice = dis.readDouble();
-                String addTwo = dis.readUTF();;
+                String addTwo = dis.readUTF();
+                ;
                 double addTwoPrice = dis.readDouble();
 
-                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity,addOne,addOnePrice,addTwo,addTwoPrice));
+                list.add(new FoodItems(id, name, details, price, cuisine, imagePath, category, quantity, addOne, addOnePrice, addTwo, addTwoPrice));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
@@ -495,20 +588,6 @@ public static int applyCoupon(String code, int userId) {
         return false;
     }
 
-    //Accessing user id for a particular user (To track current user)
-    public static int getUserId(String username) {
-        ensureDataDir();
-        for (String[] user : loadUsers()) {
-            if (user[0].equals(username)) {
-                try {
-                    return Integer.parseInt(user[4]);
-                } catch (Exception ignored) {
-                }
-            }
-        }
-        return -1;
-    }
-
     public static boolean updateUserInfo(int userId, String newUsername, String newEmail, String newContact) {
         List<String[]> allUsers = loadUsers();
         boolean updated = false;
@@ -535,14 +614,19 @@ public static int applyCoupon(String code, int userId) {
         return updated;
     }
 
-
-
-
-
-
-
-
-
+    //Accessing user id for a particular user (To track current user)
+    public static int getUserId(String username) {
+        ensureDataDir();
+        for (String[] user : loadUsers()) {
+            if (user[0].equals(username)) {
+                try {
+                    return Integer.parseInt(user[4]);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return -1;
+    }
 
     public static String getUserEmail(String username) {
         ensureDataDir();
@@ -579,7 +663,7 @@ public static int applyCoupon(String code, int userId) {
         ensureDataDir();
 
         // Start from 2025001 for registered users
-        int uid = generateNextIdInFile(USERS_FILE, 4);
+        int uid = generateNextIdInFile(USERS_FILE, 2025001);
         // Generate salt and hash
         String salt = PasswordUtils.generateSalt();
         String hash = PasswordUtils.hashPassword(password, salt);
@@ -593,31 +677,6 @@ public static int applyCoupon(String code, int userId) {
         }
     }
 
-    //'guest' is default user while no login is occurred
-    public static void ensureDefaultGuestUser() {
-        ensureDataDir();
-        List<String[]> users = loadUsers();
-
-        boolean guestExists = false;
-        for (String[] user : users) {
-            if (user[0].equals("guest")) {
-                guestExists = true;
-                break;
-            }
-        }
-        // guest has particular default data-formate
-        if (!guestExists) {
-            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(USERS_FILE, true))) {
-                dos.writeUTF("guest");
-                dos.writeUTF("guest@munchoak.com");
-                dos.writeUTF("00000000000");
-                dos.writeUTF("guestPass#123");
-                dos.writeInt(2025000);
-            } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
-            }
-        }
-    }
 
     //To load all information of users
     public static List<String[]> loadUsers() {
@@ -646,7 +705,7 @@ public static int applyCoupon(String code, int userId) {
      * Creates a payment, cart, and payment-items entry.
      * Returns the generated payment ID.
      */
-    public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method) throws IOException {
+    public static int createPaymentAndCart(int userId, Cart cart, Map<Integer, FoodItems> foodMap, String method,double finalTotal) throws IOException {
         ensureDataDir();
 
         int paymentId = generateNextIdInFile(PAYMENTS_FILE, 3001);  //First payemnt id starts from 3001
@@ -657,9 +716,11 @@ public static int applyCoupon(String code, int userId) {
         try (DataOutputStream pw = new DataOutputStream(new FileOutputStream(PAYMENTS_FILE, true))) {
             pw.writeInt(paymentId);
             pw.writeInt(userId);
-            pw.writeDouble(cart.getTotalPrice(foodMap));
+            //pw.writeDouble(cart.getTotalPrice(foodMap));
+            pw.writeDouble(finalTotal);
             pw.writeUTF(method);
             pw.writeUTF(timestamp);
+
         }
 
         // Save cart record
@@ -910,6 +971,115 @@ public static int applyCoupon(String code, int userId) {
         }
         return lastId + 1;
     }
+    public static PaymentBreakdown getPaymentBreakdown(int paymentId) {
+        ensureDataDir();
+        if (!PAYMENT_BREAKDOWN_FILE.exists()) return null;
+
+        try (DataInputStream dis =
+                     new DataInputStream(new FileInputStream(PAYMENT_BREAKDOWN_FILE))) {
+
+            while (dis.available() > 0) {
+                int pid = dis.readInt();
+                double baseSubtotal = dis.readDouble();
+                double addons = dis.readDouble();
+                double discountAmount = dis.readDouble();
+                double tip = dis.readDouble();
+                double delivery = dis.readDouble();
+                double tax = dis.readDouble();
+                double service = dis.readDouble();
+                double total = dis.readDouble();
+                int userId = dis.readInt();
+                String userName = dis.readUTF();
+
+                if (pid == paymentId) {
+                    return new PaymentBreakdown(
+                            baseSubtotal,
+                            addons,
+                            discountAmount,
+                            tip,
+                            delivery,
+                            tax,
+                            service,
+                            total,
+                            userId,
+                            userName
+                    );
+                }
+            }
+        } catch (IOException ignored) {}
+
+        return null;
+    }
+
+    public static void savePaymentBreakdown(
+            int paymentId,
+            double baseSubtotal,
+            double addons,
+            double discountAmount,
+            double tip,
+            double delivery,
+            double tax,
+            double service,
+            double total,
+            int userId,
+            String userName
+    ) throws IOException {
+
+        ensureDataDir();
+        try (DataOutputStream dos =
+                     new DataOutputStream(new FileOutputStream(PAYMENT_BREAKDOWN_FILE, true))) {
+
+            dos.writeInt(paymentId);
+            dos.writeDouble(baseSubtotal);
+            dos.writeDouble(addons);
+            dos.writeDouble(discountAmount);
+            dos.writeDouble(tip);
+            dos.writeDouble(delivery);
+            dos.writeDouble(tax);
+            dos.writeDouble(service);
+            dos.writeDouble(total);
+            dos.writeInt(userId);
+            dos.writeUTF(userName);
+        }
+    }
+
+
+    public static class PaymentBreakdown {
+        public final double baseSubtotal;
+        public final double addons;
+        public final double discountAmount;
+        public final double tip;
+        public final double delivery;
+        public final double tax;
+        public final double service;
+        public final double total;
+        public final int userId;
+        public final String userName;
+
+        public PaymentBreakdown(
+                double baseSubtotal,
+                double addons,
+                double discountAmount,
+                double tip,
+                double delivery,
+                double tax,
+                double service,
+                double total,
+                int userId,
+                String userName
+        ) {
+            this.baseSubtotal = baseSubtotal;
+            this.addons = addons;
+            this.discountAmount = discountAmount;
+            this.tip = tip;
+            this.delivery = delivery;
+            this.tax = tax;
+            this.service = service;
+            this.total = total;
+            this.userId = userId;
+            this.userName = userName;
+        }
+    }
 
 
     // ----------------- History Record -----------------
@@ -931,7 +1101,7 @@ public static int applyCoupon(String code, int userId) {
 
 
     // ---------------- ADMIN PASSWORD MANAGEMENT ----------------
-    private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+    //private static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
 
     private static void ensureAdminFile() throws IOException {
         if (!ADMIN_FILE.exists()) {

@@ -25,6 +25,14 @@ public class MenuServer {
     private static String latestMenuName = "menu.dat";
     private static final Map<String, byte[]> latestImages = new HashMap<>();
     private static byte[] latestUserFile = null;
+    private static byte[] latestReservationFile = null;
+    private static byte[] latestReservationStatusFile = null;
+    private static String latestReservationStatusName = "reservation_status.dat";
+    private static byte[] latestMessageFile = null;
+    private static String latestMessageFileName = "messages.dat";
+
+
+
 
     public static void main(String[] args) {
         try (ServerSocket server = new ServerSocket(PORT)) {
@@ -79,6 +87,33 @@ public class MenuServer {
                     cw.out.write(latestUserFile);
                 });
             }
+            if (latestReservationFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_RESERVATIONS");
+                    cw.out.writeUTF("reservations.dat");
+                    cw.out.writeInt(latestReservationFile.length);
+                    cw.out.write(latestReservationFile);
+                });
+            }
+            if (latestReservationStatusFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
+                    cw.out.writeUTF(latestReservationStatusName);
+                    cw.out.writeInt(latestReservationStatusFile.length);
+                    cw.out.write(latestReservationStatusFile);
+                });
+            }
+            if (latestMessageFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_MESSAGES");
+                    cw.out.writeUTF(latestMessageFileName);
+                    cw.out.writeInt(latestMessageFile.length);
+                    cw.out.write(latestMessageFile);
+                });
+            }
+
+
+
 
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
@@ -174,6 +209,63 @@ public class MenuServer {
                         cw.out.writeUTF("Registration successful.");
                     });
                 }
+                else if (cmd.equals("UPDATE_RESERVATIONS")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+
+                    write(new File(dir, filename).toPath(), data);
+
+                    latestReservationFile = data;
+
+                    broadcastReservations(filename, data);
+                }
+                else if (cmd.equals("UPDATE_RESERVATION_STATUS")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+
+                    write(new File(dir, filename).toPath(), data);
+
+                    // ✅ CACHE IT FOR LATE JOINERS
+                    latestReservationStatusFile = data;
+                    latestReservationStatusName = filename;
+                    broadcastReservationStatus(filename, data);
+                }
+                else if (cmd.equals("UPDATE_MESSAGES")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+
+                    write(new File(dir, filename).toPath(), data);
+
+                    // ✅ cache for late joiners
+                    latestMessageFile = data;
+                    latestMessageFileName = filename;
+
+                    broadcastMessages(filename, data);
+                }
+
+
+
             }
 
         } catch (Exception e) {
@@ -192,6 +284,37 @@ public class MenuServer {
 
             sendSafe(cw, () -> {
                 cw.out.writeUTF("UPDATE_MENU");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+    private static void broadcastReservationStatus(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+
+    private static void broadcastReservations(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_RESERVATIONS");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+    private static void broadcastMessages(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_MESSAGES");
                 cw.out.writeUTF(filename);
                 cw.out.writeInt(data.length);
                 cw.out.write(data);

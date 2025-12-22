@@ -143,29 +143,28 @@ public class History {
         }
     }
 
-    // ------------------ Data Handling ------------------
     private void loadHistory() {
         historyData.clear();
         List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
-        double delivery = 7.99;
-        double tax = 7.00;
-        double service = 1.50;
 
         for (FileStorage.HistoryRecordSimple s : list) {
             if (!Session.isAdmin() && s.userId != currentUserId) continue;
 
-            // Assume s.amount is the full total (including add-ons, fees, etc.)
-            double discountVal = FileStorage.getPaymentDiscount(s.paymentId);  // Assume FileStorage method loads saved discount for paymentId
-            double tipVal = FileStorage.getPaymentTip(s.paymentId);  // Assume FileStorage method loads saved tip for paymentId
-            double subtotal = s.amount;  // Assuming s.amount is the subtotal saved in storage
-            double fullAmount = subtotal - discountVal + delivery + tipVal + service + tax;
-            historyData.add(new HistoryRecord(s.userId, s.paymentId, s.timestamp, fullAmount, "Success", s.paymentMethod));
+            // s.amount MUST already be the FINAL TOTAL
+            historyData.add(new HistoryRecord(
+                    s.userId,
+                    s.paymentId,
+                    s.timestamp,
+                    s.amount,            // ✅ no math
+                    "Success",
+                    s.paymentMethod
+            ));
         }
     }
 
     // ------------------ Bill Popup ------------------
-    private void showBill(HistoryRecord record) {
+    public void showBill(HistoryRecord record) {
         Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
 
         Cart tempCart = new Cart();

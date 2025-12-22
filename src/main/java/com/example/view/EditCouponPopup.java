@@ -62,24 +62,31 @@ public class EditCouponPopup {
 }
 */
 package com.example.view;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
+
 import com.example.manager.FileStorage;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import java.util.List;
-import java.util.Map;
+import javafx.util.Duration;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class EditCouponPopup {
 
-    public static void show(Stage owner) {
+    public static void show(Stage owner, Runnable onSuccess) {
         Stage popup = new Stage();
         popup.initOwner(owner);
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -107,6 +114,7 @@ public class EditCouponPopup {
 
         Button saveBtn = new Button("Update");
         saveBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+        saveBtn.setDefaultButton(true); // ✅ Enter key will trigger this button
 
         saveBtn.setOnAction(e -> {
             String selectedCode = couponDropdown.getValue();
@@ -209,6 +217,8 @@ public class EditCouponPopup {
 
         popup.setScene(new Scene(box, 340, 240));
         popup.showAndWait();
+        onSuccess.run();
+
     }
         private static void clearMessageAfterDelay(Label status) {
             PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2 seconds

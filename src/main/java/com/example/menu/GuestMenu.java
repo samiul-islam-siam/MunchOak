@@ -1,7 +1,6 @@
 package com.example.menu;
 
 import com.example.manager.FileStorage;
-import com.example.munchoak.FoodItems;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

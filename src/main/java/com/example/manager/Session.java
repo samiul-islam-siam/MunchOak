@@ -3,55 +3,102 @@ package com.example.manager;
 import com.example.menu.MenuClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Session {
 
     private static int currentUserId = 2025000;
     private static String currentUsername = "guest";
-    private static String currentEmail = "guest@gmail.com";
-    private static String currentPassword = "ai01*2#";
+    private static String currentEmail = "N/A";
+    private static String currentPassword = "N/A";
+    private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
+    private static boolean isGuest = true;
+    public static boolean isGuest()
+    {
+        return isGuest;
+    }
 
-    // ===== NEW: Global menu socket client =====
+
     private static MenuClient menuClient;
+    private static Runnable reservationListener;
+    private static final List<Runnable> messageListeners = new ArrayList<>();
 
-    public static void initializeSocket() {
-        if (menuClient == null) {
-            menuClient = new MenuClient(); // connect to server
+
+    public static void setReservationListener(Runnable r) {
+        reservationListener = r;
+    }
+
+    public static void notifyReservationUpdated() {
+        if (reservationListener != null) {
+            reservationListener.run();
         }
     }
-    private static String currentContactNo = "N/A"; // default
 
+    public static void addMessageListener(Runnable r) {
+        messageListeners.add(r);
+    }
+
+    public static void notifyMessageUpdated() {
+        for (Runnable r : messageListeners) r.run();
+    }
+
+    // Contact No get-set pair
     public static String getCurrentContactNo() {
         return currentContactNo;
     }
 
+    public static void setCurrentContactNo(String contactNo) {
+        currentContactNo = contactNo;
+    }
 
+    // Email get-set pair
+    public static String getCurrentEmail() {
+        return currentEmail;
+    }
+
+    public static void setCurrentEmail(String email) {
+        currentEmail = email;
+    }
+
+    // Menu client get-set pair
+    public static MenuClient getMenuClient() {
+        return menuClient;
+    }
 
     public static void setMenuClient(MenuClient client) {
         menuClient = client;
     }
 
-    public static MenuClient getMenuClient() {
-        return menuClient;
-    }
-
+    // User ID get-set pair
     public static int getCurrentUserId() {
         return currentUserId;
     }
 
+    public static void setCurrentUserId(int userId) {
+        currentUserId = userId;
+    }
+
+    // Username get-set pair
     public static String getCurrentUsername() {
         return currentUsername;
     }
 
-    public static String getCurrentEmail() {
-        return currentEmail;
+    public static void setCurrentUsername(String username) {
+        currentUsername = username;
     }
 
+    // Password get-set pair
     public static String getCurrentPassword() {
         return currentPassword;
     }
 
+    public static void setCurrentPassword(String password) {
+        currentPassword = password;
+    }
+
+    // --------------------LOGIN VALIDATION-----------------------------------
     public static boolean isAdmin() {
         return isAdmin;
     }
@@ -67,41 +114,90 @@ public class Session {
         currentPassword = FileStorage.getUserPassword(username);
         currentContactNo = FileStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
-    }
-    public static void setCurrentEmail(String email) {
-        currentEmail = email;
-    }
-
-    public static void setCurrentContactNo(String contact) {
-        currentContactNo = contact;
+        isGuest = false;
     }
 
     public static void setAdminUser() throws IOException {
+
         currentUsername = "admin";
         currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
         currentEmail = "admin@munchoak.com"; // optional
         currentContactNo = "N/A";
-
-        currentPassword = AdminFileStorage.getAdminPassword(); // <-- new getter needed
+        currentPassword = AdminFileStorage.getAdminPassword();
         isAdmin = true; // set admin flag
-    }
+        isGuest = false;
 
-    public static void setCurrentUsername(String username) {
-        currentUsername = username;
+
+       // refreshAdminFromFile(); // load values from admin.dat instead of hardcoded defaults
     }
 
     public static void resetToGuest() {
         currentUsername = "guest";
-        currentEmail = "guest@munchoak.com";
-        currentContactNo = "00000000000";
-
-        currentPassword = "guestPass#123";
-       // currentContactNo = "00000000000";
-
+        currentEmail = "N/A";
+        currentContactNo = "N/A";
+        currentPassword = "N/A";
+        currentUserId = 2025000;
         isAdmin = false;
+        isGuest = true;
+    }
+    /*
+    public static void refreshAdminFromFile() throws IOException {
+        List<String> lines = AdminFileStorage.readLines();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(AdminFileStorage.ADMIN_ID) && parts.length >= 5) {
+                currentUserId = Integer.parseInt(parts[0]);
+                currentUsername = parts[1];
+                currentEmail = parts[2];
+                currentContactNo = parts[3];
+                currentPassword = parts[4]; // salt:hash or hash depending on design
+                isAdmin = true;
+                isGuest = false;
+                break;
+            }
+        }
+        currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
+        currentUsername = "admin";
+        currentEmail = "admin@munchoak.com";
+        currentContactNo = "N/A";
+        currentPassword = "N/A";
+        isAdmin = true;
+        isGuest = false;
+    }
+*/
+    public static void refreshAdminFromFile() throws IOException {
+        List<String> lines = AdminFileStorage.readLines();
+        boolean found = false;
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(AdminFileStorage.ADMIN_ID) && parts.length >= 5) {
+                currentUserId = Integer.parseInt(parts[0]);
+                currentUsername = parts[1];
+                currentEmail = parts[2];
+                currentContactNo = parts[3];
+                currentPassword = parts[4];
+                isAdmin = true;
+                isGuest = false;
+                found = true;
+                break;
+            }
+        }
+
+        // Only fallback if admin.dat had no valid line
+        if (!found) {
+            currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
+            currentUsername = "admin";
+            currentEmail = "admin@munchoak.com";
+            currentContactNo = "N/A";
+            currentPassword = "N/A";
+            isAdmin = true;
+            isGuest = false;
+        }
     }
 
     public static void logout() {
         resetToGuest();
     }
+
+
 }
