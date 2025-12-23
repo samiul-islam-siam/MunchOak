@@ -1,11 +1,14 @@
-package com.example.view;
+package com.example.homepage;
 
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
-import com.example.munchoak.History;
+import com.example.payment.History;
 import com.example.network.ChatClient;
+import com.example.view.*;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;

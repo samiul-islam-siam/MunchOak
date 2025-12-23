@@ -1,7 +1,6 @@
-
 package com.example.view;
 
-import com.example.manager.FileStorage;
+import com.example.manager.CouponStorage;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,7 +21,7 @@ import java.time.format.DateTimeParseException;
 
 public class AddCouponPopup {
 
-    public static void show(Stage owner) {
+    public static void show(Stage owner, Runnable onSuccess) {
         Stage popup = new Stage();
         popup.initOwner(owner);
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -45,6 +44,7 @@ public class AddCouponPopup {
         // --- Save button ---
         Button saveBtn = new Button("Save");
         saveBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+        saveBtn.setDefaultButton(true); // ✅ Enter key will trigger this button
 
         saveBtn.setOnAction(e -> {
             String code = codeField.getText().trim().toUpperCase();
@@ -136,7 +136,7 @@ public class AddCouponPopup {
 
             // Save coupon
             try {
-                FileStorage.addCoupon(code, discount,expiryText, usageLimit);
+                CouponStorage.addCoupon(code, discount,expiryText, usageLimit);
                 status.setText("Coupon added successfully!");
                 status.setTextFill(javafx.scene.paint.Color.GREEN);
                 clearMessageAfterDelay(status);
@@ -159,6 +159,7 @@ public class AddCouponPopup {
 
         popup.setScene(new Scene(box, 340, 220));
         popup.showAndWait();
+        onSuccess.run();
     }
         // --- Helper method ---
         private static void clearMessageAfterDelay(Label status) {

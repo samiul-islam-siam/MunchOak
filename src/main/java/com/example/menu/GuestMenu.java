@@ -1,6 +1,6 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.StoragePaths;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,7 +33,7 @@ public class GuestMenu extends BaseMenu {
             }
 
             //getting menu from files
-            File menuFile = FileStorage.getMenuFile();
+            File menuFile = StoragePaths.getMenuFile();
 
             //If no menu file is there guest will show some messages there
             if (!menuFile.exists() || menuFile.length() == 0) {

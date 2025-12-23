@@ -1,7 +1,10 @@
 package com.example.view;
 
-import com.example.manager.FileStorage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.manager.ReservationStorage;
 import com.example.manager.Session;
+import com.example.manager.UserStorage;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 
@@ -141,7 +144,7 @@ public class ReservationPage {
             nameField.setText(currentUser);
 
             // Fetch contact number from FileStorage
-            String contact = FileStorage.getUserContact(currentUser);
+            String contact = UserStorage.getUserContact(currentUser);
             if (contact != null && !contact.isBlank()) {
                 phoneField.setText(contact);
             }
@@ -248,16 +251,6 @@ public class ReservationPage {
         // Set initial value to today
         datePicker.setValue(LocalDate.now());
 
-//         Listener to prevent past dates and update times
-//        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
-//            LocalDate today = LocalDate.now();
-//            if (newVal != null && newVal.isBefore(today)) {
-//                datePicker.setValue(today);
-//            } else {
-//                updateTimeOptions(timeBox, datePicker);
-//            }
-//        });
-
         // Listener to prevent past dates and update times
         datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
             LocalDate today = LocalDate.now();
@@ -351,7 +344,7 @@ public class ReservationPage {
 
                 Optional<ButtonType> result = showConfirm("Confirm Reservation", summary);
                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                    boolean saved = FileStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
+                    boolean saved = ReservationStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
                     Session.getMenuClient().sendReservationUpdate();
                     if (saved) {
                         showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
@@ -413,37 +406,6 @@ public class ReservationPage {
 
         return scene;
     }
-
-// This is previous version:
-//        private void updateTimeOptions(ComboBox<String> timeBox, LocalDate selectedDate) {
-//        timeBox.getItems().clear();
-//        if (selectedDate == null) {
-//            for (int hour = 10; hour <= 22; hour++) {
-//                timeBox.getItems().add(String.format("%02d:00", hour));
-//            }
-//            return;
-//        }
-//
-//        LocalDate today = LocalDate.now();
-//        LocalTime now = LocalTime.now();
-//        int startHour;
-//        if (selectedDate.isEqual(today)) {
-//            // For today, start from the next hour after current time
-//            startHour = now.getHour() + 1;
-//        } else {
-//            // For future dates, start from 10:00
-//            startHour = 10;
-//        }
-//
-//        for (int hour = Math.max(10, startHour); hour <= 22; hour++) {
-//            timeBox.getItems().add(String.format("%02d:00", hour));
-//        }
-//
-//        // Set default to first available if none selected
-//        if (timeBox.getValue() == null || !timeBox.getItems().contains(timeBox.getValue())) {
-//            timeBox.setValue(timeBox.getItems().isEmpty() ? null : timeBox.getItems().get(0));
-//        }
-//    }
 
     private void updateTimeOptions(ComboBox<String> timeBox, DatePicker datePicker) {
         timeBox.getItems().clear();

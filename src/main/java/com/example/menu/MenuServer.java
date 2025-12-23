@@ -1,6 +1,6 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.UserStorage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -196,7 +196,7 @@ public class MenuServer {
                     userFile.getParentFile().mkdirs();
                     userFile.createNewFile();
 
-                    FileStorage.appendUser(username, email,contactNo, pwd);
+                    UserStorage.appendUser(username, email,contactNo, pwd);
 
                     byte[] fullUserData = readAllBytes(userFile.toPath());
                     latestUserFile = fullUserData;

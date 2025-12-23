@@ -1,6 +1,5 @@
-package com.example.view;
+package com.example.authentication;
 
-import com.example.manager.FileStorage;
 import com.example.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -95,7 +94,7 @@ public class ChangePasswordPopup {
             }
 
             // Update password in file
-            FileStorage.updateUserPassword(Session.getCurrentUsername(), newPass);
+            PasswordStorage.updateUserPassword(Session.getCurrentUsername(), newPass);
             Session.setCurrentUser(Session.getCurrentUsername());
 
             status.setText("Password changed successfully!");

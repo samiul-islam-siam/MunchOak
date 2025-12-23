@@ -1,7 +1,7 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
+import com.example.munchoak.Cart;
+import com.example.munchoak.FoodItems;
 
 import java.util.Map;
 
@@ -24,11 +24,14 @@ public class Bill {
     }
 
     public String generateReceipt(Map<Integer, FoodItems> foodMap) {
+        PaymentBreakdown b =
+                PaymentStorage.getPaymentBreakdown(payment.getId());
         StringBuilder sb = new StringBuilder();
         sb.append("============================================\n");
         sb.append("\t   MunchOak Restaurant \n");
         sb.append("============================================\n");
-        sb.append("User ID : ").append(Session.getCurrentUserId()).append("\n");
+        sb.append("User ID : ").append(b.userId).append("\n");
+        sb.append("User Name : ").append(b.userName).append("\n");
         sb.append("Payment ID : ").append(payment.getId()).append("\n");
         sb.append("Date/Time : ")
                 .append(payment.getTimestamp().substring(0, 19).replace("T", " "))
@@ -39,7 +42,7 @@ public class Bill {
         sb.append(String.format("%-25s %5s %10s\n", "Item", "Qty", "Price"));
         sb.append("--------------------------------------------\n");
 
-        double calculatedBaseSubtotal = 0.0;
+
         for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
             int foodId = entry.getKey();
             int qty = entry.getValue();
@@ -48,38 +51,25 @@ public class Bill {
                 //double addonPerItem = cart.getAddonPerItem(foodId);
                 double basePricePerItem = item.getPrice();
                 double lineTotal = basePricePerItem * qty; // Baseline total
-                calculatedBaseSubtotal += lineTotal;
-
                 // Show base item
                 sb.append(String.format("%-25s %5d %10.2f\n", item.getName(), qty, lineTotal));
             }
         }
 
-        // FIXED: Use reverse-engineered subtotal to include add-ons for matching total
-        double subtotal = (savedFullTotal > 0) ? savedFullTotal - 7.99 - 7.00 - 1.50 - payment.getTip() + payment.getDiscount() : calculatedBaseSubtotal;
+
         sb.append("--------------------------------------------\n");
-        sb.append(String.format("%-26s %15.2f\n", "Subtotal:", calculatedBaseSubtotal)); // Subtotal includes add-ons
+        sb.append(String.format("%-31s %10.2f\n\n", "Total Add-ons:", b.addons));
+        sb.append(String.format("%-26s %15.2f\n\n", "Subtotal:", b.baseSubtotal)); // Subtotal includes add-ons
 
-        // Fixed values matching CartPage and CheckoutPage
-        double delivery = 7.99;
-        double tax = 7.00;
-        double service = 1.50;
-
-        double discount = FileStorage.getPaymentDiscount(payment.getId());
-        double tip = FileStorage.getPaymentTip(payment.getId());
-
-
-        sb.append(String.format("%-31s %10.2f\n", "Total Add-ons:", savedFullTotal - calculatedBaseSubtotal + discount - delivery - tax - service - tip));
-        sb.append(String.format("%-31s %10.2f\n", "Delivery Amount:", delivery));
-        sb.append(String.format("%-31s %10.2f\n", "Tax Amount:", tax));
-        sb.append(String.format("%-31s %10.2f\n", "Service Fee:", service));
-        sb.append(String.format("%-31s %10.2f\n", "Tip:", tip));
-        sb.append(String.format("%-31s %10.2f\n", "Discount:", -discount));
+        sb.append(String.format("%-31s %10.2f\n", "Delivery Amount:", b.delivery));
+        sb.append(String.format("%-31s %10.2f\n", "Tax Amount:", b.tax));
+        sb.append(String.format("%-31s %10.2f\n", "Service Fee:", b.service));
+        sb.append(String.format("%-31s %10.2f\n", "Tip:", b.tip));
+        sb.append(String.format("%-31s %10.2f\n", "Discount:", -b.discountAmount));
 
         // FIXED: Use saved full total to match table amount
-        double finalTotal = (savedFullTotal > 0) ? savedFullTotal : (subtotal + delivery + tax + service + tip - discount);
         sb.append("--------------------------------------------\n");
-        sb.append(String.format("%-26s %15.2f\n", "TOTAL:", finalTotal));
+        sb.append(String.format("%-26s %15.2f\n", "TOTAL:", b.total));
         sb.append("============================================\n");
         sb.append("\tThank you for dining with us! \n");
         sb.append("============================================\n");

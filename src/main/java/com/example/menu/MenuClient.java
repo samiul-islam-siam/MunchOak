@@ -1,7 +1,8 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.MenuStorage;
 import com.example.manager.Session;
+import com.example.manager.StoragePaths;
 import com.example.munchoak.FoodItems;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -74,7 +75,7 @@ public class MenuClient {
                         File target = new File(dir, filename);
                         write(target.toPath(), data);
 
-                        FileStorage.setMenuFile(target);
+                        StoragePaths.setMenuFile(target);
 
                         Platform.runLater(() -> {
                             if (menu != null) menu.updateView();
@@ -96,7 +97,7 @@ public class MenuClient {
 
                         Platform.runLater(() -> {
                             if (menu != null) menu.updateView();
-                            if (foodList != null) foodList.setAll(FileStorage.loadMenu());
+                            if (foodList != null) foodList.setAll(MenuStorage.loadMenu());
                         });
                     }
 
@@ -173,7 +174,6 @@ public class MenuClient {
                     }
 
 
-
                 }
             }
 
@@ -187,7 +187,7 @@ public class MenuClient {
     // -------------------------
     public synchronized void sendMenuUpdate() {
         try {
-            File menuFile = FileStorage.getMenuFile();
+            File menuFile = StoragePaths.getMenuFile();
             byte[] data = readAllBytes(menuFile.toPath());
 
             out.writeUTF("UPDATE_MENU");
@@ -236,7 +236,7 @@ public class MenuClient {
         }
     }
 
-    public synchronized void sendRegister(String username, String email,String contactNo, String pwd) {
+    public synchronized void sendRegister(String username, String email, String contactNo, String pwd) {
         try {
             out.writeUTF("REGISTER_USER");
             out.writeUTF(username);
@@ -249,7 +249,8 @@ public class MenuClient {
             System.err.println("IOException: " + e.getMessage());
         }
     }
-//    public synchronized void sendReservationUpdate() {
+
+    //    public synchronized void sendReservationUpdate() {
 //        try {
 //            File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
 //            byte[] data = readAllBytes(resFile.toPath());
@@ -264,35 +265,33 @@ public class MenuClient {
 //            System.err.println("IOException: " + e.getMessage());
 //        }
 //    }
-public synchronized void sendReservationUpdate() {
-    try {
-        File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
-        File statusFile = new File("src/main/resources/com/example/manager/data/reservation_status.dat");
+    public synchronized void sendReservationUpdate() {
+        try {
+            File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
+            File statusFile = new File("src/main/resources/com/example/manager/data/reservation_status.dat");
 
-        byte[] resData = readAllBytes(resFile.toPath());
-        byte[] statusData = statusFile.exists()
-                ? readAllBytes(statusFile.toPath())
-                : new byte[0];
+            byte[] resData = readAllBytes(resFile.toPath());
+            byte[] statusData = statusFile.exists()
+                    ? readAllBytes(statusFile.toPath())
+                    : new byte[0];
 
-        // send reservations
-        out.writeUTF("UPDATE_RESERVATIONS");
-        out.writeUTF(resFile.getName());
-        out.writeInt(resData.length);
-        out.write(resData);
+            // send reservations
+            out.writeUTF("UPDATE_RESERVATIONS");
+            out.writeUTF(resFile.getName());
+            out.writeInt(resData.length);
+            out.write(resData);
 
-        // send status file
-        out.writeUTF("UPDATE_RESERVATION_STATUS");
-        out.writeUTF(statusFile.getName());
-        out.writeInt(statusData.length);
-        out.write(statusData);
+            // send status file
+            out.writeUTF("UPDATE_RESERVATION_STATUS");
+            out.writeUTF(statusFile.getName());
+            out.writeInt(statusData.length);
+            out.write(statusData);
 
-        out.flush();
+            out.flush();
 
-    } catch (Exception e) {
-        System.err.println("IOException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
     }
-}
-
-
 }
 

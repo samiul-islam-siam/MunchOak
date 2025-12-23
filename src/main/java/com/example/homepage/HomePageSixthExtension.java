@@ -1,4 +1,4 @@
-package com.example.view;
+package com.example.homepage;
 
 import com.example.menu.MenuPage;
 import javafx.animation.FadeTransition;

@@ -1,12 +1,11 @@
-package com.example.view;
+package com.example.authentication;
 
-import com.example.login.AdminDashboard;
-import com.example.manager.AdminFileStorage;
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
+import com.example.homepage.HomePage;
+import com.example.manager.*;
 import com.example.menu.BaseMenu;
 import com.example.menu.MenuClient;
 
+import com.example.munchoak.AdminHome;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
@@ -362,7 +361,7 @@ public class LoginPage {
                 return;
             }
             try {
-                if (FileStorage.userExists(username)) {
+                if (UserStorage.userExists(username)) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Signup Failed");
                     alert.setHeaderText(null);
@@ -480,11 +479,11 @@ public class LoginPage {
                     showStatus("All fields required!", true);
                     return;
                 }
-                if (!FileStorage.userExists(usernameField.getText())) {
+                if (!UserStorage.userExists(usernameField.getText())) {
                     showStatus("User not found!", true);
                     return;
                 }
-                if (!FileStorage.verifyUserPassword(usernameField.getText(), passwordField.getText())) {
+                if (!PasswordStorage.verifyUserPassword(usernameField.getText(), passwordField.getText())) {
                     showStatus("Incorrect password!", true);
                     return;
                 }
@@ -550,11 +549,11 @@ public class LoginPage {
                     showAdminStatus("Invalid Admin ID!", true);
                     return;
                 }
-                if (!AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                if (!AdminStorage.verifyAdminPassword(idEntered, passEntered)) {
                     showAdminStatus("Incorrect password!", true); // <<< Use the right method!
                     return;
                 }
-                if (!"2104".equals(idEntered) && !AdminFileStorage.verifyAdminPassword(idEntered, passEntered)) {
+                if (!"2104".equals(idEntered) && !AdminStorage.verifyAdminPassword(idEntered, passEntered)) {
                     showAdminStatus("Invalid Admin ID and Password!", true);
                     return;
                 }
@@ -564,7 +563,7 @@ public class LoginPage {
                 showAdminStatus("Admin login successful!", false);
                 PauseTransition pause = new PauseTransition(Duration.seconds(1));
                 pause.setOnFinished(ev -> {
-                    AdminDashboard dashboard = new AdminDashboard(primaryStage);
+                    AdminHome dashboard = new AdminHome(primaryStage);
                     dashboard.openAdminDashboard();
                 });
                 pause.play();
@@ -694,7 +693,7 @@ public class LoginPage {
                 errorLabel.setText("Please fill in all fields.");
                 return;
             }
-            if (!FileStorage.userExists(username)) {
+            if (!UserStorage.userExists(username)) {
                 errorLabel.setText("User not found!");
                 return;
             }
@@ -720,7 +719,7 @@ public class LoginPage {
                 return;
             }
             try {
-                FileStorage.updateUserPassword(username, np);
+                PasswordStorage.updateUserPassword(username, np);
                 errorLabel.setStyle("-fx-text-fill: lightgreen;");
                 errorLabel.setText("Password updated successfully!");
             } catch (Exception ex) {
@@ -815,7 +814,7 @@ public class LoginPage {
             saveBtn.setOnAction(ev -> {
                 String idEntered = adminIDField.getText().trim();
                 String np = newPass.getText().trim();
-                if (idEntered.isEmpty() || !idEntered.equals(AdminFileStorage.ADMIN_ID)) {
+                if (idEntered.isEmpty() || !idEntered.equals(AdminStorage.ADMIN_ID)) {
                     status.setText("❌ Invalid Admin ID!");
                     status.setStyle("-fx-text-fill: black;");
                     autoClearStatus(status);
@@ -835,7 +834,7 @@ public class LoginPage {
                     return;
                 }
                 try {
-                    AdminFileStorage.setAdminPassword(np);
+                    AdminStorage.setAdminPassword(np);
                     status.setText("✅ Admin password reset successfully!");
                     status.setStyle("-fx-text-fill: white;");
                 } catch (IOException e) {

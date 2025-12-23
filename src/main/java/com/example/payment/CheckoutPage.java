@@ -1,11 +1,15 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
+import com.example.manager.CouponStorage;
+import com.example.manager.MenuStorage;
+import com.example.munchoak.Cart;
+import com.example.munchoak.CartPage;
+import com.example.munchoak.FoodItems;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
-import com.example.view.HomePage;
-import com.example.view.LoginPage;
-import com.example.view.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
@@ -36,17 +40,19 @@ public class CheckoutPage {
     private final Cart cart;
     private final double discount; // FIXED: Added field for passed discount
     private final double tip; // FIXED: Added field for passed tip
+    private final String appliedCouponCode;
 
     // FIXED: Updated constructor to accept discount and tip
-    public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip) {
+    public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip, String appliedCouponCode) {
         this.primaryStage = primaryStage;
         this.cart = cart;
         this.discount = discount;
         this.tip = tip;
+        this.appliedCouponCode = appliedCouponCode;
     }
 
     private Map<Integer, FoodItems> buildFoodMap() {
-        List<FoodItems> loaded = FileStorage.loadMenu();
+        List<FoodItems> loaded = MenuStorage.loadMenu();
         Map<Integer, FoodItems> map = new HashMap<>();
         for (FoodItems f : loaded) map.put(f.getId(), f);
         return map;
@@ -209,12 +215,13 @@ public class CheckoutPage {
                 totalAddons += addonPer * qty;
             }
         }
+        final double TOTAL = totalAddons;
         double subtotal = baseSubtotal + totalAddons;
         boolean isEmptyCart = cart.getBuyHistory().isEmpty();
         double taxAmount = 7.00; // Fixed from Cart
         double serviceFeeAmount = 1.50; // Fixed from Cart
         double deliveryAmount = 7.99; // Fixed from Cart
-      //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
+        //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
         double discountAmount = subtotal * discount; // discount is percentage (e.g. 0.1 = 10%)
         double discountedSubtotal = subtotal - discountAmount;
         double totalPayable = discountedSubtotal + deliveryAmount + tip + serviceFeeAmount + taxAmount;
@@ -315,7 +322,7 @@ public class CheckoutPage {
             if (!keyword.isEmpty()) {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
-                List<FoodItems> results = FileStorage.loadMenu().stream()
+                List<FoodItems> results = MenuStorage.loadMenu().stream()
                         .filter(i -> i.getName().toLowerCase().contains(keyword)
                                 || i.getCategory().toLowerCase().contains(keyword)
                                 || i.getDetails().toLowerCase().contains(keyword)
@@ -738,57 +745,57 @@ public class CheckoutPage {
                 return;
             }
 
-                String cardNumber = cardField.getText().trim();
-                String expiry = expiryField.getText().trim();
-                String cvv = cvvField.getText().trim();
+            String cardNumber = cardField.getText().trim();
+            String expiry = expiryField.getText().trim();
+            String cvv = cvvField.getText().trim();
 
-                // --- Card number validation ---
-                if (!cardNumber.matches("\\d{16}")) {
-                    paymentStatus.setText("Card number must be 16 digits!");
+            // --- Card number validation ---
+            if (!cardNumber.matches("\\d{16}")) {
+                paymentStatus.setText("Card number must be 16 digits!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            }
+
+            // --- Expiry validation (MM/YY) ---
+            if (!expiry.matches("(0[1-9]|1[0-2])/\\d{2}")) {
+                paymentStatus.setText("Expiry must be in MM/YY format!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            } else {
+                // check if expiry is in the future
+                String[] parts = expiry.split("/");
+                int month = Integer.parseInt(parts[0]);
+                int year = Integer.parseInt(parts[1]) + 2000; // convert YY to YYYY
+                java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
+                if (!expDate.isAfter(java.time.YearMonth.now())) {
+                    paymentStatus.setText("Card has expired!");
                     paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
                     PauseTransition delay = new PauseTransition(Duration.seconds(2));
                     delay.setOnFinished(evt -> paymentStatus.setText(""));
                     delay.play();
                     return;
                 }
+            }
 
-                // --- Expiry validation (MM/YY) ---
-                if (!expiry.matches("(0[1-9]|1[0-2])/\\d{2}")) {
-                    paymentStatus.setText("Expiry must be in MM/YY format!");
-                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(evt -> paymentStatus.setText(""));
-                    delay.play();
-                    return;
-                } else {
-                    // check if expiry is in the future
-                    String[] parts = expiry.split("/");
-                    int month = Integer.parseInt(parts[0]);
-                    int year = Integer.parseInt(parts[1]) + 2000; // convert YY to YYYY
-                    java.time.YearMonth expDate = java.time.YearMonth.of(year, month);
-                    if (!expDate.isAfter(java.time.YearMonth.now())) {
-                        paymentStatus.setText("Card has expired!");
-                        paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                        PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                        delay.setOnFinished(evt -> paymentStatus.setText(""));
-                        delay.play();
-                        return;
-                    }
-                }
-
-                // --- CVV validation ---
-                if (!cvv.matches("\\d{3}")) {
-                    paymentStatus.setText("CVV must be 3 digits!");
-                    paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(evt -> paymentStatus.setText(""));
-                    delay.play();
-                    return;
-                }
+            // --- CVV validation ---
+            if (!cvv.matches("\\d{3}")) {
+                paymentStatus.setText("CVV must be 3 digits!");
+                paymentStatus.setTextFill(javafx.scene.paint.Color.RED);
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(evt -> paymentStatus.setText(""));
+                delay.play();
+                return;
+            }
 
             try {
 
-                List<FoodItems> menuList = FileStorage.loadMenu();
+                List<FoodItems> menuList = MenuStorage.loadMenu();
                 Map<Integer, FoodItems> menuMap = menuList.stream()
                         .collect(Collectors.toMap(FoodItems::getId, f -> f));
 
@@ -817,15 +824,29 @@ public class CheckoutPage {
                 }
 
                 // Update menu file
-                FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
+                MenuStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
 
                 /*------------------------------SERVER PART----------------------------------------*/
                 // Broadcast to all clients
                 Session.getMenuClient().sendMenuUpdate();
 
                 Payment.checkout(cart);
-                int paymentId = Payment.getLastPaymentId();
-                FileStorage.savePaymentDiscountTip(paymentId, discount, tip);
+                //int paymentId = Payment.getLastPaymentId();
+                int paymentId = PaymentStorage.createPaymentAndCart(
+                        Session.getCurrentUserId(),
+                        cart,
+                        foodMap,
+                        "card",
+                        totalPayable   // 👈 ADD THIS
+                );
+
+                PaymentStorage.savePaymentDiscountTip(paymentId, discount, tip);
+                PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
+                // AFTER Payment.checkout(cart);
+                if (discount > 0) {
+                    CouponStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());
+                }
+
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("Payment Successful!");
@@ -847,7 +868,7 @@ public class CheckoutPage {
         });
 
         // Add to payment box
-        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(),paymentStatus, payBtn);
+        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(), paymentStatus, payBtn);
 
         rightColumn.getChildren().add(paymentBox);
 
