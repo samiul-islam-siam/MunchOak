@@ -1,6 +1,6 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.UserStorage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,6 +30,12 @@ public class MenuServer {
     private static String latestReservationStatusName = "reservation_status.dat";
     private static byte[] latestMessageFile = null;
     private static String latestMessageFileName = "messages.dat";
+    // ---- COUPON CACHE ----
+    private static byte[] latestCouponsFile = null;
+    private static byte[] latestCouponUsageFile = null;
+    private static String latestCouponsFileName = "coupons.dat";
+    private static String latestCouponUsageFileName = "coupon_usage.dat";
+
 
 
 
@@ -111,6 +117,24 @@ public class MenuServer {
                     cw.out.write(latestMessageFile);
                 });
             }
+            if (latestCouponsFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_COUPONS");
+                    cw.out.writeUTF(latestCouponsFileName);
+                    cw.out.writeInt(latestCouponsFile.length);
+                    cw.out.write(latestCouponsFile);
+                });
+            }
+
+            if (latestCouponUsageFile != null) {
+                sendSafe(cw, () -> {
+                    cw.out.writeUTF("UPDATE_COUPON_USAGE");
+                    cw.out.writeUTF(latestCouponUsageFileName);
+                    cw.out.writeInt(latestCouponUsageFile.length);
+                    cw.out.write(latestCouponUsageFile);
+                });
+            }
+
 
 
 
@@ -196,7 +220,7 @@ public class MenuServer {
                     userFile.getParentFile().mkdirs();
                     userFile.createNewFile();
 
-                    FileStorage.appendUser(username, email,contactNo, pwd);
+                    UserStorage.appendUser(username, email,contactNo, pwd);
 
                     byte[] fullUserData = readAllBytes(userFile.toPath());
                     latestUserFile = fullUserData;
@@ -263,6 +287,40 @@ public class MenuServer {
 
                     broadcastMessages(filename, data);
                 }
+                else if (cmd.equals("UPDATE_COUPONS")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+                    write(new File(dir, filename).toPath(), data);
+
+                    latestCouponsFile = data;
+                    latestCouponsFileName = filename;
+
+                    broadcastCoupons(filename, data);
+                }
+
+                else if (cmd.equals("UPDATE_COUPON_USAGE")) {
+
+                    String filename = cw.in.readUTF();
+                    int size = cw.in.readInt();
+                    byte[] data = new byte[size];
+                    cw.in.readFully(data);
+
+                    File dir = new File("src/main/resources/com/example/manager/data/");
+                    dir.mkdirs();
+                    write(new File(dir, filename).toPath(), data);
+
+                    latestCouponUsageFile = data;
+                    latestCouponUsageFileName = filename;
+
+                    broadcastCouponUsage(filename, data);
+                }
+
 
 
 
@@ -294,6 +352,27 @@ public class MenuServer {
         for (ClientWrapper cw : clients) {
             sendSafe(cw, () -> {
                 cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+    private static void broadcastCoupons(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_COUPONS");
+                cw.out.writeUTF(filename);
+                cw.out.writeInt(data.length);
+                cw.out.write(data);
+            });
+        }
+    }
+
+    private static void broadcastCouponUsage(String filename, byte[] data) {
+        for (ClientWrapper cw : clients) {
+            sendSafe(cw, () -> {
+                cw.out.writeUTF("UPDATE_COUPON_USAGE");
                 cw.out.writeUTF(filename);
                 cw.out.writeInt(data.length);
                 cw.out.write(data);

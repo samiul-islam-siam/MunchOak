@@ -1,6 +1,8 @@
 package com.example.view;
 
-import com.example.manager.FileStorage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.manager.MessageStorage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
@@ -355,13 +357,13 @@ public class MessagePage {
 
         chatArea.getChildren().clear();
 
-        List<FileStorage.MessageRecord> messages =
-                FileStorage.loadMessagesForUser(userId);
+        List<MessageStorage.MessageRecord> messages =
+                MessageStorage.loadMessagesForUser(userId);
 
         if (messages.isEmpty()) {
             chatArea.getChildren().add(noMessageLabel);
         } else {
-            for (FileStorage.MessageRecord m : messages) {
+            for (MessageStorage.MessageRecord m : messages) {
                 addIncomingMessage(chatArea, m.message);
             }
         }

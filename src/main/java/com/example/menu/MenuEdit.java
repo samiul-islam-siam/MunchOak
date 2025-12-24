@@ -1,7 +1,9 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.CategoryStorage;
+import com.example.manager.MenuStorage;
 import com.example.manager.Session;
+import com.example.manager.StoragePaths;
 import com.example.munchoak.FoodItems;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -305,10 +307,10 @@ public class MenuEdit {
 
                 File destFile = new File(destDir, file.getName());
                 Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                FileStorage.setMenuFile(file);
+                StoragePaths.setMenuFile(file);
 
                 // 2. Load FoodItems from selected file
-                List<FoodItems> importedItems = FileStorage.loadMenu();
+                List<FoodItems> importedItems = MenuStorage.loadMenu();
 
                 if (importedItems.isEmpty()) {
                     owner.showAlert("Info", "The selected menu file is empty or invalid.");
@@ -333,7 +335,7 @@ public class MenuEdit {
     }
 
     public void deleteMenuFile() {
-        File menuFile = FileStorage.getMenuFile();
+        File menuFile = MenuStorage.getMenuFile();
 
         if (!menuFile.exists()) {
             owner.showAlert("Menu file not found.", "There’s no menu file to delete.");
@@ -378,7 +380,7 @@ public class MenuEdit {
                 return;
             }
             try {
-                FileStorage.addCategory(name);
+                CategoryStorage.addCategory(name);
                 loadCategories();
                 categoryBox.setValue(name);
                 // Broadcast to all clients
@@ -402,16 +404,16 @@ public class MenuEdit {
         dialog.setHeaderText("Enter new name for category:");
         dialog.setContentText("New Name:");
         dialog.showAndWait().ifPresent(newName -> {
-            if (newName.isBlank() || FileStorage.loadCategories().contains(newName)) {
+            if (newName.isBlank() || CategoryStorage.loadCategories().contains(newName)) {
                 owner.showAlert("Error", "Invalid or duplicate category name.");
                 return;
             }
             try {
-                FileStorage.replaceCategory(selected, newName);
+                CategoryStorage.replaceCategory(selected, newName);
                 loadCategories();
                 categoryBox.setValue(newName);
                 // reload menu and UI
-                owner.foodList.setAll(FileStorage.loadMenu());
+                owner.foodList.setAll(MenuStorage.loadMenu());
                 owner.loadFoodItems();
                 // Broadcast to all clients
                 Session.getMenuClient().sendMenuUpdate();
@@ -435,10 +437,10 @@ public class MenuEdit {
         confirm.showAndWait().ifPresent(res -> {
             if (res == ButtonType.YES) {
                 try {
-                    FileStorage.deleteCategory(selected);
+                    CategoryStorage.deleteCategory(selected);
                     loadCategories();
                     categoryBox.setValue(null);
-                    owner.foodList.setAll(FileStorage.loadMenu());
+                    owner.foodList.setAll(MenuStorage.loadMenu());
                     owner.loadFoodItems();
                     // Broadcast to all clients
                     Session.getMenuClient().sendMenuUpdate();
@@ -539,7 +541,7 @@ public class MenuEdit {
 
         // compute next id from existing items to avoid ID collisions
         int nextId = 1;
-        for (FoodItems f : FileStorage.loadMenu()) {
+        for (FoodItems f : MenuStorage.loadMenu()) {
             if (f.getId() >= nextId) nextId = f.getId() + 1;
         }
 
@@ -547,9 +549,9 @@ public class MenuEdit {
                 price, cuisine, imageFilename, categoryBox.getValue(), quantity, addOneField.getText().trim(), addOnePrice, addTwoField.getText().trim(), addTwoPrice);
 
         try {
-            FileStorage.appendMenuItem(newFood);
+            MenuStorage.appendMenuItem(newFood);
             // reload menu into list & UI
-            owner.foodList.setAll(FileStorage.loadMenu());
+            owner.foodList.setAll(MenuStorage.loadMenu());
             owner.loadFoodItems();
             clearFields();
             // Broadcast to all clients
@@ -684,8 +686,8 @@ public class MenuEdit {
 
         try {
             // rewrite full menu file from in-memory list
-            FileStorage.rewriteMenu(new ArrayList<>(owner.foodList));
-            owner.foodList.setAll(FileStorage.loadMenu());
+            MenuStorage.rewriteMenu(new ArrayList<>(owner.foodList));
+            owner.foodList.setAll(MenuStorage.loadMenu());
             owner.loadFoodItems();
 
             // 2. send the image ONLY if changed
@@ -706,7 +708,7 @@ public class MenuEdit {
     protected void deleteFoodItem(FoodItems food) {
         owner.foodList.remove(food);
         try {
-            FileStorage.rewriteMenu(new ArrayList<>(owner.foodList));
+            MenuStorage.rewriteMenu(new ArrayList<>(owner.foodList));
             owner.loadFoodItems();
             // Broadcast to all clients
             Session.getMenuClient().sendMenuUpdate();

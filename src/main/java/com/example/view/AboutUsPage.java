@@ -1,5 +1,7 @@
 package com.example.view;
 
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;

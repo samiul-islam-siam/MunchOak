@@ -1,11 +1,12 @@
 package com.example.menu;
 
 import com.example.manager.Session;
+import com.example.munchoak.AdminHome;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
 import com.example.view.AboutUsPage;
-import com.example.view.HomePage;
-import com.example.view.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.authentication.ProfilePage;
 import com.example.view.ReservationPage;
 
 import javafx.application.Platform;
@@ -408,7 +409,7 @@ public class MenuPage {
         backButton.getStyleClass().add("back-button");
 
         if (Session.isAdmin()) {
-            backButton.setOnAction(e -> com.example.login.AdminDashboard.openAdminDashboard());
+            backButton.setOnAction(e -> AdminHome.openAdminDashboard());
         } else {
             backButton.setOnAction(e -> returnToHomePerfectly());
         }

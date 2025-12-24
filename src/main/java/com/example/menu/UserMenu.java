@@ -1,7 +1,6 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
-import com.example.munchoak.FoodItems;
+import com.example.manager.StoragePaths;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -32,7 +31,7 @@ public class UserMenu extends BaseMenu {
                 cartButtons.setVisible(false);
                 cartButtons.setManaged(false);
             }
-            File menuFile = FileStorage.getMenuFile();
+            File menuFile = StoragePaths.getMenuFile();
             if (!menuFile.exists() || menuFile.length() == 0) {
                 //If menu is empty then cart and checkout button is disabled
                 javafx.application.Platform.runLater(() -> {

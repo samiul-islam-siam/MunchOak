@@ -1,9 +1,9 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
+import com.example.manager.*;
 import com.example.munchoak.Cart;
 import com.example.munchoak.FoodItems;
+
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,7 +64,7 @@ public class BaseMenu {
         }
 
         // reload the full menu
-        List<FoodItems> items = FileStorage.loadMenu();
+        List<FoodItems> items = MenuStorage.loadMenu();
 
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             String key = searchKeyword.toLowerCase();
@@ -152,9 +152,9 @@ public class BaseMenu {
     private Cart cart = new Cart();
 
     public Node getView() {
-        List<FoodItems> loaded = FileStorage.loadMenu();
+        List<FoodItems> loaded = MenuStorage.loadMenu();
         foodList.addAll(loaded);
-        List<FoodItems> items = FileStorage.loadMenu();
+        List<FoodItems> items = MenuStorage.loadMenu();
 
         // APPLY SEARCH KEYWORD HERE
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
@@ -171,7 +171,7 @@ public class BaseMenu {
 
 
         // load categories from files
-        categories = FileStorage.loadCategories();
+        categories = CategoryStorage.loadCategories();
 
         foodContainer = new VBox(20);
         foodContainer.setPadding(new Insets(10));
@@ -227,7 +227,7 @@ public class BaseMenu {
     // ================== CATEGORY MANAGEMENT & EDIT DELEGATE ACCESS ===================
     protected void loadCategories(ComboBox<String> categoryBox) {
         categoryBox.getItems().clear();
-        List<String> categories = FileStorage.loadCategories();
+        List<String> categories = CategoryStorage.loadCategories();
         categoryBox.getItems().addAll(categories);
     }
 

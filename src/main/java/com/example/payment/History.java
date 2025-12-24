@@ -1,8 +1,11 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
-import com.example.view.HomePage;
+import com.example.manager.*;
+import com.example.homepage.HomePage;
+
+import com.example.munchoak.Cart;
+import com.example.munchoak.CartPage;
+import com.example.munchoak.FoodItems;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -87,7 +90,7 @@ public class History {
                 btn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 4 8;");
                 btn.setOnAction(e -> {
                     HistoryRecord record = getTableView().getItems().get(getIndex());
-                    Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
+                    Map<Integer, Integer> items = PaymentStorage.getCartItemsForPayment(record.getPaymentId());
                     for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
                         cart.addToCart(entry.getKey(), entry.getValue());
                     }
@@ -145,10 +148,10 @@ public class History {
 
     private void loadHistory() {
         historyData.clear();
-        List<FileStorage.HistoryRecordSimple> list = FileStorage.loadPaymentHistory();
+        List<HistoryRecord> list = PaymentStorage.loadPaymentHistory();
         int currentUserId = Session.getCurrentUserId();
 
-        for (FileStorage.HistoryRecordSimple s : list) {
+        for (HistoryRecord s : list) {
             if (!Session.isAdmin() && s.userId != currentUserId) continue;
 
             // s.amount MUST already be the FINAL TOTAL
@@ -165,10 +168,10 @@ public class History {
 
     // ------------------ Bill Popup ------------------
     public void showBill(HistoryRecord record) {
-        Map<Integer, FoodItems> foodMap = FileStorage.loadFoodMap();
+        Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
 
         Cart tempCart = new Cart();
-        Map<Integer, Integer> items = FileStorage.getCartItemsForPayment(record.getPaymentId());
+        Map<Integer, Integer> items = PaymentStorage.getCartItemsForPayment(record.getPaymentId());
         for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
             tempCart.addToCart(entry.getKey(), entry.getValue());
         }

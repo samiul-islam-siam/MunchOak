@@ -1,7 +1,9 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
+import com.example.manager.MenuStorage;
 import com.example.manager.Session;
+import com.example.munchoak.Cart;
+import com.example.munchoak.FoodItems;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -160,7 +162,7 @@ public class Payment {
 
         // Build map of foodId -> FoodItems
         Map<Integer, FoodItems> foodMap = new HashMap<>();
-        for (FoodItems food : FileStorage.loadMenu()) {
+        for (FoodItems food : MenuStorage.loadMenu()) {
             foodMap.put(food.getId(), food);
         }
 
@@ -206,7 +208,7 @@ public class Payment {
     }
 
     public static int getLastPaymentId() {
-        return FileStorage.getLastPaymentId();
+        return PaymentStorage.getLastPaymentId();
     }
 
     // --- Helper to display receipt window ---

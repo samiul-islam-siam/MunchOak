@@ -1,4 +1,4 @@
-package com.example.view;
+package com.example.homepage;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;

@@ -1,7 +1,8 @@
 package com.example.menu;
 
-import com.example.manager.FileStorage;
+import com.example.manager.MenuStorage;
 import com.example.manager.Session;
+import com.example.manager.StoragePaths;
 import com.example.munchoak.FoodItems;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -74,7 +75,7 @@ public class MenuClient {
                         File target = new File(dir, filename);
                         write(target.toPath(), data);
 
-                        FileStorage.setMenuFile(target);
+                        StoragePaths.setMenuFile(target);
 
                         Platform.runLater(() -> {
                             if (menu != null) menu.updateView();
@@ -96,7 +97,7 @@ public class MenuClient {
 
                         Platform.runLater(() -> {
                             if (menu != null) menu.updateView();
-                            if (foodList != null) foodList.setAll(FileStorage.loadMenu());
+                            if (foodList != null) foodList.setAll(MenuStorage.loadMenu());
                         });
                     }
 
@@ -171,7 +172,32 @@ public class MenuClient {
 
                         Platform.runLater(() -> Session.notifyMessageUpdated());
                     }
+                    case "UPDATE_COUPONS" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
+                        byte[] data = new byte[size];
+                        in.readFully(data);
 
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
+                        write(new File(dir, filename).toPath(), data);
+
+                        System.out.println("Coupons synced.");
+                        Platform.runLater(() -> Session.notifyCouponUpdated());
+                    }
+
+                    case "UPDATE_COUPON_USAGE" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
+                        byte[] data = new byte[size];
+                        in.readFully(data);
+
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
+                        write(new File(dir, filename).toPath(), data);
+
+                        System.out.println("Coupon usage synced.");
+                    }
 
 
                 }
@@ -187,7 +213,7 @@ public class MenuClient {
     // -------------------------
     public synchronized void sendMenuUpdate() {
         try {
-            File menuFile = FileStorage.getMenuFile();
+            File menuFile = StoragePaths.getMenuFile();
             byte[] data = readAllBytes(menuFile.toPath());
 
             out.writeUTF("UPDATE_MENU");
@@ -236,7 +262,7 @@ public class MenuClient {
         }
     }
 
-    public synchronized void sendRegister(String username, String email,String contactNo, String pwd) {
+    public synchronized void sendRegister(String username, String email, String contactNo, String pwd) {
         try {
             out.writeUTF("REGISTER_USER");
             out.writeUTF(username);
@@ -249,50 +275,62 @@ public class MenuClient {
             System.err.println("IOException: " + e.getMessage());
         }
     }
-//    public synchronized void sendReservationUpdate() {
-//        try {
-//            File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
-//            byte[] data = readAllBytes(resFile.toPath());
-//
-//            out.writeUTF("UPDATE_RESERVATIONS");
-//            out.writeUTF(resFile.getName());
-//            out.writeInt(data.length);
-//            out.write(data);
-//            out.flush();
-//
-//        } catch (Exception e) {
-//            System.err.println("IOException: " + e.getMessage());
-//        }
-//    }
-public synchronized void sendReservationUpdate() {
-    try {
-        File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
-        File statusFile = new File("src/main/resources/com/example/manager/data/reservation_status.dat");
 
-        byte[] resData = readAllBytes(resFile.toPath());
-        byte[] statusData = statusFile.exists()
-                ? readAllBytes(statusFile.toPath())
-                : new byte[0];
+    public synchronized void sendCouponUpdate() {
+        try {
+            File couponFile = StoragePaths.COUPONS_FILE;
+            File usageFile = StoragePaths.COUPON_USAGE_FILE;
 
-        // send reservations
-        out.writeUTF("UPDATE_RESERVATIONS");
-        out.writeUTF(resFile.getName());
-        out.writeInt(resData.length);
-        out.write(resData);
+            if (couponFile.exists()) {
+                byte[] data = readAllBytes(couponFile.toPath());
+                out.writeUTF("UPDATE_COUPONS");
+                out.writeUTF(couponFile.getName());
+                out.writeInt(data.length);
+                out.write(data);
+            }
 
-        // send status file
-        out.writeUTF("UPDATE_RESERVATION_STATUS");
-        out.writeUTF(statusFile.getName());
-        out.writeInt(statusData.length);
-        out.write(statusData);
+            if (usageFile.exists()) {
+                byte[] data = readAllBytes(usageFile.toPath());
+                out.writeUTF("UPDATE_COUPON_USAGE");
+                out.writeUTF(usageFile.getName());
+                out.writeInt(data.length);
+                out.write(data);
+            }
 
-        out.flush();
+            out.flush();
 
-    } catch (Exception e) {
-        System.err.println("IOException: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Coupon sync error: " + e.getMessage());
+        }
     }
-}
 
+    public synchronized void sendReservationUpdate() {
+        try {
+            File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
+            File statusFile = new File("src/main/resources/com/example/manager/data/reservation_status.dat");
 
+            byte[] resData = readAllBytes(resFile.toPath());
+            byte[] statusData = statusFile.exists()
+                    ? readAllBytes(statusFile.toPath())
+                    : new byte[0];
+
+            // send reservations
+            out.writeUTF("UPDATE_RESERVATIONS");
+            out.writeUTF(resFile.getName());
+            out.writeInt(resData.length);
+            out.write(resData);
+
+            // send status file
+            out.writeUTF("UPDATE_RESERVATION_STATUS");
+            out.writeUTF(statusFile.getName());
+            out.writeInt(statusData.length);
+            out.write(statusData);
+
+            out.flush();
+
+        } catch (Exception e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+    }
 }
 

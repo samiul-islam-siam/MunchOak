@@ -1,69 +1,7 @@
-/*
 package com.example.view;
 
-import com.example.manager.FileStorage;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-
-import java.util.Map;
-
-public class EditCouponPopup {
-
-    public static void show(Stage owner) {
-        Stage popup = new Stage();
-        popup.initOwner(owner);
-        popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Edit Coupon");
-
-        // Load existing coupons
-        Map<String, Double> coupons = FileStorage.loadCoupons();
-
-        // Dropdown for existing coupon codes
-        ComboBox<String> couponDropdown = new ComboBox<>();
-        couponDropdown.getItems().addAll(coupons.keySet());
-        couponDropdown.setPromptText("Select Coupon");
-
-        TextField discountField = new TextField();
-        discountField.setPromptText("New Discount (e.g. 0.15 for 15%)");
-
-        Label status = new Label();
-
-        Button saveBtn = new Button("Update");
-        saveBtn.setOnAction(e -> {
-            try {
-                String selectedCode = couponDropdown.getValue();
-                if (selectedCode == null) {
-                    status.setText("Please select a coupon!");
-                    status.setStyle("-fx-text-fill: red;");
-                    return;
-                }
-                double newDiscount = Double.parseDouble(discountField.getText().trim());
-                FileStorage.editCoupon(selectedCode, newDiscount);
-                status.setText("Coupon updated successfully!");
-                status.setStyle("-fx-text-fill: green;");
-            } catch (Exception ex) {
-                status.setText("Error updating coupon!");
-                status.setStyle("-fx-text-fill: red;");
-            }
-        });
-
-        VBox box = new VBox(12, couponDropdown, discountField, saveBtn, status);
-        box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(20));
-
-        popup.setScene(new Scene(box, 320, 220));
-        popup.showAndWait();
-    }
-}
-*/
-package com.example.view;
-
-import com.example.manager.FileStorage;
+import com.example.manager.CouponStorage;
+import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -86,7 +24,7 @@ import java.util.List;
 
 public class EditCouponPopup {
 
-    public static void show(Stage owner) {
+    public static void show(Stage owner, Runnable onSuccess) {
         Stage popup = new Stage();
         popup.initOwner(owner);
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -94,10 +32,10 @@ public class EditCouponPopup {
 
         // Load existing coupons
 
-        List<FileStorage.Coupon> coupons = FileStorage.loadCoupons();
+        List<CouponStorage.Coupon> coupons = CouponStorage.loadCoupons();
 
         ComboBox<String> couponDropdown = new ComboBox<>();
-        for (FileStorage.Coupon c : coupons) {
+        for (CouponStorage.Coupon c : coupons) {
             couponDropdown.getItems().add(c.code);
         }
         couponDropdown.setPromptText("Select Coupon");
@@ -114,6 +52,7 @@ public class EditCouponPopup {
 
         Button saveBtn = new Button("Update");
         saveBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+        saveBtn.setDefaultButton(true); // ✅ Enter key will trigger this button
 
         saveBtn.setOnAction(e -> {
             String selectedCode = couponDropdown.getValue();
@@ -193,7 +132,8 @@ public class EditCouponPopup {
                 }
             }
             try {
-                FileStorage.editCoupon(selectedCode, newDiscount,newExpiry,newUsageLimit);
+                CouponStorage.editCoupon(selectedCode, newDiscount,newExpiry,newUsageLimit);
+                Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon updated successfully!");
                 status.setTextFill(javafx.scene.paint.Color.GREEN);
                 clearMessageAfterDelay(status);
@@ -216,6 +156,8 @@ public class EditCouponPopup {
 
         popup.setScene(new Scene(box, 340, 240));
         popup.showAndWait();
+        onSuccess.run();
+
     }
         private static void clearMessageAfterDelay(Label status) {
             PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2 seconds

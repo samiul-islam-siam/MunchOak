@@ -1,7 +1,7 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
+import com.example.munchoak.Cart;
+import com.example.munchoak.FoodItems;
 
 import java.util.Map;
 
@@ -24,8 +24,8 @@ public class Bill {
     }
 
     public String generateReceipt(Map<Integer, FoodItems> foodMap) {
-        FileStorage.PaymentBreakdown b =
-                FileStorage.getPaymentBreakdown(payment.getId());
+        PaymentBreakdown b =
+                PaymentStorage.getPaymentBreakdown(payment.getId());
         StringBuilder sb = new StringBuilder();
         sb.append("============================================\n");
         sb.append("\t   MunchOak Restaurant \n");
@@ -55,7 +55,6 @@ public class Bill {
                 sb.append(String.format("%-25s %5d %10.2f\n", item.getName(), qty, lineTotal));
             }
         }
-
 
 
         sb.append("--------------------------------------------\n");

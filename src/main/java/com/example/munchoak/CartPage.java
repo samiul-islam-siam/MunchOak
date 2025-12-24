@@ -1,12 +1,15 @@
 package com.example.munchoak;
 
-import com.example.manager.FileStorage;
+import com.example.manager.CouponStorage;
+import com.example.manager.MenuStorage;
 import com.example.manager.Session;
+import com.example.manager.UserStorage;
 import com.example.menu.MenuPage;
-import com.example.view.HomePage;
-import com.example.view.LoginPage;
-import com.example.view.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
 
+import com.example.payment.CheckoutPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
@@ -26,6 +29,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import static com.example.manager.CouponStorage.loadCoupons;
 
 public class CartPage {
     private final Stage primaryStage;
@@ -64,7 +69,7 @@ public class CartPage {
     }
 
     private Map<Integer, FoodItems> buildFoodMap() {
-        List<FoodItems> loaded = FileStorage.loadMenu();
+        List<FoodItems> loaded = MenuStorage.loadMenu();
         Map<Integer, FoodItems> map = new HashMap<>();
         for (FoodItems f : loaded) map.put(f.getId(), f);
         return map;
@@ -175,7 +180,7 @@ public class CartPage {
             if (!keyword.isEmpty()) {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
-                List<FoodItems> results = FileStorage.loadMenu().stream()
+                List<FoodItems> results = MenuStorage.loadMenu().stream()
                         .filter(i -> i.getName().toLowerCase().contains(keyword)
                                 || i.getCategory().toLowerCase().contains(keyword)
                                 || i.getDetails().toLowerCase().contains(keyword)
@@ -521,7 +526,7 @@ public class CartPage {
 
         // Get all menu items not already in cart
         Set<Integer> inCartIds = cart.getBuyHistory().keySet();
-        List<FoodItems> allMenuItems = FileStorage.loadMenu();
+        List<FoodItems> allMenuItems = MenuStorage.loadMenu();
         List<FoodItems> suggestedItems;
 
         if (cart.getBuyHistory().isEmpty()) {
@@ -684,13 +689,24 @@ public class CartPage {
         couponSection.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;");
 
 
-        // Load coupons from admin
-        List<FileStorage.Coupon> coupons = FileStorage.loadCoupons();
-
         ComboBox<String> couponDropdown = new ComboBox<>();
-        for (FileStorage.Coupon c : coupons) {
+
+// Initial load
+        List<CouponStorage.Coupon> coupons = loadCoupons();
+        for (CouponStorage.Coupon c : coupons) {
             couponDropdown.getItems().add(c.code);
         }
+
+// Listen for coupon updates
+        Session.addCouponListener(() -> {
+            List<CouponStorage.Coupon> updatedCoupons = loadCoupons();
+
+            couponDropdown.getItems().clear();
+            for (CouponStorage.Coupon c : updatedCoupons) {
+                couponDropdown.getItems().add(c.code);
+            }
+        });
+
 
         Label couponStatusLabel = new Label("No coupon applied");
 
@@ -782,7 +798,7 @@ public class CartPage {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Checkout");
 
-            primaryStage.setScene(new CheckoutPage(primaryStage, cart, getDisCount(), currentTip, couponCode ).getScene());
+            primaryStage.setScene(new CheckoutPage(primaryStage, cart, getDisCount(), currentTip, couponCode).getScene());
 
         });
 
@@ -814,11 +830,14 @@ public class CartPage {
                         setText(item);
                     }
                     setStyle(
-                            "-fx-background-color: black;" +
-                                    "-fx-text-fill: white;" +
+
+                            "-fx-background-color: #FFDAB9;" +
                                     "-fx-font-weight: bold;" +
-                                    "-fx-background-radius: 6;" +
-                                    "-fx-padding: 8 16;"
+                                    "-fx-text-fill: black;" +
+                                    "-fx-border-color: #ccc;" +
+                                    "-fx-border-radius: 8;" +
+                                    "-fx-background-radius: 8;" +
+                                    "-fx-padding: 8 12;"
                     );
                 }
             });
@@ -843,8 +862,38 @@ public class CartPage {
                 }
             });
 
+
             Button applyBtn = new Button("Apply Now");
-            applyBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-font-weight: bold;");
+            applyBtn.setStyle(
+                    "-fx-background-color: #FF6B00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            );
+
+// Optional hover effect
+            applyBtn.setOnMouseEntered(e -> applyBtn.setStyle(
+                    "-fx-background-color: #e55a00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            ));
+            applyBtn.setOnMouseExited(e -> applyBtn.setStyle(
+                    "-fx-background-color: #FF6B00;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 20;" +
+                            "-fx-padding: 8 16;" +
+                            "-fx-cursor: hand;"
+            ));
+            applyBtn.setDefaultButton(true); // ✅ Enter key triggers Save
             couponSection.getChildren().addAll(
                     new Label("Available Coupons"),
                     couponDropdown,
@@ -861,10 +910,10 @@ public class CartPage {
                 }
 
                 String code = selectedCode;
-                int userId = FileStorage.getUserId(Session.getCurrentUsername());
+                int userId = UserStorage.getUserId(Session.getCurrentUsername());
 
                 //int result = FileStorage.applyCoupon(code, userId);
-                int result = FileStorage.validateCoupon(code, userId);
+                int result = CouponStorage.validateCoupon(code, userId);
 
                 switch (result) {
                     case 0:
@@ -873,18 +922,29 @@ public class CartPage {
                         if (selectedCode != null) {
                             //double discountRate = coupons.get(selectedCode);
                             double discountRate = 0.0;
-                            for (FileStorage.Coupon c : coupons) {
+//                            for (CouponStorage.Coupon c : coupons) {
+//                                if (c.code.equals(selectedCode)) {
+//                                    discountRate = c.discount;
+//                                    break;
+//                                }
+//                            }
+                            List<CouponStorage.Coupon> freshCoupons = loadCoupons();
+
+                            for (CouponStorage.Coupon c : freshCoupons) {
                                 if (c.code.equals(selectedCode)) {
-                                    discountRate = c.discount;
+                                    discountRate = c.discount;   // ← always latest value
                                     break;
                                 }
                             }
+
 
                             setDisCount(discountRate);
 
                             couponStatusLabel.setText("Applied " + selectedCode + " (" + (int) (discountRate * 100) + "% off)");
                             couponStatusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-
+                            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                            delay.setOnFinished(evt -> couponStatusLabel.setText(""));
+                            delay.play();
                             // 👉 Recalculate totals
                             double discountAmount = subtotal * disCount;
                             double discountedSubtotal = subtotal - discountAmount;

@@ -1,11 +1,15 @@
-package com.example.munchoak;
+package com.example.payment;
 
-import com.example.manager.FileStorage;
+import com.example.manager.CouponStorage;
+import com.example.manager.MenuStorage;
+import com.example.munchoak.Cart;
+import com.example.munchoak.CartPage;
+import com.example.munchoak.FoodItems;
 import com.example.manager.Session;
 import com.example.menu.MenuPage;
-import com.example.view.HomePage;
-import com.example.view.LoginPage;
-import com.example.view.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
@@ -39,7 +43,7 @@ public class CheckoutPage {
     private final String appliedCouponCode;
 
     // FIXED: Updated constructor to accept discount and tip
-    public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip,String appliedCouponCode) {
+    public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip, String appliedCouponCode) {
         this.primaryStage = primaryStage;
         this.cart = cart;
         this.discount = discount;
@@ -48,7 +52,7 @@ public class CheckoutPage {
     }
 
     private Map<Integer, FoodItems> buildFoodMap() {
-        List<FoodItems> loaded = FileStorage.loadMenu();
+        List<FoodItems> loaded = MenuStorage.loadMenu();
         Map<Integer, FoodItems> map = new HashMap<>();
         for (FoodItems f : loaded) map.put(f.getId(), f);
         return map;
@@ -211,7 +215,7 @@ public class CheckoutPage {
                 totalAddons += addonPer * qty;
             }
         }
-        final double TOTAL=totalAddons;
+        final double TOTAL = totalAddons;
         double subtotal = baseSubtotal + totalAddons;
         boolean isEmptyCart = cart.getBuyHistory().isEmpty();
         double taxAmount = 7.00; // Fixed from Cart
@@ -318,7 +322,7 @@ public class CheckoutPage {
             if (!keyword.isEmpty()) {
                 searchResultsWrapper.setVisible(true);
                 searchResultsWrapper.setManaged(true);
-                List<FoodItems> results = FileStorage.loadMenu().stream()
+                List<FoodItems> results = MenuStorage.loadMenu().stream()
                         .filter(i -> i.getName().toLowerCase().contains(keyword)
                                 || i.getCategory().toLowerCase().contains(keyword)
                                 || i.getDetails().toLowerCase().contains(keyword)
@@ -791,7 +795,7 @@ public class CheckoutPage {
 
             try {
 
-                List<FoodItems> menuList = FileStorage.loadMenu();
+                List<FoodItems> menuList = MenuStorage.loadMenu();
                 Map<Integer, FoodItems> menuMap = menuList.stream()
                         .collect(Collectors.toMap(FoodItems::getId, f -> f));
 
@@ -820,7 +824,7 @@ public class CheckoutPage {
                 }
 
                 // Update menu file
-                FileStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
+                MenuStorage.rewriteMenu(new ArrayList<>(menuMap.values()));
 
                 /*------------------------------SERVER PART----------------------------------------*/
                 // Broadcast to all clients
@@ -828,7 +832,7 @@ public class CheckoutPage {
 
                 Payment.checkout(cart);
                 //int paymentId = Payment.getLastPaymentId();
-                int paymentId = FileStorage.createPaymentAndCart(
+                int paymentId = PaymentStorage.createPaymentAndCart(
                         Session.getCurrentUserId(),
                         cart,
                         foodMap,
@@ -836,14 +840,14 @@ public class CheckoutPage {
                         totalPayable   // 👈 ADD THIS
                 );
 
-                FileStorage.savePaymentDiscountTip(paymentId, discount, tip);
-                FileStorage.savePaymentBreakdown(paymentId,subtotal,TOTAL,discountAmount,tip,deliveryAmount,taxAmount,serviceFeeAmount,totalPayable,Session.getCurrentUserId(),Session.getCurrentUsername());
+                PaymentStorage.savePaymentDiscountTip(paymentId, discount, tip);
+                PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {
-                    FileStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());
+                    CouponStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());
                 }
 
-
+                Session.getMenuClient().sendCouponUpdate();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("Payment Successful!");
                 alert.setContentText("Your order has been placed for ৳" + String.format("%.2f", totalPayable) + ". Thank you for shopping with MUNCHOAK! You can view your receipt in Payment History.");
@@ -864,7 +868,7 @@ public class CheckoutPage {
         });
 
         // Add to payment box
-        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(),paymentStatus, payBtn);
+        paymentBox.getChildren().addAll(paymentTitle, cardLabel, cardField, new Label(""), new Label("Expiry Date / CVV"), expiryCvv, new Separator(), paymentStatus, payBtn);
 
         rightColumn.getChildren().add(paymentBox);
 

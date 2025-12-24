@@ -1,4 +1,4 @@
-package com.example.view;
+package com.example.homepage;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;

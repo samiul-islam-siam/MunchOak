@@ -15,8 +15,17 @@ public class Session {
     private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
     private static boolean isGuest = true;
-    public static boolean isGuest()
-    {
+    private static final List<Runnable> couponListeners = new ArrayList<>();
+    public static void addCouponListener(Runnable r) {
+        couponListeners.add(r);
+    }
+    public static void notifyCouponUpdated() {
+        for (Runnable r : couponListeners) {
+            r.run();
+        }
+    }
+
+    public static boolean isGuest() {
         return isGuest;
     }
 
@@ -109,22 +118,26 @@ public class Session {
 
     public static void setCurrentUser(String username) {
         currentUsername = username;
-        currentUserId = FileStorage.getUserId(username);
-        currentEmail = FileStorage.getUserEmail(username);
-        currentPassword = FileStorage.getUserPassword(username);
-        currentContactNo = FileStorage.getUserContact(username);
+        currentUserId = UserStorage.getUserId(username);
+        currentEmail = UserStorage.getUserEmail(username);
+        currentPassword = UserStorage.getUserPassword(username);
+        currentContactNo = UserStorage.getUserContact(username);
         isAdmin = false; // normal users are never admins
         isGuest = false;
     }
 
     public static void setAdminUser() throws IOException {
+
         currentUsername = "admin";
-        currentUserId = Integer.parseInt(AdminFileStorage.ADMIN_ID);
+        currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
         currentEmail = "admin@munchoak.com"; // optional
         currentContactNo = "N/A";
-        currentPassword = AdminFileStorage.getAdminPassword();
+        currentPassword = AdminStorage.getAdminPassword();
         isAdmin = true; // set admin flag
         isGuest = false;
+
+
+        // refreshAdminFromFile(); // load values from admin.dat instead of hardcoded defaults
     }
 
     public static void resetToGuest() {
@@ -135,6 +148,36 @@ public class Session {
         currentUserId = 2025000;
         isAdmin = false;
         isGuest = true;
+    }
+
+    public static void refreshAdminFromFile() throws IOException {
+        List<String> lines = AdminStorage.readLines();
+        boolean found = false;
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(AdminStorage.ADMIN_ID) && parts.length >= 5) {
+                currentUserId = Integer.parseInt(parts[0]);
+                currentUsername = parts[1];
+                currentEmail = parts[2];
+                currentContactNo = parts[3];
+                currentPassword = parts[4];
+                isAdmin = true;
+                isGuest = false;
+                found = true;
+                break;
+            }
+        }
+
+        // Only fallback if admin.dat had no valid line
+        if (!found) {
+            currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
+            currentUsername = "admin";
+            currentEmail = "admin@munchoak.com";
+            currentContactNo = "N/A";
+            currentPassword = "N/A";
+            isAdmin = true;
+            isGuest = false;
+        }
     }
 
     public static void logout() {

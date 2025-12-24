@@ -1,6 +1,7 @@
-package com.example.login;
+package com.example.authentication;
 
-import com.example.manager.AdminFileStorage;
+import com.example.manager.AdminStorage;
+import com.example.munchoak.AdminHome;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -129,14 +130,14 @@ public class ChangeAdminPasswordPage {
             }
 
             try {
-                AdminFileStorage.setAdminPassword(newPass);
+                AdminStorage.setAdminPassword(newPass);
                 status.setText("Password changed successfully!");
                 status.setStyle("-fx-text-fill: green;");
 
                 javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.5));
                 pause.setOnFinished(ev -> {
                     popup.close();
-                    AdminDashboard dashboard = new AdminDashboard(ownerStage);
+                    AdminHome dashboard = new AdminHome(ownerStage);
                     dashboard.openAdminDashboard();
                 });
                 pause.play();

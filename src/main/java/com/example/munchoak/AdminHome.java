@@ -1,17 +1,23 @@
-package com.example.login;
+package com.example.munchoak;
 
-import com.example.manager.FileStorage;
-import com.example.manager.Session;
+import com.example.authentication.ChangeAdminPasswordPage;
+import com.example.authentication.LoginPage;
+import com.example.manager.*;
 import com.example.menu.MenuPage;
-import com.example.munchoak.History;
-import com.example.view.HomePage;
-import com.example.view.LoginPage;
-import com.example.view.ProfilePage;
+import com.example.homepage.HomePage;
+import com.example.authentication.ProfilePage;
+import com.example.payment.History;
+import com.example.payment.PaymentStorage;
 import com.example.view.AddCouponPopup;
 import com.example.view.EditCouponPopup;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import javafx.stage.Modality;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -35,17 +41,83 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 
-
-public class AdminDashboard {
+public class AdminHome {
     private static BorderPane centerPane;
 
     private static Stage primaryStage = new Stage();
 
-    public AdminDashboard(Stage stage) {
+    public AdminHome(Stage stage) {
         primaryStage = stage;
     }
 
     private static HBox topBar;
+
+    private static void showDeleteCouponPopup(TableView<CouponStorage.Coupon> table) {
+        Stage popup = new Stage();
+        popup.setTitle("Delete Coupon");
+        popup.initOwner(primaryStage);
+        popup.initModality(Modality.WINDOW_MODAL);
+
+        // --- Dropdown ---
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setPrefWidth(250);
+        comboBox.setPromptText("Coupon Code");
+        comboBox.getItems().addAll(
+                CouponStorage.loadCoupons().stream()
+                        .map(c -> c.code)
+                        .toList()
+        );
+
+        // --- Label ---
+        Label label = new Label("Select a Coupon to Delete:");
+        label.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: black;");
+
+        // --- Delete button ---
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setStyle(
+                "-fx-background-color: #e74c3c;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-pref-width: 120;" +
+                        "-fx-padding: 8 12;" +
+                        "-fx-background-radius: 8;"
+        );
+
+        deleteBtn.setOnAction(e -> {
+            String selected = comboBox.getValue();
+            if (selected == null || selected.isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Please select a coupon.", ButtonType.OK).showAndWait();
+                return;
+            }
+
+            boolean deleted = CouponStorage.deleteCoupon(selected);
+            Session.getMenuClient().sendCouponUpdate();
+            if (deleted) {
+                new Alert(Alert.AlertType.INFORMATION, "Coupon '" + selected + "' deleted successfully.", ButtonType.OK).showAndWait();
+                table.getItems().setAll(CouponStorage.loadCoupons());
+                table.refresh();
+                popup.close();
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Failed to delete coupon.", ButtonType.OK).showAndWait();
+            }
+        });
+
+        // --- Layout ---
+        VBox box = new VBox(15, label, comboBox, deleteBtn);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20));
+        box.setMaxWidth(300);
+
+        // ✅ Matching background
+        BackgroundFill bgFill = new BackgroundFill(
+                Color.web("#E0F7FA"), CornerRadii.EMPTY, Insets.EMPTY
+        );
+        box.setBackground(new Background(bgFill));
+
+        popup.setScene(new Scene(box, 340, 220));
+        popup.show();
+    }
 
     // Place this outside openAdminDashboard(), anywhere inside AdminDashboard class
     private static void showRequestPopup(String requestText) {
@@ -105,20 +177,23 @@ public class AdminDashboard {
         Button changePassBtn = new Button("Change Password");
         Button profileBtn = new Button("Profile");
         Button reservationBtn = new Button("Reservation");   // ✅ NEW button
-        Button addCouponBtn = new Button("Add Coupon");
-        addCouponBtn.setOnAction(e -> AddCouponPopup.show(primaryStage));
-        Button editCouponBtn = new Button("Edit Coupon");
-        editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
+        //   Button addCouponBtn = new Button("Add Coupon");
+        // addCouponBtn.setOnAction(e -> AddCouponPopup.show(primaryStage));
+        //  Button editCouponBtn = new Button("Edit Coupon");
+        // editCouponBtn.setOnAction(e -> EditCouponPopup.show(primaryStage));
+        // --- Coupons Button in Sidebar ---
+        Button couponsBtn = new Button("Coupons");
+
+
         Button logoutBtn = new Button("Logout");
         Button historyBtn = new Button("Payment History");
-
         historyBtn.setStyle("-fx-background-color: #b30000; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bolder; -fx-pref-width: 200; -fx-padding: 12 0; -fx-background-radius: 25;");
         menuBox.getChildren().add(historyBtn);
 
         historyBtn.setOnAction(e -> openAdminHistory(dashboard));
 
         // --- Button Styling ---
-        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, historyBtn,chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn}) {
+        for (Button btn : new Button[]{viewUsersBtn, manageMenuBtn, historyBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, couponsBtn, logoutBtn}) {
             btn.setStyle(
                     "-fx-background-color: #b30000;" +
                             "-fx-text-fill: white;" +
@@ -157,60 +232,138 @@ public class AdminDashboard {
         }
 
         menuBox.getChildren().addAll(
-                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, addCouponBtn, editCouponBtn, logoutBtn
+                viewUsersBtn, manageMenuBtn, chatServerBtn, changePassBtn, profileBtn, reservationBtn, couponsBtn, logoutBtn
         );
         // --- Button Actions ---
         profileBtn.setOnAction(e -> {
             ProfilePage profilePage = new ProfilePage(primaryStage, primaryStage.getScene());
             primaryStage.setScene(profilePage.getProfileScene());
         });
+        couponsBtn.setOnAction(e -> {
+            VBox layout = new VBox();
+            layout.setPadding(new Insets(30, 10, 05, 10));
+            layout.setSpacing(30); // spacing between title, buttons, and table
+            layout.setAlignment(Pos.TOP_CENTER);
+            layout.setStyle("-fx-background-color: lightyellow;"); // keep default background
 
+            // --- Buttons: Add, Edit, Delete ---
+            HBox btnBox = new HBox(30);
+            btnBox.setAlignment(Pos.CENTER);
+
+            Button addBtn = new Button("Add coupon");
+            Button editBtn = new Button("Edit coupon");
+            Button deleteBtn = new Button("Delete coupon");
+
+            // 🎨 Individual button styles
+            addBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-pref-width: 140; -fx-padding: 10 0; -fx-background-radius: 8;");
+            editBtn.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-pref-width: 140; -fx-padding: 10 0; -fx-background-radius: 8;");
+            deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-pref-width: 140; -fx-padding: 10 0; -fx-background-radius: 8;");
+
+
+            btnBox.getChildren().addAll(addBtn, editBtn, deleteBtn);
+            layout.getChildren().add(btnBox);
+            // Label tableLabel = new Label("Available coupons"); tableLabel.setStyle("-fx-font-size: 27px; -fx-font-weight: bold; -fx-text-fill: black;"); layout.getChildren().add(tableLabel);
+            Label tableLabel = new Label("Available coupons");
+            tableLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-font-family: 'Arial Black'; -fx-text-fill: black;");
+            layout.getChildren().add(tableLabel);
+
+            // --- Table ---
+            TableView<CouponStorage.Coupon> table = new TableView<>();
+            addBtn.setOnAction(ev -> AddCouponPopup.show(primaryStage, () -> {
+                table.getItems().setAll(CouponStorage.loadCoupons());
+                table.refresh();
+            }));
+
+            editBtn.setOnAction(ev -> EditCouponPopup.show(primaryStage, () -> {
+                table.getItems().setAll(CouponStorage.loadCoupons());
+                table.refresh();
+            }));
+
+            deleteBtn.setOnAction(ev -> showDeleteCouponPopup(table));
+
+            table.setPrefWidth(Double.MAX_VALUE);     // ✅ full width
+            table.setMaxWidth(Double.MAX_VALUE);
+            table.setPrefHeight(1000);                 // ✅ adjustable height
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+            VBox.setVgrow(table, Priority.ALWAYS);    // ✅ allow vertical stretch
+            table.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8;");
+
+            TableColumn<CouponStorage.Coupon, String> nameCol = new TableColumn<>("Name");
+            nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().code));
+            TableColumn<CouponStorage.Coupon, String> discountCol = new TableColumn<>("Discount");
+            discountCol.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().discount)));
+
+            TableColumn<CouponStorage.Coupon, String> expiryCol = new TableColumn<>("Expiry Date");
+            expiryCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().expiry));
+            TableColumn<CouponStorage.Coupon, String> usageCol = new TableColumn<>("Usage Limit");
+            usageCol.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().usageLimit)));
+            TableColumn<CouponStorage.Coupon, String> remainingCol = new TableColumn<>("Remaining");
+            remainingCol.setCellValueFactory(data -> {
+                CouponStorage.Coupon c = data.getValue();
+                int remaining = Math.max(0, c.usageLimit - c.usedCount);
+                return new SimpleStringProperty(String.valueOf(remaining));
+            });
+
+            table.getColumns().addAll(nameCol, discountCol, expiryCol, usageCol, remainingCol);
+            table.getItems().setAll(CouponStorage.loadCoupons());
+            ScrollPane scrollPane = new ScrollPane(table);
+            scrollPane.setFitToWidth(true);
+            // scrollPane.setFitToHeight(true);
+            scrollPane.setPrefHeight(600);
+            scrollPane.setStyle("-fx-background: transparent;");
+
+
+            layout.getChildren().add(table);
+
+
+            centerPane.setCenter(layout);
+        });
 
         reservationBtn.setOnAction(e -> {
 
-            TableView<FileStorage.ReservationRecord> table = new TableView<>();
+            TableView<ReservationStorage.ReservationRecord> table = new TableView<>();
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
             Session.setReservationListener(() -> {
-                table.getItems().setAll(FileStorage.loadReservations());
+                table.getItems().setAll(ReservationStorage.loadReservations());
                 table.refresh();
             });
 
-            TableColumn<FileStorage.ReservationRecord, String> usernameCol = new TableColumn<>("Username");
+            TableColumn<ReservationStorage.ReservationRecord, String> usernameCol = new TableColumn<>("Username");
             usernameCol.setStyle("-fx-alignment: CENTER_LEFT;");
             usernameCol.setPrefWidth(120);
             usernameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().username));
 
-            TableColumn<FileStorage.ReservationRecord, String> userIdCol = new TableColumn<>("User ID");
+            TableColumn<ReservationStorage.ReservationRecord, String> userIdCol = new TableColumn<>("User ID");
             userIdCol.setStyle("-fx-alignment: CENTER_LEFT;");
             userIdCol.setPrefWidth(100);
             userIdCol.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().userId)));
 
-            TableColumn<FileStorage.ReservationRecord, String> nameCol = new TableColumn<>("Name");
+            TableColumn<ReservationStorage.ReservationRecord, String> nameCol = new TableColumn<>("Name");
             nameCol.setStyle("-fx-alignment: CENTER_LEFT;");
             nameCol.setPrefWidth(90);
             nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().name));
 
-            TableColumn<FileStorage.ReservationRecord, String> phoneCol = new TableColumn<>("Phone");
+            TableColumn<ReservationStorage.ReservationRecord, String> phoneCol = new TableColumn<>("Phone");
             phoneCol.setStyle("-fx-alignment: CENTER_LEFT;");
             phoneCol.setPrefWidth(120);
             phoneCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().phone));
 
-            TableColumn<FileStorage.ReservationRecord, String> guestsCol = new TableColumn<>("Guests");
+            TableColumn<ReservationStorage.ReservationRecord, String> guestsCol = new TableColumn<>("Guests");
             guestsCol.setStyle("-fx-alignment: CENTER;");
             guestsCol.setPrefWidth(85);
             guestsCol.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().guests)));
 
-            TableColumn<FileStorage.ReservationRecord, String> dateCol = new TableColumn<>("Date");
+            TableColumn<ReservationStorage.ReservationRecord, String> dateCol = new TableColumn<>("Date");
             dateCol.setStyle("-fx-alignment: CENTER_LEFT;");
             dateCol.setPrefWidth(105);
             dateCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().date));
 
-            TableColumn<FileStorage.ReservationRecord, String> timeCol = new TableColumn<>("Time");
+            TableColumn<ReservationStorage.ReservationRecord, String> timeCol = new TableColumn<>("Time");
             timeCol.setStyle("-fx-alignment: CENTER;");
             timeCol.setPrefWidth(85);
             timeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().time));
 
-            TableColumn<FileStorage.ReservationRecord, Void> reqCol = new TableColumn<>("Requests");
+            TableColumn<ReservationStorage.ReservationRecord, Void> reqCol = new TableColumn<>("Requests");
             reqCol.setStyle("-fx-alignment: CENTER;");
             reqCol.setPrefWidth(90);
             reqCol.setCellFactory(tc -> new TableCell<>() {
@@ -219,7 +372,7 @@ public class AdminDashboard {
                 {
                     viewBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;");
                     viewBtn.setOnAction(e -> {
-                        FileStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
+                        ReservationStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
                         showRequestPopup(rec.request);
                     });
                 }
@@ -235,14 +388,14 @@ public class AdminDashboard {
                 }
             });
 
-            TableColumn<FileStorage.ReservationRecord, String> statusCol = new TableColumn<>("Status");
+            TableColumn<ReservationStorage.ReservationRecord, String> statusCol = new TableColumn<>("Status");
             statusCol.setStyle("-fx-alignment: CENTER;");
             statusCol.setPrefWidth(110); // slightly wider
             statusCol.setCellValueFactory(data -> new SimpleStringProperty(
-                    FileStorage.getReservationStatus(data.getValue().resId)
+                    ReservationStorage.getReservationStatus(data.getValue().resId)
             ));
 
-            TableColumn<FileStorage.ReservationRecord, Void> actionCol = new TableColumn<>("Action");
+            TableColumn<ReservationStorage.ReservationRecord, Void> actionCol = new TableColumn<>("Action");
             actionCol.setPrefWidth(180);
             actionCol.setCellFactory(col -> new TableCell<>() {
                 private final Button acceptBtn = new Button("Accept");
@@ -263,8 +416,8 @@ public class AdminDashboard {
                 }
 
                 private void handleDecision(String decision) {
-                    FileStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
-                    FileStorage.setReservationStatus(rec.resId, decision);
+                    ReservationStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
+                    ReservationStorage.setReservationStatus(rec.resId, decision);
                     String message;
 
                     if ("Accepted".equals(decision)) {
@@ -291,7 +444,7 @@ public class AdminDashboard {
                     }
 
                     // 🔒 SAVE ONLY FOR THIS USER
-                    FileStorage.saveMessageForUser(
+                    MessageStorage.saveMessageForUser(
                             rec.userId,
                             "Admin",
                             message
@@ -308,8 +461,8 @@ public class AdminDashboard {
                     if (empty) {
                         setGraphic(null);
                     } else {
-                        FileStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
-                        String current = FileStorage.getReservationStatus(rec.resId);
+                        ReservationStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
+                        String current = ReservationStorage.getReservationStatus(rec.resId);
 
                         if ("Accepted".equals(current)) {
                             acceptBtn.setDisable(true);
@@ -331,7 +484,7 @@ public class AdminDashboard {
                     usernameCol, userIdCol, nameCol, phoneCol, guestsCol, dateCol, timeCol, reqCol, statusCol, actionCol
             );
 
-            table.getItems().setAll(FileStorage.loadReservations());
+            table.getItems().setAll(ReservationStorage.loadReservations());
 
             centerPane.setCenter(table);
         });
@@ -353,7 +506,7 @@ public class AdminDashboard {
         /* ------ Button Actions ------ */
 
         viewUsersBtn.setOnAction(e -> {
-            List<String[]> users = FileStorage.loadUsers();
+            List<String[]> users = UserStorage.loadUsers();
             TableView<String[]> table = new TableView<>();
 
             TableColumn<String[], String> idCol = new TableColumn<>("User ID");
@@ -376,7 +529,7 @@ public class AdminDashboard {
             passwordCol.setCellValueFactory(data -> new SimpleStringProperty("********"));
             passwordCol.setPrefWidth(100);
 
-            table.getColumns().addAll(idCol, usernameCol,userContactCol, emailCol, passwordCol);
+            table.getColumns().addAll(idCol, usernameCol, userContactCol, emailCol, passwordCol);
             table.getItems().addAll(users);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
@@ -407,6 +560,7 @@ public class AdminDashboard {
             primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
         });
     }
+
     private static void openAdminHistory(BorderPane dashboard) {
         BorderPane centerPane = new BorderPane();
 
@@ -414,8 +568,8 @@ public class AdminDashboard {
         mainLayout.setPadding(new Insets(20));
 
         // --- Total Income ---
-        double totalIncome = FileStorage.loadPaymentHistory()
-                .stream().mapToDouble(r -> r.amount).sum();
+        double totalIncome = PaymentStorage.loadPaymentHistory()
+                .stream().mapToDouble(r -> r.getAmount()).sum();
         Label totalIncomeLabel = new Label("Total Income: $" + String.format("%.2f", totalIncome));
         totalIncomeLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
         totalIncomeLabel.setWrapText(true);
@@ -447,11 +601,11 @@ public class AdminDashboard {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 // Aggregate income by date
-        Map<String, Double> incomeMap = FileStorage.loadPaymentHistory()
+        Map<String, Double> incomeMap = PaymentStorage.loadPaymentHistory()
                 .stream()
                 .collect(Collectors.groupingBy(
-                        r -> r.timestamp.split("T")[0],
-                        Collectors.summingDouble(r -> r.amount)
+                        r -> r.getTimestamp().split("T")[0],
+                        Collectors.summingDouble(r -> r.getAmount())
                 ));
 
 // Get last 7 consecutive days (including today)
@@ -480,9 +634,9 @@ public class AdminDashboard {
         // --- History Table ---
         TableView<History.HistoryRecord> table = new TableView<>();
         table.setItems(FXCollections.observableArrayList(
-                FileStorage.loadPaymentHistory().stream()
+                PaymentStorage.loadPaymentHistory().stream()
                         .map(s -> new History.HistoryRecord(
-                                s.userId, s.paymentId, s.timestamp, s.amount, "Success", s.paymentMethod))
+                                s.getUserId(), s.getPaymentId(), s.getTimestamp(), s.getAmount(), "Success", s.getPaymentMethod()))
                         .toList()
         ));
 
@@ -493,23 +647,25 @@ public class AdminDashboard {
         paymentIdCol.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getPaymentId()).asObject());
 
         TableColumn<History.HistoryRecord, String> dateCol = new TableColumn<>("Date/Time");
-        dateCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTimestamp()));
+        dateCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTimestamp()));
 
         TableColumn<History.HistoryRecord, Double> amountCol = new TableColumn<>("Amount");
         amountCol.setCellValueFactory(data -> new javafx.beans.property.SimpleDoubleProperty(data.getValue().getAmount()).asObject());
 
         TableColumn<History.HistoryRecord, String> methodCol = new TableColumn<>("Payment Method");
-        methodCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getPaymentMethod()));
+        methodCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPaymentMethod()));
 
         TableColumn<History.HistoryRecord, Void> billCol = new TableColumn<>("Bill");
         billCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("View");
+
             {
                 btn.setOnAction(e -> {
                     History.HistoryRecord record = getTableView().getItems().get(getIndex());
                     new History(primaryStage).showBill(record);
                 });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -527,8 +683,7 @@ public class AdminDashboard {
 
         // Replace the center of the dashboard
         //dashboard.setCenter(centerPane);
-        AdminDashboard.centerPane.setCenter(mainLayout);
+        AdminHome.centerPane.setCenter(mainLayout);
 
     }
-
 }
