@@ -4,18 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Coupon Sync">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="restructured">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/AdminEditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/AdminEditProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/ChangeAdminPasswordPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/ChangeAdminPasswordPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/LoginPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageInit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/StoragePaths.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/StoragePaths.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminHome.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/payment/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/payment/CheckoutPage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/payment/PaymentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/payment/PaymentStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" afterDir="false" />
@@ -42,7 +38,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="Database" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -97,11 +93,11 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/munchoak&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/example/view&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -117,11 +113,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\login" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\view\images" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\munchoak" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\example\manager\data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example" />
@@ -131,28 +127,18 @@
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.manager" />
       <recent name="com.example" />
       <recent name="" />
       <recent name="com.example.munchoak" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.payment" />
       <recent name="com.example.munchoak" />
-      <recent name="com.example.menu" />
-      <recent name="com.example.view" />
       <recent name="com.example.manager" />
+      <recent name="com.example.view" />
       <recent name="com.example.login" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -171,22 +157,31 @@
       <updated>1759067535159</updated>
       <workItem from="1765266365981" duration="2413000" />
       <workItem from="1765339976997" duration="424000" />
-      <workItem from="1765424657661" duration="3514000" />
-      <workItem from="1765440968948" duration="28000" />
-      <workItem from="1765444436242" duration="1993000" />
-      <workItem from="1765502147893" duration="5462000" />
-      <workItem from="1765508546363" duration="7705000" />
-      <workItem from="1765522054913" duration="355000" />
-      <workItem from="1765525814460" duration="571000" />
-      <workItem from="1765528176375" duration="306000" />
-      <workItem from="1765958662886" duration="4551000" />
-      <workItem from="1766118038821" duration="4204000" />
-      <workItem from="1766129528075" duration="4441000" />
-      <workItem from="1766136218877" duration="224000" />
-      <workItem from="1766145514657" duration="49000" />
-      <workItem from="1766235628304" duration="2145000" />
-      <workItem from="1766292927493" duration="3557000" />
-      <workItem from="1766569546969" duration="957000" />
+      <workItem from="1765424657661" duration="6073000" />
+      <workItem from="1765438205287" duration="924000" />
+      <workItem from="1765445475413" duration="2531000" />
+      <workItem from="1765469418200" duration="2518000" />
+      <workItem from="1765509016223" duration="7569000" />
+      <workItem from="1765555250670" duration="2048000" />
+      <workItem from="1765605724774" duration="620000" />
+      <workItem from="1765633576402" duration="3058000" />
+      <workItem from="1765809865717" duration="4944000" />
+      <workItem from="1765989686176" duration="4312000" />
+      <workItem from="1766108795029" duration="2414000" />
+      <workItem from="1766243456340" duration="772000" />
+      <workItem from="1766467202888" duration="1809000" />
+      <workItem from="1766499658354" duration="7709000" />
+      <workItem from="1766556363054" duration="2590000" />
+      <workItem from="1766565515590" duration="6693000" />
+      <workItem from="1766572943105" duration="3371000" />
+    </task>
+    <task id="LOCAL-00048" summary="login bug fixed">
+      <option name="closed" value="true" />
+      <created>1763170561132</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1763170561132</updated>
     </task>
     <task id="LOCAL-00049" summary="bug fixes">
       <option name="closed" value="true" />
@@ -492,101 +487,94 @@
       <option name="project" value="LOCAL" />
       <updated>1765080196138</updated>
     </task>
-    <task id="LOCAL-00087" summary="Add ons">
+    <task id="LOCAL-00087" summary="Run by one click">
       <option name="closed" value="true" />
-      <created>1765508663049</created>
+      <created>1765428256379</created>
       <option name="number" value="00087" />
       <option name="presentableId" value="LOCAL-00087" />
       <option name="project" value="LOCAL" />
-      <updated>1765508663049</updated>
+      <updated>1765428256379</updated>
     </task>
-    <task id="LOCAL-00088" summary="Bug fixed Add ons">
+    <task id="LOCAL-00088" summary="compressed images">
       <option name="closed" value="true" />
-      <created>1765522280769</created>
+      <created>1765472218770</created>
       <option name="number" value="00088" />
       <option name="presentableId" value="LOCAL-00088" />
       <option name="project" value="LOCAL" />
-      <updated>1765522280769</updated>
+      <updated>1765472218770</updated>
     </task>
-    <task id="LOCAL-00089" summary="Reservation Synced">
+    <task id="LOCAL-00089" summary="Menu with Add-ons">
       <option name="closed" value="true" />
-      <created>1765956425878</created>
+      <created>1765516318575</created>
       <option name="number" value="00089" />
       <option name="presentableId" value="LOCAL-00089" />
       <option name="project" value="LOCAL" />
-      <updated>1765956425879</updated>
+      <updated>1765516318575</updated>
     </task>
-    <task id="LOCAL-00090" summary="guest issues">
+    <task id="LOCAL-00090" summary="Add on bug fixed">
       <option name="closed" value="true" />
-      <created>1766072664820</created>
+      <created>1765556686103</created>
       <option name="number" value="00090" />
       <option name="presentableId" value="LOCAL-00090" />
       <option name="project" value="LOCAL" />
-      <updated>1766072664821</updated>
+      <updated>1765556686103</updated>
     </task>
-    <task id="LOCAL-00091" summary="coupon fixing">
+    <task id="LOCAL-00091" summary="Reservation update (Admin side)">
       <option name="closed" value="true" />
-      <created>1766118162449</created>
+      <created>1765635979291</created>
       <option name="number" value="00091" />
       <option name="presentableId" value="LOCAL-00091" />
       <option name="project" value="LOCAL" />
-      <updated>1766118162450</updated>
+      <updated>1765635979292</updated>
     </task>
-    <task id="LOCAL-00092" summary="Bill fixing">
+    <task id="LOCAL-00092" summary="Reservation sync &amp; coupon edit">
       <option name="closed" value="true" />
-      <created>1766127589190</created>
+      <created>1765993508945</created>
       <option name="number" value="00092" />
       <option name="presentableId" value="LOCAL-00092" />
       <option name="project" value="LOCAL" />
-      <updated>1766127589190</updated>
+      <updated>1765993508945</updated>
     </task>
-    <task id="LOCAL-00093" summary="bill">
+    <task id="LOCAL-00093" summary="Bug fix: time">
       <option name="closed" value="true" />
-      <created>1766127614886</created>
+      <created>1765994009965</created>
       <option name="number" value="00093" />
       <option name="presentableId" value="LOCAL-00093" />
       <option name="project" value="LOCAL" />
-      <updated>1766127614886</updated>
+      <updated>1765994009965</updated>
     </task>
-    <task id="LOCAL-00094" summary="logout">
+    <task id="LOCAL-00094" summary="guest mode updated">
       <option name="closed" value="true" />
-      <created>1766128140909</created>
+      <created>1766110223400</created>
       <option name="number" value="00094" />
       <option name="presentableId" value="LOCAL-00094" />
       <option name="project" value="LOCAL" />
-      <updated>1766128140910</updated>
+      <updated>1766110223400</updated>
     </task>
-    <task id="LOCAL-00095" summary="graph">
+    <task id="LOCAL-00095" summary="guest mode updated">
       <option name="closed" value="true" />
-      <created>1766293387630</created>
+      <created>1766110774720</created>
       <option name="number" value="00095" />
       <option name="presentableId" value="LOCAL-00095" />
       <option name="project" value="LOCAL" />
-      <updated>1766293387630</updated>
+      <updated>1766110774720</updated>
     </task>
-    <task id="LOCAL-00096" summary="graph">
+    <task id="LOCAL-00096" summary="restructured">
       <option name="closed" value="true" />
-      <created>1766293410239</created>
+      <created>1766505243817</created>
       <option name="number" value="00096" />
       <option name="presentableId" value="LOCAL-00096" />
       <option name="project" value="LOCAL" />
-      <updated>1766293410239</updated>
+      <updated>1766505243817</updated>
     </task>
-    <task id="LOCAL-00097" summary="Coupon Sync">
-      <option name="closed" value="true" />
-      <created>1766552349186</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1766552349186</updated>
-    </task>
-    <option name="localTasksCounter" value="98" />
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="guest browsing fixed" />
     <MESSAGE value="Chat history problem" />
     <MESSAGE value="Chat bug fixed" />
     <MESSAGE value="Searching added" />
@@ -602,17 +590,16 @@
     <MESSAGE value="Admin page fix" />
     <MESSAGE value="MenuServer &amp; Cart empty issue fixed" />
     <MESSAGE value="Final commit" />
-    <MESSAGE value="Add ons" />
-    <MESSAGE value="Bug fixed Add ons" />
-    <MESSAGE value="Reservation Synced" />
-    <MESSAGE value="guest issues" />
-    <MESSAGE value="coupon fixing" />
-    <MESSAGE value="Bill fixing" />
-    <MESSAGE value="bill" />
-    <MESSAGE value="logout" />
-    <MESSAGE value="graph" />
-    <MESSAGE value="Coupon Sync" />
-    <option name="LAST_COMMIT_MESSAGE" value="Coupon Sync" />
+    <MESSAGE value="Run by one click" />
+    <MESSAGE value="compressed images" />
+    <MESSAGE value="Menu with Add-ons" />
+    <MESSAGE value="Add on bug fixed" />
+    <MESSAGE value="Reservation update (Admin side)" />
+    <MESSAGE value="Reservation sync &amp; coupon edit" />
+    <MESSAGE value="Bug fix: time" />
+    <MESSAGE value="guest mode updated" />
+    <MESSAGE value="restructured" />
+    <option name="LAST_COMMIT_MESSAGE" value="restructured" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

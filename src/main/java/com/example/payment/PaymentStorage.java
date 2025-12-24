@@ -15,6 +15,9 @@ import java.util.Map;
 
 public final class PaymentStorage {
     private PaymentStorage() {}
+    public static final byte REC_PAYMENT = 1;
+    public static final byte REC_PAYMENT_ITEM = 2;
+    public static final byte REC_BREAKDOWN = 3;
 
     public static int createPaymentAndCart(
             int userId,
@@ -26,13 +29,14 @@ public final class PaymentStorage {
 
         StorageInit.ensureDataDir();
 
-        int paymentId = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENTS_FILE, 3001);
+        int paymentId = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENT_MASTER_FILE, 3001);
         int cartId = StorageUtil.generateNextIdInFile(StoragePaths.CARTS_FILE, 1);
-        int paymentItemIdStart = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENT_ITEMS_FILE, 1);
+        int paymentItemIdStart = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENT_MASTER_FILE, 1);
 
         String timestamp = Instant.now().toString();
 
         try (DataOutputStream pw = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENTS_FILE, true))) {
+            pw.writeByte(REC_PAYMENT);
             pw.writeInt(paymentId);
             pw.writeInt(userId);
             pw.writeDouble(finalTotal);
@@ -59,6 +63,7 @@ public final class PaymentStorage {
                 ciw.writeInt(foodId);
                 ciw.writeInt(qty);
 
+                piw.writeByte(REC_PAYMENT_ITEM);
                 piw.writeInt(paymentItemId);
                 piw.writeInt(paymentId);
                 piw.writeInt(foodId);
@@ -77,16 +82,33 @@ public final class PaymentStorage {
     public static List<History.HistoryRecord> loadPaymentHistory() {
         StorageInit.ensureDataDir();
         List<History.HistoryRecord> list = new ArrayList<>();
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENTS_FILE))) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_MASTER_FILE))) {
+
             while (dis.available() > 0) {
-                int pid = dis.readInt();
-                int uid = dis.readInt();
-                double amount = dis.readDouble();
-                String method = dis.readUTF();
-                String timestamp = dis.readUTF();
-                String status = dis.readUTF();
-                list.add(new History.HistoryRecord(uid, pid, timestamp, amount, status, method));
+                byte type = dis.readByte();
+
+                if (type == REC_PAYMENT) {
+                    int pid = dis.readInt();
+                    int uid = dis.readInt();
+                    double amount = dis.readDouble();
+                    String method = dis.readUTF();
+                    String timestamp = dis.readUTF();
+
+                    list.add(new History.HistoryRecord(
+                            uid, pid, timestamp, amount, "Success", method
+                    ));
+                }
+                else if (type == REC_PAYMENT_ITEM) {
+                    dis.skipBytes(16);
+                }
+                else if (type == REC_BREAKDOWN) {
+                    dis.readInt();
+                    for (int i = 0; i < 8; i++) dis.readDouble();
+                    dis.readInt();
+                    dis.readUTF();
+                }
             }
+
         } catch (EOFException ignored) {
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
@@ -136,6 +158,8 @@ public final class PaymentStorage {
 
         try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_BREAKDOWN_FILE))) {
             while (dis.available() > 0) {
+                byte type = dis.readByte();
+                if (type != REC_BREAKDOWN) continue;
                 int pid = dis.readInt();
                 double baseSubtotal = dis.readDouble();
                 double addons = dis.readDouble();
@@ -175,6 +199,7 @@ public final class PaymentStorage {
 
         StorageInit.ensureDataDir();
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENT_BREAKDOWN_FILE, true))) {
+            dos.writeByte(REC_BREAKDOWN);
             dos.writeInt(paymentId);
             dos.writeDouble(baseSubtotal);
             dos.writeDouble(addons);

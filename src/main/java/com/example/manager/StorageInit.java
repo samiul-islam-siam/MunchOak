@@ -23,7 +23,6 @@ public final class StorageInit {
             // coupons
             if (!StoragePaths.COUPONS_FILE.exists()) StoragePaths.COUPONS_FILE.createNewFile();
             if (!StoragePaths.COUPON_USAGE_FILE.exists()) StoragePaths.COUPON_USAGE_FILE.createNewFile();
-
             // primary files
             if (!StoragePaths.USERS_FILE.exists()) StoragePaths.USERS_FILE.createNewFile();
             if (!StoragePaths.CATEGORIES_FILE.exists()) StoragePaths.CATEGORIES_FILE.createNewFile();

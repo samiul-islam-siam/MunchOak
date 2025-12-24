@@ -12,6 +12,10 @@ import java.io.IOException;
  */
 public final class StorageUtil {
     private StorageUtil() {}
+    public static final byte REC_PAYMENT = 1;
+    public static final byte REC_PAYMENT_ITEM = 2;
+    public static final byte REC_BREAKDOWN = 3;
+
 
     public static int generateNextIdInFile(File f, int startIfEmpty) {
         StorageInit.ensureDataDir();
@@ -19,15 +23,33 @@ public final class StorageUtil {
 
         try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
 
-            if (f.equals(StoragePaths.PAYMENTS_FILE)) {
+            if (f.equals(StoragePaths.PAYMENT_MASTER_FILE)) {
                 while (dis.available() > 0) {
-                    lastId = dis.readInt(); // paymentId
-                    dis.readInt();          // userId
-                    dis.readDouble();       // amount
-                    dis.readUTF();          // method
-                    dis.readUTF();          // timestamp
+                    byte type = dis.readByte();
+
+                    if (type == REC_PAYMENT) {
+                        lastId = dis.readInt(); // paymentId
+                        dis.readInt();
+                        dis.readDouble();
+                        dis.readUTF();
+                        dis.readUTF();
+                    }
+                    else if (type == REC_PAYMENT_ITEM) {
+                        dis.readInt(); // paymentItemId
+                        dis.readInt();
+                        dis.readInt();
+                        dis.readInt();
+                    }
+                    else if (type == REC_BREAKDOWN) {
+                        dis.readInt();
+                        for (int i = 0; i < 8; i++) dis.readDouble();
+                        dis.readInt();
+                        dis.readUTF();
+                    }
                 }
-            } else if (f.equals(StoragePaths.USERS_FILE)) {
+            }
+
+            else if (f.equals(StoragePaths.USERS_FILE)) {
                 while (dis.available() > 0) {
                     dis.readUTF();
                     dis.readUTF();
@@ -59,15 +81,9 @@ public final class StorageUtil {
                     dis.readInt();
                     dis.readInt();
                     dis.readUTF();
-                }
-            } else if (f.equals(StoragePaths.PAYMENT_ITEMS_FILE)) {
-                while (dis.available() > 0) {
-                    lastId = dis.readInt(); // paymentItemId
-                    dis.readInt();          // paymentId
-                    dis.readInt();          // foodId
-                    dis.readInt();          // qty
-                }
-            } else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
+                }}
+
+            else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // resId
                     dis.readUTF();
