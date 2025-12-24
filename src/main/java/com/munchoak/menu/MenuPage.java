@@ -68,7 +68,7 @@ public class MenuPage {
             root = buildRoot();
             menuScene = new Scene(root, initWidth, initHeight);
 
-            // optional css — guard against missing resources
+            // optional CSS — guard against missing resources
             try {
                 var css1 = getClass().getResource("/com/munchoak/view/styles/style.css");
                 if (css1 != null) menuScene.getStylesheets().add(css1.toExternalForm());
@@ -302,7 +302,12 @@ public class MenuPage {
         homeButton.setGraphic(homeIcon);
         homeButton.getStyleClass().add("top-button");
         homeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
-        homeButton.setOnAction(e -> returnToHomePerfectly());
+
+        if (Session.isAdmin()) {
+            homeButton.setOnAction(e -> AdminHome.openAdminDashboard());
+        } else {
+            homeButton.setOnAction(e -> returnToHomePerfectly());
+        }
 
         Label aboutIcon = new Label("\u2139"); // ℹ
         aboutIcon.setFont(Font.font("Segoe UI Emoji", 22));
