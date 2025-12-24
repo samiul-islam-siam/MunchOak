@@ -15,6 +15,15 @@ public class Session {
     private static String currentContactNo = "N/A"; // default
     private static boolean isAdmin = false; // new flag for admin control
     private static boolean isGuest = true;
+    private static final List<Runnable> couponListeners = new ArrayList<>();
+    public static void addCouponListener(Runnable r) {
+        couponListeners.add(r);
+    }
+    public static void notifyCouponUpdated() {
+        for (Runnable r : couponListeners) {
+            r.run();
+        }
+    }
 
     public static boolean isGuest() {
         return isGuest;

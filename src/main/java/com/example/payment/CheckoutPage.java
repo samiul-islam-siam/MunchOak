@@ -1,15 +1,15 @@
 package com.example.payment;
 
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
 import com.example.manager.CouponStorage;
 import com.example.manager.MenuStorage;
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
 import com.example.munchoak.FoodItems;
-import com.example.manager.Session;
-import com.example.menu.MenuPage;
-import com.example.homepage.HomePage;
-import com.example.authentication.LoginPage;
-import com.example.authentication.ProfilePage;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
@@ -847,7 +847,7 @@ public class CheckoutPage {
                     CouponStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());
                 }
 
-
+                Session.getMenuClient().sendCouponUpdate();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("Payment Successful!");
                 alert.setContentText("Your order has been placed for ৳" + String.format("%.2f", totalPayable) + ". Thank you for shopping with MUNCHOAK! You can view your receipt in Payment History.");

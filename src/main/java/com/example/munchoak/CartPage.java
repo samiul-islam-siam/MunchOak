@@ -1,14 +1,13 @@
 package com.example.munchoak;
 
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
 import com.example.manager.CouponStorage;
 import com.example.manager.MenuStorage;
 import com.example.manager.Session;
 import com.example.manager.UserStorage;
 import com.example.menu.MenuPage;
-import com.example.homepage.HomePage;
-import com.example.authentication.LoginPage;
-import com.example.authentication.ProfilePage;
-
 import com.example.payment.CheckoutPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
@@ -29,6 +28,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import static com.example.manager.CouponStorage.loadCoupons;
 
 public class CartPage {
     private final Stage primaryStage;
@@ -687,13 +688,24 @@ public class CartPage {
         couponSection.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;");
 
 
-        // Load coupons from admin
-        List<CouponStorage.Coupon> coupons = CouponStorage.loadCoupons();
-
         ComboBox<String> couponDropdown = new ComboBox<>();
+
+// Initial load
+        List<CouponStorage.Coupon> coupons = loadCoupons();
         for (CouponStorage.Coupon c : coupons) {
             couponDropdown.getItems().add(c.code);
         }
+
+// Listen for coupon updates
+        Session.addCouponListener(() -> {
+            List<CouponStorage.Coupon> updatedCoupons = loadCoupons();
+
+            couponDropdown.getItems().clear();
+            for (CouponStorage.Coupon c : updatedCoupons) {
+                couponDropdown.getItems().add(c.code);
+            }
+        });
+
 
         Label couponStatusLabel = new Label("No coupon applied");
 
@@ -909,12 +921,21 @@ public class CartPage {
                         if (selectedCode != null) {
                             //double discountRate = coupons.get(selectedCode);
                             double discountRate = 0.0;
-                            for (CouponStorage.Coupon c : coupons) {
+//                            for (CouponStorage.Coupon c : coupons) {
+//                                if (c.code.equals(selectedCode)) {
+//                                    discountRate = c.discount;
+//                                    break;
+//                                }
+//                            }
+                            List<CouponStorage.Coupon> freshCoupons = loadCoupons();
+
+                            for (CouponStorage.Coupon c : freshCoupons) {
                                 if (c.code.equals(selectedCode)) {
-                                    discountRate = c.discount;
+                                    discountRate = c.discount;   // ← always latest value
                                     break;
                                 }
                             }
+
 
                             setDisCount(discountRate);
 

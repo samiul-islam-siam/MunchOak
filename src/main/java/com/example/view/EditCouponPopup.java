@@ -1,6 +1,7 @@
 package com.example.view;
 
 import com.example.manager.CouponStorage;
+import com.example.manager.Session;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -132,6 +133,7 @@ public class EditCouponPopup {
             }
             try {
                 CouponStorage.editCoupon(selectedCode, newDiscount,newExpiry,newUsageLimit);
+                Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon updated successfully!");
                 status.setTextFill(javafx.scene.paint.Color.GREEN);
                 clearMessageAfterDelay(status);

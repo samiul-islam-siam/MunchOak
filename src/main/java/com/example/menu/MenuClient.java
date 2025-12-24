@@ -172,6 +172,32 @@ public class MenuClient {
 
                         Platform.runLater(() -> Session.notifyMessageUpdated());
                     }
+                    case "UPDATE_COUPONS" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
+                        byte[] data = new byte[size];
+                        in.readFully(data);
+
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
+                        write(new File(dir, filename).toPath(), data);
+
+                        System.out.println("Coupons synced.");
+                        Platform.runLater(() -> Session.notifyCouponUpdated());
+                    }
+
+                    case "UPDATE_COUPON_USAGE" -> {
+                        String filename = in.readUTF();
+                        int size = in.readInt();
+                        byte[] data = new byte[size];
+                        in.readFully(data);
+
+                        File dir = new File("src/main/resources/com/example/manager/data/");
+                        dir.mkdirs();
+                        write(new File(dir, filename).toPath(), data);
+
+                        System.out.println("Coupon usage synced.");
+                    }
 
 
                 }
@@ -250,21 +276,34 @@ public class MenuClient {
         }
     }
 
-    //    public synchronized void sendReservationUpdate() {
-//        try {
-//            File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
-//            byte[] data = readAllBytes(resFile.toPath());
-//
-//            out.writeUTF("UPDATE_RESERVATIONS");
-//            out.writeUTF(resFile.getName());
-//            out.writeInt(data.length);
-//            out.write(data);
-//            out.flush();
-//
-//        } catch (Exception e) {
-//            System.err.println("IOException: " + e.getMessage());
-//        }
-//    }
+    public synchronized void sendCouponUpdate() {
+        try {
+            File couponFile = StoragePaths.COUPONS_FILE;
+            File usageFile = StoragePaths.COUPON_USAGE_FILE;
+
+            if (couponFile.exists()) {
+                byte[] data = readAllBytes(couponFile.toPath());
+                out.writeUTF("UPDATE_COUPONS");
+                out.writeUTF(couponFile.getName());
+                out.writeInt(data.length);
+                out.write(data);
+            }
+
+            if (usageFile.exists()) {
+                byte[] data = readAllBytes(usageFile.toPath());
+                out.writeUTF("UPDATE_COUPON_USAGE");
+                out.writeUTF(usageFile.getName());
+                out.writeInt(data.length);
+                out.write(data);
+            }
+
+            out.flush();
+
+        } catch (Exception e) {
+            System.err.println("Coupon sync error: " + e.getMessage());
+        }
+    }
+
     public synchronized void sendReservationUpdate() {
         try {
             File resFile = new File("src/main/resources/com/example/manager/data/reservations.dat");
