@@ -2,6 +2,7 @@ package com.example.authentication;
 
 import com.example.manager.AdminStorage;
 import com.example.munchoak.AdminHome;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

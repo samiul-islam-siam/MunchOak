@@ -2,6 +2,7 @@ package com.example.authentication;
 
 import com.example.manager.AdminStorage;
 import com.example.manager.Session;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 
 public class AdminEditProfilePopup {
@@ -31,13 +33,7 @@ public class AdminEditProfilePopup {
         layout.setPadding(new Insets(30));
         layout.setMaxWidth(400);
         layout.setPrefWidth(400);
-/*
-        // Admin ID field
-        Label adminIdLabel = new Label("Change Admin ID:");
-        adminIdLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: black;");
-        TextField adminIdField = new TextField(String.valueOf(Session.getCurrentUserId()));
-        layout.getChildren().addAll(adminIdLabel, adminIdField);
-*/
+
         // Common fields
         Label usernameLabel = new Label("Username:");
         Label emailLabel = new Label("Email:");
@@ -72,70 +68,18 @@ public class AdminEditProfilePopup {
 
         HBox buttonRow = new HBox(20, saveBtn, cancelBtn);
         buttonRow.setAlignment(Pos.CENTER);
-/*
+
         saveBtn.setOnAction(e -> {
-            // inside saveBtn.setOnAction
             String newUser = usernameField.getText().trim();
             String newEmail = emailField.getText().trim();
             String newContact = contactField.getText().trim();
             String newPass = newPassField.getText().trim();
             String confirmPass = confirmPassField.getText().trim();
-            String newAdminId = adminIdField.getText().trim();
-
-// Preserve old values if blank
-            if (newUser.isEmpty()) newUser = Session.getCurrentUsername();
-            if (newEmail.isEmpty()) newEmail = Session.getCurrentEmail();
-            if (newContact.isEmpty()) newContact = Session.getCurrentContactNo();
-            if (newAdminId.isEmpty()) newAdminId = String.valueOf(Session.getCurrentUserId());
-
-// Password update only if provided
-            if (!newPass.isEmpty() || !confirmPass.isEmpty()) {
-                if (!newPass.equals(confirmPass)) {
-                    showTempStatus(status, "Passwords do not match!", Color.BLUE);
-                    return;
-                }
-                AdminFileStorage.updateAdminPassword(String.valueOf(Session.getCurrentUserId()), newPass);
-            }
-
-// Admin ID update only if changed
-            String currentAdminId = String.valueOf(Session.getCurrentUserId());
-            if (!newAdminId.equals(currentAdminId)) {
-                if (!newAdminId.matches("\\d+")) {
-                    showTempStatus(status, "Admin ID must be numeric.", Color.BLUE);
-                    return;
-                }
-                AdminFileStorage.updateAdminId(currentAdminId, newAdminId);
-                Session.setCurrentUserId(Integer.parseInt(newAdminId));
-            }
-
-// Update admin profile info safely
-            AdminFileStorage.updateAdminInfo(String.valueOf(Session.getCurrentUserId()), newUser, newEmail, newContact);
-
-// Update Session
-            Session.setCurrentUser(newUser);
-            Session.setCurrentEmail(newEmail);
-            Session.setCurrentContactNo(newContact);
-
-            //showTempStatus(status, "Admin profile updated successfully!", Color.WHITE);
-
-            showTempStatus(status, "Admin profile updated successfully!", Color.WHITE);
-            if (onProfileUpdated != null) onProfileUpdated.run();
-        });
-*/
-
-      saveBtn.setOnAction(e -> {
-            String newUser = usernameField.getText().trim();
-            String newEmail = emailField.getText().trim();
-            String newContact = contactField.getText().trim();
-            String newPass = newPassField.getText().trim();
-            String confirmPass = confirmPassField.getText().trim();
-          //  String newAdminId = adminIdField.getText().trim();
 
             // Preserve old values if blank
             if (newUser.isEmpty()) newUser = Session.getCurrentUsername();
             if (newEmail.isEmpty()) newEmail = Session.getCurrentEmail();
             if (newContact.isEmpty()) newContact = Session.getCurrentContactNo();
-           // if (newAdminId.isEmpty()) newAdminId = String.valueOf(Session.getCurrentUserId());
 
             // Password update only if provided
             if (!newPass.isEmpty() || !confirmPass.isEmpty()) {
@@ -143,32 +87,17 @@ public class AdminEditProfilePopup {
                     showTempStatus(status, "Passwords do not match!", Color.BLUE);
                     return;
                 }
-               // AdminFileStorage.updateAdminPassword(String.valueOf(Session.getCurrentUserId()), newPass);
                 // In AdminEditProfilePopup.java
                 AdminStorage.updateAdminPassword(AdminStorage.ADMIN_ID, newPass);
-               // AdminFileStorage.updateAdminInfo(newUser, newEmail, newContact);
+                // AdminFileStorage.updateAdminInfo(newUser, newEmail, newContact);
 
                 showTempStatus(status, "Password updated successfully!", Color.WHITE);
             }
 
-        /*    // Admin ID update only if changed
-            String currentAdminId = String.valueOf(Session.getCurrentUserId());
-            if (!newAdminId.equals(currentAdminId)) {
-                if (!newAdminId.matches("\\d+")) {
-                    showTempStatus(status, "Admin ID must be numeric.", Color.BLUE);
-                    return;
-                }
-                AdminFileStorage.updateAdminId(currentAdminId, newAdminId);
-                Session.setCurrentUserId(Integer.parseInt(newAdminId));
-            }
-*/
             // Update admin profile info safely
             AdminStorage.updateAdminInfo(newUser, newEmail, newContact);
 
             // Update Session
-           // Session.setCurrentUser(newUser);
-           // Session.setCurrentEmail(newEmail);
-            //Session.setCurrentContactNo(newContact);
             try {
                 Session.refreshAdminFromFile();
             } catch (IOException ex) {

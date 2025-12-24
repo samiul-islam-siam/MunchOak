@@ -70,51 +70,6 @@ public final class PaymentStorage {
         return paymentId;
     }
 
-    public static void savePaymentDiscountTip(int paymentId, double discount, double tip) throws IOException {
-        StorageInit.ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENT_DISCOUNTS_FILE, true))) {
-            dos.writeInt(paymentId);
-            dos.writeDouble(discount);
-            dos.writeDouble(tip);
-        }
-    }
-
-    public static double getPaymentDiscount(int paymentId) {
-        StorageInit.ensureDataDir();
-        if (!StoragePaths.PAYMENT_DISCOUNTS_FILE.exists() || StoragePaths.PAYMENT_DISCOUNTS_FILE.length() == 0) return 0.0;
-
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_DISCOUNTS_FILE))) {
-            while (dis.available() > 0) {
-                int pid = dis.readInt();
-                double disc = dis.readDouble();
-                dis.readDouble(); // tip
-                if (pid == paymentId) return disc;
-            }
-        } catch (EOFException ignored) {
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-        return 0.0;
-    }
-
-    public static double getPaymentTip(int paymentId) {
-        StorageInit.ensureDataDir();
-        if (!StoragePaths.PAYMENT_DISCOUNTS_FILE.exists() || StoragePaths.PAYMENT_DISCOUNTS_FILE.length() == 0) return 0.0;
-
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_DISCOUNTS_FILE))) {
-            while (dis.available() > 0) {
-                int pid = dis.readInt();
-                dis.readDouble(); // discount
-                double tip = dis.readDouble();
-                if (pid == paymentId) return tip;
-            }
-        } catch (EOFException ignored) {
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-        return 0.0;
-    }
-
     public static int getLastPaymentId() {
         return StorageUtil.generateNextIdInFile(StoragePaths.PAYMENTS_FILE, 3001) - 1;
     }

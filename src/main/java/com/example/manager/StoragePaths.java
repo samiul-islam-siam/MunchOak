@@ -11,17 +11,19 @@ public final class StoragePaths {
     // Core files
     public static final File USERS_FILE = new File(DATA_DIR, "users.dat");
     public static final File CATEGORIES_FILE = new File(DATA_DIR, "categories.dat");
-    public static final File PAYMENTS_FILE = new File(DATA_DIR, "payments.dat");
+
     public static final File CARTS_FILE = new File(DATA_DIR, "carts.dat");
     public static final File CART_ITEMS_FILE = new File(DATA_DIR, "cartitems.dat");
-    public static final File PAYMENT_ITEMS_FILE = new File(DATA_DIR, "paymentitems.dat");
-    public static final File ORDERS_FILE = new File(DATA_DIR, "orders.dat");
+
     public static final File RESERVATIONS_FILE = new File(DATA_DIR, "reservations.dat");
     public static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
-    public static final File PAYMENT_DISCOUNTS_FILE = new File(DATA_DIR, "payment_discounts.dat");
     public static final File MESSAGES_FILE = new File(DATA_DIR, "messages.dat");
-    public static final File PAYMENT_BREAKDOWN_FILE = new File(DATA_DIR, "payment_breakdown.dat");
+
     public static final File ADMIN_FILE = new File(DATA_DIR, "admin.dat");
+    public static final File PAYMENT_MASTER_FILE = new File(DATA_DIR, "payments.dat");
+    public static final File PAYMENTS_FILE = PAYMENT_MASTER_FILE;
+    public static final File PAYMENT_ITEMS_FILE = PAYMENT_MASTER_FILE;
+    public static final File PAYMENT_BREAKDOWN_FILE = PAYMENT_MASTER_FILE;
 
     // Reservation status
     public static final File RESERVATION_STATUS_FILE =

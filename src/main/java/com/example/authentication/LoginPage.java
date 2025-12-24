@@ -30,7 +30,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
 import javafx.util.Duration;
+
 import java.util.Objects;
 
 public class LoginPage {
@@ -77,7 +79,7 @@ public class LoginPage {
             }
             attachResizeListeners(); // Renamed and fixed to handle full screen too
 
-            // ----------------- NEW: create / register MenuClient and attach menu -----------------
+            // ----------------- create / register MenuClient and attach menu -----------------
             try {
                 // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
                 MenuClient client = Session.getMenuClient();

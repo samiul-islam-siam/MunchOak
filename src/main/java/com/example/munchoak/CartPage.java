@@ -1,14 +1,13 @@
 package com.example.munchoak;
 
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
 import com.example.manager.CouponStorage;
 import com.example.manager.MenuStorage;
 import com.example.manager.Session;
 import com.example.manager.UserStorage;
 import com.example.menu.MenuPage;
-import com.example.homepage.HomePage;
-import com.example.authentication.LoginPage;
-import com.example.authentication.ProfilePage;
-
 import com.example.payment.CheckoutPage;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;

@@ -1,15 +1,15 @@
 package com.example.payment;
 
+import com.example.authentication.LoginPage;
+import com.example.authentication.ProfilePage;
+import com.example.homepage.HomePage;
 import com.example.manager.CouponStorage;
 import com.example.manager.MenuStorage;
+import com.example.manager.Session;
+import com.example.menu.MenuPage;
 import com.example.munchoak.Cart;
 import com.example.munchoak.CartPage;
 import com.example.munchoak.FoodItems;
-import com.example.manager.Session;
-import com.example.menu.MenuPage;
-import com.example.homepage.HomePage;
-import com.example.authentication.LoginPage;
-import com.example.authentication.ProfilePage;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
@@ -840,7 +840,7 @@ public class CheckoutPage {
                         totalPayable   // 👈 ADD THIS
                 );
 
-                PaymentStorage.savePaymentDiscountTip(paymentId, discount, tip);
+                //PaymentStorage.savePaymentDiscountTip(paymentId, discount, tip);
                 PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {

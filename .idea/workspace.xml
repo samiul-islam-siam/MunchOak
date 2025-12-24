@@ -4,60 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="graph">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Coupon Sync">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/AdminDashboard.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/login/ChangeAdminPasswordPage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/AdminFileStorage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/FileStorage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/PasswordUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/BaseMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/GuestMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/GuestMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuEdit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/MenuServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/menu/UserMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/menu/UserMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Bill.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/AdminEditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/AdminEditProfilePopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/ChangeAdminPasswordPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/ChangeAdminPasswordPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/authentication/LoginPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/StorageInit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/manager/StoragePaths.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/manager/StoragePaths.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/AdminHome.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CartPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/CheckoutPage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/History.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Home.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/munchoak/Payment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AboutUsPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/AddCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/AddCouponPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ChangePasswordPopup.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/EditCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/EditCouponPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/EditProfilePopup.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageComponent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageEighthExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFifthExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageFourthExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSecondExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSeventhExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageSixthExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/HomePageThirdExtension.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/LoginPage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/MessagePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ProfilePage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/view/ReservationPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/admin.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/admin.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/payment/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/payment/CheckoutPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/payment/PaymentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/payment/PaymentStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/cartitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/carts.dat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupon_usage.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/coupons.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/messages.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/messages.dat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/new_menu_with_addons2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_breakdown.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_breakdown.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/reservation_status.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/users.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/orders.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_breakdown.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payment_discounts.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/paymentitems.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/manager/data/payments.dat" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -219,14 +186,7 @@
       <workItem from="1766145514657" duration="49000" />
       <workItem from="1766235628304" duration="2145000" />
       <workItem from="1766292927493" duration="3557000" />
-    </task>
-    <task id="LOCAL-00048" summary="login bug fixed">
-      <option name="closed" value="true" />
-      <created>1763170561132</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1763170561132</updated>
+      <workItem from="1766569546969" duration="957000" />
     </task>
     <task id="LOCAL-00049" summary="bug fixes">
       <option name="closed" value="true" />
@@ -612,14 +572,21 @@
       <option name="project" value="LOCAL" />
       <updated>1766293410239</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <task id="LOCAL-00097" summary="Coupon Sync">
+      <option name="closed" value="true" />
+      <created>1766552349186</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1766552349186</updated>
+    </task>
+    <option name="localTasksCounter" value="98" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="guest browsing fixed" />
     <MESSAGE value="Chat history problem" />
     <MESSAGE value="Chat bug fixed" />
     <MESSAGE value="Searching added" />
@@ -644,7 +611,8 @@
     <MESSAGE value="bill" />
     <MESSAGE value="logout" />
     <MESSAGE value="graph" />
-    <option name="LAST_COMMIT_MESSAGE" value="graph" />
+    <MESSAGE value="Coupon Sync" />
+    <option name="LAST_COMMIT_MESSAGE" value="Coupon Sync" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

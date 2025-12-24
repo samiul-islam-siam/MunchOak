@@ -27,17 +27,13 @@ public final class StorageInit {
             // primary files
             if (!StoragePaths.USERS_FILE.exists()) StoragePaths.USERS_FILE.createNewFile();
             if (!StoragePaths.CATEGORIES_FILE.exists()) StoragePaths.CATEGORIES_FILE.createNewFile();
-            if (!StoragePaths.PAYMENTS_FILE.exists()) StoragePaths.PAYMENTS_FILE.createNewFile();
             if (!StoragePaths.CARTS_FILE.exists()) StoragePaths.CARTS_FILE.createNewFile();
             if (!StoragePaths.CART_ITEMS_FILE.exists()) StoragePaths.CART_ITEMS_FILE.createNewFile();
-            if (!StoragePaths.PAYMENT_ITEMS_FILE.exists()) StoragePaths.PAYMENT_ITEMS_FILE.createNewFile();
-            if (!StoragePaths.ORDERS_FILE.exists()) StoragePaths.ORDERS_FILE.createNewFile();
             if (!StoragePaths.RESERVATIONS_FILE.exists()) StoragePaths.RESERVATIONS_FILE.createNewFile();
             if (!StoragePaths.MENU_POINTER_FILE.exists()) StoragePaths.MENU_POINTER_FILE.createNewFile();
-            if (!StoragePaths.PAYMENT_DISCOUNTS_FILE.exists()) StoragePaths.PAYMENT_DISCOUNTS_FILE.createNewFile();
             if (!StoragePaths.MESSAGES_FILE.exists()) StoragePaths.MESSAGES_FILE.createNewFile();
-            if (!StoragePaths.PAYMENT_BREAKDOWN_FILE.exists()) StoragePaths.PAYMENT_BREAKDOWN_FILE.createNewFile();
             if (!StoragePaths.RESERVATION_STATUS_FILE.exists()) StoragePaths.RESERVATION_STATUS_FILE.createNewFile();
+            if(!StoragePaths.PAYMENT_MASTER_FILE.exists()) StoragePaths.PAYMENT_MASTER_FILE.createNewFile();
 
             // seed categories if empty/new
             CategoryStorage.ensureSeedCategories();
