@@ -1,35 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="MunchOak:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="admin home fix">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="bug fix (new version)">
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/MunchOak_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/AdminEditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/AdminEditProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPasswordPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPasswordPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangePasswordPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangePasswordPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/cartitems.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/carts.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/messages.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/messages.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/homepage/HomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/homepage/HomePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/AdminHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/AdminHome.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/network/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/network/ChatClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +81,7 @@
     "Application.Main.executor": "Run",
     "Application.MainHome.executor": "Run",
     "Application.MenuServer.executor": "Run",
+    "Application.MunchOak.executor": "Run",
     "Application.RestaurantDashboard.executor": "Run",
     "Application.Unnamed.executor": "Coverage",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -112,7 +101,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "SDKs",
+    "project.structure.last.edited": "Artifacts",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.30804598",
     "settings.editor.selected.configurable": "advanced.settings",
@@ -150,6 +139,18 @@
       <recent name="com.example.view" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration name="MunchOak" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="liberica-full-21" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.munchoak.AppLauncher" />
+      <module name="MunchOak" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Program Files\Java\javafx-sdk-25.0.1\lib&quot; --add-modules javafx.controls,javafx.fxml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -183,15 +184,7 @@
       <workItem from="1766499658354" duration="7709000" />
       <workItem from="1766556363054" duration="2874000" />
       <workItem from="1766582889624" duration="11922000" />
-      <workItem from="1766634095761" duration="7807000" />
-    </task>
-    <task id="LOCAL-00051" summary="comment added">
-      <option name="closed" value="true" />
-      <created>1763313783678</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1763313783678</updated>
+      <workItem from="1766634095761" duration="13390000" />
     </task>
     <task id="LOCAL-00052" summary="changes">
       <option name="closed" value="true" />
@@ -577,14 +570,21 @@
       <option name="project" value="LOCAL" />
       <updated>1766597318132</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="bug fix (new version)">
+      <option name="closed" value="true" />
+      <created>1766642007668</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1766642007669</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Searching added" />
     <MESSAGE value="login logout in cart page fixed" />
     <MESSAGE value="searching enhanced" />
     <MESSAGE value="back logic correction" />
@@ -609,7 +609,8 @@
     <MESSAGE value="coupon sync" />
     <MESSAGE value="Fresh commit (all synced)" />
     <MESSAGE value="admin home fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="admin home fix" />
+    <MESSAGE value="bug fix (new version)" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fix (new version)" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

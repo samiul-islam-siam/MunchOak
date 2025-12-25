@@ -67,6 +67,8 @@ public class HomePage implements HomePageComponent {
     // Message Button
     private Button messageBtn;
 
+    public static AtomicBoolean isChatWindowOpen = new AtomicBoolean(false);
+
     // UPDATED: Existing constructor now initializes cart
     public HomePage(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -531,9 +533,8 @@ public class HomePage implements HomePageComponent {
         reserveBtn.setOnAction(e -> navigateAndClose.accept(this::openReservationPageDirectly));
         aboutBtn.setOnAction(e -> navigateAndClose.accept(this::openAboutUsPageDirectly));
 
-        AtomicBoolean isChatWindowOpen = new AtomicBoolean(false);
         chatBtn.setOnAction(e -> {
-            if (!Session.getCurrentUsername().equals("guest") && !isChatWindowOpen.get()) {
+            if (!Session.isGuest() && !isChatWindowOpen.get()) {
                 openChatWindow();
                 isChatWindowOpen.set(true);
             } else {
@@ -650,12 +651,13 @@ public class HomePage implements HomePageComponent {
             Stage openChatStage = new Stage();
             openChatStage.setScene(new Scene(loader.load()));
             ChatClient controller = loader.getController();
+
             String username = Session.getCurrentUsername();
             if (username == null || username.isEmpty()) username = "Guest";
-            String role = Session.getCurrentRole();
-            boolean isAdmin = "ADMIN".equalsIgnoreCase(role) || "admin".equalsIgnoreCase(username);
+
             controller.setUsername(username);
-            controller.setAdmin(isAdmin);
+            controller.setAdmin(Session.isAdmin());
+
             openChatStage.setTitle("Chatting as [" + username + "]");
             ChatClient.chatStage = openChatStage; // <-- store stage
             openChatStage.show();

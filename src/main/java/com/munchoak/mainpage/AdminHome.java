@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static com.munchoak.homepage.HomePage.isChatWindowOpen;
+
 
 public class AdminHome {
     private static BorderPane centerPane;
@@ -529,7 +531,6 @@ public class AdminHome {
             primaryStage.setScene(menuPage.getMenuScene());
         });
 
-        AtomicBoolean isChatWindowOpen = new AtomicBoolean(false);
         chatServerBtn.setOnAction(event -> {
             HomePage homePage = new HomePage(primaryStage);
             if (!isChatWindowOpen.get()) {
