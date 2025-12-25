@@ -192,37 +192,22 @@ public class History {
         }
     }
 
-    // ------------------ Bill Popup ------------------
     public void showBill(HistoryRecord record) {
-        Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
+        int paymentId = record.getPaymentId();
 
-        Cart tempCart = new Cart();
-        Map<Integer, Integer> items = PaymentStorage.getCartItemsForPayment(record.getPaymentId());
-        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
-            tempCart.addToCart(entry.getKey(), entry.getValue());
+        // This validates breakdown existence
+        PaymentBreakdown b = PaymentStorage.getPaymentBreakdown(paymentId);
+        if (b == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Bill unavailable");
+            alert.setHeaderText(null);
+            alert.setContentText("Sorry, this bill is currently unavailable!");
+            alert.showAndWait();
+            return;
         }
 
-        // FIXED: Load actual discount and tip to match totals in bill/receipt (defaults to 0)
-        double discountVal = 0.0;
-        double tipVal = 0.0;
-        double delivery = 7.99;
-        double tax = 7.00;
-        double service = 1.50;
-
-        // FIXED: Reverse-engineer subtotal to match the saved full total (includes add-ons)
-        double calculatedBaseSubtotal = tempCart.getTotalPrice(foodMap); // Base subtotal without add-ons
-        double savedFullTotal = record.getAmount();
-        double reverseSubtotal = savedFullTotal - delivery - tax - service - tipVal + discountVal; // Includes add-ons
-
-        // FIXED: Create Payment with reverse-engineered subtotal, then set discount/tip
-        Payment payment = new Payment(record.getPaymentId(), reverseSubtotal, record.getTimestamp());
-        payment.setDiscount(discountVal);
-        payment.setTip(tipVal);
-        payment.setSuccess(record.getStatus().equalsIgnoreCase("Success"));
-        payment.setPaymentMethod(record.getPaymentMethod());
-
-        Bill bill = new Bill(tempCart, payment, savedFullTotal, calculatedBaseSubtotal);
-        String receipt = bill.generateReceipt();  // Pass saved total and base subtotal for accurate display
+        String receipt = Bill.generateReceiptFromSnapshot(paymentId, record.getTimestamp());
+        if (receipt == null) return;
 
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");

@@ -736,6 +736,7 @@ public class CheckoutPage {
         payBtn.setOnMouseEntered(e -> payBtn.setStyle("-fx-background-color: #e55a00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
         payBtn.setOnMouseExited(e -> payBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
 
+        double finalBaseSubtotal = baseSubtotal;
         payBtn.setOnAction(e -> {
             if (cardField.getText().isEmpty() || expiryField.getText().isEmpty() || cvvField.getText().isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -839,7 +840,20 @@ public class CheckoutPage {
                         totalPayable
                 );
 
-                PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
+                PaymentStorage.savePaymentBreakdown(
+                        paymentId,
+                        finalBaseSubtotal,          // ✅ base subtotal (without add-ons)
+                        TOTAL,                 // ✅ addons total
+                        discountAmount,
+                        tip,
+                        deliveryAmount,
+                        taxAmount,
+                        serviceFeeAmount,
+                        totalPayable,
+                        Session.getCurrentUserId(),
+                        Session.getCurrentUsername()
+                );
+
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {
                     CouponStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());
