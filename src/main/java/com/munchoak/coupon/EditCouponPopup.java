@@ -134,6 +134,10 @@ public class EditCouponPopup {
                 CouponStorage.editCoupon(selectedCode, newDiscount,newExpiry,newUsageLimit);
                 Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon updated successfully!");
+                PauseTransition closeDelay = new PauseTransition(Duration.seconds(2));
+                closeDelay.setOnFinished(ev -> popup.close());
+                closeDelay.play();
+
                 status.setTextFill(javafx.scene.paint.Color.GREEN);
                 clearMessageAfterDelay(status);
             } catch (Exception ex) {

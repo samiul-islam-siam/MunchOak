@@ -139,6 +139,10 @@ public class AddCouponPopup {
                 CouponStorage.addCoupon(code, discount,expiryText, usageLimit);
                 Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon added successfully!");
+                PauseTransition closeDelay = new PauseTransition(Duration.seconds(2));
+                closeDelay.setOnFinished(ev -> popup.close());
+                closeDelay.play();
+
                 status.setTextFill(javafx.scene.paint.Color.GREEN);
                 clearMessageAfterDelay(status);
             } catch (Exception ex) {

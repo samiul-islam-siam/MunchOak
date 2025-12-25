@@ -29,10 +29,10 @@ public class ChangePasswordPopup {
         );
         rulesLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: black; -fx-font-weight: normal;");
         rulesLabel.setWrapText(true);
-        rulesLabel.setMaxWidth(380); // ✅ ensures wrapping
-        rulesLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevents vertical cutoff
-        rulesLabel.setAlignment(Pos.CENTER_LEFT); // ✅ avoids center misalignment
-        VBox.setVgrow(rulesLabel, Priority.NEVER); // ✅ prevents VBox from squashing it
+        rulesLabel.setMaxWidth(380); // ensures wrapping
+        rulesLabel.setMinHeight(Region.USE_PREF_SIZE); // prevents vertical cutoff
+        rulesLabel.setAlignment(Pos.CENTER_LEFT); // avoids center misalignment
+        VBox.setVgrow(rulesLabel, Priority.NEVER); // prevents VBox from squashing it
 
         // --- Fields ---
         PasswordField newPassField = new PasswordField();
@@ -99,6 +99,10 @@ public class ChangePasswordPopup {
             Session.getMenuClient().sendUserFileUpdate();
 
             status.setText("Password changed successfully!");
+            javafx.animation.PauseTransition closeDelay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
+            closeDelay.setOnFinished(ev -> popup.close());
+            closeDelay.play();
+
             status.setTextFill(Color.GREEN);
 
             javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.5));

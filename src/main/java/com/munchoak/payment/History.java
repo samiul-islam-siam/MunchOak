@@ -25,7 +25,7 @@ import java.util.Map;
 public class History {
 
     private final Stage primaryStage;
-    private final Cart cart;  // ADDED: To support reordering into current cart
+    private final Cart cart;  // To support reordering into current cart
     private ObservableList<HistoryRecord> historyData;
 
     // UPDATED: Overloaded constructor for backward compatibility (creates new Cart if not provided)
@@ -82,7 +82,7 @@ public class History {
             }
         });
 
-        // ADDED: Reorder Column
+        // Reorder Column
         TableColumn<HistoryRecord, Void> reorderCol = new TableColumn<>("Reorder");
         reorderCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Reorder");
@@ -92,9 +92,25 @@ public class History {
                 btn.setOnAction(e -> {
                     HistoryRecord record = getTableView().getItems().get(getIndex());
                     Map<Integer, Integer> items = PaymentStorage.getCartItemsForPayment(record.getPaymentId());
+
+                    // Check availability from current menu before reordering
+                    Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
+                    for (Integer foodId : items.keySet()) {
+                        if (foodMap == null || !foodMap.containsKey(foodId) || foodMap.get(foodId) == null) {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Unavailable Item");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Sorry, this is currently unavailable. Stay tuned!");
+                            alert.showAndWait();
+                            return; // Stop reordering
+                        }
+                    }
+
+                    // If all items are available, add them to cart
                     for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
                         cart.addToCart(entry.getKey(), entry.getValue());
                     }
+
                     // Navigate to Cart page to view updated cart
                     primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
                 });

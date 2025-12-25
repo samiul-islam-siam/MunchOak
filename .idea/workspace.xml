@@ -4,10 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Fresh commit (all synced)">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="admin home fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/AdminEditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/AdminEditProfilePopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPasswordPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPasswordPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangePasswordPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangePasswordPopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditProfilePopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/AboutUsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/AboutUsPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/cartitems.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/cartitems.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/carts.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/carts.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/messages.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/messages.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +106,7 @@
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/resources/com/munchoak/manager/data",
+    "last_opened_file_path": "C:/Users/USER/IdeaProjects/OOP-project/src/main/java/com/munchoak/coupon",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -100,11 +122,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\munchoak\coupon" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\munchoak\authentication" />
+      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\munchoak\reservation" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\munchoak\manager\data" />
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\resources\com\munchoak\manager\images" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\view" />
-      <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example\menu" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\USER\IdeaProjects\OOP-project\src\main\java\com\example" />
@@ -121,11 +143,11 @@
       <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.munchoak.authentication" />
       <recent name="com.example.payment" />
       <recent name="com.example.munchoak" />
       <recent name="com.example.manager" />
       <recent name="com.example.view" />
-      <recent name="com.example.login" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -160,15 +182,8 @@
       <workItem from="1766467202888" duration="1809000" />
       <workItem from="1766499658354" duration="7709000" />
       <workItem from="1766556363054" duration="2874000" />
-      <workItem from="1766582889624" duration="11270000" />
-    </task>
-    <task id="LOCAL-00050" summary="comment added">
-      <option name="closed" value="true" />
-      <created>1763311499833</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1763311499833</updated>
+      <workItem from="1766582889624" duration="11922000" />
+      <workItem from="1766634095761" duration="7807000" />
     </task>
     <task id="LOCAL-00051" summary="comment added">
       <option name="closed" value="true" />
@@ -554,14 +569,21 @@
       <option name="project" value="LOCAL" />
       <updated>1766590667976</updated>
     </task>
-    <option name="localTasksCounter" value="99" />
+    <task id="LOCAL-00099" summary="admin home fix">
+      <option name="closed" value="true" />
+      <created>1766597318132</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1766597318132</updated>
+    </task>
+    <option name="localTasksCounter" value="100" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Chat bug fixed" />
     <MESSAGE value="Searching added" />
     <MESSAGE value="login logout in cart page fixed" />
     <MESSAGE value="searching enhanced" />
@@ -586,7 +608,8 @@
     <MESSAGE value="restructured" />
     <MESSAGE value="coupon sync" />
     <MESSAGE value="Fresh commit (all synced)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fresh commit (all synced)" />
+    <MESSAGE value="admin home fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="admin home fix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

@@ -1,8 +1,7 @@
 package com.munchoak.authentication;
 
-import com.munchoak.manager.AdminStorage;
 import com.munchoak.mainpage.AdminHome;
-
+import com.munchoak.manager.AdminStorage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -82,7 +81,7 @@ public class ChangeAdminPasswordPage {
 
             if (adminID.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
                 status.setText("Fields cannot be empty!");
-                status.setStyle("-fx-text-fill: green;");
+                status.setStyle("-fx-text-fill: blue; -fx-font-weight: bold; -fx-font-size: 14px;");
                 javafx.animation.PauseTransition clearError = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
                 clearError.setOnFinished(ev -> status.setText(""));
                 clearError.play();
@@ -91,7 +90,7 @@ public class ChangeAdminPasswordPage {
 
             if (!"2104".equals(adminID)) {
                 status.setText("Invalid Admin ID!");
-                status.setStyle("-fx-text-fill: green;");
+                status.setStyle("-fx-text-fill: blue; -fx-font-weight: bold; -fx-font-size: 14px;");
                 javafx.animation.PauseTransition clearError = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
                 clearError.setOnFinished(ev -> status.setText(""));
                 clearError.play();
@@ -100,7 +99,8 @@ public class ChangeAdminPasswordPage {
 
             if (!newPass.equals(confirmPass)) {
                 status.setText("Passwords do not match!");
-                status.setStyle("-fx-text-fill: green;");
+               // status.setStyle("-fx-text-fill: blue;");
+                status.setStyle("-fx-text-fill: blue; -fx-font-weight: bold; -fx-font-size: 14px;");
                 javafx.animation.PauseTransition clearError = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
                 clearError.setOnFinished(ev -> status.setText(""));
                 clearError.play();
@@ -133,7 +133,12 @@ public class ChangeAdminPasswordPage {
             try {
                 AdminStorage.setAdminPassword(newPass);
                 status.setText("Password changed successfully!");
-                status.setStyle("-fx-text-fill: green;");
+                javafx.animation.PauseTransition closeDelay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
+                closeDelay.setOnFinished(ev -> popup.close());
+                closeDelay.play();
+
+                status.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+
 
                 javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.5));
                 pause.setOnFinished(ev -> {

@@ -143,6 +143,10 @@ public class EditProfilePopup {
             Session.getMenuClient().sendUserFileUpdate();
 
             showTempStatus(status, "Profile updated successfully!", Color.WHITE);
+            javafx.animation.PauseTransition closeDelay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
+            closeDelay.setOnFinished(ev -> popup.close());
+            closeDelay.play();
+
             if (onProfileUpdated != null) onProfileUpdated.run();
         });
 

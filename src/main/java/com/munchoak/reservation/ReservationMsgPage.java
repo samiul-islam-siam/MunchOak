@@ -1,12 +1,10 @@
 package com.munchoak.reservation;
 
 import com.munchoak.authentication.ProfilePage;
+import com.munchoak.cart.Cart;
 import com.munchoak.homepage.HomePage;
 import com.munchoak.manager.Session;
 import com.munchoak.menu.MenuPage;
-import com.munchoak.cart.Cart;
-
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,12 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.List;
@@ -59,8 +54,8 @@ public class ReservationMsgPage {
 
         // CHAT AREA FOR INCOMING MESSAGES ONLY
         VBox chatArea = new VBox(10);
-        chatArea.setPrefWidth(600);
-        chatArea.setPrefHeight(400);
+        chatArea.setPrefWidth(800); // Increased horizontally
+        chatArea.setPrefHeight(500); // Increased vertically
         chatArea.setStyle("""
                 -fx-background-color: white;
                 -fx-border-color: #ccc;
@@ -106,75 +101,8 @@ public class ReservationMsgPage {
         );
 
 
-        // INPUT SECTION (always shown)
-        HBox inputBox = new HBox(10);
-        TextArea messageInput = new TextArea();
-        messageInput.setPromptText("Type your message here...");
-        messageInput.setPrefRowCount(3);
-        messageInput.setPrefColumnCount(50);
-        messageInput.setWrapText(true);
-        messageInput.setStyle("""
-                -fx-background-color: white;
-                -fx-border-color: #ccc;
-                -fx-border-radius: 10;
-                -fx-background-radius: 10;
-                -fx-padding: 10;
-                -fx-font-size: 14px;
-                """);
-
-        Button sendButton = new Button("Send");
-        sendButton.getStyleClass().add("dashboard-button");
-        sendButton.setPrefWidth(100);
-        sendButton.setOnAction(e -> {
-            String messageText = messageInput.getText().trim();
-            if (!messageText.isEmpty()) {
-                // Clear input
-                messageInput.clear();
-
-                if (Session.isGuest()) {
-                    Stage notifyPopup = new Stage();
-                    notifyPopup.initStyle(StageStyle.TRANSPARENT);
-                    notifyPopup.setAlwaysOnTop(true);
-                    Label notifyLabel = new Label("Please Login !");
-                    notifyLabel.setWrapText(true); // Enable text wrapping for longer messages
-                    notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 15 25 15 25; -fx-background-radius: 10;");
-                    VBox notifyBox = new VBox(notifyLabel);
-                    notifyBox.setAlignment(Pos.CENTER);
-                    notifyBox.setStyle("-fx-background-color: transparent;");
-                    Scene popupScene = new Scene(notifyBox, 320, 80);
-                    popupScene.setFill(Color.TRANSPARENT);
-                    notifyPopup.setScene(popupScene);
-                    notifyPopup.show();
-                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                    delay.setOnFinished(e2 -> notifyPopup.close());
-                    delay.play();
-                }else
-                {
-                    // Remove placeholder if present
-                    if (!chatArea.getChildren().isEmpty() && chatArea.getChildren().get(0) instanceof Label && "No messages yet. Send a message to start a conversation.".equals(((Label) chatArea.getChildren().get(0)).getText())) {
-                        chatArea.getChildren().remove(0);
-                    }
-
-                    // TODO: Save user message to FileStorage
-
-//                    // Simulate support response after delay (incoming message only)
-//                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
-//                    delay.setOnFinished(ev -> {
-//                        String response = "Support: Thank you for your message. We'll get back to you shortly.";
-//                        addIncomingMessage(chatArea, response);
-//                        chatScroll.setVvalue(1.0); // Scroll to bottom
-//                    });
-//                    delay.play();
-                }
-
-            }
-        });
-
-        inputBox.getChildren().addAll(messageInput, sendButton);
-        inputBox.setAlignment(Pos.BOTTOM_CENTER);
-
         // Overall content layout
-        VBox chatContainer = new VBox(20, chatScroll, inputBox);
+        VBox chatContainer = new VBox(20, chatScroll);
         chatContainer.setAlignment(Pos.CENTER);
 
         contentBox.getChildren().addAll(titleLabel, chatContainer);
@@ -194,7 +122,7 @@ public class ReservationMsgPage {
     private void addIncomingMessage(VBox chatArea, String text) {
         Label msgLabel = new Label("Support: " + text);
         msgLabel.setWrapText(true);
-        msgLabel.setMaxWidth(420);
+        msgLabel.setMaxWidth(700); // Increased to allow more horizontal space for full text
         msgLabel.setPadding(new Insets(10, 15, 10, 15));
         msgLabel.setStyle("""
                 -fx-background-color: #E3F2FD;

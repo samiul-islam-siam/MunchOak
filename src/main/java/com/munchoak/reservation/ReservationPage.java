@@ -1,12 +1,11 @@
 package com.munchoak.reservation;
 
 import com.munchoak.authentication.ProfilePage;
+import com.munchoak.cart.Cart;
 import com.munchoak.homepage.HomePage;
 import com.munchoak.manager.Session;
 import com.munchoak.manager.UserStorage;
 import com.munchoak.menu.MenuPage;
-import com.munchoak.cart.Cart;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -346,8 +345,8 @@ public class ReservationPage {
                     boolean saved = ReservationStorage.saveReservation(name, phone, guests, date.toString(), time, requestArea.getText());
                     Session.getMenuClient().sendReservationUpdate();
                     if (saved) {
-                        showAlert(Alert.AlertType.INFORMATION, "Reservation Confirmed 🎉",
-                                "Your table has been successfully reserved!\nWe look forward to serving you.");
+                        showAlert(Alert.AlertType.INFORMATION, "Reservation Submitted Successfully",
+                                "Thank you for your reservation request! It is now pending approval. We will notify you soon via message.");
                         // Clear fields manually with dynamic reset
                         nameField.clear();
                         phoneField.clear();

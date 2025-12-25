@@ -1,19 +1,18 @@
 package com.munchoak.authentication;
 
 import com.munchoak.homepage.HomePage;
-import com.munchoak.manager.*;
+import com.munchoak.mainpage.AdminHome;
+import com.munchoak.manager.AdminStorage;
+import com.munchoak.manager.Session;
+import com.munchoak.manager.UserStorage;
 import com.munchoak.menu.BaseMenu;
 import com.munchoak.server.MainClient;
-
-import com.munchoak.mainpage.AdminHome;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
-
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -25,14 +24,11 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
-
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class LoginPage {
@@ -136,7 +132,7 @@ public class LoginPage {
         titleSection.getChildren().add(logo);
 
         Label title = new Label("MUNCHOAK");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
         titleSection.getChildren().add(title);
         topBar.getChildren().add(titleSection);
         root.setTop(topBar);
@@ -302,7 +298,7 @@ public class LoginPage {
         // Password strength label
         registerStrengthLabel = new Label("Password Strength: ");
         registerStrengthLabel.setStyle(
-                "-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Arial Black';"
+                "-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';"
         );
         registerStrengthLabel.setMinHeight(20);
         Button registerBtn = new Button("Register");
@@ -340,7 +336,7 @@ public class LoginPage {
                         "Invalid contact number!\n" +
                                 "(Must be 11 digits starting with 01)"
                 );
-                registerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;");
+                registerStatusLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 13px;");
                 registerStatusLabel.setWrapText(true); // ✅ allow wrapping
                 registerStatusLabel.setMaxWidth(280); // ✅ force wrapping width
                 registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
@@ -404,7 +400,7 @@ public class LoginPage {
         loginLink.setStyle("-fx-text-fill: #3498db; -fx-font-size: 13px;");
         loginLink.setOnAction(e -> showLoginForm());
         registerStatusLabel = new Label("");
-        registerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        registerStatusLabel.setStyle("-fx-text-fill: black; -fx-font-size: 13px; -fx-font-weight: bold;");
         registerStatusLabel.setMinHeight(20);
         // Listen for changes in password field
         passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -419,7 +415,7 @@ public class LoginPage {
         // You can color and text per state, using switch statement (Java 17+ switch expression)
         if (passwordField.getText().isEmpty()) {
             registerStrengthLabel.setText("Password Strength: ");
-            registerStrengthLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
+            registerStrengthLabel.setStyle("-fx-text-fill: black; -fx-font-size: 12px; -fx-font-family: 'Arial Black';");
             return;
         }
         switch (strength) {
@@ -447,8 +443,8 @@ public class LoginPage {
         registerStatusLabel.setWrapText(true); // ✅ allow wrapping
         registerStatusLabel.setMaxWidth(280); // ✅ force wrapping width
         registerStatusLabel.setMinHeight(Region.USE_PREF_SIZE); // ✅ prevent vertical cutoff
-        registerStatusLabel.setStyle(isError ? "-fx-text-fill:white; -fx-font-weight: bold;"
-                : "-fx-text-fill: white; -fx-font-weight: bold;");
+        registerStatusLabel.setStyle(isError ? "-fx-text-fill:black; -fx-font-weight: bold;"
+                : "-fx-text-fill: black; -fx-font-weight: bold;");
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(ev -> registerStatusLabel.setText(""));
         pause.play();
@@ -516,7 +512,7 @@ public class LoginPage {
         VBox btnBox = new VBox(10, loginBtn, backBtn, forgotLink);
         btnBox.setAlignment(Pos.CENTER);
         statusLabel = new Label("");
-        statusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        statusLabel.setStyle("-fx-text-fill: black; -fx-font-size: 13px; -fx-font-weight: bold;");
         statusLabel.setMinHeight(20);
         pane.getChildren().addAll(title, usernameField, passwordFieldBox, statusLabel, btnBox);
         return pane;
@@ -529,7 +525,7 @@ public class LoginPage {
         pane.setMaxWidth(300);
 
         adminStatusLabel = new Label("");
-        adminStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        adminStatusLabel.setStyle("-fx-text-fill: black; -fx-font-size: 13px; -fx-font-weight: bold;");
         adminStatusLabel.setMinHeight(20);
         Label title = new Label("Admin Login");
         title.setStyle("-fx-font-size: 26px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
@@ -604,10 +600,10 @@ public class LoginPage {
 
     private void showAdminStatus(String message, boolean isError) {
         adminStatusLabel.setText(message);
-        adminStatusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 13px;" // error → white, ultra bold
+        adminStatusLabel.setStyle(isError ? "-fx-text-fill: black; -fx-font-weight: 900; -fx-font-size: 13px;" // error → black, ultra bold
                 : "-fx-text-fill: orange; -fx-font-weight: 900; -fx-font-size: 13px;");
         if (isError) {
-            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(ev -> adminStatusLabel.setText(""));
             pause.play();
         }
@@ -677,7 +673,7 @@ public class LoginPage {
         );
         root.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         Label title = new Label("Reset Your Password");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         // Username field
         TextField usernameField = new TextField();
@@ -700,14 +696,17 @@ public class LoginPage {
             String username = usernameField.getText().trim();
             String np = newPass.getText().trim();
             String cp = confirmPass.getText().trim();
+
             if (username.isEmpty() || np.isEmpty() || cp.isEmpty()) {
                 errorLabel.setText("Please fill in all fields.");
                 return;
             }
+
             if (!UserStorage.userExists(username)) {
                 errorLabel.setText("User not found!");
                 return;
             }
+
             if (np.length() < 8 ||
                     !np.matches(".*[A-Z].*") ||
                     !np.matches(".*[a-z].*") ||
@@ -725,14 +724,19 @@ public class LoginPage {
                 pause.play();
                 return;
             }
+
             if (!np.equals(cp)) {
                 errorLabel.setText("Passwords do not match!");
                 return;
             }
+
             try {
                 PasswordStorage.updateUserPassword(username, np);
                 errorLabel.setStyle("-fx-text-fill: lightgreen;");
                 errorLabel.setText("Password updated successfully!");
+                PauseTransition closeDelay = new PauseTransition(Duration.seconds(2));
+                closeDelay.setOnFinished(ev -> popup.close());
+                closeDelay.play();
             } catch (Exception ex) {
                 errorLabel.setStyle("-fx-text-fill: red;");
                 errorLabel.setText("Error updating password.");
@@ -828,18 +832,21 @@ public class LoginPage {
             saveBtn.setOnAction(ev -> {
                 String idEntered = adminIDField.getText().trim();
                 String np = newPass.getText().trim();
+
                 if (idEntered.isEmpty() || !idEntered.equals(AdminStorage.ADMIN_ID)) {
                     status.setText("❌ Invalid Admin ID!");
                     status.setStyle("-fx-text-fill: black;");
                     autoClearStatus(status);
                     return;
                 }
+
                 if (np.isEmpty()) {
                     status.setText("❌ Password cannot be empty!");
                     status.setStyle("-fx-text-fill: black;");
                     autoClearStatus(status);
                     return;
                 }
+
                 if (!isValidPassword(np)) {
                     status.setText("❌ Password must be at least 8 characters long\n"
                             + "and include uppercase, lowercase, numbers & special characters!");
@@ -847,10 +854,14 @@ public class LoginPage {
                     autoClearStatus(status);
                     return;
                 }
+
                 try {
                     AdminStorage.setAdminPassword(np);
                     status.setText("✅ Admin password reset successfully!");
-                    status.setStyle("-fx-text-fill: white;");
+                    PauseTransition closeDelay = new PauseTransition(Duration.seconds(1));
+                    closeDelay.setOnFinished(e -> popup.close());
+                    closeDelay.play();
+                    status.setStyle("-fx-text-fill: black;");
                 } catch (IOException e) {
                     status.setText("❌ Error saving password!");
                     status.setStyle("-fx-text-fill: black;");
@@ -881,7 +892,7 @@ public class LoginPage {
 
     private void showStatus(String message, boolean isError) {
         statusLabel.setText(message);
-        statusLabel.setStyle(isError ? "-fx-text-fill: white; -fx-font-weight: bolder; -fx-font-size: 13px;" // error → white, extra bold
+        statusLabel.setStyle(isError ? "-fx-text-fill: black; -fx-font-weight: bolder; -fx-font-size: 13px;" // error → black, extra bold
                 : "-fx-text-fill: orange; -fx-font-weight: bolder; -fx-font-size: 13px;"); // (success → black);
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(e -> statusLabel.setText(""));

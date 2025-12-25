@@ -91,13 +91,13 @@ public final class MenuStorage {
 
     static void loadAttachedMenu() {
         StorageInit.ensureDataDir();
-        if (!StoragePaths.MENU_POINTER_FILE.exists() || StoragePaths.MENU_POINTER_FILE.length() == 0) return;
+        if (!StoragePaths.getMenuPointerFile().exists() || StoragePaths.getMenuPointerFile().length() == 0) return;
 
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.MENU_POINTER_FILE))) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.getMenuPointerFile()))) {
             String filename = dis.readUTF();
-            File file = new File(StoragePaths.DATA_DIR, filename);
-            if (file.exists()) {
-                StoragePaths.setMenuFile(file);
+            File menuFile = new File(StoragePaths.DATA_DIR, filename);
+            if (menuFile.exists()) {
+                StoragePaths.setMenuFile(menuFile);
             }
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
@@ -106,7 +106,7 @@ public final class MenuStorage {
 
     private static void saveAttachedMenu(File menuFile) {
         StorageInit.ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.MENU_POINTER_FILE, false))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.getMenuPointerFile(), false))) {
             dos.writeUTF(menuFile.getName());
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());

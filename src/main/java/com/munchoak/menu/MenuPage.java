@@ -94,7 +94,7 @@ public class MenuPage {
         }
         menu.setSearchKeyword(searchKeyword);
 
-        // ----------------- NEW: create / register MenuClient and attach menu -----------------
+        // ----------------- create / register MenuClient and attach menu -----------------
         try {
             // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
             MainClient client = Session.getMenuClient();
@@ -123,7 +123,6 @@ public class MenuPage {
             } catch (Exception ignored) {
             }
         }
-        // ------------------------------------------------------------------------------------
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -382,14 +381,12 @@ public class MenuPage {
         cartButton.setStyle("-fx-background-color: transparent;");
 
         // Wrap right buttons in HBox for spacing
-        HBox rightButtons=null;
+        HBox rightButtons = null;
 
 
-        if(Session.isAdmin())
-        {
+        if (Session.isAdmin()) {
             rightButtons = new HBox(8, homeButton, aboutButton, profileButton);
-        }else
-        {
+        } else {
             rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
         }
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
@@ -505,17 +502,18 @@ public class MenuPage {
         } catch (Exception ignored) {
         }
 
-        Platform.runLater(() -> {
-            primaryStage.setScene(homeScene);
-            Platform.runLater(() -> {
-                if (wasFullScreen) primaryStage.setFullScreen(true);
-                else if (wasMaximized) primaryStage.setMaximized(true);
-                else {
-                    primaryStage.setWidth(currentWidth);
-                    primaryStage.setHeight(currentHeight);
-                }
-            });
-        });
+        primaryStage.setScene(homeScene);
+
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        } else {
+            primaryStage.setWidth(currentWidth);
+            primaryStage.setHeight(currentHeight);
+        }
+        primaryStage.setTitle("Home Page + Extension");
+        primaryStage.show();
     }
 
     /**

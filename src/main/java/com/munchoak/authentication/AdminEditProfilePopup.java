@@ -2,7 +2,6 @@ package com.munchoak.authentication;
 
 import com.munchoak.manager.AdminStorage;
 import com.munchoak.manager.Session;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -91,6 +90,11 @@ public class AdminEditProfilePopup {
                 AdminStorage.updateAdminPassword(AdminStorage.ADMIN_ID, newPass);
 
                 showTempStatus(status, "Password updated successfully!", Color.WHITE);
+
+                javafx.animation.PauseTransition closeDelay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
+                closeDelay.setOnFinished(ev -> popup.close());
+                closeDelay.play();
+
             }
 
             // Update admin profile info safely

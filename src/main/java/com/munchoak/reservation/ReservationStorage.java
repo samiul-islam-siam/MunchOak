@@ -93,14 +93,26 @@ public final class ReservationStorage {
         return list;
     }
 
-    public static void setReservationStatus(int resId, String status) {
+    public static boolean setReservationStatus(int resId, String status) {
         StorageInit.ensureDataDir();
+        // Prevent invalid status changes: once Accepted or Rejected, can't switch to the other
+        String currentStatus = getReservationStatus(resId);
+        if (!"Pending".equals(currentStatus)) {
+            // Only allow changes if trying to set to the same final status (e.g., idempotent updates)
+            if (("Accepted".equals(currentStatus) && !"Accepted".equals(status)) ||
+                    ("Rejected".equals(currentStatus) && !"Rejected".equals(status))) {
+                System.err.println("Cannot change reservation " + resId + " from '" + currentStatus + "' to '" + status + "'. Final decision cannot be reversed.");
+                return false;
+            }
+        }
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.RESERVATION_STATUS_FILE, true))) {
             dos.writeInt(resId);
             dos.writeUTF(status);
             dos.writeUTF(Instant.now().toString());
+            return true;
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
+            return false;
         }
     }
 
