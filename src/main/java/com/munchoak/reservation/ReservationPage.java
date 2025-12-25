@@ -468,7 +468,7 @@ public class ReservationPage {
         navBar.setBackground(new Background(new BackgroundFill(Color.web("#E9967A"), CornerRadii.EMPTY, Insets.EMPTY)));
         navBar.setPrefHeight(70);
 
-        Label title = new Label("MUNCH-OAK");
+        Label title = new Label("MunchOak");
         title.getStyleClass().add("nav-title");
 
         Region spacer = new Region();

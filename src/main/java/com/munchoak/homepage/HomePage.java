@@ -301,9 +301,63 @@ public class HomePage implements HomePageComponent {
 
         authBtn.setOnAction(e -> {
             if (loggedIn) {
-                Session.logout();
-                closeChatWindow();
-                Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Logout");
+                alert.setHeaderText(null);
+                Label content = new Label("Are you sure you want to logout?");
+                content.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+                alert.getDialogPane().setContent(content);
+                alert.getDialogPane().setPrefWidth(400);
+                alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+
+                ButtonType yesBtn = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+                ButtonType noBtn = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(yesBtn, noBtn);
+
+                Button yesButton = (Button) alert.getDialogPane().lookupButton(yesBtn);
+                Button noButton = (Button) alert.getDialogPane().lookupButton(noBtn);
+
+                yesButton.setDefaultButton(false);
+                noButton.setDefaultButton(false);
+
+
+                String boxStyle = "-fx-background-color: white; " +
+                        "-fx-border-color: black; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 6; " +
+                        "-fx-background-radius: 6; " +
+                        "-fx-padding: 6 18; " +
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;";
+                yesButton.setStyle(boxStyle);
+                noButton.setStyle(boxStyle);
+
+
+                EventHandler<MouseEvent> bounceIn = ev -> {
+                    ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                    st.setToX(1.1);
+                    st.setToY(1.1);
+                    st.play();
+                };
+                EventHandler<MouseEvent> bounceOut = ev -> {
+                    ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                    st.setToX(1.0);
+                    st.setToY(1.0);
+                    st.play();
+                };
+
+                yesButton.setOnMouseEntered(bounceIn);
+                yesButton.setOnMouseExited(bounceOut);
+                noButton.setOnMouseEntered(bounceIn);
+                noButton.setOnMouseExited(bounceOut);
+
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == yesBtn) {
+                        Session.logout();
+                        closeChatWindow();
+                        Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
+                    }
+                });
             } else {
                 openLoginPageDirectly();
             }

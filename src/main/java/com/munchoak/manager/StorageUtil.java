@@ -88,15 +88,17 @@ public final class StorageUtil {
             else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // resId
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readInt();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readInt();
+                    dis.readUTF(); // name
+                    dis.readUTF(); // phone
+                    dis.readInt(); // guests
+                    dis.readUTF(); // date
+                    dis.readUTF(); // time
+                    dis.readUTF(); // request
+                    dis.readUTF(); // createdAt
+                    dis.readUTF(); // username
+                    dis.readInt(); // userId
+                    dis.readUTF(); // status
+                    dis.readUTF(); // statusUpdatedAt
                 }
             }
 

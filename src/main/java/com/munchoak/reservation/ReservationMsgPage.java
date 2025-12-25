@@ -44,7 +44,7 @@ public class ReservationMsgPage {
         contentBox.setStyle("-fx-background-color: transparent;");
 
         // TITLE
-        Label titleLabel = new Label("Messages");
+        Label titleLabel = new Label("Notifications");
         titleLabel.setStyle("""
                 -fx-font-size: 48px;
                 -fx-text-fill: #001F3F;
@@ -54,8 +54,11 @@ public class ReservationMsgPage {
 
         // CHAT AREA FOR INCOMING MESSAGES ONLY
         VBox chatArea = new VBox(10);
-        chatArea.setPrefWidth(800); // Increased horizontally
-        chatArea.setPrefHeight(500); // Increased vertically
+        // chatArea.setPrefWidth(800); // Increased horizontally
+        // chatArea.setPrefHeight(500); // Increased vertically
+        chatArea.setFillWidth(true);
+        VBox.setVgrow(chatArea, Priority.ALWAYS);
+
         chatArea.setStyle("""
                 -fx-background-color: white;
                 -fx-border-color: #ccc;
@@ -79,7 +82,8 @@ public class ReservationMsgPage {
         chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         chatScroll.setStyle("-fx-background-color: transparent;");
-
+        // allow it to grow
+        VBox.setVgrow(chatScroll, Priority.ALWAYS);
 
         refreshMessages(chatArea, noMessageLabel);
         Session.addMessageListener(() ->
@@ -87,8 +91,9 @@ public class ReservationMsgPage {
         );
 
         // Overall content layout
-        VBox chatContainer = new VBox(20, chatScroll);
+        VBox chatContainer = new VBox(chatScroll);
         chatContainer.setAlignment(Pos.CENTER);
+        VBox.setVgrow(chatContainer, Priority.ALWAYS);
 
         contentBox.getChildren().addAll(titleLabel, chatContainer);
 
@@ -105,12 +110,12 @@ public class ReservationMsgPage {
     }
 
     private void addIncomingMessage(VBox chatArea, String text) {
-        final int PREVIEW_LEN = 140;
-
-        Label msgLabel = new Label();
+        Label msgLabel = new Label("Support: " + text);
         msgLabel.setWrapText(true);
-        msgLabel.setMaxWidth(700);
-        msgLabel.setMaxHeight(Double.MAX_VALUE);
+
+        // ✅ dynamic width based on chatArea width
+        msgLabel.maxWidthProperty().bind(chatArea.widthProperty().subtract(80));
+
         msgLabel.setPadding(new Insets(10, 15, 10, 15));
         msgLabel.setStyle("""
             -fx-background-color: #E3F2FD;
@@ -121,48 +126,7 @@ public class ReservationMsgPage {
             -fx-text-fill: #001F3F;
             """);
 
-        String full = "Support: " + text;
-        boolean needsExpand = full.length() > PREVIEW_LEN;
-
-        // collapsed by default
-        final boolean[] expanded = {false};
-
-        Button toggleBtn = new Button();
-        toggleBtn.setStyle("""
-            -fx-background-color: transparent;
-            -fx-text-fill: #0D47A1;
-            -fx-underline: true;
-            -fx-font-weight: bold;
-            """);
-
-        Runnable apply = () -> {
-            if (!needsExpand) {
-                msgLabel.setText(full);
-                toggleBtn.setVisible(false);
-                toggleBtn.setManaged(false);
-                return;
-            }
-
-            if (expanded[0]) {
-                msgLabel.setText(full);
-                toggleBtn.setText("Less");
-            } else {
-                msgLabel.setText(full.substring(0, PREVIEW_LEN) + "…");
-                toggleBtn.setText("More");
-            }
-        };
-
-        toggleBtn.setOnAction(e -> {
-            expanded[0] = !expanded[0];
-            apply.run();
-        });
-
-        apply.run();
-
-        VBox bubble = new VBox(6, msgLabel, toggleBtn);
-        bubble.setAlignment(Pos.TOP_LEFT);
-
-        HBox messageContainer = new HBox(bubble);
+        HBox messageContainer = new HBox(msgLabel);
         messageContainer.setAlignment(Pos.CENTER_LEFT);
         HBox.setMargin(messageContainer, new Insets(0, 0, 0, 20));
 
@@ -176,7 +140,7 @@ public class ReservationMsgPage {
         navBar.setBackground(new Background(new BackgroundFill(Color.web("#E9967A"), CornerRadii.EMPTY, Insets.EMPTY)));
         navBar.setPrefHeight(70);
 
-        Label title = new Label("MUNCH-OAK");
+        Label title = new Label("MunchOak");
         title.getStyleClass().add("nav-title");
 
         Region spacer = new Region();
@@ -189,7 +153,7 @@ public class ReservationMsgPage {
     private VBox createDashboard() {
         VBox dashboard = new VBox(15);
         dashboard.setPadding(new Insets(30));
-        dashboard.setPrefWidth(220);
+        dashboard.setPrefWidth(260);
         dashboard.setStyle("-fx-background-color: #F4A460;");
 
         Button homeBtn = createDashboardButton("HOME");
