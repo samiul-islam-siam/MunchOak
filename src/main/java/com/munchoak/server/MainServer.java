@@ -39,10 +39,9 @@ public class MainServer {
 
     // ---- RESERVATION CACHE ----
     private static byte[] latestReservationFile = null;
-    private static byte[] latestReservationStatusFile = null;
-    private static String latestReservationStatusName = "reservation_status.dat";
+    private static String latestReservationFileName = "reservations.dat";
     private static byte[] latestMessageFile = null;
-    private static String latestMessageFileName = "messages.dat";
+    private static String latestMessageFileName = "notifications.dat";
 
     // ---- COUPON CACHE ----
     private static byte[] latestCouponsFile = null;
@@ -127,18 +126,9 @@ public class MainServer {
             if (latestReservationFile != null) {
                 sendSafe(cw, () -> {
                     cw.out.writeUTF("UPDATE_RESERVATIONS");
-                    cw.out.writeUTF("reservations.dat");
+                    cw.out.writeUTF(latestReservationFileName);
                     cw.out.writeInt(latestReservationFile.length);
                     cw.out.write(latestReservationFile);
-                });
-            }
-
-            if (latestReservationStatusFile != null) {
-                sendSafe(cw, () -> {
-                    cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
-                    cw.out.writeUTF(latestReservationStatusName);
-                    cw.out.writeInt(latestReservationStatusFile.length);
-                    cw.out.write(latestReservationStatusFile);
                 });
             }
 
@@ -343,25 +333,6 @@ public class MainServer {
                     broadcastReservations(filename, data);
                 }
 
-                else if (cmd.equals("UPDATE_RESERVATION_STATUS")) {
-
-                    String filename = cw.in.readUTF();
-                    int size = cw.in.readInt();
-
-                    byte[] data = new byte[size];
-                    cw.in.readFully(data);
-
-                    File dir = new File("src/main/resources/com/munchoak/manager/data/");
-                    dir.mkdirs();
-
-                    write(new File(dir, filename).toPath(), data);
-
-                    // CACHE IT FOR LATE JOINERS
-                    latestReservationStatusFile = data;
-                    latestReservationStatusName = filename;
-                    broadcastReservationStatus(filename, data);
-                }
-
                 else if (cmd.equals("UPDATE_MESSAGES")) {
 
                     String filename = cw.in.readUTF();
@@ -487,17 +458,6 @@ public class MainServer {
 
             sendSafe(cw, () -> {
                 cw.out.writeUTF("UPDATE_MENU");
-                cw.out.writeUTF(filename);
-                cw.out.writeInt(data.length);
-                cw.out.write(data);
-            });
-        }
-    }
-
-    private static void broadcastReservationStatus(String filename, byte[] data) {
-        for (ClientWrapper cw : clients) {
-            sendSafe(cw, () -> {
-                cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
                 cw.out.writeUTF(filename);
                 cw.out.writeInt(data.length);
                 cw.out.write(data);

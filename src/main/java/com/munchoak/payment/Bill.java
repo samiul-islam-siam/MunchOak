@@ -1,17 +1,17 @@
 package com.munchoak.payment;
 
 import com.munchoak.cart.Cart;
-import com.munchoak.mainpage.FoodItems;
+import javafx.scene.control.Alert;
 
-import java.util.Map;
+import java.util.List;
 
 public class Bill {
     private final Cart cart;
     private final Payment payment;
-    private final double savedFullTotal; // NEW: Passed from history to match table total
-    private final double baseSubtotal; // NEW: Base subtotal without add-ons
+    private final double savedFullTotal; // Passed from history to match table total
+    private final double baseSubtotal; // Base subtotal without add-ons
 
-    // UPDATED: Constructor to accept saved total and base subtotal for history bills
+    // Constructor to accept saved total and base subtotal for history bills
     public Bill(Cart cart, Payment payment) {
         this(cart, payment, 0.0, 0.0);
     }
@@ -23,9 +23,19 @@ public class Bill {
         this.baseSubtotal = baseSubtotal;
     }
 
-    public String generateReceipt(Map<Integer, FoodItems> foodMap) {
+    public String generateReceipt() {
         PaymentBreakdown b =
                 PaymentStorage.getPaymentBreakdown(payment.getId());
+
+        if (b == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Unavailable Item");
+            alert.setHeaderText(null);
+            alert.setContentText("Sorry, Bill is currently unavailable!");
+            alert.showAndWait();
+            return null;
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("============================================\n");
         sb.append("\t   MunchOak Restaurant \n");
@@ -42,20 +52,18 @@ public class Bill {
         sb.append(String.format("%-25s %5s %10s\n", "Item", "Qty", "Price"));
         sb.append("--------------------------------------------\n");
 
+        List<PaymentItem> items =
+                PaymentStorage.getPaymentItems(payment.getId());
 
-        for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
-            int foodId = entry.getKey();
-            int qty = entry.getValue();
-            FoodItems item = foodMap.get(foodId);
-            if (item != null) {
-                //double addonPerItem = cart.getAddonPerItem(foodId);
-                double basePricePerItem = item.getPrice();
-                double lineTotal = basePricePerItem * qty; // Baseline total
-                // Show base item
-                sb.append(String.format("%-25s %5d %10.2f\n", item.getName(), qty, lineTotal));
-            }
+        for (PaymentItem pi : items) {
+            String name = pi.name;
+            double lineTotal = pi.price * pi.qty;
+
+            sb.append(String.format(
+                    "%-25s %5d %10.2f\n",
+                    name, pi.qty, lineTotal
+            ));
         }
-
 
         sb.append("--------------------------------------------\n");
         sb.append(String.format("%-31s %10.2f\n\n", "Total Add-ons:", b.addons));
@@ -67,7 +75,7 @@ public class Bill {
         sb.append(String.format("%-31s %10.2f\n", "Tip:", b.tip));
         sb.append(String.format("%-31s %10.2f\n", "Discount:", -b.discountAmount));
 
-        // FIXED: Use saved full total to match table amount
+        // Use saved full total to match table amount
         sb.append("--------------------------------------------\n");
         sb.append(String.format("%-26s %15.2f\n", "TOTAL:", b.total));
         sb.append("============================================\n");

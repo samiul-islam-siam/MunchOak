@@ -28,33 +28,32 @@ public final class ReservationMsgStorage {
     public static List<MessageRecord> loadMessagesForUser(int userId) {
         StorageInit.ensureDataDir();
         List<MessageRecord> list = new ArrayList<>();
-        if (!StoragePaths.MESSAGES_FILE.exists() || StoragePaths.MESSAGES_FILE.length() == 0) return list;
+        if (!StoragePaths.NOTIFICATIONS_FILE.exists() || StoragePaths.NOTIFICATIONS_FILE.length() == 0) return list;
 
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.MESSAGES_FILE))) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.NOTIFICATIONS_FILE))) {
             while (dis.available() > 0) {
                 int uid = dis.readInt();
                 String sender = dis.readUTF();
                 String msg = dis.readUTF();
                 String time = dis.readUTF();
-
                 if (uid == userId) list.add(new MessageRecord(uid, sender, msg, time));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            System.err.println("Message load error: " + e.getMessage());
+            System.err.println("Notification load error: " + e.getMessage());
         }
         return list;
     }
 
     public static void saveMessageForUser(int userId, String sender, String message) {
         StorageInit.ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.MESSAGES_FILE, true))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.NOTIFICATIONS_FILE, true))) {
             dos.writeInt(userId);
             dos.writeUTF(sender);
             dos.writeUTF(message);
             dos.writeUTF(Instant.now().toString());
         } catch (IOException e) {
-            System.err.println("Message save error: " + e.getMessage());
+            System.err.println("Notification save error: " + e.getMessage());
         }
     }
 }

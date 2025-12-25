@@ -2,14 +2,14 @@ package com.munchoak.payment;
 
 import com.munchoak.authentication.LoginPage;
 import com.munchoak.authentication.ProfilePage;
-import com.munchoak.homepage.HomePage;
+import com.munchoak.cart.Cart;
+import com.munchoak.cart.CartPage;
 import com.munchoak.coupon.CouponStorage;
+import com.munchoak.homepage.HomePage;
+import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.MenuStorage;
 import com.munchoak.manager.Session;
 import com.munchoak.menu.MenuPage;
-import com.munchoak.cart.Cart;
-import com.munchoak.cart.CartPage;
-import com.munchoak.mainpage.FoodItems;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;

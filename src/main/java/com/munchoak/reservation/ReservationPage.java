@@ -481,13 +481,13 @@ public class ReservationPage {
     private VBox createDashboard() {
         VBox dashboard = new VBox(15);
         dashboard.setPadding(new Insets(30));
-        dashboard.setPrefWidth(220);
+        dashboard.setPrefWidth(260);
         dashboard.setStyle("-fx-background-color: #F4A460;");
 
         Button homeBtn = createDashboardButton("HOME");
         Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
-        Button messageBtn = createDashboardButton("MESSAGES");
+        Button messageBtn = createDashboardButton("NOTIFICATIONS");
         Button aboutBtn = createDashboardButton("ABOUT US");
 
         homeBtn.setOnAction(e -> {

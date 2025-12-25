@@ -1,9 +1,9 @@
 package com.munchoak.payment;
 
-import com.munchoak.manager.MenuStorage;
-import com.munchoak.manager.Session;
 import com.munchoak.cart.Cart;
 import com.munchoak.mainpage.FoodItems;
+import com.munchoak.manager.MenuStorage;
+import com.munchoak.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -121,7 +121,7 @@ public class Payment {
             paymentStage.close();
 
             Bill bill = new Bill(cart, this);
-            String receipt = bill.generateReceipt(foodMap);
+            String receipt = bill.generateReceipt();
             showBill(receipt);
 
             cart.getBuyHistory().clear();

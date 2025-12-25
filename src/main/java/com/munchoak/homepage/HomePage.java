@@ -6,8 +6,8 @@ import com.munchoak.manager.Session;
 import com.munchoak.menu.MenuPage;
 import com.munchoak.cart.Cart;
 import com.munchoak.cart.CartPage;
-import com.munchoak.payment.History;
 import com.munchoak.network.ChatClient;
+import com.munchoak.payment.History;
 import com.munchoak.reservation.AboutUsPage;
 import com.munchoak.reservation.ReservationMsgPage;
 import com.munchoak.reservation.ReservationPage;
@@ -17,16 +17,16 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
@@ -87,7 +87,7 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
-        loggedIn = (Session.getCurrentUsername() != null && !Session.getCurrentUsername().equals("guest")) &&
+        loggedIn = (Session.getCurrentUsername() != null && !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null && !Session.getCurrentEmail().isEmpty());
 
         // === Top Buttons ===
@@ -140,9 +140,63 @@ public class HomePage implements HomePageComponent {
 
         authBtn.setOnAction(e -> {
             if (loggedIn) {
-                Session.logout();
-                closeChatWindow();
-                Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Logout");
+                alert.setHeaderText(null);
+                Label content = new Label("Are you sure you want to logout?");
+                content.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+                alert.getDialogPane().setContent(content);
+                alert.getDialogPane().setPrefWidth(400);
+                alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+
+                ButtonType yesBtn = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+                ButtonType noBtn = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(yesBtn, noBtn);
+
+                Button yesButton = (Button) alert.getDialogPane().lookupButton(yesBtn);
+                Button noButton = (Button) alert.getDialogPane().lookupButton(noBtn);
+
+                yesButton.setDefaultButton(false);
+                noButton.setDefaultButton(false);
+
+
+                String boxStyle = "-fx-background-color: white; " +
+                        "-fx-border-color: black; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 6; " +
+                        "-fx-background-radius: 6; " +
+                        "-fx-padding: 6 18; " +
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold;";
+                yesButton.setStyle(boxStyle);
+                noButton.setStyle(boxStyle);
+
+
+                EventHandler<MouseEvent> bounceIn = ev -> {
+                    ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                    st.setToX(1.1);
+                    st.setToY(1.1);
+                    st.play();
+                };
+                EventHandler<MouseEvent> bounceOut = ev -> {
+                    ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                    st.setToX(1.0);
+                    st.setToY(1.0);
+                    st.play();
+                };
+
+                yesButton.setOnMouseEntered(bounceIn);
+                yesButton.setOnMouseExited(bounceOut);
+                noButton.setOnMouseEntered(bounceIn);
+                noButton.setOnMouseExited(bounceOut);
+
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == yesBtn) {
+                        Session.logout();
+                        closeChatWindow();
+                        Platform.runLater(() -> preserveStageState(new LoginPage(primaryStage).getLoginScene()));
+                    }
+                });
             } else {
                 openLoginPageDirectly();
             }
@@ -187,7 +241,7 @@ public class HomePage implements HomePageComponent {
         menuIconBtn.getStyleClass().addAll("top-button", "menu-icon-button");
         menuIconBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
-        loggedIn = (Session.getCurrentUsername() != null && !Session.getCurrentUsername().equals("guest")) &&
+        loggedIn = (Session.getCurrentUsername() != null && !Session.isGuest()) &&
                 (Session.getCurrentEmail() != null && !Session.getCurrentEmail().isEmpty());
 
         // === Top Buttons ===
@@ -521,7 +575,7 @@ public class HomePage implements HomePageComponent {
 
         profileBtn.setOnAction(e -> navigateAndClose.accept(this::openProfilePageDirectly));
         historyBtn.setOnAction(e -> {
-            if (!Session.getCurrentUsername().equals("guest")) {
+            if (!Session.isGuest()) {
                 navigateAndClose.accept(() -> primaryStage.setScene(new History(primaryStage, this.cart).getScene()));
             } else {
                 System.out.println("Guest cannot access history");

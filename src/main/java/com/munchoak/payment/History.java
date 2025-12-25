@@ -1,12 +1,11 @@
 package com.munchoak.payment;
 
-import com.munchoak.manager.*;
-import com.munchoak.homepage.HomePage;
-
 import com.munchoak.cart.Cart;
 import com.munchoak.cart.CartPage;
+import com.munchoak.homepage.HomePage;
 import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.MenuStorage;
+import com.munchoak.manager.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -95,24 +94,34 @@ public class History {
 
                     // Check availability from current menu before reordering
                     Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
+                    boolean isavailable = true;
                     for (Integer foodId : items.keySet()) {
                         if (foodMap == null || !foodMap.containsKey(foodId) || foodMap.get(foodId) == null) {
+                            isavailable = false;
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
                             alert.setTitle("Unavailable Item");
                             alert.setHeaderText(null);
                             alert.setContentText("Sorry, this is currently unavailable. Stay tuned!");
                             alert.showAndWait();
-                            return; // Stop reordering
+                            break;
                         }
                     }
 
                     // If all items are available, add them to cart
-                    for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
-                        cart.addToCart(entry.getKey(), entry.getValue());
+                    if(isavailable)
+                    {
+                        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+                            cart.addToCart(entry.getKey(), entry.getValue());
+                        }
                     }
 
+
                     // Navigate to Cart page to view updated cart
-                    primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
+                    if(isavailable)
+                    {
+                        primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
+                    }
+
                 });
             }
 
@@ -213,7 +222,7 @@ public class History {
         payment.setPaymentMethod(record.getPaymentMethod());
 
         Bill bill = new Bill(tempCart, payment, savedFullTotal, calculatedBaseSubtotal);
-        String receipt = bill.generateReceipt(foodMap);  // Pass saved total and base subtotal for accurate display
+        String receipt = bill.generateReceipt();  // Pass saved total and base subtotal for accurate display
 
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");

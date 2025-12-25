@@ -67,7 +67,7 @@ public class ReservationMsgPage {
 
 
         // Initial placeholder
-        Label noMessageLabel = new Label("No messages yet. Send a message to start a conversation.");
+        Label noMessageLabel = new Label("There is no notification yet.");
         noMessageLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #666; -fx-alignment: center;");
         noMessageLabel.setWrapText(true);
         noMessageLabel.setPadding(new Insets(20));
@@ -81,25 +81,10 @@ public class ReservationMsgPage {
         chatScroll.setStyle("-fx-background-color: transparent;");
 
 
-//        int userId = Session.getCurrentUserId();
-//
-//        chatArea.getChildren().clear();
-//
-//        List<FileStorage.MessageRecord> messages =
-//                FileStorage.loadMessagesForUser(userId);
-//
-//        if (messages.isEmpty()) {
-//            chatArea.getChildren().add(noMessageLabel);
-//        } else {
-//            for (FileStorage.MessageRecord m : messages) {
-//                addIncomingMessage(chatArea, m.message);
-//            }
-//        }
         refreshMessages(chatArea, noMessageLabel);
         Session.addMessageListener(() ->
                 Platform.runLater(() -> refreshMessages(chatArea, noMessageLabel))
         );
-
 
         // Overall content layout
         VBox chatContainer = new VBox(20, chatScroll);
@@ -120,22 +105,66 @@ public class ReservationMsgPage {
     }
 
     private void addIncomingMessage(VBox chatArea, String text) {
-        Label msgLabel = new Label("Support: " + text);
+        final int PREVIEW_LEN = 140;
+
+        Label msgLabel = new Label();
         msgLabel.setWrapText(true);
-        msgLabel.setMaxWidth(700); // Increased to allow more horizontal space for full text
+        msgLabel.setMaxWidth(700);
+        msgLabel.setMaxHeight(Double.MAX_VALUE);
         msgLabel.setPadding(new Insets(10, 15, 10, 15));
         msgLabel.setStyle("""
-                -fx-background-color: #E3F2FD;
-                -fx-background-radius: 18px;
-                -fx-border-radius: 18px;
-                -fx-border-color: #BBDEFB;
-                -fx-border-width: 1px;
-                -fx-text-fill: #001F3F;
-                """);
+            -fx-background-color: #E3F2FD;
+            -fx-background-radius: 18px;
+            -fx-border-radius: 18px;
+            -fx-border-color: #BBDEFB;
+            -fx-border-width: 1px;
+            -fx-text-fill: #001F3F;
+            """);
 
-        HBox messageContainer = new HBox(msgLabel);
+        String full = "Support: " + text;
+        boolean needsExpand = full.length() > PREVIEW_LEN;
+
+        // collapsed by default
+        final boolean[] expanded = {false};
+
+        Button toggleBtn = new Button();
+        toggleBtn.setStyle("""
+            -fx-background-color: transparent;
+            -fx-text-fill: #0D47A1;
+            -fx-underline: true;
+            -fx-font-weight: bold;
+            """);
+
+        Runnable apply = () -> {
+            if (!needsExpand) {
+                msgLabel.setText(full);
+                toggleBtn.setVisible(false);
+                toggleBtn.setManaged(false);
+                return;
+            }
+
+            if (expanded[0]) {
+                msgLabel.setText(full);
+                toggleBtn.setText("Less");
+            } else {
+                msgLabel.setText(full.substring(0, PREVIEW_LEN) + "…");
+                toggleBtn.setText("More");
+            }
+        };
+
+        toggleBtn.setOnAction(e -> {
+            expanded[0] = !expanded[0];
+            apply.run();
+        });
+
+        apply.run();
+
+        VBox bubble = new VBox(6, msgLabel, toggleBtn);
+        bubble.setAlignment(Pos.TOP_LEFT);
+
+        HBox messageContainer = new HBox(bubble);
         messageContainer.setAlignment(Pos.CENTER_LEFT);
-        HBox.setMargin(messageContainer, new Insets(0, 0, 0, 20)); // Indent from left
+        HBox.setMargin(messageContainer, new Insets(0, 0, 0, 20));
 
         chatArea.getChildren().add(messageContainer);
     }
@@ -167,7 +196,7 @@ public class ReservationMsgPage {
         Button menuBtn = createDashboardButton("MENU");
         Button reservationBtn = createDashboardButton("RESERVATIONS");
         Button profileBtn = createDashboardButton("PROFILE");
-        Button messageBtn = createDashboardButton("MESSAGES");
+        Button messageBtn = createDashboardButton("NOTIFICATIONS");
         Button aboutBtn = createDashboardButton("ABOUT US");
 
         homeBtn.setOnAction(e -> {

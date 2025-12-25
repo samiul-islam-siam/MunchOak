@@ -1,10 +1,10 @@
 package com.munchoak.payment;
 
+import com.munchoak.cart.Cart;
+import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.StorageInit;
 import com.munchoak.manager.StoragePaths;
 import com.munchoak.manager.StorageUtil;
-import com.munchoak.cart.Cart;
-import com.munchoak.mainpage.FoodItems;
 
 import java.io.*;
 import java.time.Instant;
@@ -68,11 +68,43 @@ public final class PaymentStorage {
                 piw.writeInt(paymentId);
                 piw.writeInt(foodId);
                 piw.writeInt(qty);
+
+                double priceAtPurchase = foodMap.get(foodId).getPrice();
+                piw.writeDouble(priceAtPurchase);
+                piw.writeUTF(foodMap.get(foodId).getName());
                 paymentItemId++;
             }
         }
 
         return paymentId;
+    }
+
+
+
+    public static List<PaymentItem> getPaymentItems(int paymentId) {
+        List<PaymentItem> list = new ArrayList<>();
+
+        try (DataInputStream dis = new DataInputStream(
+                new FileInputStream(StoragePaths.PAYMENT_MASTER_FILE))) {
+
+            while (dis.available() > 0) {
+                byte type = dis.readByte();
+                if (type != REC_PAYMENT_ITEM) continue;
+
+                dis.readInt(); // paymentItemId
+                int pid = dis.readInt();
+                int foodId = dis.readInt();
+                int qty = dis.readInt();
+                double price = dis.readDouble();
+                String name = dis.readUTF();
+
+                if (pid == paymentId) {
+                    list.add(new PaymentItem(foodId, qty, price,name));
+                }
+            }
+        } catch (IOException ignored) {}
+
+        return list;
     }
 
     public static int getLastPaymentId() {
@@ -99,7 +131,13 @@ public final class PaymentStorage {
                     ));
                 }
                 else if (type == REC_PAYMENT_ITEM) {
-                    dis.skipBytes(16);
+                    //dis.skipBytes(24);
+                    dis.readInt();      // paymentItemId
+                    dis.readInt();      // paymentId
+                    dis.readInt();      // foodId
+                    dis.readInt();      // qty
+                    dis.readDouble();   // price
+                    dis.readUTF();      // food name (variable length)
                 }
                 else if (type == REC_BREAKDOWN) {
                     dis.readInt();

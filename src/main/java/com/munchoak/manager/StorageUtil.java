@@ -39,6 +39,8 @@ public final class StorageUtil {
                         dis.readInt();
                         dis.readInt();
                         dis.readInt();
+                        dis.readDouble();
+                        dis.readUTF();
                     }
                     else if (type == REC_BREAKDOWN) {
                         dis.readInt();
