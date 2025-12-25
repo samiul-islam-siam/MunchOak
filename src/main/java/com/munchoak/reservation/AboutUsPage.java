@@ -2,6 +2,7 @@ package com.munchoak.reservation;
 
 import com.munchoak.authentication.ProfilePage;
 import com.munchoak.homepage.HomePage;
+import com.munchoak.mainpage.AdminHome;
 import com.munchoak.manager.Session;
 import com.munchoak.menu.MenuPage;
 import com.munchoak.cart.Cart;
@@ -73,7 +74,11 @@ public class AboutUsPage {
         navTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         Button homeBtn = createNavButton("Home");
-        homeBtn.setOnAction(e -> navigateToHome());
+        if (Session.isAdmin()) {
+            homeBtn.setOnAction(e -> AdminHome.openAdminDashboard());
+        } else {
+            homeBtn.setOnAction(e -> navigateToHome());
+        }
 
         Button menuBtn = createNavButton("Menu");
         menuBtn.setOnAction(e -> navigateToMenu());

@@ -194,103 +194,7 @@ public class MenuEdit {
         }
     }
 
-//
-//    public VBox getFormBox() {
-//        // ensure visibility defaults are consistent with previous behavior
-//        if (formBox == null) buildForm();
-//        return formBox;
-//    }
-//
-//    private void buildForm() {
-//        nameField = new TextField();
-//        detailsField = new TextField();
-//        priceField = new TextField();
-//        cuisineField = new TextField();
-//        quantityField = new TextField();
-//        addOneField = new TextField();
-//        addOnePriceField = new TextField();
-//        addTwoField = new TextField();
-//        addTwoPriceField = new TextField();
-//
-//        imageFilenameLabel = new Label("No image selected");
-//
-//        categoryBox = new ComboBox<>();
-//        owner.loadCategories(categoryBox);
-//        categoryBox.setPromptText("Select Category");
-//
-//        GridPane inputGrid = new GridPane();
-//        inputGrid.setPadding(new Insets(10));
-//        inputGrid.setHgap(10);
-//        inputGrid.setVgap(10);
-//
-//        inputGrid.add(new Label("Food Name:"), 0, 0);
-//        inputGrid.add(nameField, 1, 0);
-//        inputGrid.add(new Label("Details:"), 0, 1);
-//        inputGrid.add(detailsField, 1, 1);
-//        inputGrid.add(new Label("Price:"), 0, 2);
-//        inputGrid.add(priceField, 1, 2);
-//        inputGrid.add(new Label("Cuisine:"), 0, 3);
-//        inputGrid.add(cuisineField, 1, 3);
-//        inputGrid.add(new Label("Category:"), 0, 4);
-//        inputGrid.add(categoryBox, 1, 4);
-//        inputGrid.add(new Label("Quantity:"), 0, 5);
-//        inputGrid.add(quantityField, 1, 5);
-//        inputGrid.add(new Label("Add-on-1"), 0, 6);
-//        inputGrid.add(addOneField, 1, 6);
-//        inputGrid.add(new Label("Add-on-1-Price"), 0, 7);
-//        inputGrid.add(addOnePriceField, 1, 7);
-//        inputGrid.add(new Label("Add-on-2"), 0, 8);
-//        inputGrid.add(addTwoField, 1, 8);
-//        inputGrid.add(new Label("Add-on-2-Price"), 0, 9);
-//        inputGrid.add(addTwoPriceField, 1, 9);
-//
-//        // Category management buttons
-//        Button addCatBtn = new Button("Add Category");
-//        Button renameCatBtn = new Button("Rename Category");
-//        Button deleteCatBtn = new Button("Delete Category");
-//        HBox categoryButtons = new HBox(20, addCatBtn, renameCatBtn, deleteCatBtn);
-//        inputGrid.add(categoryButtons, 1, 10);
-//        categoryButtons.setSpacing(12);
-//        categoryButtons.setPadding(new Insets(10, 0, 10, 0));
-//
-//        for (Node n : categoryButtons.getChildren()) {
-//            if (n instanceof Button b) owner.styleMainButton(b);
-//        }
-//        addCatBtn.setOnAction(e -> addCategory());
-//        renameCatBtn.setOnAction(e -> renameCategory());
-//        deleteCatBtn.setOnAction(e -> deleteCategory());
-//
-//        // Image selection
-//        Button browseBtn = new Button("Browse...");
-//        owner.styleMainButton(browseBtn);
-//        browseBtn.setOnAction(e -> chooseImage());
-//        HBox imageBox = new HBox(10, imageFilenameLabel, browseBtn);
-//        imageBox.setAlignment(Pos.CENTER_LEFT);
-//        inputGrid.add(new Label("Image:"), 0, 11);
-//        inputGrid.add(imageBox, 1, 11);
-//
-//        for (Node node : inputGrid.getChildren()) {
-//            if (node instanceof Label lbl) {
-//                lbl.setStyle("-fx-text-fill:#E53935;");
-//            }
-//        }
-//        // Add / Update button inside form
-//        addOrUpdateButton = new Button("Add");
-//        owner.styleMainButton(addOrUpdateButton);
-//        addOrUpdateButton.setOnAction(e -> {
-//            if (currentEditingFood == null) {
-//                addFoodItem();
-//            } else {
-//                updateFoodItem();
-//            }
-//        });
-//
-//        formBox = new VBox(10, inputGrid, addOrUpdateButton);
-//        formBox.setVisible(false);
-//        formBox.setManaged(false);
-//    }
-
-    // ---------------- Menu File Management (moved) ----------------
+    // ---------------- Menu File Management ----------------
     public void chooseMenu() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Add Menu File");
@@ -307,7 +211,7 @@ public class MenuEdit {
 
                 File destFile = new File(destDir, file.getName());
                 Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                StoragePaths.setMenuFile(file);
+                MenuStorage.setMenuFile(file);
 
                 // 2. Load FoodItems from selected file
                 List<FoodItems> importedItems = MenuStorage.loadMenu();

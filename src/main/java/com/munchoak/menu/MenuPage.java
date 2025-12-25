@@ -68,7 +68,7 @@ public class MenuPage {
             root = buildRoot();
             menuScene = new Scene(root, initWidth, initHeight);
 
-            // optional css — guard against missing resources
+            // optional CSS — guard against missing resources
             try {
                 var css1 = getClass().getResource("/com/munchoak/view/styles/style.css");
                 if (css1 != null) menuScene.getStylesheets().add(css1.toExternalForm());
@@ -94,7 +94,7 @@ public class MenuPage {
         }
         menu.setSearchKeyword(searchKeyword);
 
-        // ----------------- NEW: create / register MenuClient and attach menu -----------------
+        // ----------------- create / register MenuClient and attach menu -----------------
         try {
             // Try to reuse a MenuClient already stored in Session (so payment flow's Session.getMenuClient().sendMenuUpdate() stays valid)
             MainClient client = Session.getMenuClient();
@@ -123,7 +123,6 @@ public class MenuPage {
             } catch (Exception ignored) {
             }
         }
-        // ------------------------------------------------------------------------------------
 
         // Preserve cart if provided
         if (this.cart != null) {
@@ -302,7 +301,12 @@ public class MenuPage {
         homeButton.setGraphic(homeIcon);
         homeButton.getStyleClass().add("top-button");
         homeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: center-left;");
-        homeButton.setOnAction(e -> returnToHomePerfectly());
+
+        if (Session.isAdmin()) {
+            homeButton.setOnAction(e -> AdminHome.openAdminDashboard());
+        } else {
+            homeButton.setOnAction(e -> returnToHomePerfectly());
+        }
 
         Label aboutIcon = new Label("\u2139"); // ℹ
         aboutIcon.setFont(Font.font("Segoe UI Emoji", 22));
@@ -377,14 +381,12 @@ public class MenuPage {
         cartButton.setStyle("-fx-background-color: transparent;");
 
         // Wrap right buttons in HBox for spacing
-        HBox rightButtons=null;
+        HBox rightButtons = null;
 
 
-        if(Session.isAdmin())
-        {
+        if (Session.isAdmin()) {
             rightButtons = new HBox(8, homeButton, aboutButton, profileButton);
-        }else
-        {
+        } else {
             rightButtons = new HBox(8, homeButton, aboutButton, reservationButton, profileButton, cartButton);
         }
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
@@ -500,17 +502,18 @@ public class MenuPage {
         } catch (Exception ignored) {
         }
 
-        Platform.runLater(() -> {
-            primaryStage.setScene(homeScene);
-            Platform.runLater(() -> {
-                if (wasFullScreen) primaryStage.setFullScreen(true);
-                else if (wasMaximized) primaryStage.setMaximized(true);
-                else {
-                    primaryStage.setWidth(currentWidth);
-                    primaryStage.setHeight(currentHeight);
-                }
-            });
-        });
+        primaryStage.setScene(homeScene);
+
+        if (wasFullScreen) {
+            primaryStage.setFullScreen(true);
+        } else if (wasMaximized) {
+            primaryStage.setMaximized(true);
+        } else {
+            primaryStage.setWidth(currentWidth);
+            primaryStage.setHeight(currentHeight);
+        }
+        primaryStage.setTitle("Home Page + Extension");
+        primaryStage.show();
     }
 
     /**

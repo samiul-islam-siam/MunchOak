@@ -1,5 +1,6 @@
 package com.munchoak.network;
 
+import com.munchoak.homepage.HomePage;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,7 +57,37 @@ public class ChatClient {
         chatListView.setItems(chatMessages);
         setupUIEvents();
         setupAdminUIIfNeeded();
+
+        // Hook the "X" close button as well
+        hookStageCloseToResetFlag();
+
         connectToServer();
+    }
+
+    private void hookStageCloseToResetFlag() {
+        // The controller may not have access to the Stage immediately during initialize,
+        // so defer to next pulse.
+        Platform.runLater(() -> {
+            Stage stage = chatStage;
+            if (stage == null) {
+                // Fallback: try to get it from any control if already attached to a Scene
+                if (closeButton != null && closeButton.getScene() != null) {
+                    stage = (Stage) closeButton.getScene().getWindow();
+                }
+            }
+            if (stage == null) return;
+
+            // Avoid stacking multiple handlers if called more than once
+            Stage finalStage = stage;
+            finalStage.addEventHandler(WindowEvent.WINDOW_HIDDEN, e -> {
+                try {
+                    if (writer != null) writer.println("BYE");
+                } catch (Exception ignored) {
+                }
+                closeConnection();
+                HomePage.isChatWindowOpen.set(false);
+            });
+        });
     }
 
     public void setUsername(String username) {
@@ -88,6 +120,7 @@ public class ChatClient {
             } catch (Exception ignored) {
             }
             closeConnection();
+            HomePage.isChatWindowOpen.set(false);
             Stage st = (Stage) ((Node) e.getSource()).getScene().getWindow();
             st.close();
         });

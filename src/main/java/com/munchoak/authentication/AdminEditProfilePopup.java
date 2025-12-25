@@ -2,7 +2,6 @@ package com.munchoak.authentication;
 
 import com.munchoak.manager.AdminStorage;
 import com.munchoak.manager.Session;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -76,7 +76,7 @@ public class MainClient {
                         File target = new File(dir, filename);
                         write(target.toPath(), data);
 
-                        StoragePaths.setMenuFile(target);
+                        MenuStorage.setMenuFile(target);
 
                         Platform.runLater(() -> {
                             if (menu != null) menu.updateView();

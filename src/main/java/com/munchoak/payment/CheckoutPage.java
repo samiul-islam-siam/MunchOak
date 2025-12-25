@@ -831,13 +831,12 @@ public class CheckoutPage {
                 Session.getMenuClient().sendMenuUpdate();
 
                 Payment.checkout(cart);
-                //int paymentId = Payment.getLastPaymentId();
                 int paymentId = PaymentStorage.createPaymentAndCart(
                         Session.getCurrentUserId(),
                         cart,
                         foodMap,
                         "card",
-                        totalPayable   // 👈 ADD THIS
+                        totalPayable
                 );
 
                 PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
@@ -848,6 +847,8 @@ public class CheckoutPage {
 
                 Session.getMenuClient().sendCouponUpdate();
                 Session.getMenuClient().sendPaymentFileUpdate();
+                Session.getMenuClient().sendCartFilesUpdate();
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("Payment Successful!");
                 alert.setContentText("Your order has been placed for ৳" + String.format("%.2f", totalPayable) + ". Thank you for shopping with MUNCHOAK! You can view your receipt in Payment History.");

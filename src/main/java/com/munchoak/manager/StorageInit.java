@@ -29,10 +29,10 @@ public final class StorageInit {
             if (!StoragePaths.CARTS_FILE.exists()) StoragePaths.CARTS_FILE.createNewFile();
             if (!StoragePaths.CART_ITEMS_FILE.exists()) StoragePaths.CART_ITEMS_FILE.createNewFile();
             if (!StoragePaths.RESERVATIONS_FILE.exists()) StoragePaths.RESERVATIONS_FILE.createNewFile();
-            if (!StoragePaths.MENU_POINTER_FILE.exists()) StoragePaths.MENU_POINTER_FILE.createNewFile();
+            if (!StoragePaths.getMenuPointerFile().exists()) StoragePaths.getMenuPointerFile().createNewFile();
             if (!StoragePaths.MESSAGES_FILE.exists()) StoragePaths.MESSAGES_FILE.createNewFile();
             if (!StoragePaths.RESERVATION_STATUS_FILE.exists()) StoragePaths.RESERVATION_STATUS_FILE.createNewFile();
-            if(!StoragePaths.PAYMENT_MASTER_FILE.exists()) StoragePaths.PAYMENT_MASTER_FILE.createNewFile();
+            if (!StoragePaths.PAYMENT_MASTER_FILE.exists()) StoragePaths.PAYMENT_MASTER_FILE.createNewFile();
 
             // seed categories if empty/new
             CategoryStorage.ensureSeedCategories();

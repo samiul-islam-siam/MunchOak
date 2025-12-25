@@ -136,8 +136,6 @@ public class Session {
         isAdmin = true; // set admin flag
         isGuest = false;
 
-
-        // refreshAdminFromFile(); // load values from admin.dat instead of hardcoded defaults
     }
 
     public static void resetToGuest() {
