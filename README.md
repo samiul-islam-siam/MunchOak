@@ -38,92 +38,121 @@ this project demonstrates both frontend UI design and backend file system manage
 
 ## 📁 **Project Structure**
 
-```
+```text
 MunchOak/
-│
-├── src/
-│   └── main/
-│       ├── java/
-│       │   │
-│       │   ├── module-info.java
-│       │   │  
-│       │   └── com/
-│       │       ├── example/
-│       │           ├── login/                  # Authentication system
-│       │           │   ├── AdminDashboard.java
-│       │           │   └── ChangeAdminPasswordPage.java
-│       │           │
-│       │           ├── manager/                # File, session & storage handling
-│       │           │   ├── AdminFileStorage.java
-│       │           │   ├── FileStorage.java
-│       │           │   ├── PasswordUtils.java
-│       │           │   └── Session.java
-│       │           │
-│       │           ├── menu/                   # Food items & menu handling
-│       │           │   ├── AdminMenu.java
-│       │           │   ├── BaseMenu.java
-│       │           │   ├── GuestMenu.java
-│       │           │   ├── MenuClient.java
-│       │           │   ├── MenuPage.java
-│       │           │   ├── MenuServer.java     @Run it first
-│       │           │   └── UserMenu.java
-│       │           │
-│       │           ├── munchoak/               # Main App Logic
-│       │           │   ├── Bill.java           
-│       │           │   ├── Cart.java
-│       │           │   ├── CartPage.java
-│       │           │   ├── CheckoutPage.java
-│       │           │   ├── FoodItems.java
-│       │           │   ├── History.java
-│       │           │   ├── Home.java           # Launcher
-│       │           │   └── Payment.java
-│       │           │
-│       │           ├── network/                # Chat server & client
-│       │           │   ├── ChatClient.java
-│       │           │   ├── ChatMessage.java
-│       │           │   └── ChatServer.java     @Run it secondly
-│       │           │
-│       │           ├── view/                   # UI logic
-│       │           │   ├── AboutUsPage.java
-│       │           │   ├── ChangePasswordPopup.java
-│       │           │   ├── HomePage.java
-│       │           │   ├── HomePageComponent.java
-│       │           │   ├── HomePageExtension.java
-│       │           │   ├── HomePageSecondExtension.java
-│       │           │   ├── HomePageThirdExtension.java
-│       │           │   ├── HomePageFourthExtension.java
-│       │           │   ├── HomePageFifthExtension.java
-│       │           │   ├── HomePageSixthExtension.java
-│       │           │   ├── HomePageSeventhExtension.java
-│       │           │   ├── HomePageEighthExtension.java
-│       │           │   ├── LoginPage.java
-│       │           │   ├── ProfilePage.java
-│       │           │   └── ReservationPage.java
-│       │           │
-│       │           └── AppLauncher.java
-│       │
-│       └── resources/
-│               └── com/
-│                   └── example/
-│                       ├── manager/
-│                       │   ├── data/
-│                       │   └── images
-│                       │
-│                       ├── network/
-│                       │   ├── data/
-│                       │   └── images
-│                       │
-│                       └── view/
-│                           ├── data/
-│                           └── images
-│
-├── pom.xml
-├── .idea/
-├── .mvn/
-├── target/
-└── README.md
+├── .gitignore
+├── README.md
+├── pom.xml                     # Maven build configuration
+├── .idea/                      # IntelliJ project settings (IDE-specific)
+├── .mvn/                       # Maven wrapper support files
+└── src/
+    └── main/
+        ├── java/
+        │   │
+        │   ├── module-info.java
+        │   │
+        │   └── com/
+        │       └── munchoak/
+        │           ├── AppLauncher.java            # Application entry / launcher
+        │           │
+        │           ├── authentication/             # Login, profile & password management
+        │           │   ├── AdminEditProfilePopup.java
+        │           │   ├── ChangeAdminPasswordPage.java
+        │           │   ├── ChangePasswordPopup.java
+        │           │   ├── EditProfilePopup.java
+        │           │   ├── LoginPage.java
+        │           │   ├── PasswordStorage.java
+        │           │   ├── PasswordUtil.java
+        │           │   └── ProfilePage.java
+        │           │
+        │           ├── cart/                       # Cart UI, pricing, cart state & helpers
+        │           │   ├── Cart.java
+        │           │   ├── CartItemView.java
+        │           │   ├── CartNavbarView.java
+        │           │   ├── CartPage.java
+        │           │   ├── CartPageState.java
+        │           │   ├── CartPricing.java
+        │           │   └── CartSearchCardFactory.java
+        │           │
+        │           ├── coupon/                     # Coupon CRUD + coupon persistence
+        │           │   ├── AddCouponPopup.java
+        │           │   ├── CouponStorage.java
+        │           │   └── EditCouponPopup.java
+        │           │
+        │           ├── homepage/                   # Landing/home page components & extensions
+        │           │   ├── HomePage.java
+        │           │   ├── HomePageComponent.java
+        │           │   ├── HomePageExtension.java
+        │           │   ├── HomePageSecondExtension.java
+        │           │   ├── HomePageThirdExtension.java
+        │           │   ├── HomePageFourthExtension.java
+        │           │   ├── HomePageFifthExtension.java
+        │           │   ├── HomePageSixthExtension.java
+        │           │   ├── HomePageSeventhExtension.java
+        │           │   └── HomePageEighthExtension.java
+        │           │
+        │           ├── mainpage/                   # Main navigation pages (admin/user entry views)
+        │           │   ├── AdminHome.java
+        │           │   ├── FoodItems.java
+        │           │   └── Home.java
+        │           │
+        │           ├── manager/                    # Storage/persistence utilities + session handling
+        │           │   ├── AdminStorage.java
+        │           │   ├── CategoryStorage.java
+        │           │   ├── MenuStorage.java
+        │           │   ├── Session.java
+        │           │   ├── StorageInit.java
+        │           │   ├── StoragePaths.java
+        │           │   ├── StorageUtil.java
+        │           │   └── UserStorage.java
+        │           │
+        │           ├── menu/                       # Menu browsing/editing for guest/user/admin
+        │           │   ├── AdminMenu.java
+        │           │   ├── BaseMenu.java
+        │           │   ├── GuestMenu.java
+        │           │   ├── MenuEdit.java
+        │           │   ├── MenuPage.java
+        │           │   └── UserMenu.java
+        │           │
+        │           ├── network/                    # Socket-based chat/networking layer
+        │           │   ├── ChatClient.java
+        │           │   ├── ChatMessage.java
+        │           │   └── ChatServer.java
+        │           │
+        │           ├── payment/                    # Checkout, billing, payment history & persistence
+        │           │   ├── Bill.java
+        │           │   ├── CheckoutPage.java
+        │           │   ├── History.java
+        │           │   ├── Payment.java
+        │           │   ├── PaymentBreakdown.java
+        │           │   └── PaymentStorage.java
+        │           │
+        │           ├── reservation/                # Table reservation & reservation messaging
+        │           │   ├── AboutUsPage.java
+        │           │   ├── ReservationMsgPage.java
+        │           │   ├── ReservationMsgStorage.java
+        │           │   ├── ReservationPage.java
+        │           │   └── ReservationStorage.java
+        │           │
+        │           └── server/                     # App-level client/server bootstrapping
+        │               ├── MainClient.java
+        │               └── MainServer.java
+        │           
+        └── resources/
+            └── com/                                # Static assets (e.g., CSS, images, FXML, data)
+                └── munchoak/
+                    ├── manager/
+                    │   ├── data/
+                    │   └── images
+                    │
+                    ├── network/
+                    |   ├── chats/
+                    |   └── ChatWindow.fxml
+                    │
+                    └── view/
+                        ├── styles/
+                        └── images
 ```
-
 ## **Tools**
 
 | Tool                                   | Description                              |

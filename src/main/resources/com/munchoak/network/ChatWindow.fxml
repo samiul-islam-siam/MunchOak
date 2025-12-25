@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.munchoak.network.ChatClient"
+            prefWidth="520" prefHeight="520"
+            style="-fx-background-color: #f5f5f5;">
+
+    <children>
+
+        <!-- Left: User list (only visible for admin; hidden for normal users by controller) -->
+        <ListView fx:id="userListView"
+                  layoutX="10" layoutY="50"
+                  prefWidth="140" prefHeight="390"
+                  style="-fx-background-color: white; -fx-font-size: 13px;"/>
+
+        <!-- Close Button -->
+        <Button fx:id="closeButton" text="Close"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white;"
+                layoutX="10" layoutY="10" prefWidth="70"/>
+
+        <!-- Chat Area (Message Bubbles) -->
+        <ListView fx:id="chatListView"
+                  layoutX="160" layoutY="50"
+                  prefHeight="390" prefWidth="340"
+                  style="-fx-background-color: #f5f5f5;"
+        />
+
+        <!-- Message Field -->
+        <TextField fx:id="messageField"
+                   layoutX="160" layoutY="460"
+                   prefWidth="250"
+                   promptText="Type a message..."/>
+
+        <!-- Send Button -->
+        <Button fx:id="sendButton"
+                layoutX="420" layoutY="460"
+                prefWidth="70"
+                text="Send"
+                style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+
+    </children>
+</AnchorPane>
