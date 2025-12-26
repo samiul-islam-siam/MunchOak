@@ -1,6 +1,6 @@
 package com.munchoak.mainpage;
 
-import com.munchoak.authentication.ChangeAdminPasswordPage;
+import com.munchoak.authentication.ChangeAdminPassPopup;
 import com.munchoak.authentication.LoginPage;
 import com.munchoak.authentication.ProfilePage;
 import com.munchoak.coupon.CouponStorage;
@@ -550,7 +550,7 @@ public class AdminHome {
         });
 
         changePassBtn.setOnAction(e ->
-                ChangeAdminPasswordPage.show(primaryStage)
+                ChangeAdminPassPopup.show(primaryStage)
         );
 
         logoutBtn.setOnAction(e -> {

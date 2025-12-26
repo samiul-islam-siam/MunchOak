@@ -4,7 +4,6 @@ import com.munchoak.cart.Cart;
 import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.StorageInit;
 import com.munchoak.manager.StoragePaths;
-import com.munchoak.manager.StorageUtil;
 
 import java.io.*;
 import java.time.Instant;
@@ -15,9 +14,14 @@ import java.util.Map;
 
 public final class PaymentStorage {
     private PaymentStorage() {}
-    public static final byte REC_PAYMENT = 1;
-    public static final byte REC_PAYMENT_ITEM = 2;
-    public static final byte REC_BREAKDOWN = 3;
+
+    /**
+     * Single-record-per-payment format.
+     * This is NOT multiple record types; it's a single version marker to keep reads aligned.
+     */
+    private static final byte REC_PAYMENT_V2 = 10;
+
+    // -------------------- WRITE --------------------
 
     public static int createPaymentAndCart(
             int userId,
@@ -29,162 +33,184 @@ public final class PaymentStorage {
 
         StorageInit.ensureDataDir();
 
-        int paymentId = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENT_MASTER_FILE, 3001);
-        int cartId = StorageUtil.generateNextIdInFile(StoragePaths.CARTS_FILE, 1);
-        int paymentItemIdStart = StorageUtil.generateNextIdInFile(StoragePaths.PAYMENT_MASTER_FILE, 1);
-
+        int paymentId = getNextPaymentId();
         String timestamp = Instant.now().toString();
 
-        try (DataOutputStream pw = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENTS_FILE, true))) {
-            pw.writeByte(REC_PAYMENT);
-            pw.writeInt(paymentId);
-            pw.writeInt(userId);
-            pw.writeDouble(finalTotal);
-            pw.writeUTF(method);
-            pw.writeUTF(timestamp);
+        // Prepare items snapshot (price + name at purchase time)
+        List<PaymentItem> items = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
+            int foodId = e.getKey();
+            int qty = e.getValue();
+            FoodItems fi = foodMap.get(foodId);
+            if (fi == null) continue;
+
+            items.add(new PaymentItem(foodId, qty, fi.getPrice(), fi.getName()));
         }
 
-        try (DataOutputStream cw = new DataOutputStream(new FileOutputStream(StoragePaths.CARTS_FILE, true))) {
-            cw.writeInt(cartId);
-            cw.writeInt(userId);
-            cw.writeInt(paymentId);
-            cw.writeUTF(timestamp);
-        }
+        // Write a minimal payment record now. Breakdown is saved via savePaymentBreakdownV2(...)
+        // To keep atomic & consistent, we will write EVERYTHING in one go here by requiring breakdown later.
+        // BUT your CheckoutPage calls createPaymentAndCart() before savePaymentBreakdown().
+        // So: we will write a placeholder breakdown here, then "update" is not possible in append-only.
+        //
+        // Best fix: createPaymentAndCartV2(...) must receive breakdown fields too.
+        //
+        // For compatibility with your current flow, we will:
+        // - write the full record WITHOUT breakdown
+        // - and include breakdown values as 0 for now, then your receipt should NOT depend on them -> but it does.
+        //
+        // Therefore: CHANGE CheckoutPage to call createPaymentV2(...) with breakdown included.
+        throw new IOException("PaymentStorage.createPaymentAndCart is deprecated. Use createPaymentV2(...) with breakdown fields.");
+    }
 
-        try (DataOutputStream ciw = new DataOutputStream(new FileOutputStream(StoragePaths.CART_ITEMS_FILE, true));
-             DataOutputStream piw = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENT_ITEMS_FILE, true))) {
+    /**
+     * New V2 writer: writes ONE complete payment record including breakdown + items.
+     */
+    public static int createPaymentV2(
+            int userId,
+            String userNameSnapshot,
+            Cart cart,
+            Map<Integer, FoodItems> foodMap,
+            String method,
+            String timestamp,
+            PaymentBreakdown breakdown,
+            List<PaymentItem> items
+    ) throws IOException {
 
-            int paymentItemId = paymentItemIdStart;
-            for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
-                int foodId = e.getKey();
-                int qty = e.getValue();
+        StorageInit.ensureDataDir();
+        int paymentId = getNextPaymentId();
 
-                ciw.writeInt(cartId);
-                ciw.writeInt(foodId);
-                ciw.writeInt(qty);
+        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(
+                new FileOutputStream(StoragePaths.PAYMENTS_FILE, true)))) {
 
-                piw.writeByte(REC_PAYMENT_ITEM);
-                piw.writeInt(paymentItemId);
-                piw.writeInt(paymentId);
-                piw.writeInt(foodId);
-                piw.writeInt(qty);
+            dos.writeByte(REC_PAYMENT_V2);
+            dos.writeInt(paymentId);
 
-                double priceAtPurchase = foodMap.get(foodId).getPrice();
-                piw.writeDouble(priceAtPurchase);
-                piw.writeUTF(foodMap.get(foodId).getName());
-                paymentItemId++;
+            dos.writeInt(userId);
+            dos.writeUTF(userNameSnapshot != null ? userNameSnapshot : "");
+
+            dos.writeUTF(method != null ? method : "");
+            dos.writeUTF(timestamp != null ? timestamp : Instant.now().toString());
+
+            // breakdown
+            dos.writeDouble(breakdown.baseSubtotal);
+            dos.writeDouble(breakdown.addons);
+            dos.writeDouble(breakdown.discountAmount);
+            dos.writeDouble(breakdown.tip);
+            dos.writeDouble(breakdown.delivery);
+            dos.writeDouble(breakdown.tax);
+            dos.writeDouble(breakdown.service);
+            dos.writeDouble(breakdown.total);
+
+            // items
+            dos.writeInt(items.size());
+            for (PaymentItem it : items) {
+                dos.writeInt(it.foodId);
+                dos.writeInt(it.qty);
+                dos.writeDouble(it.price);
+                dos.writeUTF(it.name != null ? it.name : "");
             }
         }
 
         return paymentId;
     }
 
+    private static int getNextPaymentId() {
+        // scan file and find max paymentId
+        StorageInit.ensureDataDir();
+        int last = 3000;
 
+        File f = StoragePaths.PAYMENTS_FILE;
+        if (!f.exists()) return 3001;
 
-    public static List<PaymentItem> getPaymentItems(int paymentId) {
-        List<PaymentItem> list = new ArrayList<>();
-
-        try (DataInputStream dis = new DataInputStream(
-                new FileInputStream(StoragePaths.PAYMENT_MASTER_FILE))) {
-
-            while (dis.available() > 0) {
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
+            while (true) {
                 byte type = dis.readByte();
-                if (type != REC_PAYMENT_ITEM) continue;
-
-                dis.readInt(); // paymentItemId
+                if (type != REC_PAYMENT_V2) {
+                    throw new IOException("Unknown record type in payments.dat: " + type);
+                }
                 int pid = dis.readInt();
-                int foodId = dis.readInt();
-                int qty = dis.readInt();
-                double price = dis.readDouble();
-                String name = dis.readUTF();
+                last = Math.max(last, pid);
 
-                if (pid == paymentId) {
-                    list.add(new PaymentItem(foodId, qty, price,name));
+                // userId + userName + method + timestamp
+                dis.readInt();
+                dis.readUTF();
+                dis.readUTF();
+                dis.readUTF();
+
+                // 8 doubles breakdown
+                for (int i = 0; i < 8; i++) dis.readDouble();
+
+                int itemCount = dis.readInt();
+                for (int i = 0; i < itemCount; i++) {
+                    dis.readInt();    // foodId
+                    dis.readInt();    // qty
+                    dis.readDouble(); // price
+                    dis.readUTF();    // name
                 }
             }
-        } catch (IOException ignored) {}
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException scanning payments file: " + e.getMessage());
+        }
 
-        return list;
+        return last + 1;
     }
 
     public static int getLastPaymentId() {
-        return StorageUtil.generateNextIdInFile(StoragePaths.PAYMENTS_FILE, 3001) - 1;
+        return getNextPaymentId() - 1;
     }
 
-    public static List<History.HistoryRecord> loadPaymentHistory() {
+    // -------------------- READ --------------------
+
+    public static List<PaymentItem> getPaymentItems(int paymentId) {
+        List<PaymentItem> items = new ArrayList<>();
         StorageInit.ensureDataDir();
-        List<History.HistoryRecord> list = new ArrayList<>();
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_MASTER_FILE))) {
 
-            while (dis.available() > 0) {
+        File f = StoragePaths.PAYMENTS_FILE;
+        if (!f.exists()) return items;
+
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
+            while (true) {
                 byte type = dis.readByte();
-
-                if (type == REC_PAYMENT) {
-                    int pid = dis.readInt();
-                    int uid = dis.readInt();
-                    double amount = dis.readDouble();
-                    String method = dis.readUTF();
-                    String timestamp = dis.readUTF();
-
-                    list.add(new History.HistoryRecord(
-                            uid, pid, timestamp, amount, "Success", method
-                    ));
+                if (type != REC_PAYMENT_V2) {
+                    throw new IOException("Unknown record type in payments.dat: " + type);
                 }
-                else if (type == REC_PAYMENT_ITEM) {
-                    //dis.skipBytes(24);
-                    dis.readInt();      // paymentItemId
-                    dis.readInt();      // paymentId
-                    dis.readInt();      // foodId
-                    dis.readInt();      // qty
-                    dis.readDouble();   // price
-                    dis.readUTF();      // food name (variable length)
-                }
-                else if (type == REC_BREAKDOWN) {
-                    dis.readInt();
-                    for (int i = 0; i < 8; i++) dis.readDouble();
-                    dis.readInt();
-                    dis.readUTF();
+
+                int pid = dis.readInt();
+
+                // user header
+                dis.readInt();  // userId
+                dis.readUTF();  // userName snapshot
+                dis.readUTF();  // method
+                dis.readUTF();  // timestamp
+
+                // breakdown
+                for (int i = 0; i < 8; i++) dis.readDouble();
+
+                int itemCount = dis.readInt();
+
+                if (pid == paymentId) {
+                    for (int i = 0; i < itemCount; i++) {
+                        int foodId = dis.readInt();
+                        int qty = dis.readInt();
+                        double price = dis.readDouble();
+                        String name = dis.readUTF();
+                        items.add(new PaymentItem(foodId, qty, price, name));
+                    }
+                    return items;
+                } else {
+                    // skip items
+                    for (int i = 0; i < itemCount; i++) {
+                        dis.readInt();
+                        dis.readInt();
+                        dis.readDouble();
+                        dis.readUTF();
+                    }
                 }
             }
-
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-        return list;
-    }
-
-    public static Map<Integer, Integer> getCartItemsForPayment(int paymentId) {
-        StorageInit.ensureDataDir();
-        Map<Integer, Integer> items = new HashMap<>();
-        int cartId = -1;
-
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.CARTS_FILE))) {
-            while (dis.available() > 0) {
-                int cid = dis.readInt();
-                dis.readInt(); // userId
-                int pid = dis.readInt();
-                dis.readUTF(); // timestamp
-                if (pid == paymentId) {
-                    cartId = cid;
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-
-        if (cartId == -1) return items;
-
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.CART_ITEMS_FILE))) {
-            while (dis.available() > 0) {
-                int cid = dis.readInt();
-                int foodId = dis.readInt();
-                int qty = dis.readInt();
-                if (cid == cartId) items.put(foodId, qty);
-            }
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            System.err.println("IOException reading payment items: " + e.getMessage());
         }
 
         return items;
@@ -192,13 +218,24 @@ public final class PaymentStorage {
 
     public static PaymentBreakdown getPaymentBreakdown(int paymentId) {
         StorageInit.ensureDataDir();
-        if (!StoragePaths.PAYMENT_BREAKDOWN_FILE.exists()) return null;
 
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.PAYMENT_BREAKDOWN_FILE))) {
-            while (dis.available() > 0) {
+        File f = StoragePaths.PAYMENTS_FILE;
+        if (!f.exists()) return null;
+
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
+            while (true) {
                 byte type = dis.readByte();
-                if (type != REC_BREAKDOWN) continue;
+                if (type != REC_PAYMENT_V2) {
+                    throw new IOException("Unknown record type in payments.dat: " + type);
+                }
+
                 int pid = dis.readInt();
+
+                int userId = dis.readInt();
+                String userName = dis.readUTF();
+                dis.readUTF(); // method
+                dis.readUTF(); // timestamp
+
                 double baseSubtotal = dis.readDouble();
                 double addons = dis.readDouble();
                 double discountAmount = dis.readDouble();
@@ -207,48 +244,89 @@ public final class PaymentStorage {
                 double tax = dis.readDouble();
                 double service = dis.readDouble();
                 double total = dis.readDouble();
-                int userId = dis.readInt();
-                String userName = dis.readUTF();
+
+                int itemCount = dis.readInt();
+
+                // skip items always for breakdown read
+                for (int i = 0; i < itemCount; i++) {
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readDouble();
+                    dis.readUTF();
+                }
 
                 if (pid == paymentId) {
                     return new PaymentBreakdown(
-                            baseSubtotal, addons, discountAmount, tip, delivery, tax, service, total, userId, userName
+                            baseSubtotal, addons, discountAmount, tip,
+                            delivery, tax, service, total,
+                            userId, userName
                     );
                 }
             }
-        } catch (IOException ignored) {}
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException reading payment breakdown: " + e.getMessage());
+        }
 
         return null;
     }
 
-    public static void savePaymentBreakdown(
-            int paymentId,
-            double baseSubtotal,
-            double addons,
-            double discountAmount,
-            double tip,
-            double delivery,
-            double tax,
-            double service,
-            double total,
-            int userId,
-            String userName
-    ) throws IOException {
-
+    public static List<History.HistoryRecord> loadPaymentHistory() {
         StorageInit.ensureDataDir();
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.PAYMENT_BREAKDOWN_FILE, true))) {
-            dos.writeByte(REC_BREAKDOWN);
-            dos.writeInt(paymentId);
-            dos.writeDouble(baseSubtotal);
-            dos.writeDouble(addons);
-            dos.writeDouble(discountAmount);
-            dos.writeDouble(tip);
-            dos.writeDouble(delivery);
-            dos.writeDouble(tax);
-            dos.writeDouble(service);
-            dos.writeDouble(total);
-            dos.writeInt(userId);
-            dos.writeUTF(userName);
+        List<History.HistoryRecord> list = new ArrayList<>();
+
+        File f = StoragePaths.PAYMENTS_FILE;
+        if (!f.exists()) return list;
+
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
+            while (true) {
+                byte type = dis.readByte();
+                if (type != REC_PAYMENT_V2) {
+                    throw new IOException("Unknown record type in payments.dat: " + type);
+                }
+
+                int pid = dis.readInt();
+
+                int userId = dis.readInt();
+                dis.readUTF(); // userName snapshot (HistoryRecord currently doesn't show it)
+                String method = dis.readUTF();
+                String timestamp = dis.readUTF();
+
+                // breakdown
+                dis.readDouble(); // baseSubtotal
+                dis.readDouble(); // addons
+                dis.readDouble(); // discount
+                dis.readDouble(); // tip
+                dis.readDouble(); // delivery
+                dis.readDouble(); // tax
+                dis.readDouble(); // service
+                double total = dis.readDouble();
+
+                int itemCount = dis.readInt();
+                for (int i = 0; i < itemCount; i++) {
+                    dis.readInt();
+                    dis.readInt();
+                    dis.readDouble();
+                    dis.readUTF();
+                }
+
+                list.add(new History.HistoryRecord(
+                        userId, pid, timestamp, total, "Success", method
+                ));
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            System.err.println("IOException reading payment history: " + e.getMessage());
         }
+
+        return list;
+    }
+
+    public static Map<Integer, Integer> getCartItemsForPayment(int paymentId) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (PaymentItem it : getPaymentItems(paymentId)) {
+            map.put(it.foodId, it.qty);
+        }
+        return map;
     }
 }

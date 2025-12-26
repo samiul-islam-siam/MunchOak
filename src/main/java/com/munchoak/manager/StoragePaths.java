@@ -24,11 +24,8 @@ public final class StoragePaths {
     // Notifications (renamed)
     public static final File NOTIFICATIONS_FILE = new File(DATA_DIR, "notifications.dat");
 
-    // Payment
-    public static final File PAYMENT_MASTER_FILE = new File(DATA_DIR, "payments.dat");
-    public static final File PAYMENTS_FILE = PAYMENT_MASTER_FILE;
-    public static final File PAYMENT_ITEMS_FILE = PAYMENT_MASTER_FILE;
-    public static final File PAYMENT_BREAKDOWN_FILE = PAYMENT_MASTER_FILE;
+    // Payment (ONE FILE)
+    public static final File PAYMENTS_FILE = new File(DATA_DIR, "payments.dat");
 
     // Coupons
     public static final File COUPON_USAGE_FILE = new File(DATA_DIR, "coupon_usage.dat");
@@ -38,13 +35,7 @@ public final class StoragePaths {
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
 
-    public static File getMenuFile() {
-        return MENU_FILE;
-    }
-
-    public static void setMenuFile(File file) {
-        MENU_FILE = file;
-    }
-
+    public static File getMenuFile() { return MENU_FILE; }
+    public static void setMenuFile(File file) { MENU_FILE = file; }
     public static File getMenuPointerFile() { return MENU_POINTER_FILE; }
 }

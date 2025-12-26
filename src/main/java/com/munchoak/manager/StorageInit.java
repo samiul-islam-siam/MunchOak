@@ -9,7 +9,6 @@ public final class StorageInit {
     public static void init() {
         try {
             ensureDataDir();
-            deleteLegacyFiles();          // <-- add
             MenuStorage.loadAttachedMenu();
             ensureAdminFile();
         } catch (IOException e) {
@@ -39,8 +38,8 @@ public final class StorageInit {
             // notifications (renamed from messages.dat)
             if (!StoragePaths.NOTIFICATIONS_FILE.exists()) StoragePaths.NOTIFICATIONS_FILE.createNewFile();
 
-            // payment
-            if (!StoragePaths.PAYMENT_MASTER_FILE.exists()) StoragePaths.PAYMENT_MASTER_FILE.createNewFile();
+            // payment (single file)
+            if (!StoragePaths.PAYMENTS_FILE.exists()) StoragePaths.PAYMENTS_FILE.createNewFile();
 
             // seed categories if empty/new
             CategoryStorage.ensureSeedCategories();
@@ -54,20 +53,6 @@ public final class StorageInit {
         File admin = StoragePaths.ADMIN_FILE;
         if (!admin.exists()) {
             StoragePaths.ADMIN_FILE.createNewFile();
-        }
-    }
-
-    private static void deleteLegacyFiles() {
-        // delete reservation_status.dat (legacy)
-        File oldResStatus = new File(StoragePaths.DATA_DIR, "reservation_status.dat");
-        if (oldResStatus.exists() && !oldResStatus.delete()) {
-            System.err.println("Warning: could not delete legacy file reservation_status.dat");
-        }
-
-        // delete messages.dat (legacy)
-        File oldMessages = new File(StoragePaths.DATA_DIR, "messages.dat");
-        if (oldMessages.exists() && !oldMessages.delete()) {
-            System.err.println("Warning: could not delete legacy file messages.dat");
         }
     }
 }

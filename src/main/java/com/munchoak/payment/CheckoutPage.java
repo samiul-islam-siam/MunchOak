@@ -832,26 +832,40 @@ public class CheckoutPage {
                 Session.getMenuClient().sendMenuUpdate();
 
                 Payment.checkout(cart);
-                int paymentId = PaymentStorage.createPaymentAndCart(
-                        Session.getCurrentUserId(),
-                        cart,
-                        foodMap,
-                        "card",
-                        totalPayable
-                );
 
-                PaymentStorage.savePaymentBreakdown(
-                        paymentId,
-                        finalBaseSubtotal,          // ✅ base subtotal (without add-ons)
-                        TOTAL,                 // ✅ addons total
-                        discountAmount,
-                        tip,
+                // Build snapshot items list (price + name at purchase time)
+                List<PaymentItem> paymentItems = new ArrayList<>();
+                for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+                    int foodId = entry.getKey();
+                    int qty = entry.getValue();
+                    FoodItems fi = foodMap.get(foodId);
+                    if (fi == null) continue;
+                    paymentItems.add(new PaymentItem(foodId, qty, fi.getPrice(), fi.getName()));
+                }
+
+// Build breakdown snapshot (store everything needed for bill)
+                PaymentBreakdown breakdown = new PaymentBreakdown(
+                        finalBaseSubtotal,          // baseSubtotal (without addons)
+                        TOTAL,                      // addons
+                        discountAmount,             // discountAmount (money)
+                        tip,                        // tip
                         deliveryAmount,
                         taxAmount,
                         serviceFeeAmount,
-                        totalPayable,
+                        totalPayable,               // total
                         Session.getCurrentUserId(),
                         Session.getCurrentUsername()
+                );
+
+                int paymentId = PaymentStorage.createPaymentV2(
+                        Session.getCurrentUserId(),
+                        Session.getCurrentUsername(),      // snapshot username
+                        cart,
+                        foodMap,
+                        "card",
+                        java.time.Instant.now().toString(),
+                        breakdown,
+                        paymentItems
                 );
 
                 // AFTER Payment.checkout(cart);

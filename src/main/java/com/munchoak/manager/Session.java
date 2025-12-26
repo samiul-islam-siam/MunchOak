@@ -151,14 +151,19 @@ public class Session {
     public static void refreshAdminFromFile() throws IOException {
         List<String> lines = AdminStorage.readLines();
         boolean found = false;
+
         for (String line : lines) {
             String[] parts = line.split(",");
-            if (parts[0].equals(AdminStorage.ADMIN_ID) && parts.length >= 5) {
+            if (parts.length >= 5 && parts[0].equals(AdminStorage.ADMIN_ID)) {
                 currentUserId = Integer.parseInt(parts[0]);
                 currentUsername = parts[1];
                 currentEmail = parts[2];
                 currentContactNo = parts[3];
-                currentPassword = parts[4];
+
+                // parts[4] is "salt:hash" -> store hash-only for consistency with getAdminPassword()
+                String[] saltAndHash = parts[4].split(":");
+                currentPassword = (saltAndHash.length == 2) ? saltAndHash[1] : "N/A";
+
                 isAdmin = true;
                 isGuest = false;
                 found = true;
@@ -166,7 +171,6 @@ public class Session {
             }
         }
 
-        // Only fallback if admin.dat had no valid line
         if (!found) {
             currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
             currentUsername = "admin";

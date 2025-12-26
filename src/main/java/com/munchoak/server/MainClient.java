@@ -409,7 +409,7 @@ public class MainClient {
 
     public synchronized void sendPaymentFileUpdate() {
         try {
-            File paymentsFile = StoragePaths.PAYMENT_MASTER_FILE; // payments.dat
+            File paymentsFile = StoragePaths.PAYMENTS_FILE; // payments.dat
 
             if (paymentsFile.exists()) {
                 byte[] data = readAllBytes(paymentsFile.toPath());
