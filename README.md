@@ -14,26 +14,30 @@ this project demonstrates both frontend UI design and backend file system manage
 ### **User Features**
 
 * Login or browse as guest
-* Explore an interactive menu with detailed food items
+* Explore an interactive menu with detailed food items and add-ons
 * Add items to the cart & place orders (only for logged-in users)
-* Reserve tables (only for logged-in users)
+* Request reserving tables and get notifications (only for logged-in users)
 * Real-time chat with admin using socket communication
-* User login is synchronized over the connected network
+* All files are synchronized over the connected network
 * Smooth UI with animations and organized pages
+* Edit or update profile
 
 ### **Admin Features**
 
-* Dynamically update menu or food items
-* Manage menu items through an admin dashboard
+* Dynamically update menu, food items or coupons
+* Manage menu items, users, coupons through an admin dashboard
 * Live chat with customers
+* Graphical daily analytics
+* Update profile or change password
 
 ### **Networking**
 
 * Custom-built **Chat Server**
 * Multiple clients can communicate with the admin
 * User to user communication is prohibited
+* Automatic server detection
 * Real-time message flow
-* Menu Server to update Food Items
+* Central Main Server to synchronize all files
 * Real-time updated menu page and user synchronization
 
 ## 📁 **Project Structure**
@@ -56,22 +60,19 @@ MunchOak/
         │           ├── AppLauncher.java            # Application entry / launcher
         │           │
         │           ├── authentication/             # Login, profile & password management
-        │           │   ├── AdminEditProfilePopup.java
-        │           │   ├── ChangeAdminPasswordPage.java
-        │           │   ├── ChangePasswordPopup.java
-        │           │   ├── EditProfilePopup.java
+        │           │   ├── ChangeAdminPassPopup.java
+        │           │   ├── ChangeUserPassPopup.java
+        │           │   ├── EditAdminProfilePopup.java
+        │           │   ├── EditUserProfilePopup.java
         │           │   ├── LoginPage.java
+        │           │   ├── PasswordPolicy.java
         │           │   ├── PasswordStorage.java
         │           │   ├── PasswordUtil.java
         │           │   └── ProfilePage.java
         │           │
         │           ├── cart/                       # Cart UI, pricing, cart state & helpers
         │           │   ├── Cart.java
-        │           │   ├── CartItemView.java
-        │           │   ├── CartNavbarView.java
         │           │   ├── CartPage.java
-        │           │   ├── CartPageState.java
-        │           │   ├── CartPricing.java
         │           │   └── CartSearchCardFactory.java
         │           │
         │           ├── coupon/                     # Coupon CRUD + coupon persistence
@@ -143,7 +144,7 @@ MunchOak/
                 └── munchoak/
                     ├── manager/
                     │   ├── data/
-                    │   └── images
+                    │   └── images/
                     │
                     ├── network/
                     |   ├── chats/
@@ -151,7 +152,7 @@ MunchOak/
                     │
                     └── view/
                         ├── styles/
-                        └── images
+                        └── images/
 ```
 ## **Tools**
 
@@ -170,25 +171,19 @@ MunchOak/
 1. Import the project into **IntelliJ IDEA**.
 2. Allow Maven to download all JavaFX dependencies.
 3. Build the entire project.
-4. First run `MenuServer.java` and then `ChatServer.java`.
-5. Navigate to:
+4. Run `AppLauncher.java`
 
-```
-src/main/java/com/example/munchoak/Home.java
-```
-
-6. Run `Home.java` to start the system.
-
-### **Connecting to the Menu & Chat Server**
+### **Connecting to the Server**
 
 #### **On Windows**
 
 1. **Turn off Windows Defender Firewall**
    (Required for socket communication over LAN)
 2. Choose only one PC as the **server** <br> 
-   Menu Server will run at port 8080 and Chat Server will run at port 5050
+   Main Server will run at port 8080 and Chat Server will run at port 5050
 3. All other devices must be connected to the **same Wi-Fi network**
-4. To test connectivity, run:
+4. After running app, if servers are running already then it will automatically detect it and connect to it.
+5. To test connectivity, run:
 
    ```
    ping <server IPv4 address>
@@ -199,6 +194,14 @@ src/main/java/com/example/munchoak/Home.java
    ```
    ping 10.33.22.87
    ```
+   
+## Executable File Link
+
+   MunchOak App: `https://drive.google.com/file/d/18RLX461iS06rpHKSpuBKuonKj5VyW_My/view?usp=drive_link` <br>
+   
+   Run this command in the terminal before running the app:
+   
+   `netsh advfirewall firewall add rule name="MunchOak UDP Discovery" dir=in action=allow protocol=UDP localport=5051`
 
 ## **Contributors**
 
