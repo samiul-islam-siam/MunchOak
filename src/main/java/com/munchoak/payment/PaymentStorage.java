@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class PaymentStorage {
-    private PaymentStorage() {}
+    private PaymentStorage() {
+    }
 
     /**
      * Single-record-per-payment format.
@@ -23,47 +24,8 @@ public final class PaymentStorage {
 
     // -------------------- WRITE --------------------
 
-    public static int createPaymentAndCart(
-            int userId,
-            Cart cart,
-            Map<Integer, FoodItems> foodMap,
-            String method,
-            double finalTotal
-    ) throws IOException {
-
-        StorageInit.ensureDataDir();
-
-        int paymentId = getNextPaymentId();
-        String timestamp = Instant.now().toString();
-
-        // Prepare items snapshot (price + name at purchase time)
-        List<PaymentItem> items = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
-            int foodId = e.getKey();
-            int qty = e.getValue();
-            FoodItems fi = foodMap.get(foodId);
-            if (fi == null) continue;
-
-            items.add(new PaymentItem(foodId, qty, fi.getPrice(), fi.getName()));
-        }
-
-        // Write a minimal payment record now. Breakdown is saved via savePaymentBreakdownV2(...)
-        // To keep atomic & consistent, we will write EVERYTHING in one go here by requiring breakdown later.
-        // BUT your CheckoutPage calls createPaymentAndCart() before savePaymentBreakdown().
-        // So: we will write a placeholder breakdown here, then "update" is not possible in append-only.
-        //
-        // Best fix: createPaymentAndCartV2(...) must receive breakdown fields too.
-        //
-        // For compatibility with your current flow, we will:
-        // - write the full record WITHOUT breakdown
-        // - and include breakdown values as 0 for now, then your receipt should NOT depend on them -> but it does.
-        //
-        // Therefore: CHANGE CheckoutPage to call createPaymentV2(...) with breakdown included.
-        throw new IOException("PaymentStorage.createPaymentAndCart is deprecated. Use createPaymentV2(...) with breakdown fields.");
-    }
-
     /**
-     * New V2 writer: writes ONE complete payment record including breakdown + items.
+     * ONE complete payment record including breakdown + items.
      */
     public static int createPaymentV2(
             int userId,

@@ -3,7 +3,8 @@ package com.munchoak.manager;
 import java.io.File;
 
 public final class StoragePaths {
-    private StoragePaths() {}
+    private StoragePaths() {
+    }
 
     public static final File DATA_DIR = new File("src/main/resources/com/munchoak/manager/data");
 
@@ -35,7 +36,15 @@ public final class StoragePaths {
     private static File MENU_FILE = new File(DATA_DIR, "menu.dat");
     private static final File MENU_POINTER_FILE = new File(DATA_DIR, "menu_pointer.dat");
 
-    public static File getMenuFile() { return MENU_FILE; }
-    public static void setMenuFile(File file) { MENU_FILE = file; }
-    public static File getMenuPointerFile() { return MENU_POINTER_FILE; }
+    public static File getMenuFile() {
+        return MENU_FILE;
+    }
+
+    public static void setMenuFile(File file) {
+        MENU_FILE = file;
+    }
+
+    public static File getMenuPointerFile() {
+        return MENU_POINTER_FILE;
+    }
 }

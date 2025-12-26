@@ -27,7 +27,7 @@ public class History {
     private final Cart cart;  // To support reordering into current cart
     private ObservableList<HistoryRecord> historyData;
 
-    // UPDATED: Overloaded constructor for backward compatibility (creates new Cart if not provided)
+    // Overloaded constructor for backward compatibility (creates new Cart if not provided)
     public History(Stage primaryStage) {
         this(primaryStage, new Cart());
     }
@@ -108,8 +108,7 @@ public class History {
                     }
 
                     // If all items are available, add them to cart
-                    if(isavailable)
-                    {
+                    if (isavailable) {
                         for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
                             cart.addToCart(entry.getKey(), entry.getValue());
                         }
@@ -117,8 +116,7 @@ public class History {
 
 
                     // Navigate to Cart page to view updated cart
-                    if(isavailable)
-                    {
+                    if (isavailable) {
                         primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
                     }
 
@@ -185,7 +183,7 @@ public class History {
                     s.userId,
                     s.paymentId,
                     s.timestamp,
-                    s.amount,            // ✅ no math
+                    s.amount,
                     "Success",
                     s.paymentMethod
             ));

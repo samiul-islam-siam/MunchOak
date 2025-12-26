@@ -11,7 +11,8 @@ import java.io.IOException;
  * Keep ONLY generic helpers here, not domain logic.
  */
 public final class StorageUtil {
-    private StorageUtil() {}
+    private StorageUtil() {
+    }
 
     public static int generateNextIdInFile(File f, int startIfEmpty) {
         StorageInit.ensureDataDir();
@@ -51,9 +52,8 @@ public final class StorageUtil {
                     dis.readInt();
                     dis.readInt();
                     dis.readUTF();
-                }}
-
-            else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
+                }
+            } else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // resId
                     dis.readUTF(); // name

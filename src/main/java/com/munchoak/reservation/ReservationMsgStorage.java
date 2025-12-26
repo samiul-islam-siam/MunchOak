@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ReservationMsgStorage {
-    private ReservationMsgStorage() {}
+    private ReservationMsgStorage() {
+    }
 
     public static class MessageRecord {
         public final int userId;

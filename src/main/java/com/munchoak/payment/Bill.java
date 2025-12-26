@@ -21,7 +21,7 @@ public class Bill {
         this.baseSubtotal = baseSubtotal;
     }
 
-    // NEW: Always-correct history receipt (menu-independent)
+    // Always-correct history receipt (menu-independent)
     public static String generateReceiptFromSnapshot(int paymentId, String timestampFromHistory) {
         PaymentBreakdown b = PaymentStorage.getPaymentBreakdown(paymentId);
 

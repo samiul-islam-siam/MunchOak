@@ -40,7 +40,7 @@ public class EditAdminProfilePopup {
         Label newPassLabel = new Label("New Password:");
         Label confirmPassLabel = new Label("Confirm Password:");
 
-        for (Label label : new Label[] { adminIdLabel, usernameLabel, emailLabel, contactLabel, newPassLabel, confirmPassLabel}) {
+        for (Label label : new Label[]{adminIdLabel, usernameLabel, emailLabel, contactLabel, newPassLabel, confirmPassLabel}) {
             label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: black;");
             label.setPrefWidth(120);
         }

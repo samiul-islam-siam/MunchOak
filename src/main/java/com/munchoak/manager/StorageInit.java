@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 public final class StorageInit {
-    private StorageInit() {}
+    private StorageInit() {
+    }
 
     public static void init() {
         try {

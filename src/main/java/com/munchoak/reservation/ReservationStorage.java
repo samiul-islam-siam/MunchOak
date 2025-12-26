@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ReservationStorage {
-    private ReservationStorage() {}
+    private ReservationStorage() {
+    }
 
     /**
      * NEW reservations.dat format (single file, latest-only status):
-     *
+     * <p>
      * int    resId
      * UTF    name
      * UTF    phone

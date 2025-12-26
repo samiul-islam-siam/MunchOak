@@ -31,7 +31,7 @@ import java.util.Optional;
 
 public class ReservationPage {
     private final Stage primaryStage;
-    private final Cart cart;  // ADDED: Cart field for state persistence
+    private final Cart cart;  // Cart field for state persistence
 
     public ReservationPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;

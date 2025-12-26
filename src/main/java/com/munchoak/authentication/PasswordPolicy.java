@@ -1,7 +1,8 @@
 package com.munchoak.authentication;
 
 public final class PasswordPolicy {
-    private PasswordPolicy() {}
+    private PasswordPolicy() {
+    }
 
     // One consistent special set across the whole app
     private static final String SPECIAL = "!@#$%^&*()_+-=[]{}|;:'\",.<>/?";

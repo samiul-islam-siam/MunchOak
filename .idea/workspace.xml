@@ -9,31 +9,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="bug fix (bill)">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/PasswordPolicy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/AdminEditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditAdminProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPasswordPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPassPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangePasswordPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeUserPassPopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditProfilePopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/EditUserProfilePopup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ProfilePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ProfilePage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/AdminHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/AdminHome.java" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Final version!">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/Cart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/Cart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartItemView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartNavbarView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartPageState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartPricing.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartSearchCardFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/cart/CartSearchCardFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/AddCouponPopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/CouponStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/CouponStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/coupon/EditCouponPopup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/FoodItems.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/mainpage/FoodItems.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/AdminStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/AdminStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/CategoryStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/CategoryStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/MenuStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageInit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StoragePaths.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/StorageUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/UserStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/UserStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/BaseMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/BaseMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/Bill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/Bill.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/CheckoutPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/History.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/PaymentItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/PaymentItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/PaymentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/payment/PaymentStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupon_usage.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupon_usage.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/menu_pointer.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/menu_pointer.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons1.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons1.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/AboutUsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/AboutUsPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationMsgStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/reservation/ReservationStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/server/MainServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -202,15 +209,7 @@
       <workItem from="1766582889624" duration="11922000" />
       <workItem from="1766634095761" duration="13800000" />
       <workItem from="1766671701525" duration="11032000" />
-      <workItem from="1766716625861" duration="5888000" />
-    </task>
-    <task id="LOCAL-00056" summary="Comment added">
-      <option name="closed" value="true" />
-      <created>1763402303456</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1763402303456</updated>
+      <workItem from="1766716625861" duration="7401000" />
     </task>
     <task id="LOCAL-00057" summary="Comment added">
       <option name="closed" value="true" />
@@ -596,14 +595,21 @@
       <option name="project" value="LOCAL" />
       <updated>1766684228280</updated>
     </task>
-    <option name="localTasksCounter" value="105" />
+    <task id="LOCAL-00105" summary="Final version!">
+      <option name="closed" value="true" />
+      <created>1766722897962</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1766722897962</updated>
+    </task>
+    <option name="localTasksCounter" value="106" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bill Bug fixes" />
     <MESSAGE value="menu file updated" />
     <MESSAGE value="Menu Synchronized!" />
     <MESSAGE value="UI pattern update" />
@@ -628,7 +634,8 @@
     <MESSAGE value="bug fix (bill, reservation)" />
     <MESSAGE value="bug fix (reservation window)" />
     <MESSAGE value="bug fix (bill)" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug fix (bill)" />
+    <MESSAGE value="Final version!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final version!" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class UserStorage {
-    private UserStorage() {}
+    private UserStorage() {
+    }
 
     public static boolean userExists(String username) {
         StorageInit.ensureDataDir();
@@ -23,7 +24,8 @@ public final class UserStorage {
             if (user[0].equals(username)) {
                 try {
                     return Integer.parseInt(user[4]);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
         return -1;

@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Stores and manages admin credentials/info in admin.dat.
  * Format (single line preferred):
- *   ADMIN_ID,username,email,contact,salt:hash
- *
+ * ADMIN_ID,username,email,contact,salt:hash
+ * <p>
  * Rules:
  * - ADMIN_ID is constant and cannot be changed.
  * - Admin username is constant once created (cannot be changed via update methods).
@@ -20,7 +20,8 @@ public final class AdminStorage {
 
     public static final String ADMIN_ID = "2104";
 
-    private AdminStorage() {}
+    private AdminStorage() {
+    }
 
     // ---------- Public API ----------
 

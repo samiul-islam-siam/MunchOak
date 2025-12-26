@@ -54,8 +54,6 @@ public class ReservationMsgPage {
 
         // CHAT AREA FOR INCOMING MESSAGES ONLY
         VBox chatArea = new VBox(10);
-        // chatArea.setPrefWidth(800); // Increased horizontally
-        // chatArea.setPrefHeight(500); // Increased vertically
         chatArea.setFillWidth(true);
         VBox.setVgrow(chatArea, Priority.ALWAYS);
 
@@ -66,7 +64,6 @@ public class ReservationMsgPage {
                 -fx-background-radius: 10;
                 -fx-padding: 10;
                 """);
-
 
 
         // Initial placeholder
@@ -82,6 +79,7 @@ public class ReservationMsgPage {
         chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         chatScroll.setStyle("-fx-background-color: transparent;");
+
         // allow it to grow
         VBox.setVgrow(chatScroll, Priority.ALWAYS);
 
@@ -118,13 +116,13 @@ public class ReservationMsgPage {
 
         msgLabel.setPadding(new Insets(10, 15, 10, 15));
         msgLabel.setStyle("""
-            -fx-background-color: #E3F2FD;
-            -fx-background-radius: 18px;
-            -fx-border-radius: 18px;
-            -fx-border-color: #BBDEFB;
-            -fx-border-width: 1px;
-            -fx-text-fill: #001F3F;
-            """);
+                -fx-background-color: #E3F2FD;
+                -fx-background-radius: 18px;
+                -fx-border-radius: 18px;
+                -fx-border-color: #BBDEFB;
+                -fx-border-width: 1px;
+                -fx-text-fill: #001F3F;
+                """);
 
         HBox messageContainer = new HBox(msgLabel);
         messageContainer.setAlignment(Pos.CENTER_LEFT);
