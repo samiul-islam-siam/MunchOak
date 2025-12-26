@@ -9,12 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Final Server commit">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Final commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/LoginPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/manager/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPassPopup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/authentication/ChangeAdminPassPopup.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,15 +182,8 @@
       <workItem from="1766671701525" duration="11032000" />
       <workItem from="1766716625861" duration="9190000" />
       <workItem from="1766740981644" duration="853000" />
-      <workItem from="1766754287847" duration="1487000" />
-    </task>
-    <task id="LOCAL-00059" summary="UI upgrade">
-      <option name="closed" value="true" />
-      <created>1763443631483</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1763443631483</updated>
+      <workItem from="1766754287847" duration="4163000" />
+      <workItem from="1766760453242" duration="536000" />
     </task>
     <task id="LOCAL-00060" summary="bug fixes">
       <option name="closed" value="true" />
@@ -579,7 +569,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766742537686</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="Final commit">
+      <option name="closed" value="true" />
+      <created>1766756100500</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1766756100500</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -609,9 +607,9 @@
     <MESSAGE value="bug fix (reservation window)" />
     <MESSAGE value="bug fix (bill)" />
     <MESSAGE value="Final version!" />
-    <MESSAGE value="Final commit" />
     <MESSAGE value="Final Server commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Final Server commit" />
+    <MESSAGE value="Final commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final commit" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

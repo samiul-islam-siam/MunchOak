@@ -2,6 +2,7 @@ package com.munchoak.authentication;
 
 import com.munchoak.mainpage.AdminHome;
 import com.munchoak.manager.AdminStorage;
+import com.munchoak.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -99,6 +100,7 @@ public class ChangeAdminPassPopup {
 
             try {
                 AdminStorage.setAdminPassword(newPass);
+                Session.getMenuClient().sendAdminFileUpdate();
 
                 status.setText("Password changed successfully!");
                 status.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
