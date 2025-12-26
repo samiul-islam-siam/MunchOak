@@ -11,11 +11,8 @@ import java.io.IOException;
  * Keep ONLY generic helpers here, not domain logic.
  */
 public final class StorageUtil {
-    private StorageUtil() {}
-    public static final byte REC_PAYMENT = 1;
-    public static final byte REC_PAYMENT_ITEM = 2;
-    public static final byte REC_BREAKDOWN = 3;
-
+    private StorageUtil() {
+    }
 
     public static int generateNextIdInFile(File f, int startIfEmpty) {
         StorageInit.ensureDataDir();
@@ -23,35 +20,7 @@ public final class StorageUtil {
 
         try (DataInputStream dis = new DataInputStream(new FileInputStream(f))) {
 
-            if (f.equals(StoragePaths.PAYMENT_MASTER_FILE)) {
-                while (dis.available() > 0) {
-                    byte type = dis.readByte();
-
-                    if (type == REC_PAYMENT) {
-                        lastId = dis.readInt(); // paymentId
-                        dis.readInt();
-                        dis.readDouble();
-                        dis.readUTF();
-                        dis.readUTF();
-                    }
-                    else if (type == REC_PAYMENT_ITEM) {
-                        dis.readInt(); // paymentItemId
-                        dis.readInt();
-                        dis.readInt();
-                        dis.readInt();
-                        dis.readDouble();
-                        dis.readUTF();
-                    }
-                    else if (type == REC_BREAKDOWN) {
-                        dis.readInt();
-                        for (int i = 0; i < 8; i++) dis.readDouble();
-                        dis.readInt();
-                        dis.readUTF();
-                    }
-                }
-            }
-
-            else if (f.equals(StoragePaths.USERS_FILE)) {
+            if (f.equals(StoragePaths.USERS_FILE)) {
                 while (dis.available() > 0) {
                     dis.readUTF();
                     dis.readUTF();
@@ -83,20 +52,21 @@ public final class StorageUtil {
                     dis.readInt();
                     dis.readInt();
                     dis.readUTF();
-                }}
-
-            else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
+                }
+            } else if (f.equals(StoragePaths.RESERVATIONS_FILE)) {
                 while (dis.available() > 0) {
                     lastId = dis.readInt(); // resId
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readInt();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readUTF();
-                    dis.readInt();
+                    dis.readUTF(); // name
+                    dis.readUTF(); // phone
+                    dis.readInt(); // guests
+                    dis.readUTF(); // date
+                    dis.readUTF(); // time
+                    dis.readUTF(); // request
+                    dis.readUTF(); // createdAt
+                    dis.readUTF(); // username
+                    dis.readInt(); // userId
+                    dis.readUTF(); // status
+                    dis.readUTF(); // statusUpdatedAt
                 }
             }
 

@@ -1,8 +1,9 @@
 package com.munchoak;
 
-import com.munchoak.server.MainServer;
 import com.munchoak.mainpage.Home;
 import com.munchoak.network.ChatServer;
+import com.munchoak.network.LanDiscoveryBroadcaster;
+import com.munchoak.server.MainServer;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -35,10 +36,13 @@ public class AppLauncher {
             }
         }
 
+        // ---- LAN Discovery Broadcaster (UDP) ----
+        // Other devices can discover this server automatically.
+        LanDiscoveryBroadcaster.start(8080, 5050);
+
         // Home UI
         Home.main(args);
     }
-
 
     private static boolean isPortInUse(String host, int port) {
         try (Socket socket = new Socket(host, port)) {

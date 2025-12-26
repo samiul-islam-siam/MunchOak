@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CategoryStorage {
-    private CategoryStorage() {}
+    private CategoryStorage() {
+    }
 
     static void ensureSeedCategories() throws IOException {
         // If file was just created and empty, seed it.

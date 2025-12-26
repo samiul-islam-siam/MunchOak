@@ -8,7 +8,8 @@ import java.io.*;
 import java.util.List;
 
 public final class PasswordStorage {
-    private PasswordStorage() {}
+    private PasswordStorage() {
+    }
 
     public static boolean verifyUserPassword(String username, String password) {
         StorageInit.ensureDataDir();

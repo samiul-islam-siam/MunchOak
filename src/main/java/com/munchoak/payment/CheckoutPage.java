@@ -2,14 +2,14 @@ package com.munchoak.payment;
 
 import com.munchoak.authentication.LoginPage;
 import com.munchoak.authentication.ProfilePage;
-import com.munchoak.homepage.HomePage;
+import com.munchoak.cart.Cart;
+import com.munchoak.cart.CartPage;
 import com.munchoak.coupon.CouponStorage;
+import com.munchoak.homepage.HomePage;
+import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.MenuStorage;
 import com.munchoak.manager.Session;
 import com.munchoak.menu.MenuPage;
-import com.munchoak.cart.Cart;
-import com.munchoak.cart.CartPage;
-import com.munchoak.mainpage.FoodItems;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.beans.value.ChangeListener;
@@ -38,11 +38,11 @@ import java.util.stream.Collectors;
 public class CheckoutPage {
     private final Stage primaryStage;
     private final Cart cart;
-    private final double discount; // FIXED: Added field for passed discount
-    private final double tip; // FIXED: Added field for passed tip
+    private final double discount; // Added field for passed discount
+    private final double tip; // Added field for passed tip
     private final String appliedCouponCode;
 
-    // FIXED: Updated constructor to accept discount and tip
+    // Updated constructor to accept discount and tip
     public CheckoutPage(Stage primaryStage, Cart cart, double discount, double tip, String appliedCouponCode) {
         this.primaryStage = primaryStage;
         this.cart = cart;
@@ -84,9 +84,11 @@ public class CheckoutPage {
         starsHBox.setAlignment(Pos.CENTER);
         AtomicInteger currentRating = new AtomicInteger(5); // Default rating
         List<Label> stars = new ArrayList<>();
+
         for (int i = 1; i <= 5; i++) {
             Label star = new Label(currentRating.get() >= i ? "★" : "☆");
             star.setStyle("-fx-font-size: 24px; -fx-cursor: hand; -fx-text-fill: gold;");
+
             // Initial glow for filled stars
             if (currentRating.get() >= i) {
                 Glow glow = new Glow(0.5);
@@ -95,10 +97,12 @@ public class CheckoutPage {
                 star.setEffect(null);
             }
             final int rating = i;
+
             // Click event with pulse animation
             star.setOnMouseClicked(e -> {
                 currentRating.set(rating);
                 updateStars(stars, currentRating.get());
+
                 // Pulse animation on click
                 ScaleTransition pulse = new ScaleTransition(Duration.millis(150), star);
                 pulse.setToX(1.3);
@@ -107,6 +111,7 @@ public class CheckoutPage {
                 pulse.setCycleCount(2);
                 pulse.play();
             });
+
             // Enter event with scale up animation and enhanced glow
             star.setOnMouseEntered(e -> {
                 updateStars(stars, rating, true);
@@ -202,7 +207,7 @@ public class CheckoutPage {
     public Scene getScene() {
         Map<Integer, FoodItems> foodMap = buildFoodMap();
 
-        // FIXED: Calculate base subtotal and total add-ons to match CartPage
+        // Calculate base subtotal and total add-ons to match CartPage
         double baseSubtotal = 0.0;
         double totalAddons = 0.0;
         for (Map.Entry<Integer, Integer> e : cart.getBuyHistory().entrySet()) {
@@ -221,6 +226,7 @@ public class CheckoutPage {
         double taxAmount = 7.00; // Fixed from Cart
         double serviceFeeAmount = 1.50; // Fixed from Cart
         double deliveryAmount = 7.99; // Fixed from Cart
+
         //  double totalPayable = isEmptyCart ? 0.0 : (subtotal - discount + deliveryAmount + tip + serviceFeeAmount + taxAmount);
         double discountAmount = subtotal * discount; // discount is percentage (e.g. 0.1 = 10%)
         double discountedSubtotal = subtotal - discountAmount;
@@ -314,6 +320,7 @@ public class CheckoutPage {
         // Initially hide the search results wrapper
         searchResultsWrapper.setVisible(false);
         searchResultsWrapper.setManaged(false);
+
         // Live search: triggers on every text change
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             String keyword = newValue.trim().toLowerCase();
@@ -334,7 +341,6 @@ public class CheckoutPage {
                     noResult.setStyle("-fx-padding: 10; -fx-text-fill: red; -fx-font-size: 14px;");
 
                     searchResultsPane.getChildren().add(noResult);
-                    //resultsContainer.getChildren().setAll(noResult);
                     return;
                 }
 
@@ -399,10 +405,7 @@ public class CheckoutPage {
             }
         });
 
-
         searchField.setOnAction(e -> searchBtn.fire());
-        //searchContainer.getChildren().addAll(searchField, searchBtn);
-
 
         // SPACERS
         Region spacer1 = new Region();
@@ -418,7 +421,7 @@ public class CheckoutPage {
         homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");
         homeBtn.setOnMouseEntered(e -> homeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
         homeBtn.setOnMouseExited(e -> homeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"));
-        // FIXED: Pass cart to HomePage to preserve state during navigation
+        // Pass cart to HomePage to preserve state during navigation
         homeBtn.setOnAction(e -> primaryStage.setScene(new HomePage(primaryStage, cart).getHomeScene()));
 
         Button menuBtn = new Button("Menu");
@@ -647,7 +650,7 @@ public class CheckoutPage {
         rightColumn.setPrefWidth(350);
         rightColumn.setStyle("-fx-background-color: transparent;");
 
-        // FIXED: Updated Order Summary Box to match CartPage (breakdown with add-ons)
+        // Updated Order Summary Box to match CartPage (breakdown with add-ons)
         if (!isEmptyCart) {
             VBox summaryBox = new VBox(15);
             summaryBox.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 20; -fx-margin: 0 0 20 0;");
@@ -736,6 +739,7 @@ public class CheckoutPage {
         payBtn.setOnMouseEntered(e -> payBtn.setStyle("-fx-background-color: #e55a00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
         payBtn.setOnMouseExited(e -> payBtn.setStyle("-fx-background-color: #FF6B00; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12;"));
 
+        double finalBaseSubtotal = baseSubtotal;
         payBtn.setOnAction(e -> {
             if (cardField.getText().isEmpty() || expiryField.getText().isEmpty() || cvvField.getText().isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -831,15 +835,42 @@ public class CheckoutPage {
                 Session.getMenuClient().sendMenuUpdate();
 
                 Payment.checkout(cart);
-                int paymentId = PaymentStorage.createPaymentAndCart(
+
+                // Build snapshot items list (price + name at purchase time)
+                List<PaymentItem> paymentItems = new ArrayList<>();
+                for (Map.Entry<Integer, Integer> entry : cart.getBuyHistory().entrySet()) {
+                    int foodId = entry.getKey();
+                    int qty = entry.getValue();
+                    FoodItems fi = foodMap.get(foodId);
+                    if (fi == null) continue;
+                    paymentItems.add(new PaymentItem(foodId, qty, fi.getPrice(), fi.getName()));
+                }
+
+                // Build breakdown snapshot (store everything needed for bill)
+                PaymentBreakdown breakdown = new PaymentBreakdown(
+                        finalBaseSubtotal,          // baseSubtotal (without addons)
+                        TOTAL,                      // addons
+                        discountAmount,             // discountAmount (money)
+                        tip,                        // tip
+                        deliveryAmount,
+                        taxAmount,
+                        serviceFeeAmount,
+                        totalPayable,               // total
                         Session.getCurrentUserId(),
+                        Session.getCurrentUsername()
+                );
+
+                int paymentId = PaymentStorage.createPaymentV2(
+                        Session.getCurrentUserId(),
+                        Session.getCurrentUsername(),      // snapshot username
                         cart,
                         foodMap,
                         "card",
-                        totalPayable
+                        java.time.Instant.now().toString(),
+                        breakdown,
+                        paymentItems
                 );
 
-                PaymentStorage.savePaymentBreakdown(paymentId, subtotal, TOTAL, discountAmount, tip, deliveryAmount, taxAmount, serviceFeeAmount, totalPayable, Session.getCurrentUserId(), Session.getCurrentUsername());
                 // AFTER Payment.checkout(cart);
                 if (discount > 0) {
                     CouponStorage.consumeCoupon(appliedCouponCode, Session.getCurrentUserId());

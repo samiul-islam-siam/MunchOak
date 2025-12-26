@@ -55,7 +55,6 @@ public class ChatServer {
         }
     }
 
-
     private static List<String> readHistory(String username) {
         File f = historyFileFor(username);
         if (!f.exists()) return Collections.emptyList();
@@ -69,14 +68,13 @@ public class ChatServer {
                 lines.add(role + "|" + text);
             }
         } catch (EOFException eof) {
-            // Reached end of file — normal
+            // end of file — normal
         } catch (IOException e) {
             System.err.println("⚠️ Error reading history for " + username + ": " + e.getMessage());
         }
 
         return lines;
     }
-
 
     private static void notifyAdminsUserList() {
         String list = String.join(",", users.keySet().stream().sorted().collect(Collectors.toList()));

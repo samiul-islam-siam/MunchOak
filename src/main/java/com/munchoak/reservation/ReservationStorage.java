@@ -11,8 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ReservationStorage {
-    private ReservationStorage() {}
+    private ReservationStorage() {
+    }
 
+    /**
+     * NEW reservations.dat format (single file, latest-only status):
+     * <p>
+     * int    resId
+     * UTF    name
+     * UTF    phone
+     * int    guests
+     * UTF    date
+     * UTF    time
+     * UTF    request
+     * UTF    createdAt
+     * UTF    username
+     * int    userId
+     * UTF    status
+     * UTF    statusUpdatedAt
+     */
     public static class ReservationRecord {
         public final int resId;
         public final String name;
@@ -25,8 +42,23 @@ public final class ReservationStorage {
         public final String username;
         public final int userId;
 
-        public ReservationRecord(int resId, String name, String phone, int guests, String date, String time,
-                                 String request, String createdAt, String username, int userId) {
+        public final String status;
+        public final String statusUpdatedAt;
+
+        public ReservationRecord(
+                int resId,
+                String name,
+                String phone,
+                int guests,
+                String date,
+                String time,
+                String request,
+                String createdAt,
+                String username,
+                int userId,
+                String status,
+                String statusUpdatedAt
+        ) {
             this.resId = resId;
             this.name = name;
             this.phone = phone;
@@ -37,101 +69,191 @@ public final class ReservationStorage {
             this.createdAt = createdAt;
             this.username = username;
             this.userId = userId;
+            this.status = status;
+            this.statusUpdatedAt = statusUpdatedAt;
         }
     }
 
     public static boolean saveReservation(String name, String phone, int guests, String date, String time, String request) {
         StorageInit.ensureDataDir();
+
         try {
             int resId = StorageUtil.generateNextIdInFile(StoragePaths.RESERVATIONS_FILE, 1);
             String createdAt = Instant.now().toString();
 
+            ReservationRecord rec = new ReservationRecord(
+                    resId,
+                    name,
+                    phone,
+                    guests,
+                    date,
+                    time,
+                    request,
+                    createdAt,
+                    Session.getCurrentUsername(),
+                    Session.getCurrentUserId(),
+                    "Pending",
+                    createdAt
+            );
+
             try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.RESERVATIONS_FILE, true))) {
-                dos.writeInt(resId);
-                dos.writeUTF(name);
-                dos.writeUTF(phone);
-                dos.writeInt(guests);
-                dos.writeUTF(date);
-                dos.writeUTF(time);
-                dos.writeUTF(request);
-                dos.writeUTF(createdAt);
-                dos.writeUTF(Session.getCurrentUsername());
-                dos.writeInt(Session.getCurrentUserId());
+                writeNewFormat(dos, rec);
             }
 
-            setReservationStatus(resId, "Pending");
             return true;
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            System.err.println("Reservation save error: " + e.getMessage());
             return false;
         }
     }
 
     public static List<ReservationRecord> loadReservations() {
         StorageInit.ensureDataDir();
+
         List<ReservationRecord> list = new ArrayList<>();
         if (!StoragePaths.RESERVATIONS_FILE.exists() || StoragePaths.RESERVATIONS_FILE.length() == 0) return list;
 
         try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.RESERVATIONS_FILE))) {
             while (dis.available() > 0) {
-                int resId = dis.readInt();
-                String name = dis.readUTF();
-                String phone = dis.readUTF();
-                int guests = dis.readInt();
-                String date = dis.readUTF();
-                String time = dis.readUTF();
-                String request = dis.readUTF();
-                String createdAt = dis.readUTF();
-                String username = dis.readUTF();
-                int userId = dis.readInt();
-                list.add(new ReservationRecord(resId, name, phone, guests, date, time, request, createdAt, username, userId));
+                list.add(readNewFormat(dis));
             }
         } catch (EOFException ignored) {
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            System.err.println("Reservation load error: " + e.getMessage());
         }
+
         return list;
     }
 
+    /**
+     * Updates ONLY the clicked reservation (by resId).
+     * Works only once: once Accepted or Rejected, cannot change to the other.
+     * Rewrites reservations.dat so status is stored in the same file (latest-only).
+     *
+     * @return true if update applied (or idempotent), false if forbidden or missing.
+     */
     public static boolean setReservationStatus(int resId, String status) {
         StorageInit.ensureDataDir();
-        // Prevent invalid status changes: once Accepted or Rejected, can't switch to the other
-        String currentStatus = getReservationStatus(resId);
-        if (!"Pending".equals(currentStatus)) {
-            // Only allow changes if trying to set to the same final status (e.g., idempotent updates)
-            if (("Accepted".equals(currentStatus) && !"Accepted".equals(status)) ||
-                    ("Rejected".equals(currentStatus) && !"Rejected".equals(status))) {
-                System.err.println("Cannot change reservation " + resId + " from '" + currentStatus + "' to '" + status + "'. Final decision cannot be reversed.");
-                return false;
+
+        List<ReservationRecord> all = loadReservations();
+        boolean found = false;
+        int matches = 0;
+
+        for (int i = 0; i < all.size(); i++) {
+            ReservationRecord r = all.get(i);
+            if (r.resId != resId) continue;
+
+            matches++;
+            found = true;
+
+            String current = (r.status == null || r.status.isBlank()) ? "Pending" : r.status;
+
+            // Final decision: only allow idempotent "same status" updates.
+            if (!"Pending".equals(current)) {
+                if (current.equals(status)) {
+                    return true; // idempotent
+                }
+                return false; // forbidden (work only once)
             }
+
+            all.set(i, new ReservationRecord(
+                    r.resId,
+                    r.name,
+                    r.phone,
+                    r.guests,
+                    r.date,
+                    r.time,
+                    r.request,
+                    r.createdAt,
+                    r.username,
+                    r.userId,
+                    status,
+                    Instant.now().toString()
+            ));
+            break; // update ONLY one record
         }
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.RESERVATION_STATUS_FILE, true))) {
-            dos.writeInt(resId);
-            dos.writeUTF(status);
-            dos.writeUTF(Instant.now().toString());
-            return true;
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-            return false;
+
+        if (matches > 1) {
+            System.err.println("Warning: duplicate resId found in reservations.dat: " + resId +
+                    ". Only the first match was updated.");
         }
+
+        if (!found) return false;
+
+        return rewriteAllNewFormat(all);
     }
 
     public static String getReservationStatus(int resId) {
         StorageInit.ensureDataDir();
-        if (!StoragePaths.RESERVATION_STATUS_FILE.exists() || StoragePaths.RESERVATION_STATUS_FILE.length() == 0) return "Pending";
-
-        String last = "Pending";
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(StoragePaths.RESERVATION_STATUS_FILE))) {
-            while (dis.available() > 0) {
-                int id = dis.readInt();
-                String status = dis.readUTF();
-                dis.readUTF(); // timestamp
-                if (id == resId) last = status;
-            }
-        } catch (EOFException ignored) {
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+        for (ReservationRecord r : loadReservations()) {
+            if (r.resId == resId) return (r.status == null || r.status.isBlank()) ? "Pending" : r.status;
         }
-        return last;
+        return "Pending";
+    }
+
+    // -------------------- Low-level read/write (NEW FORMAT) --------------------
+
+    private static boolean rewriteAllNewFormat(List<ReservationRecord> list) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(StoragePaths.RESERVATIONS_FILE, false))) {
+            for (ReservationRecord r : list) {
+                writeNewFormat(dos, r);
+            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Reservation rewrite error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private static void writeNewFormat(DataOutputStream dos, ReservationRecord r) throws IOException {
+        dos.writeInt(r.resId);
+        dos.writeUTF(nullToEmpty(r.name));
+        dos.writeUTF(nullToEmpty(r.phone));
+        dos.writeInt(r.guests);
+        dos.writeUTF(nullToEmpty(r.date));
+        dos.writeUTF(nullToEmpty(r.time));
+        dos.writeUTF(nullToEmpty(r.request));
+        dos.writeUTF(nullToEmpty(r.createdAt));
+        dos.writeUTF(nullToEmpty(r.username));
+        dos.writeInt(r.userId);
+        dos.writeUTF(nullToEmpty(r.status.isBlank() ? "Pending" : r.status));
+        dos.writeUTF(nullToEmpty(r.statusUpdatedAt));
+    }
+
+    private static ReservationRecord readNewFormat(DataInputStream dis) throws IOException {
+        int resId = dis.readInt();
+        String name = dis.readUTF();
+        String phone = dis.readUTF();
+        int guests = dis.readInt();
+        String date = dis.readUTF();
+        String time = dis.readUTF();
+        String request = dis.readUTF();
+        String createdAt = dis.readUTF();
+        String username = dis.readUTF();
+        int userId = dis.readInt();
+        String status = dis.readUTF();
+        String statusUpdatedAt = dis.readUTF();
+
+        if (status == null || status.isBlank()) status = "Pending";
+        if (statusUpdatedAt == null || statusUpdatedAt.isBlank()) statusUpdatedAt = createdAt;
+
+        return new ReservationRecord(
+                resId,
+                name,
+                phone,
+                guests,
+                date,
+                time,
+                request,
+                createdAt,
+                username,
+                userId,
+                status,
+                statusUpdatedAt
+        );
+    }
+
+    private static String nullToEmpty(String s) {
+        return (s == null) ? "" : s;
     }
 }

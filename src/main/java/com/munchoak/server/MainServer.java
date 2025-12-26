@@ -33,16 +33,15 @@ public class MainServer {
     private static byte[] latestUserFile = null;
     private static String latestUserFileName = "user.dat";
 
-    // ADD near other caches
+    // ---- ADMIN CACHE ----
     private static byte[] latestAdminFile = null;
     private static String latestAdminFileName = "admin.dat";
 
     // ---- RESERVATION CACHE ----
     private static byte[] latestReservationFile = null;
-    private static byte[] latestReservationStatusFile = null;
-    private static String latestReservationStatusName = "reservation_status.dat";
+    private static String latestReservationFileName = "reservations.dat";
     private static byte[] latestMessageFile = null;
-    private static String latestMessageFileName = "messages.dat";
+    private static String latestMessageFileName = "notifications.dat";
 
     // ---- COUPON CACHE ----
     private static byte[] latestCouponsFile = null;
@@ -127,18 +126,9 @@ public class MainServer {
             if (latestReservationFile != null) {
                 sendSafe(cw, () -> {
                     cw.out.writeUTF("UPDATE_RESERVATIONS");
-                    cw.out.writeUTF("reservations.dat");
+                    cw.out.writeUTF(latestReservationFileName);
                     cw.out.writeInt(latestReservationFile.length);
                     cw.out.write(latestReservationFile);
-                });
-            }
-
-            if (latestReservationStatusFile != null) {
-                sendSafe(cw, () -> {
-                    cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
-                    cw.out.writeUTF(latestReservationStatusName);
-                    cw.out.writeInt(latestReservationStatusFile.length);
-                    cw.out.write(latestReservationStatusFile);
                 });
             }
 
@@ -288,9 +278,7 @@ public class MainServer {
                         cw.out.writeBoolean(true);
                         cw.out.writeUTF("Registration successful.");
                     });
-                }
-
-                else if (cmd.equals("UPDATE_USERFILE")) {
+                } else if (cmd.equals("UPDATE_USERFILE")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -305,9 +293,7 @@ public class MainServer {
                     latestUserFile = data;
 
                     broadcastUserFile(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_ADMINFILE")) {
+                } else if (cmd.equals("UPDATE_ADMINFILE")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -323,9 +309,7 @@ public class MainServer {
                     latestAdminFileName = filename;
 
                     broadcastAdminFile(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_RESERVATIONS")) {
+                } else if (cmd.equals("UPDATE_RESERVATIONS")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -341,28 +325,7 @@ public class MainServer {
                     latestReservationFile = data;
 
                     broadcastReservations(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_RESERVATION_STATUS")) {
-
-                    String filename = cw.in.readUTF();
-                    int size = cw.in.readInt();
-
-                    byte[] data = new byte[size];
-                    cw.in.readFully(data);
-
-                    File dir = new File("src/main/resources/com/munchoak/manager/data/");
-                    dir.mkdirs();
-
-                    write(new File(dir, filename).toPath(), data);
-
-                    // CACHE IT FOR LATE JOINERS
-                    latestReservationStatusFile = data;
-                    latestReservationStatusName = filename;
-                    broadcastReservationStatus(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_MESSAGES")) {
+                } else if (cmd.equals("UPDATE_MESSAGES")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -380,9 +343,7 @@ public class MainServer {
                     latestMessageFileName = filename;
 
                     broadcastMessages(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_COUPONS")) {
+                } else if (cmd.equals("UPDATE_COUPONS")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -397,9 +358,7 @@ public class MainServer {
                     latestCouponsFileName = filename;
 
                     broadcastCoupons(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_COUPON_USAGE")) {
+                } else if (cmd.equals("UPDATE_COUPON_USAGE")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -414,9 +373,7 @@ public class MainServer {
                     latestCouponUsageFileName = filename;
 
                     broadcastCouponUsage(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_PAYMENTS")) {
+                } else if (cmd.equals("UPDATE_PAYMENTS")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -432,9 +389,7 @@ public class MainServer {
                     latestPaymentsFileName = filename;
 
                     broadcastPayments(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_CARTS")) {
+                } else if (cmd.equals("UPDATE_CARTS")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -450,9 +405,7 @@ public class MainServer {
                     latestCartsFileName = filename;
 
                     broadcastCarts(filename, data);
-                }
-
-                else if (cmd.equals("UPDATE_CARTITEMS")) {
+                } else if (cmd.equals("UPDATE_CARTITEMS")) {
 
                     String filename = cw.in.readUTF();
                     int size = cw.in.readInt();
@@ -487,17 +440,6 @@ public class MainServer {
 
             sendSafe(cw, () -> {
                 cw.out.writeUTF("UPDATE_MENU");
-                cw.out.writeUTF(filename);
-                cw.out.writeInt(data.length);
-                cw.out.write(data);
-            });
-        }
-    }
-
-    private static void broadcastReservationStatus(String filename, byte[] data) {
-        for (ClientWrapper cw : clients) {
-            sendSafe(cw, () -> {
-                cw.out.writeUTF("UPDATE_RESERVATION_STATUS");
                 cw.out.writeUTF(filename);
                 cw.out.writeInt(data.length);
                 cw.out.write(data);
