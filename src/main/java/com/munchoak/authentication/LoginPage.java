@@ -654,7 +654,7 @@ public class LoginPage {
                     return;
                 }
 
-                // ✅ use AdminStorage constant, not hard-coded "2104"
+                // use AdminStorage constant
                 if (!AdminStorage.ADMIN_ID.equals(idEntered)) {
                     showAdminStatus("Invalid Admin ID!", true);
                     return;
@@ -665,9 +665,7 @@ public class LoginPage {
                     return;
                 }
 
-                // (Removed redundant double-check block)
-
-                Session.setAdminUser();
+                Session.refreshAdminFromFile();
                 showAdminStatus("Admin login successful!", false);
 
                 PauseTransition pause = new PauseTransition(Duration.seconds(1));

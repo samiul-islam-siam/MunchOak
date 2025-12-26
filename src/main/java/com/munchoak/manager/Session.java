@@ -128,18 +128,6 @@ public class Session {
         isGuest = false;
     }
 
-    public static void setAdminUser() throws IOException {
-
-        currentUsername = "admin";
-        currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
-        currentEmail = "admin@munchoak.com"; // optional
-        currentContactNo = "N/A";
-        currentPassword = AdminStorage.getAdminPassword();
-        isAdmin = true; // set admin flag
-        isGuest = false;
-
-    }
-
     public static void resetToGuest() {
         currentUsername = "guest";
         currentEmail = "N/A";
