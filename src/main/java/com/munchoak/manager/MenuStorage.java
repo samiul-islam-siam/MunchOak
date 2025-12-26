@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class MenuStorage {
-    private MenuStorage() {}
+    private MenuStorage() {
+    }
 
     public static void setMenuFile(File file) {
         StoragePaths.setMenuFile(file);

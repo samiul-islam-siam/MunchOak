@@ -51,8 +51,7 @@ public class AddCouponPopup {
             String discountText = discountField.getText().trim();
             String expiryText = expiryField.getText().trim();
             String usageText = usageLimitField.getText().trim();
-            if (code.isEmpty() || discountText.isEmpty() || expiryText.isEmpty() || usageText.isEmpty())
-            {
+            if (code.isEmpty() || discountText.isEmpty() || expiryText.isEmpty() || usageText.isEmpty()) {
                 status.setText("All fields are required!");
                 status.setTextFill(javafx.scene.paint.Color.RED);
                 clearMessageAfterDelay(status);
@@ -90,8 +89,7 @@ public class AddCouponPopup {
                 return;
             }
 
-            if (expiryText.isEmpty())
-            {
+            if (expiryText.isEmpty()) {
                 status.setText("Expiry date cannot be empty!");
                 status.setTextFill(javafx.scene.paint.Color.RED);
                 clearMessageAfterDelay(status);
@@ -136,7 +134,7 @@ public class AddCouponPopup {
 
             // Save coupon
             try {
-                CouponStorage.addCoupon(code, discount,expiryText, usageLimit);
+                CouponStorage.addCoupon(code, discount, expiryText, usageLimit);
                 Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon added successfully!");
                 PauseTransition closeDelay = new PauseTransition(Duration.seconds(2));
@@ -152,7 +150,7 @@ public class AddCouponPopup {
             }
         });
 
-        VBox box = new VBox(12, codeField, discountField,expiryField,usageLimitField, saveBtn, status);
+        VBox box = new VBox(12, codeField, discountField, expiryField, usageLimitField, saveBtn, status);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(20));
 
@@ -166,13 +164,14 @@ public class AddCouponPopup {
         popup.showAndWait();
         onSuccess.run();
     }
-        // --- Helper method ---
-        private static void clearMessageAfterDelay(Label status) {
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(evt -> status.setText(""));
-            delay.play();
-        }
+
+    // --- Helper method ---
+    private static void clearMessageAfterDelay(Label status) {
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(evt -> status.setText(""));
+        delay.play();
     }
+}
 
 
 

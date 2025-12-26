@@ -31,7 +31,7 @@ import java.util.Optional;
 
 public class ReservationPage {
     private final Stage primaryStage;
-    private final Cart cart;  // ADDED: Cart field for state persistence
+    private final Cart cart;  // Cart field for state persistence
 
     public ReservationPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -468,7 +468,7 @@ public class ReservationPage {
         navBar.setBackground(new Background(new BackgroundFill(Color.web("#E9967A"), CornerRadii.EMPTY, Insets.EMPTY)));
         navBar.setPrefHeight(70);
 
-        Label title = new Label("MUNCH-OAK");
+        Label title = new Label("MunchOak");
         title.getStyleClass().add("nav-title");
 
         Region spacer = new Region();
@@ -481,13 +481,13 @@ public class ReservationPage {
     private VBox createDashboard() {
         VBox dashboard = new VBox(15);
         dashboard.setPadding(new Insets(30));
-        dashboard.setPrefWidth(220);
+        dashboard.setPrefWidth(260);
         dashboard.setStyle("-fx-background-color: #F4A460;");
 
         Button homeBtn = createDashboardButton("HOME");
         Button menuBtn = createDashboardButton("MENU");
         Button profileBtn = createDashboardButton("PROFILE");
-        Button messageBtn = createDashboardButton("MESSAGES");
+        Button messageBtn = createDashboardButton("NOTIFICATIONS");
         Button aboutBtn = createDashboardButton("ABOUT US");
 
         homeBtn.setOnAction(e -> {

@@ -1,6 +1,6 @@
 package com.munchoak.mainpage;
 
-import com.munchoak.authentication.ChangeAdminPasswordPage;
+import com.munchoak.authentication.ChangeAdminPassPopup;
 import com.munchoak.authentication.LoginPage;
 import com.munchoak.authentication.ProfilePage;
 import com.munchoak.coupon.CouponStorage;
@@ -13,8 +13,10 @@ import com.munchoak.payment.History;
 import com.munchoak.payment.PaymentStorage;
 import com.munchoak.reservation.ReservationMsgStorage;
 import com.munchoak.reservation.ReservationStorage;
+import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,10 +26,12 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +40,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.munchoak.homepage.HomePage.isChatWindowOpen;
-
 
 public class AdminHome {
     private static BorderPane centerPane;
@@ -392,7 +395,6 @@ public class AdminHome {
                 private final HBox box = new HBox(5, acceptBtn, rejectBtn);
 
                 {
-                    //box.setAlignment(Pos.CENTER);
                     box.setAlignment(Pos.CENTER);
                     box.setSpacing(5);
                     acceptBtn.setMinWidth(50);
@@ -406,8 +408,17 @@ public class AdminHome {
 
                 private void handleDecision(String decision) {
                     ReservationStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
-                    ReservationStorage.setReservationStatus(rec.resId, decision);
+                    // ReservationStorage.setReservationStatus(rec.resId, decision);
                     String message;
+
+                    boolean ok = ReservationStorage.setReservationStatus(rec.resId, decision);
+                    if (!ok) {
+                        new Alert(Alert.AlertType.WARNING,
+                                "This reservation was already finalized. Action is allowed only once.",
+                                ButtonType.OK).showAndWait();
+                        getTableView().refresh();
+                        return;
+                    }
 
                     if ("Accepted".equals(decision)) {
                         message =
@@ -419,7 +430,7 @@ public class AdminHome {
                                         "⏰ Time: " + rec.time + "\n\n" +
                                         "Thank you for choosing us.\n" +
                                         "We look forward to serving you.\n\n" +
-                                        "— MUNCH-OAK Team";
+                                        "— MunchOak Team";
                     } else {
                         message =
                                 "Hello " + rec.username + ",\n\n" +
@@ -429,7 +440,7 @@ public class AdminHome {
                                         "📅 Date: " + rec.date + "\n" +
                                         "⏰ Time: " + rec.time + "\n\n" +
                                         "Please try again with a different date or time.\n\n" +
-                                        "— MUNCH-OAK Team";
+                                        "— MunchOak Team";
                     }
 
                     // 🔒 SAVE ONLY FOR THIS USER
@@ -539,13 +550,65 @@ public class AdminHome {
         });
 
         changePassBtn.setOnAction(e ->
-                ChangeAdminPasswordPage.show(primaryStage)
+                ChangeAdminPassPopup.show(primaryStage)
         );
 
         logoutBtn.setOnAction(e -> {
-            Session.logout();
-            HomePage.closeChatWindow();
-            primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Logout");
+            alert.setHeaderText(null);
+            Label content = new Label("Are you sure you want to logout?");
+            content.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            alert.getDialogPane().setContent(content);
+            alert.getDialogPane().setPrefWidth(400);
+            alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+            ButtonType yesBtn = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+            ButtonType noBtn = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(yesBtn, noBtn);
+
+            Button yesButton = (Button) alert.getDialogPane().lookupButton(yesBtn);
+            Button noButton = (Button) alert.getDialogPane().lookupButton(noBtn);
+
+            yesButton.setDefaultButton(false);
+            noButton.setDefaultButton(false);
+
+            String boxStyle = "-fx-background-color: white; " +
+                    "-fx-border-color: black; " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 6; " +
+                    "-fx-background-radius: 6; " +
+                    "-fx-padding: 6 18; " +
+                    "-fx-text-fill: black; " +
+                    "-fx-font-weight: bold;";
+            yesButton.setStyle(boxStyle);
+            noButton.setStyle(boxStyle);
+
+            // ✅ Bounce effect directly inside static block
+            EventHandler<MouseEvent> bounceIn = ev -> {
+                ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                st.setToX(1.1);
+                st.setToY(1.1);
+                st.play();
+            };
+            EventHandler<MouseEvent> bounceOut = ev -> {
+                ScaleTransition st = new ScaleTransition(Duration.millis(150), (Button) ev.getSource());
+                st.setToX(1.0);
+                st.setToY(1.0);
+                st.play();
+            };
+
+            yesButton.setOnMouseEntered(bounceIn);
+            yesButton.setOnMouseExited(bounceOut);
+            noButton.setOnMouseEntered(bounceIn);
+            noButton.setOnMouseExited(bounceOut);
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == yesBtn) {
+                    Session.logout();
+                    HomePage.closeChatWindow();
+                    primaryStage.setScene(new LoginPage(primaryStage).getLoginScene());
+                }
+            });
         });
     }
 

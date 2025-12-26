@@ -65,19 +65,15 @@ public class ChatClient {
     }
 
     private void hookStageCloseToResetFlag() {
-        // The controller may not have access to the Stage immediately during initialize,
-        // so defer to next pulse.
         Platform.runLater(() -> {
             Stage stage = chatStage;
             if (stage == null) {
-                // Fallback: try to get it from any control if already attached to a Scene
                 if (closeButton != null && closeButton.getScene() != null) {
                     stage = (Stage) closeButton.getScene().getWindow();
                 }
             }
             if (stage == null) return;
 
-            // Avoid stacking multiple handlers if called more than once
             Stage finalStage = stage;
             finalStage.addEventHandler(WindowEvent.WINDOW_HIDDEN, e -> {
                 try {
@@ -138,18 +134,12 @@ public class ChatClient {
                     selectedUser = newV;
                     if (newV == null) return;
 
-                    // Clear previous conversation before loading new
                     adminConversations.putIfAbsent(newV, FXCollections.observableArrayList());
                     chatMessages.setAll(adminConversations.get(newV));
 
-                    // ask server for history of the newly selected user
                     if (!Objects.equals(oldV, newV) && writer != null) {
-                        // Mark that history is loading
                         loadingHistory = true;
-
-                        // clear old messages only for this user to prevent echo
                         adminConversations.get(newV).clear();
-
                         writer.println("GETHIST|" + newV);
                     }
                 });
@@ -157,17 +147,31 @@ public class ChatClient {
     }
 
     private void connectToServer() {
+        // 1) Try LAN discovery (auto)
+        // 2) Fallback to localhost (same PC)
+        String host = "localhost";
+        int port = 5050;
+
         try {
-            socket = new Socket("localhost", 5050);
+            LanDiscoveryClient.Result r = LanDiscoveryClient.discover(1500);
+            host = r.host;
+            port = r.chatPort;
+        } catch (Exception ignored) {
+            // discovery failed; keep localhost
+        }
+
+        try {
+            socket = new Socket(host, port);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
             writer.println("AUTH|" + username + "|" + (isAdmin ? "ADMIN" : "USER"));
 
-            Thread listener = new Thread(this::listenLoop);
+            Thread listener = new Thread(this::listenLoop, "ChatClient-Listener");
             listener.setDaemon(true);
             listener.start();
+
         } catch (IOException e) {
-            chatMessages.add(new ChatMessage("Unable to connect to server.", false));
+            chatMessages.add(new ChatMessage("Unable to connect to chat server (" + host + ":" + port + ")", false));
         }
     }
 
@@ -218,48 +222,35 @@ public class ChatClient {
 
     private void handleIncomingAsAdmin(String field1, String text) {
         String marker = field1 == null ? "" : field1.trim();
-
-        // Determine if this message is a history entry
         boolean isHistoryRole = marker.equalsIgnoreCase("USER") || marker.equalsIgnoreCase("ADMIN");
 
-        // --- CASE 1: this is a history message ---
         if (loadingHistory && isHistoryRole) {
             if (selectedUser == null) return;
 
-            // Ensure conversation list exists
             adminConversations.putIfAbsent(selectedUser, FXCollections.observableArrayList());
             ObservableList<ChatMessage> conv = adminConversations.get(selectedUser);
 
-            boolean isSelf = marker.equalsIgnoreCase("ADMIN"); // ADMIN entries are self-sent
+            boolean isSelf = marker.equalsIgnoreCase("ADMIN");
             conv.add(new ChatMessage(text, isSelf));
-
-            // Update visible chat
             chatMessages.setAll(conv);
             return;
         }
 
-        // --- CASE 2: history just finished ---
         if (loadingHistory && !isHistoryRole) {
-            loadingHistory = false; // mark history loading complete
-            // Fall through to handle as live message
+            loadingHistory = false;
         }
 
-        // --- CASE 3: live message from a user ---
         String fromUser = marker;
 
-        // Ensure conversation list exists
         adminConversations.putIfAbsent(fromUser, FXCollections.observableArrayList());
         ObservableList<ChatMessage> conv = adminConversations.get(fromUser);
 
-        // Add live message
         conv.add(new ChatMessage(fromUser + ": " + text, false));
 
-        // Update visible chat if currently selected
         if (Objects.equals(selectedUser, fromUser)) {
             chatMessages.setAll(conv);
         }
     }
-
 
     private void handleIncomingAsUser(String field1, String text) {
         String marker = field1 == null ? "" : field1.trim();

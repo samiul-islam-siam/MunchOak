@@ -28,7 +28,7 @@ import javafx.util.Duration;
 public class AboutUsPage {
 
     private final Stage primaryStage;
-    private final Cart cart;  // ADDED: Cart field for state persistence
+    private final Cart cart;  // Cart field for state persistence
 
     public AboutUsPage(Stage primaryStage, Cart cart) {
         this.primaryStage = primaryStage;
@@ -101,11 +101,9 @@ public class AboutUsPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        if(Session.isAdmin())
-        {
+        if (Session.isAdmin()) {
             navBar.getChildren().addAll(navTitle, spacer, homeBtn, menuBtn, profileBtn);
-        }else
-        {
+        } else {
             navBar.getChildren().addAll(navTitle, spacer, homeBtn, menuBtn, reservationBtn, profileBtn, cartBtn);
         }
 

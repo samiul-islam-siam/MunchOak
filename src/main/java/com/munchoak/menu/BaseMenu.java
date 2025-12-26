@@ -769,10 +769,9 @@ public class BaseMenu {
             addOnSection.getChildren().add(optionalLabel); // Add the optional label inside the section for better grouping
         }
 
-        HBox quantityBox=null;
+        HBox quantityBox = null;
         Button addToCartDetail = null;
-        if(!Session.isAdmin())
-        {
+        if (!Session.isAdmin()) {
             // Quantity
             quantityBox = new HBox(10);
             quantityBox.setAlignment(Pos.CENTER);
@@ -862,13 +861,11 @@ public class BaseMenu {
 
         // Info VBox
         VBox infoVBox = new VBox(15);
-        if(!Session.isAdmin())
-        {
+        if (!Session.isAdmin()) {
 
             infoVBox.setPrefWidth(400);
             infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, quantityBox, addToCartDetail);
-        }else
-        {
+        } else {
             infoVBox.setPrefWidth(200);
             infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection);
         }

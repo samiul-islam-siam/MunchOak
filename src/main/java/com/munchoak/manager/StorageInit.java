@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 public final class StorageInit {
-    private StorageInit() {}
+    private StorageInit() {
+    }
 
     public static void init() {
         try {
@@ -23,16 +24,23 @@ public final class StorageInit {
             // coupons
             if (!StoragePaths.COUPONS_FILE.exists()) StoragePaths.COUPONS_FILE.createNewFile();
             if (!StoragePaths.COUPON_USAGE_FILE.exists()) StoragePaths.COUPON_USAGE_FILE.createNewFile();
+
             // primary files
             if (!StoragePaths.USERS_FILE.exists()) StoragePaths.USERS_FILE.createNewFile();
             if (!StoragePaths.CATEGORIES_FILE.exists()) StoragePaths.CATEGORIES_FILE.createNewFile();
             if (!StoragePaths.CARTS_FILE.exists()) StoragePaths.CARTS_FILE.createNewFile();
             if (!StoragePaths.CART_ITEMS_FILE.exists()) StoragePaths.CART_ITEMS_FILE.createNewFile();
+
+            // reservation (single file only)
             if (!StoragePaths.RESERVATIONS_FILE.exists()) StoragePaths.RESERVATIONS_FILE.createNewFile();
+
             if (!StoragePaths.getMenuPointerFile().exists()) StoragePaths.getMenuPointerFile().createNewFile();
-            if (!StoragePaths.MESSAGES_FILE.exists()) StoragePaths.MESSAGES_FILE.createNewFile();
-            if (!StoragePaths.RESERVATION_STATUS_FILE.exists()) StoragePaths.RESERVATION_STATUS_FILE.createNewFile();
-            if (!StoragePaths.PAYMENT_MASTER_FILE.exists()) StoragePaths.PAYMENT_MASTER_FILE.createNewFile();
+
+            // notifications (renamed from messages.dat)
+            if (!StoragePaths.NOTIFICATIONS_FILE.exists()) StoragePaths.NOTIFICATIONS_FILE.createNewFile();
+
+            // payment (single file)
+            if (!StoragePaths.PAYMENTS_FILE.exists()) StoragePaths.PAYMENTS_FILE.createNewFile();
 
             // seed categories if empty/new
             CategoryStorage.ensureSeedCategories();

@@ -36,7 +36,8 @@ public class CartSearchCardFactory {
         try (InputStream is = CartSearchCardFactory.class.getResourceAsStream("/images/" + item.getImagePath())) {
             if (is != null) iv.setImage(new Image(is));
             else iv.setImage(new Image("file:src/main/resources/com/munchoak/manager/images/" + item.getImagePath()));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         Label name = new Label(item.getName());
         name.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: black;");
