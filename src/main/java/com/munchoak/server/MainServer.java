@@ -31,7 +31,7 @@ public class MainServer {
 
     // ---- USER CACHE ----
     private static byte[] latestUserFile = null;
-    private static String latestUserFileName = "user.dat";
+    private static String latestUserFileName = "users.dat";
 
     // ---- ADMIN CACHE ----
     private static byte[] latestAdminFile = null;

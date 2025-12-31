@@ -135,7 +135,7 @@ public class ReservationPage {
                     -fx-padding: 10 15 10 15;
                 """);
         phoneField.setMaxWidth(350);
-        // ✅ Autofill from user.dat if logged in
+        // ✅ Autofill from users.dat if logged in
         String currentUser = Session.getCurrentUsername();
         if (!Session.isGuest()) {
             // Use username as default name

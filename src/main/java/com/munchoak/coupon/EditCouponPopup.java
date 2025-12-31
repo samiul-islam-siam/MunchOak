@@ -102,6 +102,7 @@ public class EditCouponPopup {
                         clearMessageAfterDelay(status);
                         return;
                     }
+                    newExpiry = expiryDate.toString();
                 } catch (DateTimeParseException ex) {
                     status.setText("Invalid expiry date format!");
                     status.setTextFill(javafx.scene.paint.Color.RED);
