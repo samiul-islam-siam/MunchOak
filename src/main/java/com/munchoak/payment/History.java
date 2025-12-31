@@ -1,12 +1,11 @@
 package com.munchoak.payment;
 
-import com.munchoak.manager.*;
-import com.munchoak.homepage.HomePage;
-
 import com.munchoak.cart.Cart;
 import com.munchoak.cart.CartPage;
+import com.munchoak.homepage.HomePage;
 import com.munchoak.mainpage.FoodItems;
 import com.munchoak.manager.MenuStorage;
+import com.munchoak.manager.Session;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -28,7 +27,7 @@ public class History {
     private final Cart cart;  // To support reordering into current cart
     private ObservableList<HistoryRecord> historyData;
 
-    // UPDATED: Overloaded constructor for backward compatibility (creates new Cart if not provided)
+    // Overloaded constructor for backward compatibility (creates new Cart if not provided)
     public History(Stage primaryStage) {
         this(primaryStage, new Cart());
     }
@@ -95,24 +94,32 @@ public class History {
 
                     // Check availability from current menu before reordering
                     Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
+                    boolean isavailable = true;
                     for (Integer foodId : items.keySet()) {
                         if (foodMap == null || !foodMap.containsKey(foodId) || foodMap.get(foodId) == null) {
+                            isavailable = false;
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
                             alert.setTitle("Unavailable Item");
                             alert.setHeaderText(null);
                             alert.setContentText("Sorry, this is currently unavailable. Stay tuned!");
                             alert.showAndWait();
-                            return; // Stop reordering
+                            break;
                         }
                     }
 
                     // If all items are available, add them to cart
-                    for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
-                        cart.addToCart(entry.getKey(), entry.getValue());
+                    if (isavailable) {
+                        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+                            cart.addToCart(entry.getKey(), entry.getValue());
+                        }
                     }
 
+
                     // Navigate to Cart page to view updated cart
-                    primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
+                    if (isavailable) {
+                        primaryStage.setScene(new CartPage(primaryStage, cart).getScene());
+                    }
+
                 });
             }
 
@@ -176,44 +183,29 @@ public class History {
                     s.userId,
                     s.paymentId,
                     s.timestamp,
-                    s.amount,            // ✅ no math
+                    s.amount,
                     "Success",
                     s.paymentMethod
             ));
         }
     }
 
-    // ------------------ Bill Popup ------------------
     public void showBill(HistoryRecord record) {
-        Map<Integer, FoodItems> foodMap = MenuStorage.loadFoodMap();
+        int paymentId = record.getPaymentId();
 
-        Cart tempCart = new Cart();
-        Map<Integer, Integer> items = PaymentStorage.getCartItemsForPayment(record.getPaymentId());
-        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
-            tempCart.addToCart(entry.getKey(), entry.getValue());
+        // This validates breakdown existence
+        PaymentBreakdown b = PaymentStorage.getPaymentBreakdown(paymentId);
+        if (b == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Bill unavailable");
+            alert.setHeaderText(null);
+            alert.setContentText("Sorry, this bill is currently unavailable!");
+            alert.showAndWait();
+            return;
         }
 
-        // FIXED: Load actual discount and tip to match totals in bill/receipt (defaults to 0)
-        double discountVal = 0.0;
-        double tipVal = 0.0;
-        double delivery = 7.99;
-        double tax = 7.00;
-        double service = 1.50;
-
-        // FIXED: Reverse-engineer subtotal to match the saved full total (includes add-ons)
-        double calculatedBaseSubtotal = tempCart.getTotalPrice(foodMap); // Base subtotal without add-ons
-        double savedFullTotal = record.getAmount();
-        double reverseSubtotal = savedFullTotal - delivery - tax - service - tipVal + discountVal; // Includes add-ons
-
-        // FIXED: Create Payment with reverse-engineered subtotal, then set discount/tip
-        Payment payment = new Payment(record.getPaymentId(), reverseSubtotal, record.getTimestamp());
-        payment.setDiscount(discountVal);
-        payment.setTip(tipVal);
-        payment.setSuccess(record.getStatus().equalsIgnoreCase("Success"));
-        payment.setPaymentMethod(record.getPaymentMethod());
-
-        Bill bill = new Bill(tempCart, payment, savedFullTotal, calculatedBaseSubtotal);
-        String receipt = bill.generateReceipt(foodMap);  // Pass saved total and base subtotal for accurate display
+        String receipt = Bill.generateReceiptFromSnapshot(paymentId, record.getTimestamp());
+        if (receipt == null) return;
 
         Stage billStage = new Stage();
         billStage.setTitle("Bill Receipt");

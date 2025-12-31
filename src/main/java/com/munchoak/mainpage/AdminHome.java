@@ -1,24 +1,22 @@
 package com.munchoak.mainpage;
-import javafx.animation.ScaleTransition;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Duration;
 
-import com.munchoak.authentication.ChangeAdminPasswordPage;
+import com.munchoak.authentication.ChangeAdminPassPopup;
 import com.munchoak.authentication.LoginPage;
 import com.munchoak.authentication.ProfilePage;
 import com.munchoak.coupon.CouponStorage;
 import com.munchoak.homepage.HomePage;
 import com.munchoak.manager.*;
 import com.munchoak.menu.MenuPage;
-import com.munchoak.payment.History;
-import com.munchoak.payment.PaymentStorage;
 import com.munchoak.coupon.AddCouponPopup;
 import com.munchoak.coupon.EditCouponPopup;
+import com.munchoak.payment.History;
+import com.munchoak.payment.PaymentStorage;
 import com.munchoak.reservation.ReservationMsgStorage;
 import com.munchoak.reservation.ReservationStorage;
+import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,20 +26,20 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.munchoak.homepage.HomePage.isChatWindowOpen;
-
 
 public class AdminHome {
     private static BorderPane centerPane;
@@ -397,7 +395,6 @@ public class AdminHome {
                 private final HBox box = new HBox(5, acceptBtn, rejectBtn);
 
                 {
-                    //box.setAlignment(Pos.CENTER);
                     box.setAlignment(Pos.CENTER);
                     box.setSpacing(5);
                     acceptBtn.setMinWidth(50);
@@ -411,8 +408,17 @@ public class AdminHome {
 
                 private void handleDecision(String decision) {
                     ReservationStorage.ReservationRecord rec = getTableView().getItems().get(getIndex());
-                    ReservationStorage.setReservationStatus(rec.resId, decision);
+                    // ReservationStorage.setReservationStatus(rec.resId, decision);
                     String message;
+
+                    boolean ok = ReservationStorage.setReservationStatus(rec.resId, decision);
+                    if (!ok) {
+                        new Alert(Alert.AlertType.WARNING,
+                                "This reservation was already finalized. Action is allowed only once.",
+                                ButtonType.OK).showAndWait();
+                        getTableView().refresh();
+                        return;
+                    }
 
                     if ("Accepted".equals(decision)) {
                         message =
@@ -424,7 +430,7 @@ public class AdminHome {
                                         "⏰ Time: " + rec.time + "\n\n" +
                                         "Thank you for choosing us.\n" +
                                         "We look forward to serving you.\n\n" +
-                                        "— MUNCH-OAK Team";
+                                        "— MunchOak Team";
                     } else {
                         message =
                                 "Hello " + rec.username + ",\n\n" +
@@ -434,7 +440,7 @@ public class AdminHome {
                                         "📅 Date: " + rec.date + "\n" +
                                         "⏰ Time: " + rec.time + "\n\n" +
                                         "Please try again with a different date or time.\n\n" +
-                                        "— MUNCH-OAK Team";
+                                        "— MunchOak Team";
                     }
 
                     // 🔒 SAVE ONLY FOR THIS USER
@@ -544,8 +550,9 @@ public class AdminHome {
         });
 
         changePassBtn.setOnAction(e ->
-                ChangeAdminPasswordPage.show(primaryStage)
+                ChangeAdminPassPopup.show(primaryStage)
         );
+
         logoutBtn.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirm Logout");
@@ -603,9 +610,7 @@ public class AdminHome {
                 }
             });
         });
-
     }
-
 
     private static void openAdminHistory(BorderPane dashboard) {
         BorderPane centerPane = new BorderPane();

@@ -5,6 +5,7 @@ import com.munchoak.manager.Session;
 import com.munchoak.manager.StoragePaths;
 import com.munchoak.menu.BaseMenu;
 import com.munchoak.mainpage.FoodItems;
+import com.munchoak.network.LanDiscoveryClient;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 
@@ -35,8 +36,21 @@ public class MainClient {
     }
 
     private void init() {
+        // 1) Try LAN discovery (auto)
+        // 2) Fallback to localhost (same PC)
+        String host = "localhost";
+        int port = 8080;
+
         try {
-            socket = new Socket("localhost", 8080);
+            LanDiscoveryClient.Result r = LanDiscoveryClient.discover(1500);
+            host = r.host;
+            port = r.menuPort;
+        } catch (Exception ignored) {
+            // discovery failed; keep localhost
+        }
+
+        try {
+            socket = new Socket(host, port);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
@@ -58,7 +72,6 @@ public class MainClient {
     private void listenLoop() {
         try {
             while (true) {
-
                 String cmd = in.readUTF();
 
                 switch (cmd) {
@@ -153,29 +166,11 @@ public class MainClient {
                         File f = new File(dir, filename);
                         write(f.toPath(), data);
 
-                        //FileStorage.reloadReservationStatus(); // ✅ ADD THIS
                         System.out.println("Reservations synced from server.");
-                        Platform.runLater(() -> Session.notifyReservationUpdated()); // ✅ ADD
-                    }
-
-                    case "UPDATE_RESERVATION_STATUS" -> {
-                        String filename = in.readUTF();
-                        int size = in.readInt();
-
-                        byte[] data = new byte[size];
-                        in.readFully(data);
-
-                        File dir = new File("src/main/resources/com/munchoak/manager/data/");
-                        dir.mkdirs();
-
-                        File f = new File(dir, filename);
-                        write(f.toPath(), data);
-
                         Platform.runLater(() -> Session.notifyReservationUpdated());
                     }
 
                     case "UPDATE_MESSAGES" -> {
-
                         String filename = in.readUTF();
                         int size = in.readInt();
 
@@ -294,26 +289,6 @@ public class MainClient {
         }
     }
 
-    public synchronized void sendMessageUpdate() {
-        try {
-            File msgFile =
-                    new File("src/main/resources/com/munchoak/manager/data/messages.dat");
-
-            if (!msgFile.exists()) return;
-
-            byte[] data = readAllBytes(msgFile.toPath());
-
-            out.writeUTF("UPDATE_MESSAGES");
-            out.writeUTF(msgFile.getName());
-            out.writeInt(data.length);
-            out.write(data);
-            out.flush();
-
-        } catch (Exception e) {
-            System.err.println("Message sync error: " + e.getMessage());
-        }
-    }
-
     public synchronized void sendImageUpdate(File img) {
         try {
             byte[] data = readAllBytes(img.toPath());
@@ -374,29 +349,38 @@ public class MainClient {
     public synchronized void sendReservationUpdate() {
         try {
             File resFile = new File("src/main/resources/com/munchoak/manager/data/reservations.dat");
-            File statusFile = new File("src/main/resources/com/munchoak/manager/data/reservation_status.dat");
 
             byte[] resData = readAllBytes(resFile.toPath());
-            byte[] statusData = statusFile.exists()
-                    ? readAllBytes(statusFile.toPath())
-                    : new byte[0];
 
-            // send reservations
             out.writeUTF("UPDATE_RESERVATIONS");
             out.writeUTF(resFile.getName());
             out.writeInt(resData.length);
             out.write(resData);
 
-            // send status file
-            out.writeUTF("UPDATE_RESERVATION_STATUS");
-            out.writeUTF(statusFile.getName());
-            out.writeInt(statusData.length);
-            out.write(statusData);
-
             out.flush();
 
         } catch (Exception e) {
             System.err.println("IOException: " + e.getMessage());
+        }
+    }
+
+    public synchronized void sendMessageUpdate() {
+        try {
+            File msgFile =
+                    new File("src/main/resources/com/munchoak/manager/data/notifications.dat");
+
+            if (!msgFile.exists()) return;
+
+            byte[] data = readAllBytes(msgFile.toPath());
+
+            out.writeUTF("UPDATE_MESSAGES");
+            out.writeUTF(msgFile.getName());
+            out.writeInt(data.length);
+            out.write(data);
+            out.flush();
+
+        } catch (Exception e) {
+            System.err.println("Message sync error: " + e.getMessage());
         }
     }
 
@@ -436,7 +420,7 @@ public class MainClient {
 
     public synchronized void sendPaymentFileUpdate() {
         try {
-            File paymentsFile = StoragePaths.PAYMENT_MASTER_FILE; // payments.dat
+            File paymentsFile = StoragePaths.PAYMENTS_FILE; // payments.dat
 
             if (paymentsFile.exists()) {
                 byte[] data = readAllBytes(paymentsFile.toPath());
@@ -481,4 +465,3 @@ public class MainClient {
         }
     }
 }
-

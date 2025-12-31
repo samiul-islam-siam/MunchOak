@@ -16,9 +16,11 @@ public class Session {
     private static boolean isAdmin = false; // new flag for admin control
     private static boolean isGuest = true;
     private static final List<Runnable> couponListeners = new ArrayList<>();
+
     public static void addCouponListener(Runnable r) {
         couponListeners.add(r);
     }
+
     public static void notifyCouponUpdated() {
         for (Runnable r : couponListeners) {
             r.run();
@@ -126,18 +128,6 @@ public class Session {
         isGuest = false;
     }
 
-    public static void setAdminUser() throws IOException {
-
-        currentUsername = "admin";
-        currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
-        currentEmail = "admin@munchoak.com"; // optional
-        currentContactNo = "N/A";
-        currentPassword = AdminStorage.getAdminPassword();
-        isAdmin = true; // set admin flag
-        isGuest = false;
-
-    }
-
     public static void resetToGuest() {
         currentUsername = "guest";
         currentEmail = "N/A";
@@ -151,14 +141,19 @@ public class Session {
     public static void refreshAdminFromFile() throws IOException {
         List<String> lines = AdminStorage.readLines();
         boolean found = false;
+
         for (String line : lines) {
             String[] parts = line.split(",");
-            if (parts[0].equals(AdminStorage.ADMIN_ID) && parts.length >= 5) {
+            if (parts.length >= 5 && parts[0].equals(AdminStorage.ADMIN_ID)) {
                 currentUserId = Integer.parseInt(parts[0]);
                 currentUsername = parts[1];
                 currentEmail = parts[2];
                 currentContactNo = parts[3];
-                currentPassword = parts[4];
+
+                // parts[4] is "salt:hash" -> store hash-only for consistency with getAdminPassword()
+                String[] saltAndHash = parts[4].split(":");
+                currentPassword = (saltAndHash.length == 2) ? saltAndHash[1] : "N/A";
+
                 isAdmin = true;
                 isGuest = false;
                 found = true;
@@ -166,7 +161,6 @@ public class Session {
             }
         }
 
-        // Only fallback if admin.dat had no valid line
         if (!found) {
             currentUserId = Integer.parseInt(AdminStorage.ADMIN_ID);
             currentUsername = "admin";

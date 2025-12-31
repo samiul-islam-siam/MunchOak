@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CouponStorage {
-    private CouponStorage() {}
+    private CouponStorage() {
+    }
 
     public static class Coupon {
         public final String code;
@@ -59,7 +60,8 @@ public final class CouponStorage {
                 int usedCount = dis.readInt();
                 coupons.add(new Coupon(code, discount, expiry, usageLimit, usedCount));
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return coupons;
     }
 

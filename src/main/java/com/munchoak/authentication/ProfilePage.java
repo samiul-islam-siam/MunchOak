@@ -1,25 +1,21 @@
 package com.munchoak.authentication;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ButtonBar;
-import javafx.animation.ScaleTransition;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Duration;
-import javafx.scene.control.Button;
 
 import com.munchoak.manager.Session;
+import javafx.animation.ScaleTransition;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class ProfilePage {
     private final Stage primaryStage;
@@ -39,9 +35,21 @@ public class ProfilePage {
         String contactNo = Session.getCurrentContactNo();
 
         if (Session.isGuest()) {
-            Label title = new Label("You are browsing \n as guest");
-            title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: black;");
-            Label passLabel = new Label("Default guest Id: " + userId);
+            Label title = new Label("You are browsing as guest.\nPlease login to get full experience.");
+
+            // center the multi-line text inside the label
+            title.setTextAlignment(TextAlignment.CENTER);
+            title.setAlignment(Pos.CENTER);
+
+            // change font (CSS way)
+            title.setStyle("""
+                        -fx-font-family: "Tahoma";
+                        -fx-font-size: 32px;
+                        -fx-font-weight: bold;
+                        -fx-text-fill: black;
+                    """);
+
+            Label passLabel = new Label("Default guest ID: " + userId);
             passLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #1b4fa8;");
 
             Button backBtn = new Button("⬅ Back");
@@ -55,7 +63,7 @@ public class ProfilePage {
             VBox card = new VBox(15, title, passLabel, loginBtn, backBtn);
             card.setAlignment(Pos.CENTER);
             card.setPadding(new Insets(30));
-            card.setMaxWidth(400);
+            card.setMaxWidth(650);
             card.setStyle("-fx-background-color: rgba(255,255,255,0.9); -fx-background-radius: 15;");
 
             // --- Root gradient background ---
@@ -153,13 +161,18 @@ public class ProfilePage {
         // --- VBox card ---
         VBox card;
         if (Session.isAdmin()) {
-            // Admin profile: NO edit button
-            card = new VBox(15, title, userLabel, emailLabel, contactLabel, passLabel, logoutBtn, backBtn);
-        } else {
-            // Normal user profile: include edit button
+            // Admin profile
             Button editBtn = new Button("Edit Profile");
             editBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
-            editBtn.setOnAction(e -> EditProfilePopup.show(primaryStage, () -> {
+            editBtn.setOnAction(e -> EditAdminProfilePopup.show(primaryStage, () -> {
+                primaryStage.setScene(new ProfilePage(primaryStage, previousScene).getProfileScene());
+            }));
+            card = new VBox(15, title, userLabel, emailLabel, contactLabel, passLabel, editBtn, logoutBtn, backBtn);
+        } else {
+            // Normal user profile
+            Button editBtn = new Button("Edit Profile");
+            editBtn.setStyle("-fx-background-color: #1b4fa8; -fx-text-fill: white; -fx-padding: 8 16; -fx-font-size: 14px;");
+            editBtn.setOnAction(e -> EditUserProfilePopup.show(primaryStage, () -> {
                 primaryStage.setScene(new ProfilePage(primaryStage, previousScene).getProfileScene());
             }));
 

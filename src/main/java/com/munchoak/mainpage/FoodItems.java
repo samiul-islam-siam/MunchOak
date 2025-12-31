@@ -99,30 +99,35 @@ public class FoodItems {
         this.quantity.set(q);
     }
 
-    public String getAddOne(){return addOne.get();}
-    public void setAddOne(String addOne)
-    {
+    public String getAddOne() {
+        return addOne.get();
+    }
+
+    public void setAddOne(String addOne) {
         this.addOne.set(addOne);
     }
-    public double getAddOnePrice()
-    {
+
+    public double getAddOnePrice() {
         return addOnePrice.get();
     }
-    public void setAddOnePrice(double addOnePrice)
-    {
+
+    public void setAddOnePrice(double addOnePrice) {
         this.addOnePrice.set(addOnePrice);
     }
-    public String getAddTwo(){return addTwo.get();}
-    public void setAddTwo(String addTwo)
-    {
+
+    public String getAddTwo() {
+        return addTwo.get();
+    }
+
+    public void setAddTwo(String addTwo) {
         this.addTwo.set(addTwo);
     }
-    public double getAddTwoPrice()
-    {
+
+    public double getAddTwoPrice() {
         return addTwoPrice.get();
     }
-    public void setAddTwoPrice(double addTwoPrice)
-    {
+
+    public void setAddTwoPrice(double addTwoPrice) {
         this.addTwoPrice.set(addTwoPrice);
     }
 }

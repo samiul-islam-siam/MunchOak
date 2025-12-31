@@ -1,9 +1,9 @@
 package com.munchoak.payment;
 
-import com.munchoak.manager.MenuStorage;
-import com.munchoak.manager.Session;
 import com.munchoak.cart.Cart;
 import com.munchoak.mainpage.FoodItems;
+import com.munchoak.manager.MenuStorage;
+import com.munchoak.manager.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -36,101 +36,6 @@ public class Payment {
         this.success = false;
         this.discount = 0.0;
         this.tip = 0.0;
-    }
-
-    // Main payment entry point (opens the method selection UI)
-    public void processPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
-        Stage stage = new Stage();
-        stage.setTitle("Select Payment Method");
-
-        Label title = new Label("Choose Payment Method");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        Button cardBtn = new Button("Pay with Card");
-        Button cashBtn = new Button("Pay Cash");
-        Button backBtn = new Button("Back");
-
-        styleButton(cardBtn);
-        styleButton(cashBtn);
-        styleSecondaryButton(backBtn);
-
-        VBox vbox = new VBox(20, title, cardBtn, cashBtn, backBtn);
-        vbox.setPadding(new Insets(25));
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #eef2f3, #dfe9f3);");
-
-        stage.setScene(new Scene(vbox, 340, 260));
-        stage.show();
-
-        cardBtn.setOnAction(e -> {
-            stage.close();
-            cardPayment(cart, foodMap);
-        });
-
-        backBtn.setOnAction(e -> stage.close());
-    }
-
-
-    // --- CARD PAYMENT METHOD ---
-    private void cardPayment(Cart cart, Map<Integer, FoodItems> foodMap) {
-
-        Stage paymentStage = new Stage();
-        paymentStage.setTitle("Card Payment");
-
-        Label title = new Label("Enter Card Details");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        Label cardLabel = new Label("Card Number:");
-        TextField cardField = new TextField();
-        cardField.setPromptText("XXXX XXXX XXXX XXXX");
-
-        Label pinLabel = new Label("PIN:");
-        PasswordField pinField = new PasswordField();
-        pinField.setPromptText("****");
-
-        Button payButton = new Button("Pay Now");
-        Button backButton = new Button("Back");
-
-        styleButton(payButton);
-        styleSecondaryButton(backButton);
-
-        VBox vbox = new VBox(12, title, cardLabel, cardField, pinLabel, pinField, payButton, backButton);
-        vbox.setPadding(new Insets(25));
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);");
-
-        Scene scene = new Scene(vbox, 350, 330);
-        paymentStage.setScene(scene);
-        paymentStage.show();
-
-        payButton.setOnAction(e -> {
-            String card = cardField.getText().trim();
-            String pin = pinField.getText().trim();
-
-            if (card.isEmpty() || pin.isEmpty()) {
-                new Alert(Alert.AlertType.ERROR, "Please fill all fields!").show();
-                return;
-            }
-            if (card.length() < 8 || pin.length() < 4) {
-                new Alert(Alert.AlertType.ERROR, "Invalid card (8-digit) or PIN (4-digit)!").show();
-                return;
-            }
-
-            paymentMethod = "Card";
-            this.success = true;
-            paymentStage.close();
-
-            Bill bill = new Bill(cart, this);
-            String receipt = bill.generateReceipt(foodMap);
-            showBill(receipt);
-
-            cart.getBuyHistory().clear();
-        });
-
-        backButton.setOnAction(e -> {
-            paymentStage.close();
-            processPayment(cart, foodMap);
-        });
     }
 
     // ===================== CHECKOUT HANDLER =====================
@@ -168,65 +73,6 @@ public class Payment {
     public static int getLastPaymentId() {
         return PaymentStorage.getLastPaymentId();
     }
-
-    // --- Helper to display receipt window ---
-    private void showBill(String receipt) {
-        Stage billStage = new Stage();
-        billStage.setTitle("Bill Receipt");
-
-        TextArea receiptArea = new TextArea(receipt);
-        receiptArea.setEditable(false); // Prevent editing bill
-        receiptArea.setStyle("-fx-font-size: 14px; -fx-font-family: monospace;");
-        receiptArea.setPrefSize(500, 400);
-
-        VBox box = new VBox(15, receiptArea);
-        box.setPadding(new Insets(20));
-        box.setAlignment(Pos.CENTER);
-
-        billStage.setScene(new Scene(box));
-        billStage.show();
-    }
-
-    private void styleButton(Button btn) {
-        btn.setStyle(
-                "-fx-background-color: linear-gradient(to right, #4facfe, #00f2fe);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 15px;" +
-                        "-fx-padding: 10 18;" +
-                        "-fx-background-radius: 12;"
-        );
-
-        btn.setOnMouseEntered(e ->
-                btn.setStyle(
-                        "-fx-background-color: linear-gradient(to right, #3399ff, #00e6f6);" +
-                                "-fx-text-fill: white;" +
-                                "-fx-font-size: 15px;" +
-                                "-fx-padding: 10 18;" +
-                                "-fx-background-radius: 12;"
-                )
-        );
-
-        btn.setOnMouseExited(e ->
-                btn.setStyle(
-                        "-fx-background-color: linear-gradient(to right, #4facfe, #00f2fe);" +
-                                "-fx-text-fill: white;" +
-                                "-fx-font-size: 15px;" +
-                                "-fx-padding: 10 18;" +
-                                "-fx-background-radius: 12;"
-                )
-        );
-    }
-
-    private void styleSecondaryButton(Button btn) {
-        btn.setStyle(
-                "-fx-background-color: #dee2e6;" +
-                        "-fx-text-fill: #333;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-padding: 8 14;" +
-                        "-fx-background-radius: 10;"
-        );
-    }
-
 
     // --- Setters (for use in CheckoutPage and History) ---
     public void setDiscount(double discount) {

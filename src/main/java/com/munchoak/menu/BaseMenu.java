@@ -769,95 +769,107 @@ public class BaseMenu {
             addOnSection.getChildren().add(optionalLabel); // Add the optional label inside the section for better grouping
         }
 
+        HBox quantityBox = null;
+        Button addToCartDetail = null;
+        if (!Session.isAdmin()) {
+            // Quantity
+            quantityBox = new HBox(10);
+            quantityBox.setAlignment(Pos.CENTER);
+            Button minusBtn = new Button("-");
+            Label qtyLabel = new Label("1");
+            Button plusBtn = new Button("+");
+            minusBtn.setPrefSize(40, 40);
+            plusBtn.setPrefSize(40, 40);
+            minusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
+            plusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
+            qtyLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            quantityBox.getChildren().addAll(minusBtn, qtyLabel, plusBtn);
 
-        // Quantity
-        HBox quantityBox = new HBox(10);
-        quantityBox.setAlignment(Pos.CENTER);
-        Button minusBtn = new Button("-");
-        Label qtyLabel = new Label("1");
-        Button plusBtn = new Button("+");
-        minusBtn.setPrefSize(40, 40);
-        plusBtn.setPrefSize(40, 40);
-        minusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
-        plusBtn.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold;");
-        qtyLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        quantityBox.getChildren().addAll(minusBtn, qtyLabel, plusBtn);
-
-        final int[] currentQuantity = {1};
-        minusBtn.setOnAction(ev -> {
-            if (currentQuantity[0] > 1) {
-                currentQuantity[0]--;
-                qtyLabel.setText(String.valueOf(currentQuantity[0]));
-            }
-        });
-        plusBtn.setOnAction(ev -> {
-            currentQuantity[0]++;
-            qtyLabel.setText(String.valueOf(currentQuantity[0]));
-        });
-
-        // Add to Cart button
-        Button addToCartDetail = new Button("Add to cart");
-        styleMainButton(addToCartDetail);
-        addToCartDetail.setPrefWidth(Double.MAX_VALUE);
-        addToCartDetail.setOnAction(ev -> {
-            if (Session.isGuest()) {
-                Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.TRANSPARENT);
-                notifyPopup.setAlwaysOnTop(true);
-                Label notifyLabel = new Label("Please Login !");
-                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
-                VBox notifyBox = new VBox(notifyLabel);
-                notifyBox.setAlignment(Pos.CENTER);
-                notifyBox.setStyle("-fx-background-color: transparent;");
-                Scene notifyScene = new Scene(notifyBox, 200, 50);
-                notifyScene.setFill(Color.TRANSPARENT);
-                notifyPopup.setScene(notifyScene);
-                notifyPopup.show();
-                PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                delay.setOnFinished(e2 -> notifyPopup.close());
-                delay.play();
-                dialog.close();
-            } else {
-
-                if (food.getQuantity() <= 0) {
-                    showAlert("Stock Empty", "This item is out of stock.");
-                    return;
+            final int[] currentQuantity = {1};
+            minusBtn.setOnAction(ev -> {
+                if (currentQuantity[0] > 1) {
+                    currentQuantity[0]--;
+                    qtyLabel.setText(String.valueOf(currentQuantity[0]));
                 }
+            });
+            plusBtn.setOnAction(ev -> {
+                currentQuantity[0]++;
+                qtyLabel.setText(String.valueOf(currentQuantity[0]));
+            });
 
-                // Calculate per-item add-on total
-                double addonPerItem = currentTotalPriceHolder[0] - basePrice;
 
-                // Deduct actual selected quantity (not hardcoded -1)
-                int selectedQty = currentQuantity[0];
-                food.setQuantity(food.getQuantity() - selectedQty);
+            // Add to Cart button
+            addToCartDetail = new Button("Add to cart");
+            styleMainButton(addToCartDetail);
+            addToCartDetail.setPrefWidth(Double.MAX_VALUE);
+            addToCartDetail.setOnAction(ev -> {
+                if (Session.isGuest()) {
+                    Stage notifyPopup = new Stage();
+                    notifyPopup.initStyle(StageStyle.TRANSPARENT);
+                    notifyPopup.setAlwaysOnTop(true);
+                    Label notifyLabel = new Label("Please Login !");
+                    notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                    VBox notifyBox = new VBox(notifyLabel);
+                    notifyBox.setAlignment(Pos.CENTER);
+                    notifyBox.setStyle("-fx-background-color: transparent;");
+                    Scene notifyScene = new Scene(notifyBox, 200, 50);
+                    notifyScene.setFill(Color.TRANSPARENT);
+                    notifyPopup.setScene(notifyScene);
+                    notifyPopup.show();
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(e2 -> notifyPopup.close());
+                    delay.play();
+                    dialog.close();
+                } else {
 
-                cart.addToCart(food.getId(), selectedQty, addonPerItem);  // Pass add-on per item
-                updateCartIcon();
-                // Popup notification
-                Stage notifyPopup = new Stage();
-                notifyPopup.initStyle(StageStyle.TRANSPARENT);
-                notifyPopup.setAlwaysOnTop(true);
-                Label notifyLabel = new Label(food.getName() + " added to cart!");
-                notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
-                VBox notifyBox = new VBox(notifyLabel);
-                notifyBox.setAlignment(Pos.CENTER);
-                notifyBox.setStyle("-fx-background-color: transparent;");
-                Scene notifyScene = new Scene(notifyBox, 200, 50);
-                notifyScene.setFill(Color.TRANSPARENT);
-                notifyPopup.setScene(notifyScene);
-                notifyPopup.show();
-                PauseTransition delay = new PauseTransition(Duration.seconds(2));
-                delay.setOnFinished(e2 -> notifyPopup.close());
-                delay.play();
-                dialog.close();
-                updateView();
-            }
-        });
+                    if (food.getQuantity() <= 0) {
+                        showAlert("Stock Empty", "This item is out of stock.");
+                        return;
+                    }
+
+                    // Calculate per-item add-on total
+                    double addonPerItem = currentTotalPriceHolder[0] - basePrice;
+
+                    // Deduct actual selected quantity (not hardcoded -1)
+                    int selectedQty = currentQuantity[0];
+                    food.setQuantity(food.getQuantity() - selectedQty);
+
+                    cart.addToCart(food.getId(), selectedQty, addonPerItem);  // Pass add-on per item
+                    updateCartIcon();
+                    // Popup notification
+                    Stage notifyPopup = new Stage();
+                    notifyPopup.initStyle(StageStyle.TRANSPARENT);
+                    notifyPopup.setAlwaysOnTop(true);
+                    Label notifyLabel = new Label(food.getName() + " added to cart!");
+                    notifyLabel.setStyle("-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 10;");
+                    VBox notifyBox = new VBox(notifyLabel);
+                    notifyBox.setAlignment(Pos.CENTER);
+                    notifyBox.setStyle("-fx-background-color: transparent;");
+                    Scene notifyScene = new Scene(notifyBox, 200, 50);
+                    notifyScene.setFill(Color.TRANSPARENT);
+                    notifyPopup.setScene(notifyScene);
+                    notifyPopup.show();
+                    PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                    delay.setOnFinished(e2 -> notifyPopup.close());
+                    delay.play();
+                    dialog.close();
+                    updateView();
+                }
+            });
+        }
+
 
         // Info VBox
         VBox infoVBox = new VBox(15);
-        infoVBox.setPrefWidth(400);
-        infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, quantityBox, addToCartDetail);
+        if (!Session.isAdmin()) {
+
+            infoVBox.setPrefWidth(400);
+            infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection, quantityBox, addToCartDetail);
+        } else {
+            infoVBox.setPrefWidth(200);
+            infoVBox.getChildren().addAll(priceLabel, descLabel, cuisineLabel, addOnSection);
+        }
+
 
         center.getChildren().addAll(largeImgView, infoVBox);
         root.setCenter(scrollPane);

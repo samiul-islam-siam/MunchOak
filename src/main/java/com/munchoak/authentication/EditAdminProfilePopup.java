@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class AdminEditProfilePopup {
+public class EditAdminProfilePopup {
 
     public static void show(Stage owner, Runnable onProfileUpdated) {
         Stage popup = new Stage();
@@ -33,26 +33,50 @@ public class AdminEditProfilePopup {
         layout.setMaxWidth(400);
         layout.setPrefWidth(400);
 
-        // Common fields
+        Label adminIdLabel = new Label("Admin ID:");
         Label usernameLabel = new Label("Username:");
         Label emailLabel = new Label("Email:");
         Label contactLabel = new Label("Contact No:");
         Label newPassLabel = new Label("New Password:");
         Label confirmPassLabel = new Label("Confirm Password:");
 
-        for (Label label : new Label[]{usernameLabel, emailLabel, contactLabel, newPassLabel, confirmPassLabel}) {
+        for (Label label : new Label[]{adminIdLabel, usernameLabel, emailLabel, contactLabel, newPassLabel, confirmPassLabel}) {
             label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: black;");
             label.setPrefWidth(120);
         }
 
+        TextField adminIdField = new TextField(AdminStorage.ADMIN_ID);
+        adminIdField.setDisable(true);
+        adminIdField.setEditable(false);
+
         TextField usernameField = new TextField(Session.getCurrentUsername());
+        usernameField.setDisable(true);
+        usernameField.setEditable(false);
+
         TextField emailField = new TextField(Session.getCurrentEmail());
         TextField contactField = new TextField(Session.getCurrentContactNo());
+
         PasswordField newPassField = new PasswordField();
         PasswordField confirmPassField = new PasswordField();
-
         newPassField.setPromptText("Enter new password");
         confirmPassField.setPromptText("Confirm new password");
+
+        Label prefix = new Label("Password Strength:");
+        prefix.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: black;");
+        Label strengthWord = new Label();
+        strengthWord.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #B8860B;");
+        HBox strengthBox = new HBox(5, prefix, strengthWord);
+        strengthBox.setAlignment(Pos.CENTER_LEFT);
+
+        newPassField.textProperty().addListener((obs, o, n) ->
+                strengthWord.setText(PasswordPolicy.strengthWord(n))
+        );
+
+        Label rulesLabel = new Label(PasswordPolicy.rulesText());
+        rulesLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: black; -fx-font-weight: normal;");
+        rulesLabel.setWrapText(true);
+        rulesLabel.setMaxWidth(380);
+        rulesLabel.setMinHeight(Region.USE_PREF_SIZE);
 
         Label status = new Label();
         status.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
@@ -69,39 +93,29 @@ public class AdminEditProfilePopup {
         buttonRow.setAlignment(Pos.CENTER);
 
         saveBtn.setOnAction(e -> {
-            String newUser = usernameField.getText().trim();
             String newEmail = emailField.getText().trim();
             String newContact = contactField.getText().trim();
             String newPass = newPassField.getText().trim();
             String confirmPass = confirmPassField.getText().trim();
 
-            // Preserve old values if blank
-            if (newUser.isEmpty()) newUser = Session.getCurrentUsername();
             if (newEmail.isEmpty()) newEmail = Session.getCurrentEmail();
             if (newContact.isEmpty()) newContact = Session.getCurrentContactNo();
 
-            // Password update only if provided
             if (!newPass.isEmpty() || !confirmPass.isEmpty()) {
                 if (!newPass.equals(confirmPass)) {
                     showTempStatus(status, "Passwords do not match!", Color.BLUE);
                     return;
                 }
-                // In AdminEditProfilePopup.java
+                if (!PasswordPolicy.isValid(newPass)) {
+                    showTempStatus(status, "Invalid password format!", Color.BLUE);
+                    return;
+                }
                 AdminStorage.updateAdminPassword(AdminStorage.ADMIN_ID, newPass);
-
-                showTempStatus(status, "Password updated successfully!", Color.WHITE);
-
-                javafx.animation.PauseTransition closeDelay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
-                closeDelay.setOnFinished(ev -> popup.close());
-                closeDelay.play();
-
             }
 
-            // Update admin profile info safely
-            AdminStorage.updateAdminInfo(newUser, newEmail, newContact);
+            AdminStorage.updateAdminContactAndEmail(newEmail, newContact);
             Session.getMenuClient().sendAdminFileUpdate();
 
-            // Update Session
             try {
                 Session.refreshAdminFromFile();
             } catch (IOException ex) {
@@ -110,15 +124,23 @@ public class AdminEditProfilePopup {
             }
 
             showTempStatus(status, "Admin profile updated successfully!", Color.WHITE);
+
+            javafx.animation.PauseTransition closeDelay =
+                    new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
+            closeDelay.setOnFinished(ev -> popup.close());
+            closeDelay.play();
+
             if (onProfileUpdated != null) onProfileUpdated.run();
         });
 
         layout.getChildren().addAll(
+                adminIdLabel, adminIdField,
                 usernameLabel, usernameField,
                 emailLabel, emailField,
                 contactLabel, contactField,
                 newPassLabel, newPassField,
                 confirmPassLabel, confirmPassField,
+                strengthBox, rulesLabel,
                 buttonRow, status
         );
 
@@ -129,16 +151,16 @@ public class AdminEditProfilePopup {
         );
         layout.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        popup.setScene(new Scene(layout, 450, 600));
+        popup.setScene(new Scene(layout, 450, 650));
         popup.show();
     }
 
     private static void showTempStatus(Label status, String message, Color color) {
         status.setText(message);
         status.setTextFill(color);
-        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(2));
+        javafx.animation.PauseTransition pause =
+                new javafx.animation.PauseTransition(javafx.util.Duration.seconds(2));
         pause.setOnFinished(ev -> status.setText(""));
         pause.play();
     }
 }
-

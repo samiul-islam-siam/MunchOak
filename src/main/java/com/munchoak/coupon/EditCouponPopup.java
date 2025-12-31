@@ -30,7 +30,6 @@ public class EditCouponPopup {
         popup.setTitle("Edit Coupon");
 
         // Load existing coupons
-
         List<CouponStorage.Coupon> coupons = CouponStorage.loadCoupons();
 
         ComboBox<String> couponDropdown = new ComboBox<>();
@@ -70,23 +69,23 @@ public class EditCouponPopup {
             String newExpiry = null;
             Integer newUsageLimit = null;
             if (!discountText.isEmpty()) {
-            try {
-                // newDiscount = Double.parseDouble(discountText);
-                double d = Double.parseDouble(discountText);
-                if (d <= 0 || d >= 1) {
-                    status.setText("Discount must be between 0.01 and 0.99");
+                try {
+                    // newDiscount = Double.parseDouble(discountText);
+                    double d = Double.parseDouble(discountText);
+                    if (d <= 0 || d >= 1) {
+                        status.setText("Discount must be between 0.01 and 0.99");
+                        status.setTextFill(javafx.scene.paint.Color.RED);
+                        clearMessageAfterDelay(status);
+                        return;
+                    }
+                    newDiscount = d;
+                } catch (NumberFormatException ex) {
+                    status.setText("Invalid discount format!");
                     status.setTextFill(javafx.scene.paint.Color.RED);
                     clearMessageAfterDelay(status);
                     return;
                 }
-                newDiscount = d;
-            } catch (NumberFormatException ex) {
-                status.setText("Invalid discount format!");
-                status.setTextFill(javafx.scene.paint.Color.RED);
-                clearMessageAfterDelay(status);
-                return;
             }
-        }
 
             if (!expiryText.isEmpty()) {
                 if (!expiryText.matches("\\d{4}-\\d{2}-\\d{2}")) {
@@ -103,6 +102,7 @@ public class EditCouponPopup {
                         clearMessageAfterDelay(status);
                         return;
                     }
+                    newExpiry = expiryDate.toString();
                 } catch (DateTimeParseException ex) {
                     status.setText("Invalid expiry date format!");
                     status.setTextFill(javafx.scene.paint.Color.RED);
@@ -110,7 +110,7 @@ public class EditCouponPopup {
                     return;
                 }
             }
-           // int newUsageLimit;
+            // int newUsageLimit;
             if (!usageText.isEmpty()) {
 
                 try {
@@ -131,7 +131,7 @@ public class EditCouponPopup {
                 }
             }
             try {
-                CouponStorage.editCoupon(selectedCode, newDiscount,newExpiry,newUsageLimit);
+                CouponStorage.editCoupon(selectedCode, newDiscount, newExpiry, newUsageLimit);
                 Session.getMenuClient().sendCouponUpdate();
                 status.setText("Coupon updated successfully!");
                 PauseTransition closeDelay = new PauseTransition(Duration.seconds(2));
@@ -147,7 +147,7 @@ public class EditCouponPopup {
             }
         });
 
-        VBox box = new VBox(12, couponDropdown, discountField, expiryField,usageLimitField, saveBtn, status);
+        VBox box = new VBox(12, couponDropdown, discountField, expiryField, usageLimitField, saveBtn, status);
         box.setAlignment(Pos.CENTER);
         box.setPadding(new Insets(20));
         box.setMaxWidth(300);
@@ -162,10 +162,11 @@ public class EditCouponPopup {
         onSuccess.run();
 
     }
-        private static void clearMessageAfterDelay(Label status) {
-            PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2 seconds
-            delay.setOnFinished(evt -> status.setText(""));
-            delay.play();
-        }
+
+    private static void clearMessageAfterDelay(Label status) {
+        PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2 seconds
+        delay.setOnFinished(evt -> status.setText(""));
+        delay.play();
     }
+}
 

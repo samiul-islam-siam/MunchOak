@@ -42,6 +42,7 @@ public class MenuEdit {
         this.owner = owner;
         buildForm();
     }
+
     public VBox getFormBox() {
         // ensure visibility defaults are consistent with previous behavior
         if (formBox == null) buildForm();
@@ -160,7 +161,6 @@ public class MenuEdit {
         });
 
 
-
         HBox buttonRow = new HBox(addOrUpdateButton);
         buttonRow.setAlignment(Pos.CENTER);
 
@@ -177,7 +177,7 @@ public class MenuEdit {
         // ================================
         // FINAL FORM CONTAINER
         // ================================
-        formBox = new VBox(10,backBtn, twoColForm, categoryButtons, imageRow, buttonRow);
+        formBox = new VBox(10, backBtn, twoColForm, categoryButtons, imageRow, buttonRow);
         formBox.setPadding(new Insets(5));
 
         formBox.setMaxWidth(Double.MAX_VALUE);
@@ -545,8 +545,7 @@ public class MenuEdit {
                 owner.showAlert("Error", "Invalid Add-on 1 price.");
                 return;
             }
-        }else
-        {
+        } else {
             currentEditingFood.setAddOnePrice(0);
         }
 
@@ -564,8 +563,7 @@ public class MenuEdit {
                 owner.showAlert("Error", "Invalid Add-on 2 price.");
                 return;
             }
-        }else
-        {
+        } else {
             currentEditingFood.setAddTwoPrice(0);
         }
 
