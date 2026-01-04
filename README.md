@@ -164,7 +164,7 @@ MunchOak/
 | **IntelliJ IDEA CE v2025.2.2**         | Development environment                  |
 | **Maven**                              | Build automation & dependency management |
 
-## ▶️ **How to Run the Application**
+## ▶️ **How to Run the Application in IDE**
 
 ### **Run the Main Application**
 
@@ -183,25 +183,25 @@ MunchOak/
    Main Server will run at port 8080 and Chat Server will run at port 5050
 3. All other devices must be connected to the **same Wi-Fi network**
 4. After running app, if servers are running already then it will automatically detect it and connect to it.
-5. To test connectivity, run:
+5. You can also check the connectivity as follows: 
+-  Run in the command prompt:
 
    ```
    ping <server IPv4 address>
    ```
 
-   Example:
+- For example:
 
    ```
    ping 10.33.22.87
    ```
-   
-## Executable File Link
 
-   MunchOak App: `https://drive.google.com/file/d/18RLX461iS06rpHKSpuBKuonKj5VyW_My/view?usp=drive_link` <br>
-   
-   Run this command in the terminal before running the app:
-   
-   `netsh advfirewall firewall add rule name="MunchOak UDP Discovery" dir=in action=allow protocol=UDP localport=5051`
+## Executable File and Installer Link
+
+- Exe file: [MunchOak App-3.0.exe](https://drive.google.com/file/d/1Whb9V8VTa6S56lOjPijQDeELMSlrZHFA/view?usp=drive_link)
+- Installer: [MunchOak App-3.0.msi](https://drive.google.com/file/d/1rJdzsGo9nasJLeNU1ciBrLAamc9d8pvM/view?usp=drive_link)
+
+_**Note: You have to run the downloaded app as "run as administrator"**_
 
 ## **Contributors**
 
