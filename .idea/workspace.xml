@@ -9,11 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="updated readme">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/AppLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/AppLauncher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/network/LanDiscoveryBroadcaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/network/LanDiscoveryBroadcaster.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" afterDir="false" />
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="bug fixation">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/menu/MenuEdit.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,14 +190,7 @@
       <workItem from="1767411321341" duration="1063000" />
       <workItem from="1767533664430" duration="2143000" />
       <workItem from="1767835429023" duration="2183000" />
-    </task>
-    <task id="LOCAL-00064" summary="login, logout fixed">
-      <option name="closed" value="true" />
-      <created>1763608427829</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1763608427838</updated>
+      <workItem from="1767845932997" duration="349000" />
     </task>
     <task id="LOCAL-00065" summary="login, logout fixed">
       <option name="closed" value="true" />
@@ -586,14 +576,21 @@
       <option name="project" value="LOCAL" />
       <updated>1767534568985</updated>
     </task>
-    <option name="localTasksCounter" value="113" />
+    <task id="LOCAL-00113" summary="bug fixation">
+      <option name="closed" value="true" />
+      <created>1767846160813</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1767846160813</updated>
+    </task>
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Admin page fix" />
     <MESSAGE value="MenuServer &amp; Cart empty issue fixed" />
     <MESSAGE value="Run by one click" />
     <MESSAGE value="compressed images" />
@@ -618,7 +615,8 @@
     <MESSAGE value="README commit update" />
     <MESSAGE value="Small bug fix" />
     <MESSAGE value="updated readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated readme" />
+    <MESSAGE value="bug fixation" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug fixation" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

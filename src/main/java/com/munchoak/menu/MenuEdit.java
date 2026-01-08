@@ -390,28 +390,7 @@ public class MenuEdit {
             owner.showAlert("Error", "Invalid Quantity.");
             return;
         }
-//        double addOnePrice;
-//        try {
-//            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
-//            if (addOnePrice < 0) {
-//                owner.showAlert("Error", "Price cannot be negative.");
-//                return;
-//            }
-//        } catch (NumberFormatException e) {
-//            owner.showAlert("Error", "Invalid add-on price.");
-//            return;
-//        }
-//        double addTwoPrice;
-//        try {
-//            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
-//            if (addTwoPrice < 0) {
-//                owner.showAlert("Error", "Price cannot be negative.");
-//                return;
-//            }
-//        } catch (NumberFormatException e) {
-//            owner.showAlert("Error", "Invalid add-on price.");
-//            return;
-//        }
+
         double addOnePrice = 0;
         String addOneText = addOnePriceField.getText().trim();
         if (!addOneText.isEmpty()) {
@@ -507,30 +486,7 @@ public class MenuEdit {
 
         currentEditingFood.setAddOne(addOneField.getText().trim());
         currentEditingFood.setAddTwo(addTwoField.getText().trim());
-//        double addOnePrice;
-//        try {
-//            addOnePrice = Double.parseDouble(addOnePriceField.getText().trim());
-//            if (addOnePrice < 0) {
-//                owner.showAlert("Error", "Price cannot be negative.");
-//                return;
-//            }
-//            currentEditingFood.setAddOnePrice(addOnePrice);
-//        } catch (NumberFormatException e) {
-//            owner.showAlert("Error", "Invalid price.");
-//            return;
-//        }
-//        double addTwoPrice;
-//        try {
-//            addTwoPrice = Double.parseDouble(addTwoPriceField.getText().trim());
-//            if (addTwoPrice < 0) {
-//                owner.showAlert("Error", "Price cannot be negative.");
-//                return;
-//            }
-//            currentEditingFood.setAddTwoPrice(addTwoPrice);
-//        } catch (NumberFormatException e) {
-//            owner.showAlert("Error", "Invalid price.");
-//            return;
-//        }
+
         double addOnePrice = 0;
         String addOneText = addOnePriceField.getText().trim();
         if (!addOneText.isEmpty()) {
