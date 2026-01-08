@@ -27,7 +27,7 @@ public final class LanDiscoveryBroadcaster {
         t.start();
     }
     private static void run(int menuPort, int chatPort) {
-        try (DatagramSocket socket = new DatagramSocket()) {
+        try (DatagramSocket socket = new DatagramSocket()) { // UDP protocol
             socket.setBroadcast(true);
 
             while (true) {

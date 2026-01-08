@@ -9,19 +9,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="Small bug fix">
+    <list default="true" id="b57ce651-8770-48a6-a199-29f97fa07826" name="Changes" comment="updated readme">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/AppLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/AppLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/munchoak/network/LanDiscoveryBroadcaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/munchoak/network/LanDiscoveryBroadcaster.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/admin.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupon_usage.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupon_usage.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/coupons.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/menu_pointer.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/menu_pointer.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/new_menu_with_addons2.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/notifications.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/notifications.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/payments.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/reservations.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/reservations.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/users.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/manager/data/users.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/munchoak/network/Chats/siam.dat" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/munchoak/network/Chats/siam.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,15 +191,8 @@
       <workItem from="1767242324596" duration="5024000" />
       <workItem from="1767368983406" duration="724000" />
       <workItem from="1767411321341" duration="1063000" />
-      <workItem from="1767533664430" duration="792000" />
-    </task>
-    <task id="LOCAL-00063" summary="menu updated">
-      <option name="closed" value="true" />
-      <created>1763607106264</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1763607106264</updated>
+      <workItem from="1767533664430" duration="2143000" />
+      <workItem from="1767835429023" duration="2183000" />
     </task>
     <task id="LOCAL-00064" summary="login, logout fixed">
       <option name="closed" value="true" />
@@ -593,14 +578,21 @@
       <option name="project" value="LOCAL" />
       <updated>1767160921593</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <task id="LOCAL-00112" summary="updated readme">
+      <option name="closed" value="true" />
+      <created>1767534568985</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1767534568985</updated>
+    </task>
+    <option name="localTasksCounter" value="113" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Cart count added" />
     <MESSAGE value="Admin page fix" />
     <MESSAGE value="MenuServer &amp; Cart empty issue fixed" />
     <MESSAGE value="Run by one click" />
@@ -625,7 +617,8 @@
     <MESSAGE value="Final commit" />
     <MESSAGE value="README commit update" />
     <MESSAGE value="Small bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Small bug fix" />
+    <MESSAGE value="updated readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated readme" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/OOP_project$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1765425537566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />

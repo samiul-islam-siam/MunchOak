@@ -4,6 +4,7 @@ import com.munchoak.mainpage.Home;
 import com.munchoak.network.ChatServer;
 import com.munchoak.network.LanDiscoveryBroadcaster;
 import com.munchoak.network.LanDiscoveryClient;
+import com.munchoak.network.ServerNotFoundException;
 import com.munchoak.server.MainServer;
 
 import java.io.IOException;
@@ -14,8 +15,8 @@ public class AppLauncher {
     public static void main(String[] args) {
 
         try {
-            LanDiscoveryClient.Result server =
-                    LanDiscoveryClient.discover(2000);
+            LanDiscoveryClient.Result server = LanDiscoveryClient.discover(2000);
+            requireServer(server); // throws if not found
 
             System.out.println("Server found on LAN: " + server.host);
             String[] clientArgs = {
@@ -27,8 +28,10 @@ public class AppLauncher {
 
             return;
 
-        } catch (Exception ignored) {
+        } catch (ServerNotFoundException e) {
             System.out.println("No LAN server found. Continuing local logic...");
+        } catch (Exception e) {
+            System.err.println("LAN discovery failed: " + e.getMessage());
         }
 
         boolean isMenuServerRunning = isPortInUse("localhost", 8080);
@@ -59,6 +62,10 @@ public class AppLauncher {
         LanDiscoveryBroadcaster.start(8080, 5050);
 
         Home.main(args);
+    }
+
+    private static void requireServer(LanDiscoveryClient.Result server) throws ServerNotFoundException {
+        if (server == null) throw new ServerNotFoundException();
     }
 
     private static boolean isPortInUse(String host, int port) {
